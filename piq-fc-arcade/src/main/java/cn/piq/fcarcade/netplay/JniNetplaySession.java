@@ -77,8 +77,8 @@ public final class JniNetplaySession implements AutoCloseable {
         var p=cn.piq.fcarcade.core.libretro.GenericLibretroNesCore.profile(false);
         return new LibretroProfile(p.name(),p.extension(),p.fullPath(),p.devices(),false,p.options(),
                 Map.of("windows-x64",new LibretroProfile.Artifact(
-                        "/core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r1.dll",
-                        "81989a6d9932c928a9a75b63ae7100381b99529ddba3064d0d92d66c2162aabe")));
+                        "/core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r2.dll",
+                        "591976547fa49a29ad3c20acecd96ef46eed0a7376398295a9468cfaae55c05c")));
     }
     public synchronized void persistence(NetplayProcess.Persistence value) {
         if(started||closed||!grant.host())throw new IllegalStateException("主持启动前绑定保存");

@@ -113,6 +113,31 @@ class JniNetplaySessionTest {
         assertNotEquals(FcNetplaySaves.key(false,"card|1"),FcNetplaySaves.key(false,true,"card|1"));
         assertThrows(IllegalArgumentException.class,()->FcNetplaySaves.key(true,true,"card|1"));
     }
+    @Test void r2CannotReadOrOverwriteThePreviousJniTrialSave() {
+        var p=JniNetplaySession.profile();
+        var descriptor="PIQ-JNI-Netplay-v1\n81989a6d9932c928a9a75b63ae7100381b99529ddba3064d0d92d66c2162aabe\n"
+                +p.name()+"\n"+p.extension()+"\n"+p.fullPath()+"\n"+p.devices()+"\n"+p.options();
+        String rom=NetplaySaveState.hash(ROM);
+        var old=new NetplaySaveState.Identity(NetplaySaveState.hash(descriptor.getBytes(java.nio.charset.StandardCharsets.UTF_8)),
+                FcNetplaySaves.identity(false,rom).content());
+        var bytes=NetplaySaveState.encode(new NetplaySaveState.Parts(old,8,new byte[]{1},new byte[0],new byte[0]));
+        assertFalse(FcNetplaySaves.accepts(false,true,rom,bytes));
+        assertEquals("core|nes-jni-netplay-v2|card|1",FcNetplaySaves.key(false,true,"card|1"));
+        assertNotEquals("core|nes-jni-netplay-v1|card|1",FcNetplaySaves.key(false,true,"card|1"));
+    }
+    @Test void inexactCoreStillFailsClosedAndCannotSave()throws Exception {
+        Core broken=new Core(){@Override public void restore(byte[] bytes){super.restore(bytes);state++;}};
+        var run=new JniNetplaySession(new NetplayProcess.Grant(701,UUID.randomUUID(),true,true,0),()->ROM,
+                packet->{},()->broken);
+        AtomicInteger commits=new AtomicInteger();
+        run.persistence(new NetplayProcess.Persistence(){
+            public byte[] load(NetplaySaveState.Identity identity){return null;}
+            public CompletableFuture<Void> save(byte[] bytes){commits.incrementAndGet();return CompletableFuture.completedFuture(null);}
+        });
+        run.start();run.terminated().get(10,TimeUnit.SECONDS);
+        assertNotNull(run.error());assertFalse(run.ready());assertTrue(broken.closed);
+        assertEquals(0,commits.get());
+    }
     @Test void invalidSpectatorCannotStopTheHost()throws Exception {
         try(var room=new Room(false)) {
             until(room.host::ready,room);

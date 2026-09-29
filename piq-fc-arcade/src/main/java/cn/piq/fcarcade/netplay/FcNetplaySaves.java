@@ -7,12 +7,12 @@ public final class FcNetplaySaves {
     private FcNetplaySaves(){}
     public static String prefix(boolean gun){return gun?"core|nes-netplay-zapper-v1|":"core|nes-netplay-v1|";}
     public static String key(boolean gun,String owner){return prefix(gun)+owner;}
-    public static String jniPrefix(){return "core|nes-jni-netplay-v1|";}
+    public static String jniPrefix(){return "core|nes-jni-netplay-v2|";}
     public static String key(boolean gun,boolean jni,String owner){if(jni&&gun)throw new IllegalArgumentException("JNI Netplay 光枪尚未支持");return jni?jniPrefix()+owner:key(gun,owner);}
     public static NetplaySaveState.Identity jniIdentity(String rom){
         var original=identity(false,rom);
         var p=JniNetplaySession.profile();
-        var descriptor="PIQ-JNI-Netplay-v1\n"+p.cores().get("windows-x64").sha256()+"\n"
+        var descriptor="PIQ-JNI-Netplay-v2\n"+p.cores().get("windows-x64").sha256()+"\n"
                 +p.name()+"\n"+p.extension()+"\n"+p.fullPath()+"\n"+p.devices()+"\n"+p.options();
         return new NetplaySaveState.Identity(NetplaySaveState.hash(descriptor.getBytes(java.nio.charset.StandardCharsets.UTF_8)),original.content());
     }

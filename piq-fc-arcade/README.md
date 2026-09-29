@@ -4,7 +4,11 @@
 
 FC 构建一期已接入[固定外部输入与构建说明](../source-control/BUILDING.md)：先导入/校验9个固定哈希输入，再执行 `check jar`，不再隐式读取历史 outputs 或未提交的原生资源。独立源码目录加显式缓存已通过2558项测试（10跳过）；仍需已缓存的Maven依赖，不代表所有附属/原生核心从零构建或Minecraft实机通过。构建验证包不自动安装或成为新发行；同时补齐首次Git误忽略的Java world包。
 
-## 当前 FC76.24：FC JNI Netplay / GBA11 / MD1（2026-09-29）
+## 当前 FC76.25：JNI Netplay 游戏加载修复（2026-09-29）
+
+修复 FC 方块加载的 JNI 能力位校验、VRC7 初始内存权限和 MMC3 等游戏的禁用映射恢复，保留精确恢复/CRC。双方主包同版，新 JNI r2 试验档与旧 r1 隔离、不自动迁移；普通模式/旧 RetroArch/附属不变。[安装、存档与验证边界](design/FC76.25-JNI游戏加载修复.md)。本轮未代装、重启或发布，Minecraft 真人待验。
+
+## 沿用 FC76.24：FC JNI Netplay / GBA11 / MD1（2026-09-29）
 
 新增显式确认的FC普通双手柄JNI回滚联机及独立试验存档，GBA11接共用JNI，MD1新增私人单人MD2附属。默认进程/旧RetroArch不替换；SFC/街机没有随之切JNI Netplay。最终核心与专服加载结果、安装入口及未验范围见[本轮指南](design/FC76.24-GBA11-MD1-JNI试用说明.md)。没有代装/发布，不标稳定。
 

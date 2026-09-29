@@ -26,7 +26,7 @@ def pinnedCoreInputs = [
         'core/nes_rust_wasm_bg.wasm': piqLockedInput('nes-wasm'),
         'core/nes_zapper_v1.wasm': piqLockedInput('nes-zapper-wasm'),
         'core/nes_mapper19_v1.wasm': piqLockedInput('nes-mapper19-wasm'),
-        'core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r1.dll': piqLockedInput('mesen-jni-netplay-r1')
+        'core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r2.dll': piqLockedInput('mesen-jni-netplay-r2')
 ]
 def preparePinnedResources = tasks.register('preparePinnedResources', Sync) {
     pinnedCoreInputs.each { resource, input ->
@@ -39,7 +39,9 @@ sourceSets.main.resources.srcDir preparePinnedResources
 def originalResourcesRoot = file('src/main/resources').toPath()
 tasks.named('processResources') {
     // Ignore only old raw copies of pinned binaries, not generated copies or other assets.
-    exclude { element -> pinnedCoreInputs.containsKey(element.path) && element.file.toPath().startsWith(originalResourcesRoot) }
+    exclude { element -> (pinnedCoreInputs.containsKey(element.path) ||
+            element.path == 'core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r1.dll') &&
+            element.file.toPath().startsWith(originalResourcesRoot) }
 }
 
 // FC remains built into the one required main mod. Shared code is an internal

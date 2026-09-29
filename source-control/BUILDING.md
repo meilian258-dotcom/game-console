@@ -1,6 +1,8 @@
 # 从 Git 源码构建：一期（FC 主包）
 
-适用：2026-09-29，FC76.24源码、Java21、项目wrapper锁定Gradle9.2.1与NeoForge21.1.236。这是开发构建说明，不是游戏升级通知；不改变JNI/存档/服务器逻辑。
+适用：2026-09-29，FC76.24/76.25源码、Java21、项目wrapper锁定Gradle9.2.1与NeoForge21.1.236。这是开发构建说明，不是游戏升级通知。
+
+FC76.25 的功能修复将第9项 JNI Netplay 核心更新为 `mesen-jni-netplay-r2`，仍共9个输入；r1缓存不删除且不能代替r2。原生重建入口见 [Mesen r2](../piq-fc-arcade/native-mesen-netplay/README.md)，导入使用 `python source-control/build_inputs.py import --id mesen-jni-netplay-r2 --file "实际重建目录/mesen_piq_jni_netplay_r2.dll"`。游戏行为/存档变更另见 [FC76.25指南](../piq-fc-arcade/design/FC76.25-JNI游戏加载修复.md)。下方第3、4节保留最初76.24构建迁移的历史证据，不作为76.25未修复的结论。
 
 ## 先说明边界
 

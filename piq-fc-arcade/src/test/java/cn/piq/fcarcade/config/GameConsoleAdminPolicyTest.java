@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameConsoleAdminPolicyTest {
     @Test void selectedModesNeverExpandCapabilities() {
-        for(int mask=0;mask<=15;mask++)for(int preferred=-1;preferred<=2;preferred++)for(int fallback=0;fallback<=2;fallback++) {
+        for(int mask=0;mask<=31;mask++)for(int preferred=-1;preferred<=2;preferred++)for(int fallback=0;fallback<=2;fallback++) {
             int result=GameConsoleAdminPolicy.selectNewMode(preferred,mask,fallback);
             assertEquals(preferred>=0&&(mask&(1<<preferred))!=0?preferred:fallback,result);
         }
@@ -21,12 +21,15 @@ class GameConsoleAdminPolicyTest {
         }
     }
     @Test void advertisingNetplayDoesNotSelectItAsAnAutomaticDefault() {
-        for(int legacy=0;legacy<=7;legacy++)for(int preferred=-1;preferred<=2;preferred++)for(int fallback=0;fallback<=2;fallback++) {
+        for(int extra:new int[]{8,16,24})for(int legacy=0;legacy<=7;legacy++)for(int preferred=-1;preferred<=2;preferred++)for(int fallback=0;fallback<=2;fallback++) {
             assertEquals(GameConsoleAdminPolicy.selectNewMode(preferred,legacy,fallback),
-                    GameConsoleAdminPolicy.selectNewMode(preferred,legacy|8,fallback));
+                    GameConsoleAdminPolicy.selectNewMode(preferred,legacy|extra,fallback));
         }
         // Experimental Netplay is an explicit device choice, not a global placement default.
         assertFalse(GameConsoleAdminPolicy.validMode(3));
+        assertFalse(GameConsoleAdminPolicy.validMode(4));
+        assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.selectNewMode(4,31,1));
+        assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.selectNewMode(1,31,4));
         assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.selectNewMode(3,15,1));
         assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.selectNewMode(1,15,3));
     }
@@ -40,7 +43,7 @@ class GameConsoleAdminPolicyTest {
     @Test void malformedDefaultsAreRejected() {
         assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.selectNewMode(-2,7,1));
         assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.selectNewMode(3,7,1));
-        assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.selectNewMode(1,16,1));
+        assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.selectNewMode(1,32,1));
         assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.selectNewMode(1,-1,1));
         assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.selectNewMode(1,7,3));
     }

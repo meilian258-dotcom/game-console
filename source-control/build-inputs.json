@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "scope": "FC76.24 external binary build inputs only; no ROM or user data; not an open-source distribution license grant",
+  "scope": "FC76.25 external binary build inputs only; no ROM or user data; not an open-source distribution license grant",
   "inputs": {
     "jna-5-14-0": {
       "filename": "jna-5.14.0.jar",
@@ -37,12 +37,12 @@
       "legacyPath": "outputs/jni-unified-20260929/crc-audit/fixed-native/piq-retroarch.exe",
       "purpose": "FC build.gradle prepareNetplayRuntime; historical output dependency"
     },
-    "mesen-jni-netplay-r1": {
-      "filename": "mesen_piq_jni_netplay_r1.dll",
+    "mesen-jni-netplay-r2": {
+      "filename": "mesen_piq_jni_netplay_r2.dll",
       "bytes": 3606016,
-      "sha256": "81989a6d9932c928a9a75b63ae7100381b99529ddba3064d0d92d66c2162aabe",
-      "legacyPath": "piq-fc-arcade/src/main/resources/core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r1.dll",
-      "purpose": "FC76.24 fixed JNI Netplay core; corresponding source/build instructions required"
+      "sha256": "591976547fa49a29ad3c20acecd96ef46eed0a7376398295a9468cfaae55c05c",
+      "legacyPath": "piq-fc-arcade/src/main/resources/core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r2.dll",
+      "purpose": "FC76.25 JNI Netplay VRC7 init and inactive bank restore fixes; native-mesen-netplay/build.py corresponding source"
     },
     "nes-zapper-wasm": {
       "filename": "nes_zapper_v1.wasm",
