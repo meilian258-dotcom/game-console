@@ -94,7 +94,10 @@ class PrivateHomeClientTest {
         assertTrue(source.contains("Commands.literal(\"gameconsole-private\")"));
         assertTrue(source("client/ClientArcadeEvents").contains("PrivateHomeClient.install()"));
         String start = between(source, "static String start(", "private static boolean connected()");
-        before(start, "!valid(target)||held(target)==null", "CabinetClientOwner.acquire(reservation)");
+        before(start, "!valid(target)||(!target.provider.cartridgePower()&&held(target)==null)", "CabinetClientOwner.acquire(reservation)");
+        assertTrue(source.contains("default boolean cartridgePower(){return false;}"));
+        assertTrue(source.contains("if(p.cartridgePower())continue;"));
+        assertTrue(source.contains("!provider.matches(mc.player,item,console)||!ControllerCapture.unique(mc.player,item,lease,provider::identity)"));
         before(start, "CabinetClientOwner.acquire(reservation)", "new Run(target,reservation,rom,root,backend)");
         assertTrue(start.contains("if(current==null||current.owner!=reservation)CabinetClientOwner.release(reservation)"));
         assertTrue(source.contains("engine=target.provider.create(rom,saveRoot,backend);engine.paused(true)"));

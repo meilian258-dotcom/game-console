@@ -60,7 +60,7 @@ python source-control/audit.py
 **源码已纳入 Git，不等于从干净克隆即可完整打包所有 MOD。** 首次 Git 接管未改构建；随后 FC 构建一期已完成，入口为 [固定输入及构建说明](source-control/BUILDING.md)：
 
 - FC 主包的 JNA/Mesen、JNI 桥、RetroArch、三个 WASM 和 JNI Netplay 核心，现按 `source-control/build-inputs.json` 从显式离线缓存读取，校验大小/SHA；不再回退旧 `outputs`、默认 JNI dist 或原资源目录的未提交二进制。必须先导入合法固定输入，不是自动从公网下载核心。
-- 多个附属依赖主包 `build/libs` 的 FC76.22；Flash 仍有历史 FC61 路径；MD 默认 FC76.24，可通过 `-PgameConsoleJar=` 指定。SFC 家用还依赖 SFC core9 的历史 JAR。
+- 多个附属依赖主包 `build/libs` 的 FC76.22；Flash 仍有历史 FC61 路径；MD alpha.2 默认 FC76.27（共享内容卡服务），可通过 `-PgameConsoleJar=` 指定兼容包。SFC 家用还依赖 SFC core9 的历史 JAR。
 - 街机还使用旧 `piq-runtime-pack-v1.zip` 与固定 FBNeo DLL；GBA、Flash、PvZ 和各原生构建器另有自己的运行库/工具链。第三方 vendored 源码和许可保留，商业游戏内容不入库。
 
 旧路径中的文件仍保留，不能因被忽略就随意删除。`source-control/external-artifacts.json` 是首次接管时的历史盘点，FC 当前构建锁为 `build-inputs.json`；两者都不是全部平台依赖已闭合的证明。缺项应按组件说明重新构建或由维护者提供合法、固定哈希的制品，禁止找一个同名 DLL/JAR 冒充。

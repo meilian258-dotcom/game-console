@@ -1,0 +1,156 @@
+package cn.piq.fcarcade.home.content;
+
+import cn.piq.fcarcade.access.PlayerContentAccess;
+import cn.piq.fcarcade.home.CartridgeComputerBlockEntity;
+import cn.piq.fcarcade.home.CartridgeComputerBinding;
+import cn.piq.fcarcade.home.CartridgeTransfer;
+import cn.piq.retro.storage.ConsoleStorage;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.*;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.*;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
+import static cn.piq.fcarcade.home.content.ContentCardNetwork.*;
+
+/** Shared writer and authorized one-player content transfer. Native execution stays in the addon. */
+public final class ContentCards {
+    public record Adapter(Supplier<Item> item,String label,Set<String> extensions,ContentCardStore.Validator validator){
+        public Adapter{Objects.requireNonNull(item);Objects.requireNonNull(label);extensions=Set.copyOf(extensions);Objects.requireNonNull(validator);}
+    }
+    private static final Map<ResourceLocation,Adapter> ADAPTERS=new ConcurrentHashMap<>();
+    private static final Map<MinecraftServer,State> STATES=new WeakHashMap<>();
+    private static final ThreadPoolExecutor IO=new ThreadPoolExecutor(1,1,30,TimeUnit.SECONDS,new ArrayBlockingQueue<>(8),r->{var t=new Thread(r,"GameConsole-content-card-io");t.setDaemon(true);return t;});
+    private static boolean installed;
+    public static void register(ResourceLocation system,Adapter adapter){if(ADAPTERS.putIfAbsent(system,adapter)!=null)throw new IllegalArgumentException("Duplicate cartridge system");}
+    public static Adapter adapter(ResourceLocation system){return ADAPTERS.get(system);}
+    public static synchronized void install(){if(installed)return;installed=true;
+        NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post event)->tick(event.getServer()));
+        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event)->{var s=STATES.remove(event.getServer());if(s!=null){s.closed=true;s.edits.clear();s.plays.clear();}});
+    }
+    private static State state(ServerPlayer p){return STATES.computeIfAbsent(p.getServer(),s->new State());}
+    // New content-card storage has no legacy directory to migrate. Resolve only here;
+    // directory creation, validation and file reads belong to the bounded IO worker.
+    private static ContentCardStore store(ServerPlayer p,ResourceLocation system){var a=ADAPTERS.get(system);return new ContentCardStore(ConsoleStorage.location(p.getServer().getServerDirectory()).resolve("content-cards").resolve(system.getNamespace()).resolve(system.getPath()),a.extensions,a.validator);}
+    private static boolean online(ServerPlayer p,Object connection){return p!=null&&p.getServer()!=null&&p.getServer().isSameThread()&&!p.hasDisconnected()&&p.connection.getConnection()==connection&&p.getServer().getPlayerList().getPlayer(p.getUUID())==p&&p.isAlive()&&!p.isSpectator();}
+    public static void open(ServerPlayer p,InteractionHand hand,BlockPos pos,ResourceLocation system){
+        var a=ADAPTERS.get(system);if(a==null||!PlayerContentAccess.canBrowse(p)) {say(p,"没有游戏库访问权，请联系管理员。");return;}
+        var level=p.serverLevel();var stack=p.getItemInHand(hand);
+        if(!level.hasChunkAt(pos)||!(level.getBlockEntity(pos) instanceof CartridgeComputerBlockEntity computer)||!stack.is(a.item.get())||stack.getCount()!=1
+                ||p.distanceToSqr(pos.getCenter())>25||!level.mayInteract(p,pos))return;
+        var s=state(p);var old=s.edits.get(p.getUUID());
+        if(old!=null&&System.nanoTime()-old.opened<500_000_000L)return;
+        if(old==null&&s.edits.size()>=4){say(p,"写卡服务繁忙，请稍后重试。");return;}
+        var e=new Edit(p,hand,pos,computer,system,stack);s.edits.put(p.getUUID(),e);
+        reply(p,e,OPEN,a.label+"：选择游戏后明确写入卡带",0,List.of());list(p,s,e,0);
+    }
+    private static boolean valid(ServerPlayer p,State s,Edit e){return !s.closed&&s.edits.get(p.getUUID())==e&&online(p,e.connection)&&p.serverLevel()==e.level&&e.level.hasChunkAt(e.pos)
+            &&e.binding.permits(e.computer.computerId(),p.serverLevel().dimension().location().toString(),e.level.getBlockEntity(e.pos)==e.computer,
+                    e.level.hasChunkAt(e.pos),p.isAlive()&&!p.isSpectator(),PlayerContentAccess.canBrowse(p),e.level.mayInteract(p,e.pos),p.distanceToSqr(e.pos.getCenter()))
+            &&p.getItemInHand(e.hand)==e.stack&&(e.hand==InteractionHand.OFF_HAND||p.getInventory().selected==e.slot)
+            &&ItemStack.matches(e.stack,e.snapshot)&&p.distanceToSqr(e.pos.getCenter())<=25&&e.level.mayInteract(p,e.pos)&&PlayerContentAccess.canBrowse(p)
+            &&System.nanoTime()-e.opened<300_000_000_000L;}
+    public static void handle(ServerPlayer p,Message m){
+        var s=STATES.get(p.getServer());if(s==null)return;
+        var play=s.plays.get(p.getUUID());
+        if(play!=null&&play.token.equals(m.token())&&play.system.equals(m.system())&&play.pos.equals(m.pos())){playMessage(p,s,play,m);return;}
+        var e=s.edits.get(p.getUUID());if(e==null||!e.token.equals(m.token())||!e.system.equals(m.system())||!e.pos.equals(m.pos()))return;
+        if(!valid(p,s,e)){s.edits.remove(p.getUUID());reply(p,e,CANCEL,"写卡已取消：卡带、电脑、距离或权限改变",0,List.of());return;}
+        if(m.op()==CANCEL){s.edits.remove(p.getUUID());return;}
+        if(e.busy)return;
+        try{
+            if(m.op()==LIST){if(System.nanoTime()-e.lastList<1_000_000_000L){reply(p,e,STATUS,"刷新过快，请稍后再试",0,List.of());return;}list(p,s,e,m.offset());}
+            else if(m.op()==WRITE&&e.upload==null){
+                if(!PlayerContentAccess.canUseServerRom(p))throw new IllegalArgumentException("没有使用服务器 ROM 的权限");
+                var selected=e.catalog.stream().filter(v->v.hash().equals(m.hash())).findFirst().orElseThrow();
+                job(p,s,e,()->{e.store.read(selected);return selected;},entry->{
+                    if(!PlayerContentAccess.canUseServerRom(p))throw new IllegalArgumentException("服务器 ROM 权限已撤销");write(p,e,entry,entry.name());
+                });
+            }else if(m.op()==UPLOAD){
+                if(!PlayerContentAccess.canUploadRom(p))throw new IllegalArgumentException("管理员未允许上传 ROM");
+                if(e.upload!=null||m.size()<1||m.size()>ContentCardStore.MAX_BYTES)throw new IllegalArgumentException("上传状态无效");
+                var entry=new ContentCardStore.Entry(m.hash(),m.name(),m.size());
+                if(!e.store.accepts(entry.name()))throw new IllegalArgumentException("文件扩展名不匹配");
+                e.upload=new CartridgeTransfer(m.size(),System.nanoTime());e.entry=entry;reply(p,e,READY,"开始上传到服务器；完成后写卡",0,List.of());
+            }else if(m.op()==PART){
+                if(!PlayerContentAccess.canUploadRom(p)||e.upload==null||e.upload.expired(System.nanoTime()))throw new IllegalArgumentException("上传已取消或超时");
+                e.upload.append(m.offset(),m.data());
+                if(e.upload.received()<e.upload.total())reply(p,e,READY,"正在上传…",e.upload.received(),List.of());
+                else {byte[] complete=e.upload.finish();e.upload=null;var entry=e.entry;
+                    job(p,s,e,()->e.store.store(entry.name(),entry.hash(),complete),stored->{
+                        if(!PlayerContentAccess.canUploadRom(p))throw new IllegalArgumentException("上传权限已撤销；原卡未改动");write(p,e,stored,entry.name());
+                    });
+                }
+            }
+        }catch(RuntimeException error){e.upload=null;reply(p,e,STATUS,"操作失败，原卡未改动："+clean(error),0,List.of());}
+    }
+    private static void list(ServerPlayer p,State s,Edit e,int page){
+        e.lastList=System.nanoTime();if(page<0||page>31)return;
+        job(p,s,e,e.store::list,entries->{e.catalog=entries;int from=Math.min(page*8,entries.size());reply(p,e,LIST,"服务器游戏；上传权限以管理终端为准",page,entries.subList(from,Math.min(from+8,entries.size())));});
+    }
+    private static void write(ServerPlayer p,Edit e,ContentCardStore.Entry entry,String title){
+        ContentCardData.write(e.stack,e.system,entry,title);e.snapshot=e.stack.copy();p.inventoryMenu.broadcastChanges();reply(p,e,STATUS,"写卡成功："+title,0,List.of());
+    }
+    private static <T> void job(ServerPlayer p,State s,Edit e,Callable<T> task,Consumer<T> done){
+        e.busy=true;var server=p.getServer();
+        try{IO.execute(()->{T result=null;Exception failure=null;try{result=task.call();}catch(Exception error){failure=error;}var value=result;var error=failure;
+            server.execute(()->{e.busy=false;if(!valid(p,s,e))return;if(error!=null){reply(p,e,STATUS,"操作失败，原卡未改动："+clean(error),0,List.of());return;}
+                try{done.accept(value);}catch(RuntimeException invalid){reply(p,e,STATUS,"操作取消："+clean(invalid),0,List.of());}});
+        });}catch(RejectedExecutionException full){e.busy=false;reply(p,e,STATUS,"IO 队列已满，请稍后重试",0,List.of());}
+    }
+    /** Caller supplies a live world/lease/power grant. Callback false means shutdown, never native success. */
+    public static UUID play(ServerPlayer p,ResourceLocation system,BlockPos pos,ContentCardStore.Entry entry,BooleanSupplier authorized,Consumer<Boolean> status){
+        var s=state(p);if(s.closed||s.plays.containsKey(p.getUUID())||s.plays.size()>=4||!authorized.getAsBoolean())return null;
+        var play=new Play(p,system,pos,entry,authorized,status);s.plays.put(p.getUUID(),play);var server=p.getServer();var files=store(p,system);
+        try{IO.execute(()->{byte[] data=null;Exception error=null;try{data=files.read(entry);}catch(Exception ex){error=ex;}var bytes=data;var failure=error;
+            server.execute(()->{if(!valid(p,s,play))return;if(failure!=null){say(p,"卡带启动失败："+clean(failure));stop(p,s,play);return;}
+                play.bytes=bytes;send(p,msg(DOWNLOAD,system,play.token,pos,entry.hash(),entry.name(),entry.size(),0,new byte[0]));});
+        });}catch(RejectedExecutionException full){stop(p,s,play);return null;}return play.token;
+    }
+    private static boolean valid(ServerPlayer p,State s,Play play){return !s.closed&&s.plays.get(p.getUUID())==play&&online(p,play.connection)&&play.authorized.getAsBoolean();}
+    private static void playMessage(ServerPlayer p,State s,Play play,Message m){
+        if(!valid(p,s,play)){stop(p,s,play);return;}
+        if(m.op()==STOP){stop(p,s,play);return;}
+        if(m.op()==GET&&play.bytes!=null&&m.offset()==play.offset&&play.offset<play.bytes.length){
+            int end=Math.min(play.offset+ContentCardStore.CHUNK,play.bytes.length);byte[] part=Arrays.copyOfRange(play.bytes,play.offset,end);
+            send(p,msg(DATA,play.system,play.token,play.pos,play.entry.hash(),play.entry.name(),play.entry.size(),play.offset,part));play.offset=end;
+            if(end==play.bytes.length)play.bytes=null;
+        }else if(m.op()==STARTED&&play.offset==play.entry.size()&&!play.started){play.started=true;play.last=System.nanoTime();play.status.accept(true);}
+        if(m.op()==HEARTBEAT&&play.started)play.last=System.nanoTime();
+    }
+    public static void stop(ServerPlayer p,UUID token){var s=STATES.get(p.getServer());if(s==null)return;var play=s.plays.get(p.getUUID());if(play!=null&&play.token.equals(token))stop(p,s,play);}
+    private static void stop(ServerPlayer p,State s,Play play){
+        if(!s.plays.remove(p.getUUID(),play))return;play.bytes=null;
+        if(online(p,play.connection))send(p,msg(STOP,play.system,play.token,play.pos,"","",0,0,new byte[0]));play.status.accept(false);
+    }
+    private static void tick(MinecraftServer server){
+        var s=STATES.get(server);if(s==null)return;
+        for(var id:List.copyOf(s.edits.keySet())){var p=server.getPlayerList().getPlayer(id);var e=s.edits.get(id);
+            if(p==null||!valid(p,s,e)){s.edits.remove(id);if(p!=null&&online(p,e.connection))reply(p,e,CANCEL,"离开电脑或卡带改变，写卡已取消",0,List.of());}}
+        for(var id:List.copyOf(s.plays.keySet())){var play=s.plays.get(id);var p=server.getPlayerList().getPlayer(id);
+            if(p==null){s.plays.remove(id);play.bytes=null;play.status.accept(false);}
+            else if(!valid(p,s,play)||System.nanoTime()-play.last>(play.started?15:120)*1_000_000_000L)stop(p,s,play);}
+    }
+    private static void reply(ServerPlayer p,Edit e,int op,String text,int offset,List<ContentCardStore.Entry> entries){send(p,new Message(op,e.system,e.token,e.pos,"",text.substring(0,Math.min(250,text.length())),0,offset,new byte[0],entries));}
+    private static String clean(Throwable e){var m=e.getMessage();if(m==null)m=e.getClass().getSimpleName();return m.replaceAll("[\\p{Cntrl}]"," ").substring(0,Math.min(160,m.length()));}
+    private static void say(ServerPlayer p,String text){p.displayClientMessage(net.minecraft.network.chat.Component.literal(text),false);}
+    private static final class State{boolean closed;final Map<UUID,Edit> edits=new HashMap<>();final Map<UUID,Play> plays=new HashMap<>();}
+    private static final class Edit{
+        final UUID token=UUID.randomUUID(),computerId;final Object connection;final ServerLevel level;final BlockPos pos;final CartridgeComputerBlockEntity computer;
+        final ResourceLocation system;final InteractionHand hand;final int slot;final ItemStack stack;final CartridgeComputerBinding binding;ItemStack snapshot;final long opened=System.nanoTime();
+        final ContentCardStore store;long lastList;boolean busy;CartridgeTransfer upload;ContentCardStore.Entry entry;List<ContentCardStore.Entry> catalog=List.of();
+        Edit(ServerPlayer p,InteractionHand h,BlockPos pos,CartridgeComputerBlockEntity c,ResourceLocation system,ItemStack stack){connection=p.connection.getConnection();level=p.serverLevel();this.pos=pos.immutable();computer=c;computerId=c.computerId();binding=new CartridgeComputerBinding(computerId,level.dimension().location().toString(),pos.getX(),pos.getY(),pos.getZ());this.system=system;store=store(p,system);hand=h;slot=p.getInventory().selected;this.stack=stack;snapshot=stack.copy();}
+    }
+    private static final class Play{
+        final UUID token=UUID.randomUUID();final Object connection;final ResourceLocation system;final BlockPos pos;final ContentCardStore.Entry entry;final BooleanSupplier authorized;final Consumer<Boolean> status;
+        long last=System.nanoTime();int offset;byte[] bytes;boolean started;
+        Play(ServerPlayer p,ResourceLocation system,BlockPos pos,ContentCardStore.Entry entry,BooleanSupplier auth,Consumer<Boolean> status){connection=p.connection.getConnection();this.system=system;this.pos=pos.immutable();this.entry=entry;authorized=auth;this.status=status;}
+    }
+    private ContentCards(){}
+}

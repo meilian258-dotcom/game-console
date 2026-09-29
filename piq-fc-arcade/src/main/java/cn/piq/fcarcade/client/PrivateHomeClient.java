@@ -45,6 +45,8 @@ public final class PrivateHomeClient {
             return create(rom,saveRoot);
         }
         default boolean publicBusy(){return false;}
+        /** Opt-in physical cartridge session; the addon validates its server-issued power lease. */
+        default boolean cartridgePower(){return false;}
         default UUID identity(ItemStack stack){return lease(stack);}
     }
     record Target(Provider provider, Object connection, Object level, UUID player, UUID lease,
@@ -52,6 +54,7 @@ public final class PrivateHomeClient {
     private static final Map<ResourceLocation,Provider> PROVIDERS = new LinkedHashMap<>();
     private static final Set<Runnable> BEFORE_START = new LinkedHashSet<>();
     private static Run current;
+    private static LibretroRuntimes.Backend cartridgeBackend;
     private static boolean installed, opening, sampling, closing;
     private static java.util.concurrent.CompletableFuture<PrivateEngine.SaveResult> pendingSave;
     private static String notice = "请先接好电视，借出并手持实体手柄；公开主机须处于关机状态。";
@@ -93,12 +96,16 @@ public final class PrivateHomeClient {
         ControllerCapture.registerRuntime(PrivateHomeClient::refreshKeyboard);
         NeoForge.EVENT_BUS.addListener((RegisterClientCommandsEvent e)->e.getDispatcher().register(
                 Commands.literal("gameconsole-private").executes(c->{opening=true;return 1;})
+                    .then(Commands.literal("cartridge-runtime")
+                        .then(Commands.literal("process").executes(c->cartridgeBackend(LibretroRuntimes.Backend.PROCESS)))
+                        .then(Commands.literal("jni").executes(c->cartridgeBackend(LibretroRuntimes.Backend.JNI_TRIAL)))
+                        .then(Commands.literal("default").executes(c->cartridgeBackend(null))))
                     .then(Commands.literal("stop").executes(c->{stop("已请求结束私人游戏");return 1;}))));
         NeoForge.EVENT_BUS.addListener(PrivateHomeClient::tick);
         NeoForge.EVENT_BUS.addListener((RenderFrameEvent.Pre e)->update());
         NeoForge.EVENT_BUS.addListener(PrivateHomeClient::render);
         NeoForge.EVENT_BUS.addListener(PrivateHomeClient::interaction);
-        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e)->{opening=false;stop("已离开服务器");});
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e)->{opening=false;cartridgeBackend=null;stop("已离开服务器");});
         NeoForge.EVENT_BUS.addListener((GameShuttingDownEvent e)->shutdown());
         NetworkDiagnosticsClient.registerDevices("private-home",()->current==null?List.of():List.of(
                 new NetworkDiagnosticsView.Device(current.target.provider.label(),NetworkDiagnosticsView.Mode.PRIVATE_LOCAL,
@@ -135,6 +142,7 @@ public final class PrivateHomeClient {
     static Target find() {
         var mc=Minecraft.getInstance(); if(!connected())return null;
         for(var held:List.of(mc.player.getMainHandItem(),mc.player.getOffhandItem()))for(var p:PROVIDERS.values()){
+            if(p.cartridgePower())continue;
             UUID lease=p.lease(held);if(lease==null||!ControllerCapture.unique(mc.player,held,lease,p::identity))continue;
             var console=p.locate(mc.player,held);if(console==null)continue;
             BlockPos pos=console instanceof HomeConsoleBlockEntity fc?fc.tvPos():console instanceof ExternalHomeConsoleBlockEntity ex?ex.televisionPos():null;
@@ -147,6 +155,37 @@ public final class PrivateHomeClient {
     static String start(Target target,String filename) {
         return start(target,filename,defaultBackend(target));
     }
+    private static int cartridgeBackend(LibretroRuntimes.Backend backend){
+        var player=Minecraft.getInstance().player;if(player==null)return 0;
+        if(current!=null||closing){player.displayClientMessage(Component.literal("请先正常关机并等待保存完成，再切换卡带运行器。"),false);return 0;}
+        if(backend==LibretroRuntimes.Backend.JNI_TRIAL){
+            String reason=LibretroRuntimes.jniUnavailableReason();
+            if(!reason.isEmpty()){player.displayClientMessage(Component.literal(reason),false);return 0;}
+        }
+        cartridgeBackend=backend;
+        player.displayClientMessage(Component.literal("内容卡家用机下次开机："+(backend==null?"默认 JNI（支持的平台）":backend==LibretroRuntimes.Backend.PROCESS?"独立进程（兼容）":"JNI")
+                +"。只影响本机本次连接，不改 FC/SFC 私人页；不同后端存档隔离、不转换。JNI 原生故障可能使 Minecraft 崩溃。"),false);
+        return 1;
+    }
+    /** Called only after the shared cartridge client has verified an authorized download. */
+    public static String startCartridge(ResourceLocation system,BlockPos pos,Path rom){
+        var mc=Minecraft.getInstance();var provider=PROVIDERS.get(system);
+        if(!connected()||provider==null||!provider.cartridgePower()||!mc.level.hasChunkAt(pos))return "卡带主机不可用";
+        var console=mc.level.getBlockEntity(pos);
+        if(!(console instanceof ExternalHomeConsoleBlockEntity ex)||ex.televisionPos()==null
+                ||!mc.level.hasChunkAt(ex.televisionPos())||!(mc.level.getBlockEntity(ex.televisionPos()) instanceof HomeTvBlockEntity tv))return "请先接好电视";
+        for(int i=0;i<mc.player.getInventory().getContainerSize();i++){
+            var item=mc.player.getInventory().getItem(i);var lease=provider.lease(item);
+            if(lease==null||!provider.matches(mc.player,item,console)||!ControllerCapture.unique(mc.player,item,lease,provider::identity))continue;
+            var target=new Target(provider,mc.getConnection(),mc.level,mc.player.getUUID(),lease,console,hardware(console),tv,tv.hardwareId(),link(console),tv.powered());
+            return start(target,rom.toString(),cartridgeBackend==null?defaultBackend(target):cartridgeBackend);
+        }
+        return "请先借取这台主机的 1P 手柄";
+    }
+    public static int cartridgeState(ResourceLocation system,BlockPos pos){
+        var r=current;return r==null||r.target.provider!=PROVIDERS.get(system)||!r.target.console.getBlockPos().equals(pos)?-1:r.engine.isReady()?1:0;
+    }
+    public static void stopCartridge(ResourceLocation system,BlockPos pos){if(cartridgeState(system,pos)>=0)stop("实体主机关机，正在保存");}
     static LibretroRuntimes.Backend defaultBackend(Target target){
         return LibretroRuntimes.defaultBackend(target!=null&&target.provider.supportsJniTrial());
     }
@@ -154,7 +193,7 @@ public final class PrivateHomeClient {
         Objects.requireNonNull(backend);
         if(current!=null||closing)return "请先结束上一局并等待本地保存完成。";
         if(!yieldObservers())return notice;
-        if(target==null||!valid(target)||held(target)==null)return "手柄、连接或主机状态已变化，请重新借取空闲主机的手柄。";
+        if(target==null||!valid(target)||(!target.provider.cartridgePower()&&held(target)==null))return "手柄、连接或主机状态已变化，请重新借取空闲主机的手柄。";
         if(backend==LibretroRuntimes.Backend.JNI_TRIAL){
             if(!target.provider.supportsJniTrial())return "此附属尚未接入 JNI 私人试验，请选择独立进程。";
             String unavailable=LibretroRuntimes.jniUnavailableReason();if(!unavailable.isEmpty())return unavailable;
@@ -205,7 +244,7 @@ public final class PrivateHomeClient {
                 ||t.console.isRemoved()||t.tv.isRemoved()||!mc.level.hasChunkAt(t.console.getBlockPos())||!mc.level.hasChunkAt(t.tv.getBlockPos())
                 ||mc.level.getBlockEntity(t.console.getBlockPos())!=t.console||mc.level.getBlockEntity(t.tv.getBlockPos())!=t.tv
                 ||!Objects.equals(t.hardware,hardware(t.console))||!t.television.equals(t.tv.hardwareId())||t.link==null
-                ||!t.link.equals(link(t.console))||!t.link.equals(t.tv.linkId())||t.tv.signalPresent()
+                ||!t.link.equals(link(t.console))||!t.link.equals(t.tv.linkId())||(!t.provider.cartridgePower()&&t.tv.signalPresent())
                 ||t.tv.powered()!=t.tvPower||PROVIDERS.values().stream().anyMatch(Provider::publicBusy))return false;
         var stack=owned(t);
         return stack!=null&&t.provider.matches(mc.player,stack,t.console)&&HomeHardware.connected(mc.level,t.console,t.tv);
@@ -286,11 +325,12 @@ public final class PrivateHomeClient {
                         eye.add(mc.player.getLookAngle().scale(Math.min(6,mc.player.blockInteractionRange()))));
                 if(control.port()>=0&&holding){stop("归还实体手柄");return;}
                 if(control==HomeApplianceControl.POWER||control==HomeApplianceControl.RESET){
+                    if(r.target.provider.cartridgePower())return; // Server owns this power transition.
                     event.setCanceled(true);event.setSwingHand(false);stop("已结束私人游戏，未改变公共设备电源");return;
                 }
             }
         }
-        if(holding){event.setCanceled(true);event.setSwingHand(false);open();}
+        if(holding&&!r.target.provider.cartridgePower()){event.setCanceled(true);event.setSwingHand(false);open();}
     }
     private static void shutdown(){
         stop("正在退出客户端");var pending=pendingSave;if(pending==null)return;

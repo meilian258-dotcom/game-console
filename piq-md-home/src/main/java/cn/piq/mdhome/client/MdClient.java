@@ -23,6 +23,7 @@ public final class MdClient {
     public static final class Provider implements PrivateHomeClient.Provider {
         public String label(){return "MD2（私人单人）";}
         public String storageKey(){return "md";}
+        public boolean cartridgePower(){return true;}
         public boolean acceptsFile(String name){return MdRom.accepts(name);}
         public String fileHint(){return ".md / .bin / .gen（普通卡带，非CD/32X）";}
         public KeyboardConfig.Profile profile(){return KeyboardConfig.Profile.SFC;}
@@ -38,7 +39,7 @@ public final class MdClient {
         }
         public boolean matches(Player p,ItemStack s,BlockEntity entity){
             var id=lease(s);var data=s.get(DataComponents.CUSTOM_DATA);
-            if(id==null||data==null||!(entity instanceof MdConsole c)||c.isRemoved()||p==null||!p.isAlive()||p.isSpectator()||c.getLevel()!=p.level()||!c.hasInsertedCartridge()||c.visualPowered())return false;
+            if(id==null||data==null||!(entity instanceof MdConsole c)||c.isRemoved()||p==null||!p.isAlive()||p.isSpectator()||c.getLevel()!=p.level()||!c.hasInsertedCartridge()||!c.running())return false;
             var t=data.copyTag();
             return t.hasUUID("MdConsole")&&t.getUUID("MdConsole").equals(c.hardwareId())&&id.equals(c.loan())&&p.getUUID().equals(c.borrower())&&p.distanceToSqr(c.getBlockPos().getCenter())<=36;
         }

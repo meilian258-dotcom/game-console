@@ -29,6 +29,8 @@ public final class CartridgeNetwork {
     public static final CartridgeEditBinding NO_TARGET = new CartridgeEditBinding(new UUID(0, 0), new UUID(0, 0), 0, 0);
     private CartridgeNetwork() {}
     public static void register(RegisterPayloadHandlersEvent event) {
+        cn.piq.fcarcade.home.content.ContentCardNetwork.register(event);
+        cn.piq.fcarcade.home.content.ContentCards.install();
         CartridgeSaveNetwork.register(event);
         cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"34")
                 .playToServer(Request.TYPE, Request.CODEC, (payload, context) -> context.enqueueWork(() -> {
