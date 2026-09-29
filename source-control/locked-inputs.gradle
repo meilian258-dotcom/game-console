@@ -1,0 +1,40 @@
+// Shared build-time input resolver. Never downloads, falls back, or executes inputs.
+def manifestFile = new File(projectDir.parentFile, 'source-control/build-inputs.json')
+def manifest = new groovy.json.JsonSlurper().parse(manifestFile)
+if (manifest.schemaVersion != 1 || !(manifest.inputs instanceof Map)) {
+    throw new GradleException('Invalid pinned build-input manifest')
+}
+def cacheRoot = providers.gradleProperty('piqInputsDir').map { file(it) }
+        .getOrElse(new File(projectDir.parentFile, '.build-inputs')).absoluteFile
+def assertNoLinks = { File candidate ->
+    for (File part = candidate.absoluteFile; part != null; part = part.parentFile) {
+        def path = part.toPath()
+        if (java.nio.file.Files.exists(path, java.nio.file.LinkOption.NOFOLLOW_LINKS) &&
+                (java.nio.file.Files.isSymbolicLink(path) || part.canonicalFile != part.absoluteFile)) {
+            throw new GradleException("Build input symlink/reparse path refused: ${part}")
+        }
+    }
+}
+ext.piqLockedInput = { String id ->
+    def entry = manifest.inputs[id]
+    if (!(entry instanceof Map) || !(entry.sha256 ==~ /[0-9a-f]{64}/) ||
+            !(entry.filename ==~ /[A-Za-z0-9_.-]+/) || entry.filename in ['.', '..'] ||
+            !(entry.bytes instanceof Number) || entry.bytes <= 0 || entry.bytes > 536870912) {
+        throw new GradleException("Invalid pinned build input: ${id}")
+    }
+    def artifact = new File(cacheRoot, "${entry.sha256}/${entry.filename}")
+    assertNoLinks(artifact)
+    if (!artifact.isFile()) {
+        throw new GradleException("Missing pinned build input '${id}': ${artifact}. See source-control/BUILDING.md; import verified inputs first (no automatic download).")
+    }
+    if (artifact.length() != entry.bytes) throw new GradleException("Pinned input size mismatch: ${id}")
+    def digest = java.security.MessageDigest.getInstance('SHA-256')
+    artifact.withInputStream { stream ->
+        byte[] buffer = new byte[1024 * 1024]
+        for (int n = stream.read(buffer); n != -1; n = stream.read(buffer)) digest.update(buffer, 0, n)
+    }
+    if (digest.digest().encodeHex().toString() != entry.sha256) {
+        throw new GradleException("Pinned input SHA256 mismatch: ${id}")
+    }
+    return artifact
+}

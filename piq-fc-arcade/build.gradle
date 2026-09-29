@@ -12,6 +12,36 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+// Source-only clones use reviewed, hash-pinned offline inputs, never old outputs paths.
+apply from: '../source-control/locked-inputs.gradle'
+if (providers.gradleProperty('jniRuntimeDir').isPresent()) {
+    throw new GradleException('jniRuntimeDir is retired: import the reviewed DLL via source-control/build_inputs.py; see source-control/BUILDING.md')
+}
+def jnaInput = piqLockedInput('jna-5-14-0')
+def mesenWindowsInput = piqLockedInput('mesen-windows')
+def mesenLinuxInput = piqLockedInput('mesen-linux')
+def jniBridgeInput = piqLockedInput('libretro-jni-abi1')
+def netplayInput = piqLockedInput('retroarch-netplay')
+def pinnedCoreInputs = [
+        'core/nes_rust_wasm_bg.wasm': piqLockedInput('nes-wasm'),
+        'core/nes_zapper_v1.wasm': piqLockedInput('nes-zapper-wasm'),
+        'core/nes_mapper19_v1.wasm': piqLockedInput('nes-mapper19-wasm'),
+        'core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r1.dll': piqLockedInput('mesen-jni-netplay-r1')
+]
+def preparePinnedResources = tasks.register('preparePinnedResources', Sync) {
+    pinnedCoreInputs.each { resource, input ->
+        from(input) { into resource.substring(0, resource.lastIndexOf('/')) }
+    }
+    into layout.buildDirectory.dir('generated/pinned-source-resources')
+}
+// Keep the real source resource root so ModDev discovers its access transformer.
+sourceSets.main.resources.srcDir preparePinnedResources
+def originalResourcesRoot = file('src/main/resources').toPath()
+tasks.named('processResources') {
+    // Ignore only old raw copies of pinned binaries, not generated copies or other assets.
+    exclude { element -> pinnedCoreInputs.containsKey(element.path) && element.file.toPath().startsWith(originalResourcesRoot) }
+}
+
 // FC remains built into the one required main mod. Shared code is an internal
 // source module, not a second Mod/JAR that players have to install.
 sourceSets.main.java.srcDir '../piq-retro-platform/src/main/java'
@@ -23,11 +53,11 @@ sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
 sourceSets {
     libretroWorker {
         java.srcDir 'libretro-helper/src/main/java'
-        compileClasspath = files('native/libretro/jna-5.14.0.jar')
+        compileClasspath = files(jnaInput)
     }
     genericLibretroWorker {
         java.srcDir 'libretro-generic-helper/src/main/java'
-        compileClasspath = files('native/libretro/jna-5.14.0.jar')
+        compileClasspath = files(jnaInput)
     }
 }
 def genericLibretroWorkerJar = tasks.register('genericLibretroWorkerJar', Jar) {
@@ -45,7 +75,7 @@ def prepareGenericLibretroRuntime = tasks.register('prepareGenericLibretroRuntim
     doLast {
         def sha = { file -> java.security.MessageDigest.getInstance('SHA-256').digest(file.bytes).encodeHex().toString() }
         new File(destinationDir, 'runtime.properties').setText(
-            "worker.sha256=${sha(new File(destinationDir, 'worker.jar'))}\njna.sha256=${sha(file('native/libretro/jna-5.14.0.jar'))}\n", 'UTF-8')
+            "worker.sha256=${sha(new File(destinationDir, 'worker.jar'))}\njna.sha256=${sha(jnaInput)}\n", 'UTF-8')
     }
 }
 sourceSets.main.resources.srcDir layout.buildDirectory.dir('generated/generic-libretro-resources')
@@ -60,7 +90,9 @@ def libretroWorkerJar = tasks.register('libretroWorkerJar', Jar) {
 }
 def prepareLibretroRuntime = tasks.register('prepareLibretroRuntime', Sync) {
     dependsOn libretroWorkerJar
-    from('native/libretro') { include 'jna-5.14.0.jar', 'windows-x64/**', 'linux-x64/**' }
+    from(jnaInput)
+    from(mesenWindowsInput) { into 'windows-x64' }
+    from(mesenLinuxInput) { into 'linux-x64' }
     from(libretroWorkerJar)
     into layout.buildDirectory.dir('generated/libretro-resources/core/libretro')
     doLast {
@@ -76,7 +108,7 @@ sourceSets.main.resources.srcDir layout.buildDirectory.dir('generated/libretro-r
 
 // Pinned local RetroArch bridge; no network downloads during a MOD build.
 def prepareNetplayRuntime = tasks.register('prepareNetplayRuntime', Sync) {
-    from('../outputs/jni-unified-20260929/crc-audit/fixed-native/piq-retroarch.exe')
+    from(netplayInput)
     into layout.buildDirectory.dir('generated/netplay-resources/core/netplay')
     doLast {
         def exe = new File(destinationDir, 'piq-retroarch.exe')
@@ -89,12 +121,9 @@ sourceSets.main.resources.srcDir layout.buildDirectory.dir('generated/netplay-re
 tasks.named('processResources') { dependsOn prepareNetplayRuntime }
 tasks.named('processResources') { dependsOn prepareLibretroRuntime }
 
-// Build with native/libretro-jni/build_native.py or CMake first. This source-owned location
-// contains a generated artifact, never an arbitrary player/server-provided DLL.
-def jniRuntimeDir = providers.gradleProperty('jniRuntimeDir').map { file(it) }
-        .getOrElse(file('native/libretro-jni/dist'))
+// Rebuilt native DLLs require a reviewed lock change and verified cache import.
 def prepareJniRuntime = tasks.register('prepareJniRuntime', Sync) {
-    from(new File(jniRuntimeDir, 'piq-libretro-jni.dll')) { into 'windows-x64' }
+    from(jniBridgeInput) { into 'windows-x64' }
     from('native/libretro-jni/README.md')
     into layout.buildDirectory.dir('generated/jni-resources/core/libretro-jni')
     doLast {

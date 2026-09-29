@@ -108,6 +108,8 @@
 
 ## 7. 构建、验证与可复现交付
 
+FC 主包构建前必须按 [BUILDING.md](../source-control/BUILDING.md) 准备并校验固定输入缓存；`build-inputs.json` 是本期构建锁，旧 `external-artifacts.json` 只是历史盘点。不得恢复隐式 outputs 回退、用同名 DLL 替换固定哈希或绕开已退役的 `jniRuntimeDir` 检查。其他附属仍有历史构建依赖，须逐项核对，不能把 FC 一期通过写成全部机型构建统一。
+
 先看实际项目构建脚本、版本和依赖，不能把固定历史脚本当通用打包器。现有基础命令示例（在对应目录执行）：
 
 ```powershell

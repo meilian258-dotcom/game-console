@@ -44,18 +44,20 @@ python source-control/audit.py
 
 ## 构建边界与外部依赖
 
-**源码已纳入 Git，不等于从干净克隆即可完整打包所有 MOD。** 当前构建脚本有历史依赖，迁移时没有改写它们：
+**源码已纳入 Git，不等于从干净克隆即可完整打包所有 MOD。** 首次 Git 接管未改构建；随后 FC 构建一期已完成，入口为 [固定输入及构建说明](source-control/BUILDING.md)：
 
-- 主包读取 `native/libretro` 的 JNA/Mesen、`native/libretro-jni/dist` 的桥 DLL，以及根 `outputs/jni-unified-20260929/crc-audit/fixed-native/piq-retroarch.exe`。
+- FC 主包的 JNA/Mesen、JNI 桥、RetroArch、三个 WASM 和 JNI Netplay 核心，现按 `source-control/build-inputs.json` 从显式离线缓存读取，校验大小/SHA；不再回退旧 `outputs`、默认 JNI dist 或原资源目录的未提交二进制。必须先导入合法固定输入，不是自动从公网下载核心。
 - 多个附属依赖主包 `build/libs` 的 FC76.22；Flash 仍有历史 FC61 路径；MD 默认 FC76.24，可通过 `-PgameConsoleJar=` 指定。SFC 家用还依赖 SFC core9 的历史 JAR。
 - 街机还使用旧 `piq-runtime-pack-v1.zip` 与固定 FBNeo DLL；GBA、Flash、PvZ 和各原生构建器另有自己的运行库/工具链。第三方 vendored 源码和许可保留，商业游戏内容不入库。
 
-这些路径不能因被忽略就随意删除。`source-control/external-artifacts.json` 是已核对的关键输入文件名/大小/SHA清单，不是下载器，也不是全部平台依赖已闭合的证明。缺项应按组件说明重新构建或由维护者提供合法、固定哈希的制品，禁止找一个同名 DLL/JAR 冒充。
+旧路径中的文件仍保留，不能因被忽略就随意删除。`source-control/external-artifacts.json` 是首次接管时的历史盘点，FC 当前构建锁为 `build-inputs.json`；两者都不是全部平台依赖已闭合的证明。缺项应按组件说明重新构建或由维护者提供合法、固定哈希的制品，禁止找一个同名 DLL/JAR 冒充。
 
-后续另做构建标准化：统一依赖声明/固定工具链与原生核心来源、减少历史 outputs 输入、完成干净克隆 CI；不要为接管 Git 顺手改变游戏实现或旧存档规则。制作候选时记录源码 commit、工作区是否干净、所有外部输入及成品 SHA，只有完整回归和用户验收后才标稳定；版本发布、安装或重启仍需授权。
+后续继续其他附属的源码依赖、原生工具链与对应来源/许可、空缓存 CI；本期 FC 独立源码目录加显式固定缓存已完成 `check jar`，仍使用本机既有 Maven/NeoForge 缓存，不是所有核心从零重编。不要借构建整理改变游戏实现或旧存档规则。制作候选时记录源码 commit、工作区是否干净、所有外部输入及成品 SHA，只有完整回归和用户验收后才标稳定；版本发布、安装或重启仍需授权。
 
 ## 本次基线与恢复
 
 迁移证据在维护机 `outputs/git-migration-20260929/`，交付后包含审查报告、提交/独立克隆校验和 Git bundle。bundle 可使用 `git bundle verify <文件>` 检查，然后 `git clone <文件> <新的空目录>` 恢复已提交源码。它不包含忽略的制品和用户数据；同盘 bundle 也不是异地备份。
 
-本次不生成新 MOD，不提升稳定标记。此前报告的 FC JNI Netplay 精确恢复启动失败，以及新 FC 默认能力值检查问题，未在本次源码迁移修复；Git基线也不能覆盖这些待处理反馈。历史README中的测试/候选结论只对其注明版本及环境有效。
+首次接管不生成新 MOD。构建一期生成的 FC76.24 同版本开发验证 JAR 单独留在 `outputs/build-standard-phase1-20260929/attempt3/`，不替换原交付，不提升稳定标记。此前报告的 FC JNI Netplay 精确恢复启动失败，以及新 FC 默认能力值检查问题，未在源码/构建迁移修复；Git 基线也不能覆盖这些待处理反馈。历史 README 中的测试/候选结论只对其注明版本及环境有效。
+
+实际克隆编译发现首次基线 `665b12c` 的 `**/world/` 忽略规则误排了 Java `world` 包。本期收窄为组件根运行世界目录，原样补纳 64 个既有 Java 源文件并增加回归测试；没有删除或重写历史。首版 bundle 保留作历史证据，完整恢复应使用包含此次补齐提交的新 bundle。首次源码哈希比对通过只证明当时选中文件一致，不证明源码清单完整。

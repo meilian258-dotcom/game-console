@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "scope": "FC76.24 external binary build inputs only; no ROM or user data; not an open-source distribution license grant",
+  "inputs": {
+    "jna-5-14-0": {
+      "filename": "jna-5.14.0.jar",
+      "bytes": 1878533,
+      "sha256": "34ed1e1f27fa896bca50dbc4e99cf3732967cec387a7a0d5e3486c09673fe8c6",
+      "legacyPath": "piq-fc-arcade/native/libretro/jna-5.14.0.jar",
+      "purpose": "FC libretro worker classpath; native/libretro provenance"
+    },
+    "mesen-windows": {
+      "filename": "mesen_libretro.dll",
+      "bytes": 3766272,
+      "sha256": "2b3fbe286995c80ebbc85239fd28c8fa07b1011cc69c7f9021816429e3473885",
+      "legacyPath": "piq-fc-arcade/native/libretro/windows-x64/mesen_libretro.dll",
+      "purpose": "FC process core; native/libretro provenance"
+    },
+    "mesen-linux": {
+      "filename": "mesen_libretro.so",
+      "bytes": 3343872,
+      "sha256": "552f8ab6ac1fd08bd555f589eb999be73a469c79ccfa929f884adb2cf3366b43",
+      "legacyPath": "piq-fc-arcade/native/libretro/linux-x64/mesen_libretro.so",
+      "purpose": "FC Linux process core; native/libretro provenance"
+    },
+    "libretro-jni-abi1": {
+      "filename": "piq-libretro-jni.dll",
+      "bytes": 1358336,
+      "sha256": "c87361bf03d210bc4562bf1bdf7e66f0f5ce58f62742d086a23dfd7fd68d47ec",
+      "legacyPath": "piq-fc-arcade/native/libretro-jni/dist/piq-libretro-jni.dll",
+      "purpose": "Common JNI bridge; native/libretro-jni/README.md and build_native.py"
+    },
+    "retroarch-netplay": {
+      "filename": "piq-retroarch.exe",
+      "bytes": 2752000,
+      "sha256": "1335c34b04d8c3e55afe010a421ff373d938929ec196a6e93a9657972fe034e1",
+      "legacyPath": "outputs/jni-unified-20260929/crc-audit/fixed-native/piq-retroarch.exe",
+      "purpose": "FC build.gradle prepareNetplayRuntime; historical output dependency"
+    },
+    "mesen-jni-netplay-r1": {
+      "filename": "mesen_piq_jni_netplay_r1.dll",
+      "bytes": 3606016,
+      "sha256": "81989a6d9932c928a9a75b63ae7100381b99529ddba3064d0d92d66c2162aabe",
+      "legacyPath": "piq-fc-arcade/src/main/resources/core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r1.dll",
+      "purpose": "FC76.24 fixed JNI Netplay core; corresponding source/build instructions required"
+    },
+    "nes-zapper-wasm": {
+      "filename": "nes_zapper_v1.wasm",
+      "bytes": 70996,
+      "sha256": "c8d8824e5caf727678c642e6b0539deaa7c0084f33524d96779d90c7b5da79ef",
+      "legacyPath": "piq-fc-arcade/src/main/resources/core/nes_zapper_v1.wasm",
+      "purpose": "Legacy WASM core retained; not a game ROM"
+    },
+    "nes-wasm": {
+      "filename": "nes_rust_wasm_bg.wasm",
+      "bytes": 70651,
+      "sha256": "110711e30b64444414a8be2d0a3b1ab45a442cc9b9452ac7d74daab508c933ff",
+      "legacyPath": "piq-fc-arcade/src/main/resources/core/nes_rust_wasm_bg.wasm",
+      "purpose": "Legacy WASM core retained; not a game ROM"
+    },
+    "nes-mapper19-wasm": {
+      "filename": "nes_mapper19_v1.wasm",
+      "bytes": 73880,
+      "sha256": "900467682864994b1e80d8d288ef0864da60927ee6213b19310576379b330985",
+      "legacyPath": "piq-fc-arcade/src/main/resources/core/nes_mapper19_v1.wasm",
+      "purpose": "Legacy WASM core retained; not a game ROM"
+    }
+  }
+}
