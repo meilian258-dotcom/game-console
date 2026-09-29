@@ -1,0 +1,253 @@
+{
+  "credit": "Modular black computer. Static assembly-space model; interactions require a mod.",
+  "ambientocclusion": false,
+  "textures": {
+    "0": "piq_computer:block/pc_atlas",
+    "particle": "piq_computer:block/pc_atlas"
+  },
+  "elements": [
+    {
+      "name": "cpu_substrate",
+      "from": [
+        7.935,
+        6.98,
+        6.98
+      ],
+      "to": [
+        8.155,
+        9.02,
+        9.02
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.25,
+            0.25,
+            9,
+            1
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            8.25,
+            0.25,
+            9,
+            1
+          ],
+          "texture": "#0"
+        },
+        "east": {
+          "uv": [
+            8.25,
+            0.25,
+            9,
+            1
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            8.25,
+            0.25,
+            9,
+            1
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            8.25,
+            0.25,
+            9,
+            1
+          ],
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            8.25,
+            0.25,
+            9,
+            1
+          ],
+          "texture": "#0"
+        }
+      }
+    },
+    {
+      "name": "cpu_contact_edge",
+      "from": [
+        8.11,
+        7.07,
+        7.07
+      ],
+      "to": [
+        8.185,
+        8.93,
+        8.93
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.25,
+            1.5,
+            1,
+            2.25
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            0.25,
+            1.5,
+            1,
+            2.25
+          ],
+          "texture": "#0"
+        },
+        "east": {
+          "uv": [
+            0.25,
+            1.5,
+            1,
+            2.25
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            0.25,
+            1.5,
+            1,
+            2.25
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            0.25,
+            1.5,
+            1,
+            2.25
+          ],
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            0.25,
+            1.5,
+            1,
+            2.25
+          ],
+          "texture": "#0"
+        }
+      }
+    },
+    {
+      "name": "cpu_heatspreader",
+      "from": [
+        7.815,
+        7.13,
+        7.13
+      ],
+      "to": [
+        7.945,
+        8.87,
+        8.87
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.25,
+            0.25,
+            7,
+            1
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            6.25,
+            0.25,
+            7,
+            1
+          ],
+          "texture": "#0"
+        },
+        "east": {
+          "uv": [
+            6.25,
+            0.25,
+            7,
+            1
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            8.25,
+            9,
+            9.75,
+            10.5
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            6.25,
+            0.25,
+            7,
+            1
+          ],
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            6.25,
+            0.25,
+            7,
+            1
+          ],
+          "texture": "#0"
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        12,
+        105,
+        -12
+      ],
+      "translation": [
+        0.045569381038423895,
+        0.0012473293527688334,
+        0
+      ],
+      "scale": [
+        4,
+        4,
+        4
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        1,
+        0
+      ],
+      "scale": [
+        0.35,
+        0.35,
+        0.35
+      ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cn.piq.flashbox.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["FlashIdleMixin", "FlashToneMixin", "FlashKeyboardMixin"],
+  "injectors": {"defaultRequire": 1}
+}

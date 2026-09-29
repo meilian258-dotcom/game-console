@@ -1,0 +1,35 @@
+{
+  "schema": "piq-gba-handheld-client-1",
+  "ok": true,
+  "mode": "source-actual-api",
+  "production_compiled": true,
+  "fc": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync33-v1\\piq_fc_arcade-0.31.0-alpha.33.jar",
+    "sha256": "F36169E46B13CF46868851447B8518BC38C10967A03994AF26E89CE7B1E4FE00"
+  },
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\gba\\bridge\\GbaProcessSession.java": "2E4C02F8053614A34A7B556DE6A01DBAB076498AE8C0B38674EBD8DD9848F61A",
+    "src\\main\\java\\cn\\piq\\gba\\bridge\\GbaProtocol.java": "88713FEBEF209BB2B0438AE78152F9754170FC3DF0E77181717A63CBABC47B74",
+    "src\\main\\java\\cn\\piq\\gba\\bridge\\GbaSaveScope.java": "7B87569A05F4E4365AFBA01E1DBC9DB0D5587502E17F19E81E3EF0ED3B2279CF",
+    "src\\main\\java\\cn\\piq\\gba\\bridge\\GbaSaveStore.java": "84BCE15FE509A0F7DDA2C0DB516ED78ED6F4837600B0D12093AFC10ACE43E337",
+    "src\\main\\java\\cn\\piq\\gba\\GbaMod.java": "2904AC287F79800E2389F96B585CAE0AE91F7F2CF13325EA8C7AD7BB281ADC2B",
+    "src\\main\\java\\cn\\piq\\gba\\item\\GbaHandheldItem.java": "F3D87B6499A963CFD104BE9FAA5168CB7F4B484B9C216EC1BD69D73878B97979",
+    "src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldClient.java": "E6A0DC4D4D4293C868C072DBF006CC9E4DB5804AFD5CDDDA8BFD1D06D1C18BB9",
+    "src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldScreen.java": "08B62C7F0C1DACF62C770B7CB86C7C4C60A1780E14D895A18618AF47C2DA1AA4",
+    "src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldAudio.java": "AC5FEC307294037CA4F81C71B4BF728C6217C7481A7B8A9E93538BCD17F7E6DE",
+    "src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldGate.java": "8DB1CAA8C8C08A4DFE62EAE1B1AD7D464BB30B295F66D00F2A2726B227246258",
+    "src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldSelectionStore.java": "0AD6B5C3A7C8AC5585A0F5284C953FB31F3294C7C71A2FAAF1763BC2088DDD16"
+  },
+  "pure_tests": {
+    "ok": true,
+    "assertions": 4359,
+    "minecraft_or_native_core_started": false
+  },
+  "minecraft_started": false,
+  "native_core_started": false,
+  "audio_device_started": false,
+  "limitations": [
+    "Client callbacks compiled against actual MC/NeoForge but no interactive game, physical input device or UI window was started.",
+    "Pure gate/store tests do not assert a live client handshake, visible model or final native save completion."
+  ]
+}

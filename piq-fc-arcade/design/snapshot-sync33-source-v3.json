@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "mode": "source-preflight-real-api",
+  "production_compiled": true,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync32-v1\\piq_fc_arcade-0.31.0-alpha.32.jar",
+      "sha256": "090781E86821275A82E786494B9F98CF905B8CC8EED1478C3F06356ADDAFD16B"
+    }
+  },
+  "behavior": {
+    "passed_tests": 51,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "wire": {
+    "native_core_started": false,
+    "snapshot_chunks": 136,
+    "maximum_outer_bytes": 24741,
+    "assertions": 1003,
+    "minecraft_world_or_socket_started": false,
+    "ok": true,
+    "actual_backend_registry": true,
+    "actual_outer_codecs": true,
+    "snapshot_bytes": 3334118,
+    "outer_roundtrips": 276
+  },
+  "sources": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetBackends.java": "DFF9D577C1D2002161B12E617BBFDC3020F94451751D8CA45CD3B6388DB02776",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncPolicy.java": "AD9A741552F834ABF6C6BA10ED5C8B4281DDD315AAA415E0B13C7D10EDFCD67B",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncRecoveryWindow.java": "33C78905C3661D53A775AB55AC749834CB0F86416FFD5F95C4C6E41D7BB273D5",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncNetwork.java": "470ABF98DA27FF810C06B45908EFA05ACC371EBCDB74BEB455FF76B437C4153C",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSynchronizer.java": "F62CB2A36E9B9E4F17CAC068229437ED7693E0AF093874B829C091A4F92DA2FA",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRooms.java": "590338A0CF35BFBCE7D7A445A40862544B0AD56D0716E3BD347FF52BE70FC7AF",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncSettings.java": "B847A818B4B6CC9EE504B4E6D04B7363327CB912011C811E6AC63D358BBF3CD4",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncPolicyTest.java": "96067A27E7EE7779A0B9A8BC96A521DE86984E59C8C0DAF664CE437BCD18BA6B",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncRecoveryWindowTest.java": "C4FFC1006735023F55B586CA5D72799A36119F2170F629149DD8CEEB19C981C5",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncGateTest.java": "29AA45D8D48241AB6D39421142F68860C7E626364C802208D1BAC93BAC708118",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncStateTest.java": "46E2C9549F02D6FCAA89D72037167CD07E34AA850A5FE921C61EAB419E82CEEF",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncTimelineTest.java": "443063748D49536F46CFD07E8296F70160A5D7AB97D1450855B507DDF6F97350",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSnapshotSyncSourceTest.java": "4F000AF0E66B256563E28D73227087B4CF58584686FF536D2A426F57CE714FE1",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSingleSeatSourceTest.java": "A6B479197671BC917943F4679FE123602AD950DE426C78AA082CE0A75D6BC86A",
+    "tools\\qa\\CabinetRoomTestRunner.java": "76F1E13154E9C577B7E0632F97A031DE709F4F62669B03992387286881A150B3",
+    "tools\\qa\\CabinetSnapshotSync33Probe.java": "ACCBBDEB026EA5F627B76A33004CE3AE08A22943BE914C6DEF03D8C3A9367F39"
+  },
+  "logs": {
+    "compile": "",
+    "behavior": "{\"passed_tests\":51,\"minecraft_started\":false,\"mode\":\"actual-production-pure-state-machines\"}\n",
+    "wire": "WARN StatusConsoleListener Advanced terminal features are not available in this environment\n[13:34:36] [main/WARN] [ne.ne.ne.ne.re.NetworkRegistry/]: Received piq_fc_arcade:cabinet_sync_frames on the SERVER, expected to receive on the CLIENT; refusing to decode.\n[13:34:36] [main/WARN] [ne.ne.ne.ne.re.NetworkRegistry/]: Received piq_fc_arcade:cabinet_sync_restore on the SERVER, expected to receive on the CLIENT; refusing to decode.\n[13:34:36] [main/WARN] [ne.ne.ne.ne.re.NetworkRegistry/]: Received piq_fc_arcade:cabinet_sync_active on the SERVER, expected to receive on the CLIENT; refusing to decode.\n[13:34:36] [main/WARN] [ne.ne.ne.ne.re.NetworkRegistry/]: Received piq_fc_arcade:cabinet_sync_upload_grant on the SERVER, expected to receive on the CLIENT; refusing to decode.\n{\"native_core_started\":false,\"snapshot_chunks\":136,\"maximum_outer_bytes\":24741,\"assertions\":1003,\"minecraft_world_or_socket_started\":false,\"ok\":true,\"actual_backend_registry\":true,\"actual_outer_codecs\":true,\"snapshot_bytes\":3334118,\"outer_roundtrips\":276}\n"
+  },
+  "limits": [
+    "No Minecraft world, socket, native emulator or two-computer play is started.",
+    "The 3,334,118-byte state is synthetic diagnostic bytes; real native restore is independently tested.",
+    "Pure admission policy and existing state/timeline/gates are executed; server world authorization wiring is reviewed separately."
+  ]
+}

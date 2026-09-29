@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "version": "0.31.0-alpha.2",
+  "protocol": 22,
+  "review": {
+    "geometry_manifest": "home-fc-alpha2-reviewed-assets.json",
+    "geometry_manifest_sha256": "1CD976F4299AFE9E9AB2310716CF8523001E71392E29103BB55A9653EEE9F974",
+    "retained_geometry_assets": 21,
+    "separately_reviewed_assets": 4,
+    "av_original_sha256": "0898A906507FC7D2296B7973D87F9117FCFD54B9093DF4E1F0A2699E0F77B66F",
+    "av_normalization": "User approved 2026-09-08: full canvas NEAREST 64x64, alpha >=128 ->255 else 0, transparent RGB=0; no crop, redraw or recoloring."
+  },
+  "assets": {
+    "assets/piq_fc_arcade/blockstates/retro_tv.json": "D28FB779446031B18017C4D55F842B07B1734B734BD117CFD436DE75EE38815D",
+    "assets/piq_fc_arcade/models/block/famicom_console.json": "78322624A25FE1882F33398A937053AACF644C5C00430BE6247558247AC03088",
+    "assets/piq_fc_arcade/models/block/home_famicom_console.json": "609F0E125C77EF480701A87D8DAE4D7B0ADAC62C00A97A5798B42AE2AD23C8DA",
+    "assets/piq_fc_arcade/models/block/home_fc_cartridge.json": "D311209AF1443F18566B588FBE0F35248E847ACBDAF54D87043F326910F556FB",
+    "assets/piq_fc_arcade/models/block/home_retro_tv.json": "63EBDA3A69E0ABC05AA5FBA39D4DEE1262CAE511E529B9EFAA2C1F492680C4D0",
+    "assets/piq_fc_arcade/models/item/fc_cartridge.json": "C7A1198A823C221DE0210D745E1F0F6C67CAF3F82FDC7289B049D8A8E7E15174",
+    "assets/piq_fc_arcade/models/item/retro_tv.json": "D6DCFF53E4965034BCF0E6B91EC30A6A203C06FEF09650D221C8E43F8919CA7A",
+    "assets/piq_fc_arcade/textures/block/home_famicom_console.png": "5EA8EE7C97F54BC0FC83949FDC7F196C4F053A798EC98B1AEF9D18579D852935",
+    "assets/piq_fc_arcade/textures/block/home_fc_cartridge_skin.png": "3F071A850BBD033F4311982B7510EA5C214DE4991B64130DC93E0F5A2616F14C",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_back.png": "294998B248DA92695C5B4149664AA6FD37DD3ECAD7A0E092A43BD2906CAF3475",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_button.png": "F0C2613A357F4ADD3F9FB5B849A364603DEA600641CB7A118DA27091CC1262E6",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_dark.png": "73C065A5B5B4BFC6A8FF3F9987DEC63CF457CCB9C1085DC13531407C54D8ECF5",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_fascia.png": "67B742A1EE0D321D3B73DD49CE60C7EB68B3799056A6E0648A281325C6B35CB0",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_glass_edge.png": "61E16A0AD5ACDCE6D7F4AB4965EACE01D7C70D4DDB614C2472CD43DFFB30976B",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_housing.png": "F8377E66CF9651D9DE416DCA2A426C6667A9B730649E97CB666DA146D0959DBE",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_metal.png": "8CAA25DC9830B114E0EB38986FE65380925BB36645056A4B30D147C8A8208C59",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_red.png": "235DD1B9AE01BFABA68461FC02CC47B9FF4F2EF857756B2E55203E2A9D760FDE",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_rim.png": "E61B29CDED4CB228A59690C3C4FDFE43B01A5E7E6E258F771D6584607A2B0B51",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_screen.png": "0540D603D36CF41C9D9450D646FEF6D6141546D1589C0FC82A45169F7C92B1D8",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_white.png": "78272C1FFDF15EBFF7EEF25ABF98821D73FD7E7AAD53A35C181101E301CC5E78",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_yellow.png": "1857D29EBB641054748B345FBD28F9E0C4299DE18DC9AC71A5BED927531882A5",
+    "assets/piq_fc_arcade/models/item/av_cable.json": "4FF440EBA308D321E965F8CAAB94CBB2DF7033B8739C5714DE4951FD70B5A6D1",
+    "assets/piq_fc_arcade/textures/item/av_cable.png": "8F0F976A6EC675A3A501549FDFC543C74C28CE7D70359FC9F38759CC57CD594E",
+    "assets/piq_fc_arcade/blockstates/retro_tv_part.json": "081DD85D5DAF3C933BF06DD60507ACF2F751D5FFC1C207FB0EC5FBA47D584E44",
+    "assets/piq_fc_arcade/models/block/retro_tv_part.json": "EF55E0202DEC6992FB57356E412B2DC7976C31CCDDBB9C7FBB5912F51F0A9C4A"
+  },
+  "notes": [
+    "Final merged allowlist; geometry-only and alpha.1 manifests remain unchanged.",
+    "Two invisible TV proxy resources checked independently; elements empty and particle uses existing TV housing.",
+    "AV item model uses item/generated and piq_fc_arcade:item/av_cable; six RCA heads visually checked on final nearest preview.",
+    "All non-home model/texture/blockstate resources must match the fixed beta.3 appearance baseline."
+  ]
+}

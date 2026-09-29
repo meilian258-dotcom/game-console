@@ -1,0 +1,10628 @@
+[
+  {
+    "elementIndex": 36,
+    "uuid": "6daa8bf1-9765-4b07-a8ba-a3b17a6574cd",
+    "name": "卡带可替换游戏标签",
+    "group": "front_label",
+    "material": "label",
+    "face": "north",
+    "rect": {
+      "x": 32,
+      "y": 32,
+      "width": 616,
+      "height": 278
+    },
+    "uv": [
+      32,
+      32,
+      648,
+      310
+    ],
+    "kind": "game_label"
+  },
+  {
+    "elementIndex": 37,
+    "uuid": "36e732f5-f797-4fe3-a73b-fb7467e1a921",
+    "name": "背面说明标签",
+    "group": "back_label",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 704,
+      "y": 32,
+      "width": 260,
+      "height": 100
+    },
+    "uv": [
+      704,
+      32,
+      964,
+      132
+    ],
+    "kind": "back_label"
+  },
+  {
+    "elementIndex": 7,
+    "uuid": "b3332f92-3160-4796-a3ff-7c985609cda1",
+    "name": "卡带外壳·竖芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 18,
+      "y": 365,
+      "width": 19,
+      "height": 57
+    },
+    "uv": [
+      18,
+      365,
+      37,
+      422
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 7,
+    "uuid": "b3332f92-3160-4796-a3ff-7c985609cda1",
+    "name": "卡带外壳·竖芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 41,
+      "y": 365,
+      "width": 108,
+      "height": 57
+    },
+    "uv": [
+      41,
+      365,
+      149,
+      422
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 7,
+    "uuid": "b3332f92-3160-4796-a3ff-7c985609cda1",
+    "name": "卡带外壳·竖芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 153,
+      "y": 365,
+      "width": 19,
+      "height": 57
+    },
+    "uv": [
+      153,
+      365,
+      172,
+      422
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 7,
+    "uuid": "b3332f92-3160-4796-a3ff-7c985609cda1",
+    "name": "卡带外壳·竖芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 176,
+      "y": 365,
+      "width": 108,
+      "height": 57
+    },
+    "uv": [
+      176,
+      365,
+      284,
+      422
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 7,
+    "uuid": "b3332f92-3160-4796-a3ff-7c985609cda1",
+    "name": "卡带外壳·竖芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 41,
+      "y": 342,
+      "width": 108,
+      "height": 19
+    },
+    "uv": [
+      41,
+      342,
+      149,
+      361
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 7,
+    "uuid": "b3332f92-3160-4796-a3ff-7c985609cda1",
+    "name": "卡带外壳·竖芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 41,
+      "y": 426,
+      "width": 108,
+      "height": 19
+    },
+    "uv": [
+      41,
+      426,
+      149,
+      445
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 6,
+    "uuid": "66e878de-a763-4c8b-a432-64a8f3c0363b",
+    "name": "卡带外壳·横芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 294,
+      "y": 365,
+      "width": 19,
+      "height": 41
+    },
+    "uv": [
+      294,
+      365,
+      313,
+      406
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 6,
+    "uuid": "66e878de-a763-4c8b-a432-64a8f3c0363b",
+    "name": "卡带外壳·横芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 317,
+      "y": 365,
+      "width": 123,
+      "height": 41
+    },
+    "uv": [
+      317,
+      365,
+      440,
+      406
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 6,
+    "uuid": "66e878de-a763-4c8b-a432-64a8f3c0363b",
+    "name": "卡带外壳·横芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 444,
+      "y": 365,
+      "width": 19,
+      "height": 41
+    },
+    "uv": [
+      444,
+      365,
+      463,
+      406
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 6,
+    "uuid": "66e878de-a763-4c8b-a432-64a8f3c0363b",
+    "name": "卡带外壳·横芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 467,
+      "y": 365,
+      "width": 123,
+      "height": 41
+    },
+    "uv": [
+      467,
+      365,
+      590,
+      406
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 6,
+    "uuid": "66e878de-a763-4c8b-a432-64a8f3c0363b",
+    "name": "卡带外壳·横芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 317,
+      "y": 342,
+      "width": 123,
+      "height": 19
+    },
+    "uv": [
+      317,
+      342,
+      440,
+      361
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 6,
+    "uuid": "66e878de-a763-4c8b-a432-64a8f3c0363b",
+    "name": "卡带外壳·横芯",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 317,
+      "y": 410,
+      "width": 123,
+      "height": 19
+    },
+    "uv": [
+      317,
+      410,
+      440,
+      429
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 13,
+    "uuid": "c3a2d36f-6c84-434a-a610-d1d29bc87e57",
+    "name": "卡带前壳层·竖芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "west",
+    "rect": {
+      "x": 600,
+      "y": 348,
+      "width": 2,
+      "height": 54
+    },
+    "uv": [
+      600,
+      348,
+      602,
+      402
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 13,
+    "uuid": "c3a2d36f-6c84-434a-a610-d1d29bc87e57",
+    "name": "卡带前壳层·竖芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "north",
+    "rect": {
+      "x": 606,
+      "y": 348,
+      "width": 107,
+      "height": 54
+    },
+    "uv": [
+      606,
+      348,
+      713,
+      402
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 13,
+    "uuid": "c3a2d36f-6c84-434a-a610-d1d29bc87e57",
+    "name": "卡带前壳层·竖芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "east",
+    "rect": {
+      "x": 717,
+      "y": 348,
+      "width": 2,
+      "height": 54
+    },
+    "uv": [
+      717,
+      348,
+      719,
+      402
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 13,
+    "uuid": "c3a2d36f-6c84-434a-a610-d1d29bc87e57",
+    "name": "卡带前壳层·竖芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "south",
+    "rect": {
+      "x": 723,
+      "y": 348,
+      "width": 107,
+      "height": 54
+    },
+    "uv": [
+      723,
+      348,
+      830,
+      402
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 13,
+    "uuid": "c3a2d36f-6c84-434a-a610-d1d29bc87e57",
+    "name": "卡带前壳层·竖芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "up",
+    "rect": {
+      "x": 606,
+      "y": 342,
+      "width": 107,
+      "height": 2
+    },
+    "uv": [
+      606,
+      342,
+      713,
+      344
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 13,
+    "uuid": "c3a2d36f-6c84-434a-a610-d1d29bc87e57",
+    "name": "卡带前壳层·竖芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "down",
+    "rect": {
+      "x": 606,
+      "y": 406,
+      "width": 107,
+      "height": 2
+    },
+    "uv": [
+      606,
+      406,
+      713,
+      408
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 0,
+    "uuid": "f9c4f14a-2eef-46ea-a384-608b1dac8bab",
+    "name": "插入段左导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 840,
+      "y": 363,
+      "width": 17,
+      "height": 18
+    },
+    "uv": [
+      840,
+      363,
+      857,
+      381
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 0,
+    "uuid": "f9c4f14a-2eef-46ea-a384-608b1dac8bab",
+    "name": "插入段左导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 861,
+      "y": 363,
+      "width": 7,
+      "height": 18
+    },
+    "uv": [
+      861,
+      363,
+      868,
+      381
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 0,
+    "uuid": "f9c4f14a-2eef-46ea-a384-608b1dac8bab",
+    "name": "插入段左导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 872,
+      "y": 363,
+      "width": 17,
+      "height": 18
+    },
+    "uv": [
+      872,
+      363,
+      889,
+      381
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 0,
+    "uuid": "f9c4f14a-2eef-46ea-a384-608b1dac8bab",
+    "name": "插入段左导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 893,
+      "y": 363,
+      "width": 7,
+      "height": 18
+    },
+    "uv": [
+      893,
+      363,
+      900,
+      381
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 0,
+    "uuid": "f9c4f14a-2eef-46ea-a384-608b1dac8bab",
+    "name": "插入段左导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 861,
+      "y": 342,
+      "width": 7,
+      "height": 17
+    },
+    "uv": [
+      861,
+      342,
+      868,
+      359
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 0,
+    "uuid": "f9c4f14a-2eef-46ea-a384-608b1dac8bab",
+    "name": "插入段左导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 861,
+      "y": 385,
+      "width": 7,
+      "height": 17
+    },
+    "uv": [
+      861,
+      385,
+      868,
+      402
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 1,
+    "uuid": "b004f101-1484-4395-a08c-6d68abf04dbb",
+    "name": "插入段右导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 910,
+      "y": 363,
+      "width": 17,
+      "height": 18
+    },
+    "uv": [
+      910,
+      363,
+      927,
+      381
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 1,
+    "uuid": "b004f101-1484-4395-a08c-6d68abf04dbb",
+    "name": "插入段右导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 931,
+      "y": 363,
+      "width": 7,
+      "height": 18
+    },
+    "uv": [
+      931,
+      363,
+      938,
+      381
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 1,
+    "uuid": "b004f101-1484-4395-a08c-6d68abf04dbb",
+    "name": "插入段右导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 942,
+      "y": 363,
+      "width": 17,
+      "height": 18
+    },
+    "uv": [
+      942,
+      363,
+      959,
+      381
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 1,
+    "uuid": "b004f101-1484-4395-a08c-6d68abf04dbb",
+    "name": "插入段右导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 963,
+      "y": 363,
+      "width": 7,
+      "height": 18
+    },
+    "uv": [
+      963,
+      363,
+      970,
+      381
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 1,
+    "uuid": "b004f101-1484-4395-a08c-6d68abf04dbb",
+    "name": "插入段右导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 931,
+      "y": 342,
+      "width": 7,
+      "height": 17
+    },
+    "uv": [
+      931,
+      342,
+      938,
+      359
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 1,
+    "uuid": "b004f101-1484-4395-a08c-6d68abf04dbb",
+    "name": "插入段右导轨",
+    "group": "connector",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 931,
+      "y": 385,
+      "width": 7,
+      "height": 17
+    },
+    "uv": [
+      931,
+      385,
+      938,
+      402
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 31,
+    "uuid": "6e70a7dc-0d0f-4974-a670-ab401a94846c",
+    "name": "卡带标签凹框·竖芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "west",
+    "rect": {
+      "x": 18,
+      "y": 461,
+      "width": 2,
+      "height": 45
+    },
+    "uv": [
+      18,
+      461,
+      20,
+      506
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 31,
+    "uuid": "6e70a7dc-0d0f-4974-a670-ab401a94846c",
+    "name": "卡带标签凹框·竖芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "north",
+    "rect": {
+      "x": 24,
+      "y": 461,
+      "width": 91,
+      "height": 45
+    },
+    "uv": [
+      24,
+      461,
+      115,
+      506
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 31,
+    "uuid": "6e70a7dc-0d0f-4974-a670-ab401a94846c",
+    "name": "卡带标签凹框·竖芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "east",
+    "rect": {
+      "x": 119,
+      "y": 461,
+      "width": 2,
+      "height": 45
+    },
+    "uv": [
+      119,
+      461,
+      121,
+      506
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 31,
+    "uuid": "6e70a7dc-0d0f-4974-a670-ab401a94846c",
+    "name": "卡带标签凹框·竖芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "south",
+    "rect": {
+      "x": 125,
+      "y": 461,
+      "width": 91,
+      "height": 45
+    },
+    "uv": [
+      125,
+      461,
+      216,
+      506
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 31,
+    "uuid": "6e70a7dc-0d0f-4974-a670-ab401a94846c",
+    "name": "卡带标签凹框·竖芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "up",
+    "rect": {
+      "x": 24,
+      "y": 455,
+      "width": 91,
+      "height": 2
+    },
+    "uv": [
+      24,
+      455,
+      115,
+      457
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 31,
+    "uuid": "6e70a7dc-0d0f-4974-a670-ab401a94846c",
+    "name": "卡带标签凹框·竖芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "down",
+    "rect": {
+      "x": 24,
+      "y": 510,
+      "width": 91,
+      "height": 2
+    },
+    "uv": [
+      24,
+      510,
+      115,
+      512
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 8,
+    "uuid": "30181a33-ec8f-4450-afd9-5ab5909c8169",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 226,
+      "y": 478,
+      "width": 19,
+      "height": 11
+    },
+    "uv": [
+      226,
+      478,
+      245,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 8,
+    "uuid": "30181a33-ec8f-4450-afd9-5ab5909c8169",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 249,
+      "y": 478,
+      "width": 11,
+      "height": 11
+    },
+    "uv": [
+      249,
+      478,
+      260,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 8,
+    "uuid": "30181a33-ec8f-4450-afd9-5ab5909c8169",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 264,
+      "y": 478,
+      "width": 19,
+      "height": 11
+    },
+    "uv": [
+      264,
+      478,
+      283,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 8,
+    "uuid": "30181a33-ec8f-4450-afd9-5ab5909c8169",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 287,
+      "y": 478,
+      "width": 11,
+      "height": 11
+    },
+    "uv": [
+      287,
+      478,
+      298,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 8,
+    "uuid": "30181a33-ec8f-4450-afd9-5ab5909c8169",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 249,
+      "y": 455,
+      "width": 11,
+      "height": 19
+    },
+    "uv": [
+      249,
+      455,
+      260,
+      474
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 8,
+    "uuid": "30181a33-ec8f-4450-afd9-5ab5909c8169",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 249,
+      "y": 493,
+      "width": 11,
+      "height": 19
+    },
+    "uv": [
+      249,
+      493,
+      260,
+      512
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 9,
+    "uuid": "7f718e5e-aa22-4c02-a595-bda5b853c535",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 308,
+      "y": 478,
+      "width": 19,
+      "height": 11
+    },
+    "uv": [
+      308,
+      478,
+      327,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 9,
+    "uuid": "7f718e5e-aa22-4c02-a595-bda5b853c535",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 331,
+      "y": 478,
+      "width": 11,
+      "height": 11
+    },
+    "uv": [
+      331,
+      478,
+      342,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 9,
+    "uuid": "7f718e5e-aa22-4c02-a595-bda5b853c535",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 346,
+      "y": 478,
+      "width": 19,
+      "height": 11
+    },
+    "uv": [
+      346,
+      478,
+      365,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 9,
+    "uuid": "7f718e5e-aa22-4c02-a595-bda5b853c535",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 369,
+      "y": 478,
+      "width": 11,
+      "height": 11
+    },
+    "uv": [
+      369,
+      478,
+      380,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 9,
+    "uuid": "7f718e5e-aa22-4c02-a595-bda5b853c535",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 331,
+      "y": 455,
+      "width": 11,
+      "height": 19
+    },
+    "uv": [
+      331,
+      455,
+      342,
+      474
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 9,
+    "uuid": "7f718e5e-aa22-4c02-a595-bda5b853c535",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 331,
+      "y": 493,
+      "width": 11,
+      "height": 19
+    },
+    "uv": [
+      331,
+      493,
+      342,
+      512
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 10,
+    "uuid": "f129cada-928f-473d-ac93-dd3aa5de6ad0",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 390,
+      "y": 478,
+      "width": 19,
+      "height": 11
+    },
+    "uv": [
+      390,
+      478,
+      409,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 10,
+    "uuid": "f129cada-928f-473d-ac93-dd3aa5de6ad0",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 413,
+      "y": 478,
+      "width": 11,
+      "height": 11
+    },
+    "uv": [
+      413,
+      478,
+      424,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 10,
+    "uuid": "f129cada-928f-473d-ac93-dd3aa5de6ad0",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 428,
+      "y": 478,
+      "width": 19,
+      "height": 11
+    },
+    "uv": [
+      428,
+      478,
+      447,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 10,
+    "uuid": "f129cada-928f-473d-ac93-dd3aa5de6ad0",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 451,
+      "y": 478,
+      "width": 11,
+      "height": 11
+    },
+    "uv": [
+      451,
+      478,
+      462,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 10,
+    "uuid": "f129cada-928f-473d-ac93-dd3aa5de6ad0",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 413,
+      "y": 455,
+      "width": 11,
+      "height": 19
+    },
+    "uv": [
+      413,
+      455,
+      424,
+      474
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 10,
+    "uuid": "f129cada-928f-473d-ac93-dd3aa5de6ad0",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 413,
+      "y": 493,
+      "width": 11,
+      "height": 19
+    },
+    "uv": [
+      413,
+      493,
+      424,
+      512
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 11,
+    "uuid": "41e63e1d-06a6-42f3-a532-463ddf52545b",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 472,
+      "y": 478,
+      "width": 19,
+      "height": 11
+    },
+    "uv": [
+      472,
+      478,
+      491,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 11,
+    "uuid": "41e63e1d-06a6-42f3-a532-463ddf52545b",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 495,
+      "y": 478,
+      "width": 11,
+      "height": 11
+    },
+    "uv": [
+      495,
+      478,
+      506,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 11,
+    "uuid": "41e63e1d-06a6-42f3-a532-463ddf52545b",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 510,
+      "y": 478,
+      "width": 19,
+      "height": 11
+    },
+    "uv": [
+      510,
+      478,
+      529,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 11,
+    "uuid": "41e63e1d-06a6-42f3-a532-463ddf52545b",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 533,
+      "y": 478,
+      "width": 11,
+      "height": 11
+    },
+    "uv": [
+      533,
+      478,
+      544,
+      489
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 11,
+    "uuid": "41e63e1d-06a6-42f3-a532-463ddf52545b",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 495,
+      "y": 455,
+      "width": 11,
+      "height": 19
+    },
+    "uv": [
+      495,
+      455,
+      506,
+      474
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 11,
+    "uuid": "41e63e1d-06a6-42f3-a532-463ddf52545b",
+    "name": "卡带外壳·倒角",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 495,
+      "y": 493,
+      "width": 11,
+      "height": 19
+    },
+    "uv": [
+      495,
+      493,
+      506,
+      512
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 12,
+    "uuid": "2fd22236-b323-486f-abb4-964bb4e13f39",
+    "name": "卡带前壳层·横芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "west",
+    "rect": {
+      "x": 554,
+      "y": 461,
+      "width": 2,
+      "height": 41
+    },
+    "uv": [
+      554,
+      461,
+      556,
+      502
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 12,
+    "uuid": "2fd22236-b323-486f-abb4-964bb4e13f39",
+    "name": "卡带前壳层·横芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "north",
+    "rect": {
+      "x": 560,
+      "y": 461,
+      "width": 120,
+      "height": 41
+    },
+    "uv": [
+      560,
+      461,
+      680,
+      502
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 12,
+    "uuid": "2fd22236-b323-486f-abb4-964bb4e13f39",
+    "name": "卡带前壳层·横芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "east",
+    "rect": {
+      "x": 684,
+      "y": 461,
+      "width": 2,
+      "height": 41
+    },
+    "uv": [
+      684,
+      461,
+      686,
+      502
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 12,
+    "uuid": "2fd22236-b323-486f-abb4-964bb4e13f39",
+    "name": "卡带前壳层·横芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "south",
+    "rect": {
+      "x": 690,
+      "y": 461,
+      "width": 120,
+      "height": 41
+    },
+    "uv": [
+      690,
+      461,
+      810,
+      502
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 12,
+    "uuid": "2fd22236-b323-486f-abb4-964bb4e13f39",
+    "name": "卡带前壳层·横芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "up",
+    "rect": {
+      "x": 560,
+      "y": 455,
+      "width": 120,
+      "height": 2
+    },
+    "uv": [
+      560,
+      455,
+      680,
+      457
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 12,
+    "uuid": "2fd22236-b323-486f-abb4-964bb4e13f39",
+    "name": "卡带前壳层·横芯",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "down",
+    "rect": {
+      "x": 560,
+      "y": 506,
+      "width": 120,
+      "height": 2
+    },
+    "uv": [
+      560,
+      506,
+      680,
+      508
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 30,
+    "uuid": "721b975b-33bf-47da-a35b-ff8825efefd5",
+    "name": "卡带标签凹框·横芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "west",
+    "rect": {
+      "x": 18,
+      "y": 528,
+      "width": 2,
+      "height": 40
+    },
+    "uv": [
+      18,
+      528,
+      20,
+      568
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 30,
+    "uuid": "721b975b-33bf-47da-a35b-ff8825efefd5",
+    "name": "卡带标签凹框·横芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "north",
+    "rect": {
+      "x": 24,
+      "y": 528,
+      "width": 96,
+      "height": 40
+    },
+    "uv": [
+      24,
+      528,
+      120,
+      568
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 30,
+    "uuid": "721b975b-33bf-47da-a35b-ff8825efefd5",
+    "name": "卡带标签凹框·横芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "east",
+    "rect": {
+      "x": 124,
+      "y": 528,
+      "width": 2,
+      "height": 40
+    },
+    "uv": [
+      124,
+      528,
+      126,
+      568
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 30,
+    "uuid": "721b975b-33bf-47da-a35b-ff8825efefd5",
+    "name": "卡带标签凹框·横芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "south",
+    "rect": {
+      "x": 130,
+      "y": 528,
+      "width": 96,
+      "height": 40
+    },
+    "uv": [
+      130,
+      528,
+      226,
+      568
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 30,
+    "uuid": "721b975b-33bf-47da-a35b-ff8825efefd5",
+    "name": "卡带标签凹框·横芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "up",
+    "rect": {
+      "x": 24,
+      "y": 522,
+      "width": 96,
+      "height": 2
+    },
+    "uv": [
+      24,
+      522,
+      120,
+      524
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 30,
+    "uuid": "721b975b-33bf-47da-a35b-ff8825efefd5",
+    "name": "卡带标签凹框·横芯",
+    "group": "shell",
+    "material": "seam",
+    "face": "down",
+    "rect": {
+      "x": 24,
+      "y": 572,
+      "width": 96,
+      "height": 2
+    },
+    "uv": [
+      24,
+      572,
+      120,
+      574
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 3,
+    "uuid": "6f0a2eed-f7e6-4939-aff2-50fde64af045",
+    "name": "插入段后唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 236,
+      "y": 534,
+      "width": 8,
+      "height": 11
+    },
+    "uv": [
+      236,
+      534,
+      244,
+      545
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 3,
+    "uuid": "6f0a2eed-f7e6-4939-aff2-50fde64af045",
+    "name": "插入段后唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 248,
+      "y": 534,
+      "width": 92,
+      "height": 11
+    },
+    "uv": [
+      248,
+      534,
+      340,
+      545
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 3,
+    "uuid": "6f0a2eed-f7e6-4939-aff2-50fde64af045",
+    "name": "插入段后唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 344,
+      "y": 534,
+      "width": 8,
+      "height": 11
+    },
+    "uv": [
+      344,
+      534,
+      352,
+      545
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 3,
+    "uuid": "6f0a2eed-f7e6-4939-aff2-50fde64af045",
+    "name": "插入段后唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 356,
+      "y": 534,
+      "width": 92,
+      "height": 11
+    },
+    "uv": [
+      356,
+      534,
+      448,
+      545
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 3,
+    "uuid": "6f0a2eed-f7e6-4939-aff2-50fde64af045",
+    "name": "插入段后唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 248,
+      "y": 522,
+      "width": 92,
+      "height": 8
+    },
+    "uv": [
+      248,
+      522,
+      340,
+      530
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 3,
+    "uuid": "6f0a2eed-f7e6-4939-aff2-50fde64af045",
+    "name": "插入段后唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 248,
+      "y": 549,
+      "width": 92,
+      "height": 8
+    },
+    "uv": [
+      248,
+      549,
+      340,
+      557
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 2,
+    "uuid": "a897ce61-bb92-4d0a-ac79-1a9d233866c2",
+    "name": "插入段前唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 458,
+      "y": 533,
+      "width": 7,
+      "height": 11
+    },
+    "uv": [
+      458,
+      533,
+      465,
+      544
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 2,
+    "uuid": "a897ce61-bb92-4d0a-ac79-1a9d233866c2",
+    "name": "插入段前唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 469,
+      "y": 533,
+      "width": 92,
+      "height": 11
+    },
+    "uv": [
+      469,
+      533,
+      561,
+      544
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 2,
+    "uuid": "a897ce61-bb92-4d0a-ac79-1a9d233866c2",
+    "name": "插入段前唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 565,
+      "y": 533,
+      "width": 7,
+      "height": 11
+    },
+    "uv": [
+      565,
+      533,
+      572,
+      544
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 2,
+    "uuid": "a897ce61-bb92-4d0a-ac79-1a9d233866c2",
+    "name": "插入段前唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 576,
+      "y": 533,
+      "width": 92,
+      "height": 11
+    },
+    "uv": [
+      576,
+      533,
+      668,
+      544
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 2,
+    "uuid": "a897ce61-bb92-4d0a-ac79-1a9d233866c2",
+    "name": "插入段前唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 469,
+      "y": 522,
+      "width": 92,
+      "height": 7
+    },
+    "uv": [
+      469,
+      522,
+      561,
+      529
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 2,
+    "uuid": "a897ce61-bb92-4d0a-ac79-1a9d233866c2",
+    "name": "插入段前唇",
+    "group": "connector",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 469,
+      "y": 548,
+      "width": 92,
+      "height": 7
+    },
+    "uv": [
+      469,
+      548,
+      561,
+      555
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 4,
+    "uuid": "1702d886-5cc5-4720-a4c6-c9fa9e1e3488",
+    "name": "连接器PCB",
+    "group": "connector",
+    "material": "pcb",
+    "face": "west",
+    "rect": {
+      "x": 678,
+      "y": 529,
+      "width": 3,
+      "height": 19
+    },
+    "uv": [
+      678,
+      529,
+      681,
+      548
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 4,
+    "uuid": "1702d886-5cc5-4720-a4c6-c9fa9e1e3488",
+    "name": "连接器PCB",
+    "group": "connector",
+    "material": "pcb",
+    "face": "north",
+    "rect": {
+      "x": 685,
+      "y": 529,
+      "width": 93,
+      "height": 19
+    },
+    "uv": [
+      685,
+      529,
+      778,
+      548
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 4,
+    "uuid": "1702d886-5cc5-4720-a4c6-c9fa9e1e3488",
+    "name": "连接器PCB",
+    "group": "connector",
+    "material": "pcb",
+    "face": "east",
+    "rect": {
+      "x": 782,
+      "y": 529,
+      "width": 3,
+      "height": 19
+    },
+    "uv": [
+      782,
+      529,
+      785,
+      548
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 4,
+    "uuid": "1702d886-5cc5-4720-a4c6-c9fa9e1e3488",
+    "name": "连接器PCB",
+    "group": "connector",
+    "material": "pcb",
+    "face": "south",
+    "rect": {
+      "x": 789,
+      "y": 529,
+      "width": 93,
+      "height": 19
+    },
+    "uv": [
+      789,
+      529,
+      882,
+      548
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 4,
+    "uuid": "1702d886-5cc5-4720-a4c6-c9fa9e1e3488",
+    "name": "连接器PCB",
+    "group": "connector",
+    "material": "pcb",
+    "face": "up",
+    "rect": {
+      "x": 685,
+      "y": 522,
+      "width": 93,
+      "height": 3
+    },
+    "uv": [
+      685,
+      522,
+      778,
+      525
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 4,
+    "uuid": "1702d886-5cc5-4720-a4c6-c9fa9e1e3488",
+    "name": "连接器PCB",
+    "group": "connector",
+    "material": "pcb",
+    "face": "down",
+    "rect": {
+      "x": 685,
+      "y": 552,
+      "width": 93,
+      "height": 3
+    },
+    "uv": [
+      685,
+      552,
+      778,
+      555
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 5,
+    "uuid": "eea05d2d-ce82-4bf8-a4c3-a54e3a3d393b",
+    "name": "连接器内部支撑",
+    "group": "connector",
+    "material": "rubber",
+    "face": "west",
+    "rect": {
+      "x": 18,
+      "y": 592,
+      "width": 4,
+      "height": 6
+    },
+    "uv": [
+      18,
+      592,
+      22,
+      598
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 5,
+    "uuid": "eea05d2d-ce82-4bf8-a4c3-a54e3a3d393b",
+    "name": "连接器内部支撑",
+    "group": "connector",
+    "material": "rubber",
+    "face": "north",
+    "rect": {
+      "x": 26,
+      "y": 592,
+      "width": 92,
+      "height": 6
+    },
+    "uv": [
+      26,
+      592,
+      118,
+      598
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 5,
+    "uuid": "eea05d2d-ce82-4bf8-a4c3-a54e3a3d393b",
+    "name": "连接器内部支撑",
+    "group": "connector",
+    "material": "rubber",
+    "face": "east",
+    "rect": {
+      "x": 122,
+      "y": 592,
+      "width": 4,
+      "height": 6
+    },
+    "uv": [
+      122,
+      592,
+      126,
+      598
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 5,
+    "uuid": "eea05d2d-ce82-4bf8-a4c3-a54e3a3d393b",
+    "name": "连接器内部支撑",
+    "group": "connector",
+    "material": "rubber",
+    "face": "south",
+    "rect": {
+      "x": 130,
+      "y": 592,
+      "width": 92,
+      "height": 6
+    },
+    "uv": [
+      130,
+      592,
+      222,
+      598
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 5,
+    "uuid": "eea05d2d-ce82-4bf8-a4c3-a54e3a3d393b",
+    "name": "连接器内部支撑",
+    "group": "connector",
+    "material": "rubber",
+    "face": "up",
+    "rect": {
+      "x": 26,
+      "y": 584,
+      "width": 92,
+      "height": 4
+    },
+    "uv": [
+      26,
+      584,
+      118,
+      588
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 5,
+    "uuid": "eea05d2d-ce82-4bf8-a4c3-a54e3a3d393b",
+    "name": "连接器内部支撑",
+    "group": "connector",
+    "material": "rubber",
+    "face": "down",
+    "rect": {
+      "x": 26,
+      "y": 602,
+      "width": 92,
+      "height": 4
+    },
+    "uv": [
+      26,
+      602,
+      118,
+      606
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 14,
+    "uuid": "711a0f04-64de-4446-a18b-afef43970055",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "west",
+    "rect": {
+      "x": 232,
+      "y": 590,
+      "width": 2,
+      "height": 10
+    },
+    "uv": [
+      232,
+      590,
+      234,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 14,
+    "uuid": "711a0f04-64de-4446-a18b-afef43970055",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "north",
+    "rect": {
+      "x": 238,
+      "y": 590,
+      "width": 10,
+      "height": 10
+    },
+    "uv": [
+      238,
+      590,
+      248,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 14,
+    "uuid": "711a0f04-64de-4446-a18b-afef43970055",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "east",
+    "rect": {
+      "x": 252,
+      "y": 590,
+      "width": 2,
+      "height": 10
+    },
+    "uv": [
+      252,
+      590,
+      254,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 14,
+    "uuid": "711a0f04-64de-4446-a18b-afef43970055",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "south",
+    "rect": {
+      "x": 258,
+      "y": 590,
+      "width": 10,
+      "height": 10
+    },
+    "uv": [
+      258,
+      590,
+      268,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 14,
+    "uuid": "711a0f04-64de-4446-a18b-afef43970055",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "up",
+    "rect": {
+      "x": 238,
+      "y": 584,
+      "width": 10,
+      "height": 2
+    },
+    "uv": [
+      238,
+      584,
+      248,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 14,
+    "uuid": "711a0f04-64de-4446-a18b-afef43970055",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "down",
+    "rect": {
+      "x": 238,
+      "y": 604,
+      "width": 10,
+      "height": 2
+    },
+    "uv": [
+      238,
+      604,
+      248,
+      606
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 15,
+    "uuid": "5b972b28-a770-43f1-a285-6184432272a1",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "west",
+    "rect": {
+      "x": 278,
+      "y": 590,
+      "width": 2,
+      "height": 10
+    },
+    "uv": [
+      278,
+      590,
+      280,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 15,
+    "uuid": "5b972b28-a770-43f1-a285-6184432272a1",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "north",
+    "rect": {
+      "x": 284,
+      "y": 590,
+      "width": 10,
+      "height": 10
+    },
+    "uv": [
+      284,
+      590,
+      294,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 15,
+    "uuid": "5b972b28-a770-43f1-a285-6184432272a1",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "east",
+    "rect": {
+      "x": 298,
+      "y": 590,
+      "width": 2,
+      "height": 10
+    },
+    "uv": [
+      298,
+      590,
+      300,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 15,
+    "uuid": "5b972b28-a770-43f1-a285-6184432272a1",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "south",
+    "rect": {
+      "x": 304,
+      "y": 590,
+      "width": 10,
+      "height": 10
+    },
+    "uv": [
+      304,
+      590,
+      314,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 15,
+    "uuid": "5b972b28-a770-43f1-a285-6184432272a1",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "up",
+    "rect": {
+      "x": 284,
+      "y": 584,
+      "width": 10,
+      "height": 2
+    },
+    "uv": [
+      284,
+      584,
+      294,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 15,
+    "uuid": "5b972b28-a770-43f1-a285-6184432272a1",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "down",
+    "rect": {
+      "x": 284,
+      "y": 604,
+      "width": 10,
+      "height": 2
+    },
+    "uv": [
+      284,
+      604,
+      294,
+      606
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 16,
+    "uuid": "7be2add5-4756-4086-a0ef-dc2903c25bea",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "west",
+    "rect": {
+      "x": 324,
+      "y": 590,
+      "width": 2,
+      "height": 10
+    },
+    "uv": [
+      324,
+      590,
+      326,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 16,
+    "uuid": "7be2add5-4756-4086-a0ef-dc2903c25bea",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "north",
+    "rect": {
+      "x": 330,
+      "y": 590,
+      "width": 10,
+      "height": 10
+    },
+    "uv": [
+      330,
+      590,
+      340,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 16,
+    "uuid": "7be2add5-4756-4086-a0ef-dc2903c25bea",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "east",
+    "rect": {
+      "x": 344,
+      "y": 590,
+      "width": 2,
+      "height": 10
+    },
+    "uv": [
+      344,
+      590,
+      346,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 16,
+    "uuid": "7be2add5-4756-4086-a0ef-dc2903c25bea",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "south",
+    "rect": {
+      "x": 350,
+      "y": 590,
+      "width": 10,
+      "height": 10
+    },
+    "uv": [
+      350,
+      590,
+      360,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 16,
+    "uuid": "7be2add5-4756-4086-a0ef-dc2903c25bea",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "up",
+    "rect": {
+      "x": 330,
+      "y": 584,
+      "width": 10,
+      "height": 2
+    },
+    "uv": [
+      330,
+      584,
+      340,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 16,
+    "uuid": "7be2add5-4756-4086-a0ef-dc2903c25bea",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "down",
+    "rect": {
+      "x": 330,
+      "y": 604,
+      "width": 10,
+      "height": 2
+    },
+    "uv": [
+      330,
+      604,
+      340,
+      606
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 17,
+    "uuid": "7c69c7b6-853b-424a-ad99-98266ea9a649",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "west",
+    "rect": {
+      "x": 370,
+      "y": 590,
+      "width": 2,
+      "height": 10
+    },
+    "uv": [
+      370,
+      590,
+      372,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 17,
+    "uuid": "7c69c7b6-853b-424a-ad99-98266ea9a649",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "north",
+    "rect": {
+      "x": 376,
+      "y": 590,
+      "width": 10,
+      "height": 10
+    },
+    "uv": [
+      376,
+      590,
+      386,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 17,
+    "uuid": "7c69c7b6-853b-424a-ad99-98266ea9a649",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "east",
+    "rect": {
+      "x": 390,
+      "y": 590,
+      "width": 2,
+      "height": 10
+    },
+    "uv": [
+      390,
+      590,
+      392,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 17,
+    "uuid": "7c69c7b6-853b-424a-ad99-98266ea9a649",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "south",
+    "rect": {
+      "x": 396,
+      "y": 590,
+      "width": 10,
+      "height": 10
+    },
+    "uv": [
+      396,
+      590,
+      406,
+      600
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 17,
+    "uuid": "7c69c7b6-853b-424a-ad99-98266ea9a649",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "up",
+    "rect": {
+      "x": 376,
+      "y": 584,
+      "width": 10,
+      "height": 2
+    },
+    "uv": [
+      376,
+      584,
+      386,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 17,
+    "uuid": "7c69c7b6-853b-424a-ad99-98266ea9a649",
+    "name": "卡带前壳层·倒角",
+    "group": "shell",
+    "material": "shell_light",
+    "face": "down",
+    "rect": {
+      "x": 376,
+      "y": 604,
+      "width": 10,
+      "height": 2
+    },
+    "uv": [
+      376,
+      604,
+      386,
+      606
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 38,
+    "uuid": "22195378-b1bf-4146-a924-cfaf0d3ffd2f",
+    "name": "正面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 416,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      416,
+      590,
+      418,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 38,
+    "uuid": "22195378-b1bf-4146-a924-cfaf0d3ffd2f",
+    "name": "正面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 422,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      422,
+      590,
+      425,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 38,
+    "uuid": "22195378-b1bf-4146-a924-cfaf0d3ffd2f",
+    "name": "正面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 429,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      429,
+      590,
+      431,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 38,
+    "uuid": "22195378-b1bf-4146-a924-cfaf0d3ffd2f",
+    "name": "正面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 435,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      435,
+      590,
+      438,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 38,
+    "uuid": "22195378-b1bf-4146-a924-cfaf0d3ffd2f",
+    "name": "正面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 422,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      422,
+      584,
+      425,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 38,
+    "uuid": "22195378-b1bf-4146-a924-cfaf0d3ffd2f",
+    "name": "正面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 422,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      422,
+      600,
+      425,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 39,
+    "uuid": "a757e6c3-b10c-419f-a4eb-90ff9ef7d9cb",
+    "name": "正面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 448,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      448,
+      590,
+      450,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 39,
+    "uuid": "a757e6c3-b10c-419f-a4eb-90ff9ef7d9cb",
+    "name": "正面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 454,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      454,
+      590,
+      457,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 39,
+    "uuid": "a757e6c3-b10c-419f-a4eb-90ff9ef7d9cb",
+    "name": "正面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 461,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      461,
+      590,
+      463,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 39,
+    "uuid": "a757e6c3-b10c-419f-a4eb-90ff9ef7d9cb",
+    "name": "正面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 467,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      467,
+      590,
+      470,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 39,
+    "uuid": "a757e6c3-b10c-419f-a4eb-90ff9ef7d9cb",
+    "name": "正面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 454,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      454,
+      584,
+      457,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 39,
+    "uuid": "a757e6c3-b10c-419f-a4eb-90ff9ef7d9cb",
+    "name": "正面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 454,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      454,
+      600,
+      457,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 40,
+    "uuid": "11a4e921-0885-4bec-ae7a-ff30c2be00fb",
+    "name": "正面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 480,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      480,
+      590,
+      482,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 40,
+    "uuid": "11a4e921-0885-4bec-ae7a-ff30c2be00fb",
+    "name": "正面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 486,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      486,
+      590,
+      489,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 40,
+    "uuid": "11a4e921-0885-4bec-ae7a-ff30c2be00fb",
+    "name": "正面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 493,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      493,
+      590,
+      495,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 40,
+    "uuid": "11a4e921-0885-4bec-ae7a-ff30c2be00fb",
+    "name": "正面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 499,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      499,
+      590,
+      502,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 40,
+    "uuid": "11a4e921-0885-4bec-ae7a-ff30c2be00fb",
+    "name": "正面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 486,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      486,
+      584,
+      489,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 40,
+    "uuid": "11a4e921-0885-4bec-ae7a-ff30c2be00fb",
+    "name": "正面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 486,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      486,
+      600,
+      489,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 41,
+    "uuid": "b12de60f-b68c-4ae2-ab8e-dad345cb5073",
+    "name": "正面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 512,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      512,
+      590,
+      514,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 41,
+    "uuid": "b12de60f-b68c-4ae2-ab8e-dad345cb5073",
+    "name": "正面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 518,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      518,
+      590,
+      521,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 41,
+    "uuid": "b12de60f-b68c-4ae2-ab8e-dad345cb5073",
+    "name": "正面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 525,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      525,
+      590,
+      527,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 41,
+    "uuid": "b12de60f-b68c-4ae2-ab8e-dad345cb5073",
+    "name": "正面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 531,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      531,
+      590,
+      534,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 41,
+    "uuid": "b12de60f-b68c-4ae2-ab8e-dad345cb5073",
+    "name": "正面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 518,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      518,
+      584,
+      521,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 41,
+    "uuid": "b12de60f-b68c-4ae2-ab8e-dad345cb5073",
+    "name": "正面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 518,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      518,
+      600,
+      521,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 42,
+    "uuid": "16e07ea4-f36f-4ded-a486-c3e3bf3461e8",
+    "name": "正面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 544,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      544,
+      590,
+      546,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 42,
+    "uuid": "16e07ea4-f36f-4ded-a486-c3e3bf3461e8",
+    "name": "正面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 550,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      550,
+      590,
+      553,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 42,
+    "uuid": "16e07ea4-f36f-4ded-a486-c3e3bf3461e8",
+    "name": "正面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 557,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      557,
+      590,
+      559,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 42,
+    "uuid": "16e07ea4-f36f-4ded-a486-c3e3bf3461e8",
+    "name": "正面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 563,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      563,
+      590,
+      566,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 42,
+    "uuid": "16e07ea4-f36f-4ded-a486-c3e3bf3461e8",
+    "name": "正面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 550,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      550,
+      584,
+      553,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 42,
+    "uuid": "16e07ea4-f36f-4ded-a486-c3e3bf3461e8",
+    "name": "正面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 550,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      550,
+      600,
+      553,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 43,
+    "uuid": "62d12bf9-eeb4-4310-aca7-cf0a353ff2ef",
+    "name": "正面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 576,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      576,
+      590,
+      578,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 43,
+    "uuid": "62d12bf9-eeb4-4310-aca7-cf0a353ff2ef",
+    "name": "正面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 582,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      582,
+      590,
+      585,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 43,
+    "uuid": "62d12bf9-eeb4-4310-aca7-cf0a353ff2ef",
+    "name": "正面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 589,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      589,
+      590,
+      591,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 43,
+    "uuid": "62d12bf9-eeb4-4310-aca7-cf0a353ff2ef",
+    "name": "正面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 595,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      595,
+      590,
+      598,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 43,
+    "uuid": "62d12bf9-eeb4-4310-aca7-cf0a353ff2ef",
+    "name": "正面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 582,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      582,
+      584,
+      585,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 43,
+    "uuid": "62d12bf9-eeb4-4310-aca7-cf0a353ff2ef",
+    "name": "正面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 582,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      582,
+      600,
+      585,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 44,
+    "uuid": "92a538b7-b1e9-469a-aab0-7755fe9f1f89",
+    "name": "正面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 608,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      608,
+      590,
+      610,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 44,
+    "uuid": "92a538b7-b1e9-469a-aab0-7755fe9f1f89",
+    "name": "正面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 614,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      614,
+      590,
+      617,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 44,
+    "uuid": "92a538b7-b1e9-469a-aab0-7755fe9f1f89",
+    "name": "正面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 621,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      621,
+      590,
+      623,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 44,
+    "uuid": "92a538b7-b1e9-469a-aab0-7755fe9f1f89",
+    "name": "正面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 627,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      627,
+      590,
+      630,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 44,
+    "uuid": "92a538b7-b1e9-469a-aab0-7755fe9f1f89",
+    "name": "正面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 614,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      614,
+      584,
+      617,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 44,
+    "uuid": "92a538b7-b1e9-469a-aab0-7755fe9f1f89",
+    "name": "正面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 614,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      614,
+      600,
+      617,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 45,
+    "uuid": "db471bcc-b6a1-4ca0-a87d-142358f3c3db",
+    "name": "正面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 640,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      640,
+      590,
+      642,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 45,
+    "uuid": "db471bcc-b6a1-4ca0-a87d-142358f3c3db",
+    "name": "正面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 646,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      646,
+      590,
+      649,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 45,
+    "uuid": "db471bcc-b6a1-4ca0-a87d-142358f3c3db",
+    "name": "正面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 653,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      653,
+      590,
+      655,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 45,
+    "uuid": "db471bcc-b6a1-4ca0-a87d-142358f3c3db",
+    "name": "正面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 659,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      659,
+      590,
+      662,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 45,
+    "uuid": "db471bcc-b6a1-4ca0-a87d-142358f3c3db",
+    "name": "正面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 646,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      646,
+      584,
+      649,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 45,
+    "uuid": "db471bcc-b6a1-4ca0-a87d-142358f3c3db",
+    "name": "正面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 646,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      646,
+      600,
+      649,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 46,
+    "uuid": "77f375e1-f84a-4162-ae3e-693cb0785329",
+    "name": "正面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 672,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      672,
+      590,
+      674,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 46,
+    "uuid": "77f375e1-f84a-4162-ae3e-693cb0785329",
+    "name": "正面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 678,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      678,
+      590,
+      681,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 46,
+    "uuid": "77f375e1-f84a-4162-ae3e-693cb0785329",
+    "name": "正面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 685,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      685,
+      590,
+      687,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 46,
+    "uuid": "77f375e1-f84a-4162-ae3e-693cb0785329",
+    "name": "正面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 691,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      691,
+      590,
+      694,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 46,
+    "uuid": "77f375e1-f84a-4162-ae3e-693cb0785329",
+    "name": "正面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 678,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      678,
+      584,
+      681,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 46,
+    "uuid": "77f375e1-f84a-4162-ae3e-693cb0785329",
+    "name": "正面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 678,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      678,
+      600,
+      681,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 47,
+    "uuid": "00180365-5f45-4a2e-a415-6b5f7d3edcc4",
+    "name": "正面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 704,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      704,
+      590,
+      706,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 47,
+    "uuid": "00180365-5f45-4a2e-a415-6b5f7d3edcc4",
+    "name": "正面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 710,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      710,
+      590,
+      713,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 47,
+    "uuid": "00180365-5f45-4a2e-a415-6b5f7d3edcc4",
+    "name": "正面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 717,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      717,
+      590,
+      719,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 47,
+    "uuid": "00180365-5f45-4a2e-a415-6b5f7d3edcc4",
+    "name": "正面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 723,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      723,
+      590,
+      726,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 47,
+    "uuid": "00180365-5f45-4a2e-a415-6b5f7d3edcc4",
+    "name": "正面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 710,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      710,
+      584,
+      713,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 47,
+    "uuid": "00180365-5f45-4a2e-a415-6b5f7d3edcc4",
+    "name": "正面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 710,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      710,
+      600,
+      713,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 48,
+    "uuid": "02f05fa2-7d05-439d-a349-f54cf865f07c",
+    "name": "正面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 736,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      736,
+      590,
+      738,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 48,
+    "uuid": "02f05fa2-7d05-439d-a349-f54cf865f07c",
+    "name": "正面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 742,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      742,
+      590,
+      745,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 48,
+    "uuid": "02f05fa2-7d05-439d-a349-f54cf865f07c",
+    "name": "正面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 749,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      749,
+      590,
+      751,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 48,
+    "uuid": "02f05fa2-7d05-439d-a349-f54cf865f07c",
+    "name": "正面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 755,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      755,
+      590,
+      758,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 48,
+    "uuid": "02f05fa2-7d05-439d-a349-f54cf865f07c",
+    "name": "正面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 742,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      742,
+      584,
+      745,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 48,
+    "uuid": "02f05fa2-7d05-439d-a349-f54cf865f07c",
+    "name": "正面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 742,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      742,
+      600,
+      745,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 49,
+    "uuid": "0801b851-0574-430c-a4a7-f9e051f722b2",
+    "name": "正面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 768,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      768,
+      590,
+      770,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 49,
+    "uuid": "0801b851-0574-430c-a4a7-f9e051f722b2",
+    "name": "正面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 774,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      774,
+      590,
+      777,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 49,
+    "uuid": "0801b851-0574-430c-a4a7-f9e051f722b2",
+    "name": "正面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 781,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      781,
+      590,
+      783,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 49,
+    "uuid": "0801b851-0574-430c-a4a7-f9e051f722b2",
+    "name": "正面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 787,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      787,
+      590,
+      790,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 49,
+    "uuid": "0801b851-0574-430c-a4a7-f9e051f722b2",
+    "name": "正面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 774,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      774,
+      584,
+      777,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 49,
+    "uuid": "0801b851-0574-430c-a4a7-f9e051f722b2",
+    "name": "正面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 774,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      774,
+      600,
+      777,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 50,
+    "uuid": "1aa93e3c-52b8-45c4-a6fa-aadf2fbcb9ea",
+    "name": "正面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 800,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      800,
+      590,
+      802,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 50,
+    "uuid": "1aa93e3c-52b8-45c4-a6fa-aadf2fbcb9ea",
+    "name": "正面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 806,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      806,
+      590,
+      809,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 50,
+    "uuid": "1aa93e3c-52b8-45c4-a6fa-aadf2fbcb9ea",
+    "name": "正面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 813,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      813,
+      590,
+      815,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 50,
+    "uuid": "1aa93e3c-52b8-45c4-a6fa-aadf2fbcb9ea",
+    "name": "正面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 819,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      819,
+      590,
+      822,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 50,
+    "uuid": "1aa93e3c-52b8-45c4-a6fa-aadf2fbcb9ea",
+    "name": "正面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 806,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      806,
+      584,
+      809,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 50,
+    "uuid": "1aa93e3c-52b8-45c4-a6fa-aadf2fbcb9ea",
+    "name": "正面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 806,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      806,
+      600,
+      809,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 51,
+    "uuid": "3c24fc71-4fed-463a-ae6c-d5fb821e3005",
+    "name": "正面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 832,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      832,
+      590,
+      834,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 51,
+    "uuid": "3c24fc71-4fed-463a-ae6c-d5fb821e3005",
+    "name": "正面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 838,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      838,
+      590,
+      841,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 51,
+    "uuid": "3c24fc71-4fed-463a-ae6c-d5fb821e3005",
+    "name": "正面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 845,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      845,
+      590,
+      847,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 51,
+    "uuid": "3c24fc71-4fed-463a-ae6c-d5fb821e3005",
+    "name": "正面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 851,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      851,
+      590,
+      854,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 51,
+    "uuid": "3c24fc71-4fed-463a-ae6c-d5fb821e3005",
+    "name": "正面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 838,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      838,
+      584,
+      841,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 51,
+    "uuid": "3c24fc71-4fed-463a-ae6c-d5fb821e3005",
+    "name": "正面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 838,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      838,
+      600,
+      841,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 52,
+    "uuid": "af14f2f9-0408-4d96-a28f-5b4a55a74022",
+    "name": "正面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 864,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      864,
+      590,
+      866,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 52,
+    "uuid": "af14f2f9-0408-4d96-a28f-5b4a55a74022",
+    "name": "正面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 870,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      870,
+      590,
+      873,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 52,
+    "uuid": "af14f2f9-0408-4d96-a28f-5b4a55a74022",
+    "name": "正面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 877,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      877,
+      590,
+      879,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 52,
+    "uuid": "af14f2f9-0408-4d96-a28f-5b4a55a74022",
+    "name": "正面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 883,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      883,
+      590,
+      886,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 52,
+    "uuid": "af14f2f9-0408-4d96-a28f-5b4a55a74022",
+    "name": "正面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 870,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      870,
+      584,
+      873,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 52,
+    "uuid": "af14f2f9-0408-4d96-a28f-5b4a55a74022",
+    "name": "正面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 870,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      870,
+      600,
+      873,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 53,
+    "uuid": "af93290d-3998-4f1c-a480-a7d0a98e4b10",
+    "name": "正面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 896,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      896,
+      590,
+      898,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 53,
+    "uuid": "af93290d-3998-4f1c-a480-a7d0a98e4b10",
+    "name": "正面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 902,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      902,
+      590,
+      905,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 53,
+    "uuid": "af93290d-3998-4f1c-a480-a7d0a98e4b10",
+    "name": "正面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 909,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      909,
+      590,
+      911,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 53,
+    "uuid": "af93290d-3998-4f1c-a480-a7d0a98e4b10",
+    "name": "正面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 915,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      915,
+      590,
+      918,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 53,
+    "uuid": "af93290d-3998-4f1c-a480-a7d0a98e4b10",
+    "name": "正面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 902,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      902,
+      584,
+      905,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 53,
+    "uuid": "af93290d-3998-4f1c-a480-a7d0a98e4b10",
+    "name": "正面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 902,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      902,
+      600,
+      905,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 54,
+    "uuid": "3b478b30-533c-4513-af33-850062e9b351",
+    "name": "正面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 928,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      928,
+      590,
+      930,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 54,
+    "uuid": "3b478b30-533c-4513-af33-850062e9b351",
+    "name": "正面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 934,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      934,
+      590,
+      937,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 54,
+    "uuid": "3b478b30-533c-4513-af33-850062e9b351",
+    "name": "正面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 941,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      941,
+      590,
+      943,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 54,
+    "uuid": "3b478b30-533c-4513-af33-850062e9b351",
+    "name": "正面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 947,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      947,
+      590,
+      950,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 54,
+    "uuid": "3b478b30-533c-4513-af33-850062e9b351",
+    "name": "正面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 934,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      934,
+      584,
+      937,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 54,
+    "uuid": "3b478b30-533c-4513-af33-850062e9b351",
+    "name": "正面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 934,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      934,
+      600,
+      937,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 55,
+    "uuid": "df6ed3c4-c100-4eef-a32d-8ca980428a10",
+    "name": "正面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 960,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      960,
+      590,
+      962,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 55,
+    "uuid": "df6ed3c4-c100-4eef-a32d-8ca980428a10",
+    "name": "正面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 966,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      966,
+      590,
+      969,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 55,
+    "uuid": "df6ed3c4-c100-4eef-a32d-8ca980428a10",
+    "name": "正面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 973,
+      "y": 590,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      973,
+      590,
+      975,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 55,
+    "uuid": "df6ed3c4-c100-4eef-a32d-8ca980428a10",
+    "name": "正面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 979,
+      "y": 590,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      979,
+      590,
+      982,
+      596
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 55,
+    "uuid": "df6ed3c4-c100-4eef-a32d-8ca980428a10",
+    "name": "正面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 966,
+      "y": 584,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      966,
+      584,
+      969,
+      586
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 55,
+    "uuid": "df6ed3c4-c100-4eef-a32d-8ca980428a10",
+    "name": "正面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 966,
+      "y": 600,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      966,
+      600,
+      969,
+      602
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 56,
+    "uuid": "9b4b32ec-cbc0-42a0-a9ab-4c5307ef30e0",
+    "name": "正面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 18,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      18,
+      622,
+      20,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 56,
+    "uuid": "9b4b32ec-cbc0-42a0-a9ab-4c5307ef30e0",
+    "name": "正面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 24,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      24,
+      622,
+      27,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 56,
+    "uuid": "9b4b32ec-cbc0-42a0-a9ab-4c5307ef30e0",
+    "name": "正面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 31,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      31,
+      622,
+      33,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 56,
+    "uuid": "9b4b32ec-cbc0-42a0-a9ab-4c5307ef30e0",
+    "name": "正面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 37,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      37,
+      622,
+      40,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 56,
+    "uuid": "9b4b32ec-cbc0-42a0-a9ab-4c5307ef30e0",
+    "name": "正面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 24,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      24,
+      616,
+      27,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 56,
+    "uuid": "9b4b32ec-cbc0-42a0-a9ab-4c5307ef30e0",
+    "name": "正面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 24,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      24,
+      632,
+      27,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 57,
+    "uuid": "890802e0-631e-4e94-ae4b-07fa09636b3b",
+    "name": "正面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 50,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      50,
+      622,
+      52,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 57,
+    "uuid": "890802e0-631e-4e94-ae4b-07fa09636b3b",
+    "name": "正面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 56,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      56,
+      622,
+      59,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 57,
+    "uuid": "890802e0-631e-4e94-ae4b-07fa09636b3b",
+    "name": "正面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 63,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      63,
+      622,
+      65,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 57,
+    "uuid": "890802e0-631e-4e94-ae4b-07fa09636b3b",
+    "name": "正面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 69,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      69,
+      622,
+      72,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 57,
+    "uuid": "890802e0-631e-4e94-ae4b-07fa09636b3b",
+    "name": "正面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 56,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      56,
+      616,
+      59,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 57,
+    "uuid": "890802e0-631e-4e94-ae4b-07fa09636b3b",
+    "name": "正面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 56,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      56,
+      632,
+      59,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 58,
+    "uuid": "f746ca1e-3f24-4642-a242-e1e072048187",
+    "name": "正面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 82,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      82,
+      622,
+      84,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 58,
+    "uuid": "f746ca1e-3f24-4642-a242-e1e072048187",
+    "name": "正面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 88,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      88,
+      622,
+      91,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 58,
+    "uuid": "f746ca1e-3f24-4642-a242-e1e072048187",
+    "name": "正面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 95,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      95,
+      622,
+      97,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 58,
+    "uuid": "f746ca1e-3f24-4642-a242-e1e072048187",
+    "name": "正面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 101,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      101,
+      622,
+      104,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 58,
+    "uuid": "f746ca1e-3f24-4642-a242-e1e072048187",
+    "name": "正面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 88,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      88,
+      616,
+      91,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 58,
+    "uuid": "f746ca1e-3f24-4642-a242-e1e072048187",
+    "name": "正面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 88,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      88,
+      632,
+      91,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 59,
+    "uuid": "2cd5fe04-0d0a-4c8f-a1f2-c21114445134",
+    "name": "正面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 114,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      114,
+      622,
+      116,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 59,
+    "uuid": "2cd5fe04-0d0a-4c8f-a1f2-c21114445134",
+    "name": "正面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 120,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      120,
+      622,
+      123,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 59,
+    "uuid": "2cd5fe04-0d0a-4c8f-a1f2-c21114445134",
+    "name": "正面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 127,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      127,
+      622,
+      129,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 59,
+    "uuid": "2cd5fe04-0d0a-4c8f-a1f2-c21114445134",
+    "name": "正面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 133,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      133,
+      622,
+      136,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 59,
+    "uuid": "2cd5fe04-0d0a-4c8f-a1f2-c21114445134",
+    "name": "正面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 120,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      120,
+      616,
+      123,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 59,
+    "uuid": "2cd5fe04-0d0a-4c8f-a1f2-c21114445134",
+    "name": "正面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 120,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      120,
+      632,
+      123,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 60,
+    "uuid": "a5888c2a-9ab0-48fe-a04b-aa26fc1b5882",
+    "name": "正面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 146,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      146,
+      622,
+      148,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 60,
+    "uuid": "a5888c2a-9ab0-48fe-a04b-aa26fc1b5882",
+    "name": "正面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 152,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      152,
+      622,
+      155,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 60,
+    "uuid": "a5888c2a-9ab0-48fe-a04b-aa26fc1b5882",
+    "name": "正面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 159,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      159,
+      622,
+      161,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 60,
+    "uuid": "a5888c2a-9ab0-48fe-a04b-aa26fc1b5882",
+    "name": "正面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 165,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      165,
+      622,
+      168,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 60,
+    "uuid": "a5888c2a-9ab0-48fe-a04b-aa26fc1b5882",
+    "name": "正面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 152,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      152,
+      616,
+      155,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 60,
+    "uuid": "a5888c2a-9ab0-48fe-a04b-aa26fc1b5882",
+    "name": "正面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 152,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      152,
+      632,
+      155,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 61,
+    "uuid": "f8a453ac-d9db-4a25-aecf-df17dee41cb0",
+    "name": "正面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 178,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      178,
+      622,
+      180,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 61,
+    "uuid": "f8a453ac-d9db-4a25-aecf-df17dee41cb0",
+    "name": "正面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 184,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      184,
+      622,
+      187,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 61,
+    "uuid": "f8a453ac-d9db-4a25-aecf-df17dee41cb0",
+    "name": "正面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 191,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      191,
+      622,
+      193,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 61,
+    "uuid": "f8a453ac-d9db-4a25-aecf-df17dee41cb0",
+    "name": "正面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 197,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      197,
+      622,
+      200,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 61,
+    "uuid": "f8a453ac-d9db-4a25-aecf-df17dee41cb0",
+    "name": "正面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 184,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      184,
+      616,
+      187,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 61,
+    "uuid": "f8a453ac-d9db-4a25-aecf-df17dee41cb0",
+    "name": "正面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 184,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      184,
+      632,
+      187,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 62,
+    "uuid": "9ce271d1-f931-425e-a1db-c4bf69048f0b",
+    "name": "背面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 210,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      210,
+      622,
+      212,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 62,
+    "uuid": "9ce271d1-f931-425e-a1db-c4bf69048f0b",
+    "name": "背面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 216,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      216,
+      622,
+      219,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 62,
+    "uuid": "9ce271d1-f931-425e-a1db-c4bf69048f0b",
+    "name": "背面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 223,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      223,
+      622,
+      225,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 62,
+    "uuid": "9ce271d1-f931-425e-a1db-c4bf69048f0b",
+    "name": "背面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 229,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      229,
+      622,
+      232,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 62,
+    "uuid": "9ce271d1-f931-425e-a1db-c4bf69048f0b",
+    "name": "背面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 216,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      216,
+      616,
+      219,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 62,
+    "uuid": "9ce271d1-f931-425e-a1db-c4bf69048f0b",
+    "name": "背面金手指01",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 216,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      216,
+      632,
+      219,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 63,
+    "uuid": "abab1fd7-1815-4c1f-a6e5-20e22712c02d",
+    "name": "背面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 242,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      242,
+      622,
+      244,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 63,
+    "uuid": "abab1fd7-1815-4c1f-a6e5-20e22712c02d",
+    "name": "背面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 248,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      248,
+      622,
+      251,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 63,
+    "uuid": "abab1fd7-1815-4c1f-a6e5-20e22712c02d",
+    "name": "背面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 255,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      255,
+      622,
+      257,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 63,
+    "uuid": "abab1fd7-1815-4c1f-a6e5-20e22712c02d",
+    "name": "背面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 261,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      261,
+      622,
+      264,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 63,
+    "uuid": "abab1fd7-1815-4c1f-a6e5-20e22712c02d",
+    "name": "背面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 248,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      248,
+      616,
+      251,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 63,
+    "uuid": "abab1fd7-1815-4c1f-a6e5-20e22712c02d",
+    "name": "背面金手指02",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 248,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      248,
+      632,
+      251,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 64,
+    "uuid": "f2dd1784-dabd-438e-ade5-5af7e6b23cad",
+    "name": "背面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 274,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      274,
+      622,
+      276,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 64,
+    "uuid": "f2dd1784-dabd-438e-ade5-5af7e6b23cad",
+    "name": "背面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 280,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      280,
+      622,
+      283,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 64,
+    "uuid": "f2dd1784-dabd-438e-ade5-5af7e6b23cad",
+    "name": "背面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 287,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      287,
+      622,
+      289,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 64,
+    "uuid": "f2dd1784-dabd-438e-ade5-5af7e6b23cad",
+    "name": "背面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 293,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      293,
+      622,
+      296,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 64,
+    "uuid": "f2dd1784-dabd-438e-ade5-5af7e6b23cad",
+    "name": "背面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 280,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      280,
+      616,
+      283,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 64,
+    "uuid": "f2dd1784-dabd-438e-ade5-5af7e6b23cad",
+    "name": "背面金手指03",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 280,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      280,
+      632,
+      283,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 65,
+    "uuid": "18534635-17f4-4cae-a20e-9b3d7e32e211",
+    "name": "背面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 306,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      306,
+      622,
+      308,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 65,
+    "uuid": "18534635-17f4-4cae-a20e-9b3d7e32e211",
+    "name": "背面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 312,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      312,
+      622,
+      315,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 65,
+    "uuid": "18534635-17f4-4cae-a20e-9b3d7e32e211",
+    "name": "背面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 319,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      319,
+      622,
+      321,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 65,
+    "uuid": "18534635-17f4-4cae-a20e-9b3d7e32e211",
+    "name": "背面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 325,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      325,
+      622,
+      328,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 65,
+    "uuid": "18534635-17f4-4cae-a20e-9b3d7e32e211",
+    "name": "背面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 312,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      312,
+      616,
+      315,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 65,
+    "uuid": "18534635-17f4-4cae-a20e-9b3d7e32e211",
+    "name": "背面金手指04",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 312,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      312,
+      632,
+      315,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 66,
+    "uuid": "f7e22560-f80a-460c-a66d-74485bd4e55a",
+    "name": "背面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 338,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      338,
+      622,
+      340,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 66,
+    "uuid": "f7e22560-f80a-460c-a66d-74485bd4e55a",
+    "name": "背面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 344,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      344,
+      622,
+      347,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 66,
+    "uuid": "f7e22560-f80a-460c-a66d-74485bd4e55a",
+    "name": "背面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 351,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      351,
+      622,
+      353,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 66,
+    "uuid": "f7e22560-f80a-460c-a66d-74485bd4e55a",
+    "name": "背面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 357,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      357,
+      622,
+      360,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 66,
+    "uuid": "f7e22560-f80a-460c-a66d-74485bd4e55a",
+    "name": "背面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 344,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      344,
+      616,
+      347,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 66,
+    "uuid": "f7e22560-f80a-460c-a66d-74485bd4e55a",
+    "name": "背面金手指05",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 344,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      344,
+      632,
+      347,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 67,
+    "uuid": "76b90937-9324-4639-ab42-0b736939fa86",
+    "name": "背面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 370,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      370,
+      622,
+      372,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 67,
+    "uuid": "76b90937-9324-4639-ab42-0b736939fa86",
+    "name": "背面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 376,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      376,
+      622,
+      379,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 67,
+    "uuid": "76b90937-9324-4639-ab42-0b736939fa86",
+    "name": "背面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 383,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      383,
+      622,
+      385,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 67,
+    "uuid": "76b90937-9324-4639-ab42-0b736939fa86",
+    "name": "背面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 389,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      389,
+      622,
+      392,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 67,
+    "uuid": "76b90937-9324-4639-ab42-0b736939fa86",
+    "name": "背面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 376,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      376,
+      616,
+      379,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 67,
+    "uuid": "76b90937-9324-4639-ab42-0b736939fa86",
+    "name": "背面金手指06",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 376,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      376,
+      632,
+      379,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 68,
+    "uuid": "b5c9b132-8d75-4e76-a38b-f3eef46d07a6",
+    "name": "背面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 402,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      402,
+      622,
+      404,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 68,
+    "uuid": "b5c9b132-8d75-4e76-a38b-f3eef46d07a6",
+    "name": "背面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 408,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      408,
+      622,
+      411,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 68,
+    "uuid": "b5c9b132-8d75-4e76-a38b-f3eef46d07a6",
+    "name": "背面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 415,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      415,
+      622,
+      417,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 68,
+    "uuid": "b5c9b132-8d75-4e76-a38b-f3eef46d07a6",
+    "name": "背面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 421,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      421,
+      622,
+      424,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 68,
+    "uuid": "b5c9b132-8d75-4e76-a38b-f3eef46d07a6",
+    "name": "背面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 408,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      408,
+      616,
+      411,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 68,
+    "uuid": "b5c9b132-8d75-4e76-a38b-f3eef46d07a6",
+    "name": "背面金手指07",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 408,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      408,
+      632,
+      411,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 69,
+    "uuid": "8fe852e2-2065-428e-a997-981293067f39",
+    "name": "背面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 434,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      434,
+      622,
+      436,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 69,
+    "uuid": "8fe852e2-2065-428e-a997-981293067f39",
+    "name": "背面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 440,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      440,
+      622,
+      443,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 69,
+    "uuid": "8fe852e2-2065-428e-a997-981293067f39",
+    "name": "背面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 447,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      447,
+      622,
+      449,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 69,
+    "uuid": "8fe852e2-2065-428e-a997-981293067f39",
+    "name": "背面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 453,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      453,
+      622,
+      456,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 69,
+    "uuid": "8fe852e2-2065-428e-a997-981293067f39",
+    "name": "背面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 440,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      440,
+      616,
+      443,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 69,
+    "uuid": "8fe852e2-2065-428e-a997-981293067f39",
+    "name": "背面金手指08",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 440,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      440,
+      632,
+      443,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 70,
+    "uuid": "5f3cefe4-48af-412d-a092-4d1968247300",
+    "name": "背面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 466,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      466,
+      622,
+      468,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 70,
+    "uuid": "5f3cefe4-48af-412d-a092-4d1968247300",
+    "name": "背面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 472,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      472,
+      622,
+      475,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 70,
+    "uuid": "5f3cefe4-48af-412d-a092-4d1968247300",
+    "name": "背面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 479,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      479,
+      622,
+      481,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 70,
+    "uuid": "5f3cefe4-48af-412d-a092-4d1968247300",
+    "name": "背面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 485,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      485,
+      622,
+      488,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 70,
+    "uuid": "5f3cefe4-48af-412d-a092-4d1968247300",
+    "name": "背面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 472,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      472,
+      616,
+      475,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 70,
+    "uuid": "5f3cefe4-48af-412d-a092-4d1968247300",
+    "name": "背面金手指09",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 472,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      472,
+      632,
+      475,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 71,
+    "uuid": "f0a1fe13-a33a-4b65-a759-7cafccc3e600",
+    "name": "背面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 498,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      498,
+      622,
+      500,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 71,
+    "uuid": "f0a1fe13-a33a-4b65-a759-7cafccc3e600",
+    "name": "背面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 504,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      504,
+      622,
+      507,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 71,
+    "uuid": "f0a1fe13-a33a-4b65-a759-7cafccc3e600",
+    "name": "背面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 511,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      511,
+      622,
+      513,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 71,
+    "uuid": "f0a1fe13-a33a-4b65-a759-7cafccc3e600",
+    "name": "背面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 517,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      517,
+      622,
+      520,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 71,
+    "uuid": "f0a1fe13-a33a-4b65-a759-7cafccc3e600",
+    "name": "背面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 504,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      504,
+      616,
+      507,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 71,
+    "uuid": "f0a1fe13-a33a-4b65-a759-7cafccc3e600",
+    "name": "背面金手指10",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 504,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      504,
+      632,
+      507,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 72,
+    "uuid": "b9d75fa0-4e05-45bf-a077-1e279c007391",
+    "name": "背面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 530,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      530,
+      622,
+      532,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 72,
+    "uuid": "b9d75fa0-4e05-45bf-a077-1e279c007391",
+    "name": "背面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 536,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      536,
+      622,
+      539,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 72,
+    "uuid": "b9d75fa0-4e05-45bf-a077-1e279c007391",
+    "name": "背面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 543,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      543,
+      622,
+      545,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 72,
+    "uuid": "b9d75fa0-4e05-45bf-a077-1e279c007391",
+    "name": "背面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 549,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      549,
+      622,
+      552,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 72,
+    "uuid": "b9d75fa0-4e05-45bf-a077-1e279c007391",
+    "name": "背面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 536,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      536,
+      616,
+      539,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 72,
+    "uuid": "b9d75fa0-4e05-45bf-a077-1e279c007391",
+    "name": "背面金手指11",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 536,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      536,
+      632,
+      539,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 73,
+    "uuid": "b84a8aee-ef0a-416e-ac71-9dc3767f02b7",
+    "name": "背面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 562,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      562,
+      622,
+      564,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 73,
+    "uuid": "b84a8aee-ef0a-416e-ac71-9dc3767f02b7",
+    "name": "背面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 568,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      568,
+      622,
+      571,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 73,
+    "uuid": "b84a8aee-ef0a-416e-ac71-9dc3767f02b7",
+    "name": "背面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 575,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      575,
+      622,
+      577,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 73,
+    "uuid": "b84a8aee-ef0a-416e-ac71-9dc3767f02b7",
+    "name": "背面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 581,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      581,
+      622,
+      584,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 73,
+    "uuid": "b84a8aee-ef0a-416e-ac71-9dc3767f02b7",
+    "name": "背面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 568,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      568,
+      616,
+      571,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 73,
+    "uuid": "b84a8aee-ef0a-416e-ac71-9dc3767f02b7",
+    "name": "背面金手指12",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 568,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      568,
+      632,
+      571,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 74,
+    "uuid": "acc18f66-53ca-4374-a3c4-4ab3fe50881c",
+    "name": "背面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 594,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      594,
+      622,
+      596,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 74,
+    "uuid": "acc18f66-53ca-4374-a3c4-4ab3fe50881c",
+    "name": "背面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 600,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      600,
+      622,
+      603,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 74,
+    "uuid": "acc18f66-53ca-4374-a3c4-4ab3fe50881c",
+    "name": "背面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 607,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      607,
+      622,
+      609,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 74,
+    "uuid": "acc18f66-53ca-4374-a3c4-4ab3fe50881c",
+    "name": "背面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 613,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      613,
+      622,
+      616,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 74,
+    "uuid": "acc18f66-53ca-4374-a3c4-4ab3fe50881c",
+    "name": "背面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 600,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      600,
+      616,
+      603,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 74,
+    "uuid": "acc18f66-53ca-4374-a3c4-4ab3fe50881c",
+    "name": "背面金手指13",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 600,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      600,
+      632,
+      603,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 75,
+    "uuid": "467b81a9-dda7-4d26-aa57-be9327d1194c",
+    "name": "背面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 626,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      626,
+      622,
+      628,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 75,
+    "uuid": "467b81a9-dda7-4d26-aa57-be9327d1194c",
+    "name": "背面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 632,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      632,
+      622,
+      635,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 75,
+    "uuid": "467b81a9-dda7-4d26-aa57-be9327d1194c",
+    "name": "背面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 639,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      639,
+      622,
+      641,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 75,
+    "uuid": "467b81a9-dda7-4d26-aa57-be9327d1194c",
+    "name": "背面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 645,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      645,
+      622,
+      648,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 75,
+    "uuid": "467b81a9-dda7-4d26-aa57-be9327d1194c",
+    "name": "背面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 632,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      632,
+      616,
+      635,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 75,
+    "uuid": "467b81a9-dda7-4d26-aa57-be9327d1194c",
+    "name": "背面金手指14",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 632,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      632,
+      632,
+      635,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 76,
+    "uuid": "cf61a013-fb2c-411c-a06c-31bdc3f30e73",
+    "name": "背面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 658,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      658,
+      622,
+      660,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 76,
+    "uuid": "cf61a013-fb2c-411c-a06c-31bdc3f30e73",
+    "name": "背面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 664,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      664,
+      622,
+      667,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 76,
+    "uuid": "cf61a013-fb2c-411c-a06c-31bdc3f30e73",
+    "name": "背面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 671,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      671,
+      622,
+      673,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 76,
+    "uuid": "cf61a013-fb2c-411c-a06c-31bdc3f30e73",
+    "name": "背面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 677,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      677,
+      622,
+      680,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 76,
+    "uuid": "cf61a013-fb2c-411c-a06c-31bdc3f30e73",
+    "name": "背面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 664,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      664,
+      616,
+      667,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 76,
+    "uuid": "cf61a013-fb2c-411c-a06c-31bdc3f30e73",
+    "name": "背面金手指15",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 664,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      664,
+      632,
+      667,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 77,
+    "uuid": "f62c48b9-cfb0-45cb-a8ce-58e2b1ce6c66",
+    "name": "背面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 690,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      690,
+      622,
+      692,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 77,
+    "uuid": "f62c48b9-cfb0-45cb-a8ce-58e2b1ce6c66",
+    "name": "背面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 696,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      696,
+      622,
+      699,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 77,
+    "uuid": "f62c48b9-cfb0-45cb-a8ce-58e2b1ce6c66",
+    "name": "背面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 703,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      703,
+      622,
+      705,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 77,
+    "uuid": "f62c48b9-cfb0-45cb-a8ce-58e2b1ce6c66",
+    "name": "背面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 709,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      709,
+      622,
+      712,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 77,
+    "uuid": "f62c48b9-cfb0-45cb-a8ce-58e2b1ce6c66",
+    "name": "背面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 696,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      696,
+      616,
+      699,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 77,
+    "uuid": "f62c48b9-cfb0-45cb-a8ce-58e2b1ce6c66",
+    "name": "背面金手指16",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 696,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      696,
+      632,
+      699,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 78,
+    "uuid": "db761f9d-4e83-41d8-a61e-8724387976ba",
+    "name": "背面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 722,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      722,
+      622,
+      724,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 78,
+    "uuid": "db761f9d-4e83-41d8-a61e-8724387976ba",
+    "name": "背面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 728,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      728,
+      622,
+      731,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 78,
+    "uuid": "db761f9d-4e83-41d8-a61e-8724387976ba",
+    "name": "背面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 735,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      735,
+      622,
+      737,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 78,
+    "uuid": "db761f9d-4e83-41d8-a61e-8724387976ba",
+    "name": "背面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 741,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      741,
+      622,
+      744,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 78,
+    "uuid": "db761f9d-4e83-41d8-a61e-8724387976ba",
+    "name": "背面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 728,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      728,
+      616,
+      731,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 78,
+    "uuid": "db761f9d-4e83-41d8-a61e-8724387976ba",
+    "name": "背面金手指17",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 728,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      728,
+      632,
+      731,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 79,
+    "uuid": "1da3b2a3-2205-40bb-a143-16fa3bc7fea3",
+    "name": "背面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 754,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      754,
+      622,
+      756,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 79,
+    "uuid": "1da3b2a3-2205-40bb-a143-16fa3bc7fea3",
+    "name": "背面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 760,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      760,
+      622,
+      763,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 79,
+    "uuid": "1da3b2a3-2205-40bb-a143-16fa3bc7fea3",
+    "name": "背面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 767,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      767,
+      622,
+      769,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 79,
+    "uuid": "1da3b2a3-2205-40bb-a143-16fa3bc7fea3",
+    "name": "背面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 773,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      773,
+      622,
+      776,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 79,
+    "uuid": "1da3b2a3-2205-40bb-a143-16fa3bc7fea3",
+    "name": "背面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 760,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      760,
+      616,
+      763,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 79,
+    "uuid": "1da3b2a3-2205-40bb-a143-16fa3bc7fea3",
+    "name": "背面金手指18",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 760,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      760,
+      632,
+      763,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 80,
+    "uuid": "764357f4-a386-4724-a552-06f9dee75480",
+    "name": "背面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 786,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      786,
+      622,
+      788,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 80,
+    "uuid": "764357f4-a386-4724-a552-06f9dee75480",
+    "name": "背面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 792,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      792,
+      622,
+      795,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 80,
+    "uuid": "764357f4-a386-4724-a552-06f9dee75480",
+    "name": "背面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 799,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      799,
+      622,
+      801,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 80,
+    "uuid": "764357f4-a386-4724-a552-06f9dee75480",
+    "name": "背面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 805,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      805,
+      622,
+      808,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 80,
+    "uuid": "764357f4-a386-4724-a552-06f9dee75480",
+    "name": "背面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 792,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      792,
+      616,
+      795,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 80,
+    "uuid": "764357f4-a386-4724-a552-06f9dee75480",
+    "name": "背面金手指19",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 792,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      792,
+      632,
+      795,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 81,
+    "uuid": "534173fd-c678-4231-ad35-aee0a543a423",
+    "name": "背面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 818,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      818,
+      622,
+      820,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 81,
+    "uuid": "534173fd-c678-4231-ad35-aee0a543a423",
+    "name": "背面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 824,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      824,
+      622,
+      827,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 81,
+    "uuid": "534173fd-c678-4231-ad35-aee0a543a423",
+    "name": "背面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 831,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      831,
+      622,
+      833,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 81,
+    "uuid": "534173fd-c678-4231-ad35-aee0a543a423",
+    "name": "背面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 837,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      837,
+      622,
+      840,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 81,
+    "uuid": "534173fd-c678-4231-ad35-aee0a543a423",
+    "name": "背面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 824,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      824,
+      616,
+      827,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 81,
+    "uuid": "534173fd-c678-4231-ad35-aee0a543a423",
+    "name": "背面金手指20",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 824,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      824,
+      632,
+      827,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 82,
+    "uuid": "c022724f-ffd3-4ade-adeb-478fc22dd928",
+    "name": "背面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 850,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      850,
+      622,
+      852,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 82,
+    "uuid": "c022724f-ffd3-4ade-adeb-478fc22dd928",
+    "name": "背面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 856,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      856,
+      622,
+      859,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 82,
+    "uuid": "c022724f-ffd3-4ade-adeb-478fc22dd928",
+    "name": "背面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 863,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      863,
+      622,
+      865,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 82,
+    "uuid": "c022724f-ffd3-4ade-adeb-478fc22dd928",
+    "name": "背面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 869,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      869,
+      622,
+      872,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 82,
+    "uuid": "c022724f-ffd3-4ade-adeb-478fc22dd928",
+    "name": "背面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 856,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      856,
+      616,
+      859,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 82,
+    "uuid": "c022724f-ffd3-4ade-adeb-478fc22dd928",
+    "name": "背面金手指21",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 856,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      856,
+      632,
+      859,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 83,
+    "uuid": "02101444-d133-43ca-a6dc-0fd4297af55d",
+    "name": "背面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 882,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      882,
+      622,
+      884,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 83,
+    "uuid": "02101444-d133-43ca-a6dc-0fd4297af55d",
+    "name": "背面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 888,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      888,
+      622,
+      891,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 83,
+    "uuid": "02101444-d133-43ca-a6dc-0fd4297af55d",
+    "name": "背面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 895,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      895,
+      622,
+      897,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 83,
+    "uuid": "02101444-d133-43ca-a6dc-0fd4297af55d",
+    "name": "背面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 901,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      901,
+      622,
+      904,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 83,
+    "uuid": "02101444-d133-43ca-a6dc-0fd4297af55d",
+    "name": "背面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 888,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      888,
+      616,
+      891,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 83,
+    "uuid": "02101444-d133-43ca-a6dc-0fd4297af55d",
+    "name": "背面金手指22",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 888,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      888,
+      632,
+      891,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 84,
+    "uuid": "630a2ea4-70fa-4504-a3dc-50f2996e69c1",
+    "name": "背面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 914,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      914,
+      622,
+      916,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 84,
+    "uuid": "630a2ea4-70fa-4504-a3dc-50f2996e69c1",
+    "name": "背面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 920,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      920,
+      622,
+      923,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 84,
+    "uuid": "630a2ea4-70fa-4504-a3dc-50f2996e69c1",
+    "name": "背面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 927,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      927,
+      622,
+      929,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 84,
+    "uuid": "630a2ea4-70fa-4504-a3dc-50f2996e69c1",
+    "name": "背面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 933,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      933,
+      622,
+      936,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 84,
+    "uuid": "630a2ea4-70fa-4504-a3dc-50f2996e69c1",
+    "name": "背面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 920,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      920,
+      616,
+      923,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 84,
+    "uuid": "630a2ea4-70fa-4504-a3dc-50f2996e69c1",
+    "name": "背面金手指23",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 920,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      920,
+      632,
+      923,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 85,
+    "uuid": "a5e2242a-3512-4c70-a083-43a5478ba482",
+    "name": "背面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "west",
+    "rect": {
+      "x": 946,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      946,
+      622,
+      948,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 85,
+    "uuid": "a5e2242a-3512-4c70-a083-43a5478ba482",
+    "name": "背面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "north",
+    "rect": {
+      "x": 952,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      952,
+      622,
+      955,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 85,
+    "uuid": "a5e2242a-3512-4c70-a083-43a5478ba482",
+    "name": "背面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "east",
+    "rect": {
+      "x": 959,
+      "y": 622,
+      "width": 2,
+      "height": 6
+    },
+    "uv": [
+      959,
+      622,
+      961,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 85,
+    "uuid": "a5e2242a-3512-4c70-a083-43a5478ba482",
+    "name": "背面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "south",
+    "rect": {
+      "x": 965,
+      "y": 622,
+      "width": 3,
+      "height": 6
+    },
+    "uv": [
+      965,
+      622,
+      968,
+      628
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 85,
+    "uuid": "a5e2242a-3512-4c70-a083-43a5478ba482",
+    "name": "背面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "up",
+    "rect": {
+      "x": 952,
+      "y": 616,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      952,
+      616,
+      955,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 85,
+    "uuid": "a5e2242a-3512-4c70-a083-43a5478ba482",
+    "name": "背面金手指24",
+    "group": "contacts",
+    "material": "gold",
+    "face": "down",
+    "rect": {
+      "x": 952,
+      "y": 632,
+      "width": 3,
+      "height": 2
+    },
+    "uv": [
+      952,
+      632,
+      955,
+      634
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 32,
+    "uuid": "f835258e-157d-450f-ab88-5a92613172dd",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "west",
+    "rect": {
+      "x": 978,
+      "y": 622,
+      "width": 2,
+      "height": 4
+    },
+    "uv": [
+      978,
+      622,
+      980,
+      626
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 32,
+    "uuid": "f835258e-157d-450f-ab88-5a92613172dd",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "north",
+    "rect": {
+      "x": 984,
+      "y": 622,
+      "width": 4,
+      "height": 4
+    },
+    "uv": [
+      984,
+      622,
+      988,
+      626
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 32,
+    "uuid": "f835258e-157d-450f-ab88-5a92613172dd",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "east",
+    "rect": {
+      "x": 992,
+      "y": 622,
+      "width": 2,
+      "height": 4
+    },
+    "uv": [
+      992,
+      622,
+      994,
+      626
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 32,
+    "uuid": "f835258e-157d-450f-ab88-5a92613172dd",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "south",
+    "rect": {
+      "x": 998,
+      "y": 622,
+      "width": 4,
+      "height": 4
+    },
+    "uv": [
+      998,
+      622,
+      1002,
+      626
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 32,
+    "uuid": "f835258e-157d-450f-ab88-5a92613172dd",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "up",
+    "rect": {
+      "x": 984,
+      "y": 616,
+      "width": 4,
+      "height": 2
+    },
+    "uv": [
+      984,
+      616,
+      988,
+      618
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 32,
+    "uuid": "f835258e-157d-450f-ab88-5a92613172dd",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "down",
+    "rect": {
+      "x": 984,
+      "y": 630,
+      "width": 4,
+      "height": 2
+    },
+    "uv": [
+      984,
+      630,
+      988,
+      632
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 33,
+    "uuid": "b676d92d-df76-4b5d-ac0d-bdce657740a4",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "west",
+    "rect": {
+      "x": 18,
+      "y": 650,
+      "width": 2,
+      "height": 4
+    },
+    "uv": [
+      18,
+      650,
+      20,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 33,
+    "uuid": "b676d92d-df76-4b5d-ac0d-bdce657740a4",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "north",
+    "rect": {
+      "x": 24,
+      "y": 650,
+      "width": 4,
+      "height": 4
+    },
+    "uv": [
+      24,
+      650,
+      28,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 33,
+    "uuid": "b676d92d-df76-4b5d-ac0d-bdce657740a4",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "east",
+    "rect": {
+      "x": 32,
+      "y": 650,
+      "width": 2,
+      "height": 4
+    },
+    "uv": [
+      32,
+      650,
+      34,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 33,
+    "uuid": "b676d92d-df76-4b5d-ac0d-bdce657740a4",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "south",
+    "rect": {
+      "x": 38,
+      "y": 650,
+      "width": 4,
+      "height": 4
+    },
+    "uv": [
+      38,
+      650,
+      42,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 33,
+    "uuid": "b676d92d-df76-4b5d-ac0d-bdce657740a4",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "up",
+    "rect": {
+      "x": 24,
+      "y": 644,
+      "width": 4,
+      "height": 2
+    },
+    "uv": [
+      24,
+      644,
+      28,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 33,
+    "uuid": "b676d92d-df76-4b5d-ac0d-bdce657740a4",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "down",
+    "rect": {
+      "x": 24,
+      "y": 658,
+      "width": 4,
+      "height": 2
+    },
+    "uv": [
+      24,
+      658,
+      28,
+      660
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 34,
+    "uuid": "4775923d-08f5-42d2-a0ed-4418c8d286b9",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "west",
+    "rect": {
+      "x": 52,
+      "y": 650,
+      "width": 2,
+      "height": 4
+    },
+    "uv": [
+      52,
+      650,
+      54,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 34,
+    "uuid": "4775923d-08f5-42d2-a0ed-4418c8d286b9",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "north",
+    "rect": {
+      "x": 58,
+      "y": 650,
+      "width": 4,
+      "height": 4
+    },
+    "uv": [
+      58,
+      650,
+      62,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 34,
+    "uuid": "4775923d-08f5-42d2-a0ed-4418c8d286b9",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "east",
+    "rect": {
+      "x": 66,
+      "y": 650,
+      "width": 2,
+      "height": 4
+    },
+    "uv": [
+      66,
+      650,
+      68,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 34,
+    "uuid": "4775923d-08f5-42d2-a0ed-4418c8d286b9",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "south",
+    "rect": {
+      "x": 72,
+      "y": 650,
+      "width": 4,
+      "height": 4
+    },
+    "uv": [
+      72,
+      650,
+      76,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 34,
+    "uuid": "4775923d-08f5-42d2-a0ed-4418c8d286b9",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "up",
+    "rect": {
+      "x": 58,
+      "y": 644,
+      "width": 4,
+      "height": 2
+    },
+    "uv": [
+      58,
+      644,
+      62,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 34,
+    "uuid": "4775923d-08f5-42d2-a0ed-4418c8d286b9",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "down",
+    "rect": {
+      "x": 58,
+      "y": 658,
+      "width": 4,
+      "height": 2
+    },
+    "uv": [
+      58,
+      658,
+      62,
+      660
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 35,
+    "uuid": "e1b53ada-13ab-4ac9-ae1c-c6238929fd8c",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "west",
+    "rect": {
+      "x": 86,
+      "y": 650,
+      "width": 2,
+      "height": 4
+    },
+    "uv": [
+      86,
+      650,
+      88,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 35,
+    "uuid": "e1b53ada-13ab-4ac9-ae1c-c6238929fd8c",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "north",
+    "rect": {
+      "x": 92,
+      "y": 650,
+      "width": 4,
+      "height": 4
+    },
+    "uv": [
+      92,
+      650,
+      96,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 35,
+    "uuid": "e1b53ada-13ab-4ac9-ae1c-c6238929fd8c",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "east",
+    "rect": {
+      "x": 100,
+      "y": 650,
+      "width": 2,
+      "height": 4
+    },
+    "uv": [
+      100,
+      650,
+      102,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 35,
+    "uuid": "e1b53ada-13ab-4ac9-ae1c-c6238929fd8c",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "south",
+    "rect": {
+      "x": 106,
+      "y": 650,
+      "width": 4,
+      "height": 4
+    },
+    "uv": [
+      106,
+      650,
+      110,
+      654
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 35,
+    "uuid": "e1b53ada-13ab-4ac9-ae1c-c6238929fd8c",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "up",
+    "rect": {
+      "x": 92,
+      "y": 644,
+      "width": 4,
+      "height": 2
+    },
+    "uv": [
+      92,
+      644,
+      96,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 35,
+    "uuid": "e1b53ada-13ab-4ac9-ae1c-c6238929fd8c",
+    "name": "卡带标签凹框·倒角",
+    "group": "shell",
+    "material": "seam",
+    "face": "down",
+    "rect": {
+      "x": 92,
+      "y": 658,
+      "width": 4,
+      "height": 2
+    },
+    "uv": [
+      92,
+      658,
+      96,
+      660
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 18,
+    "uuid": "e2c12bd8-1b0e-4453-a2fb-8e785266df3a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 120,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      120,
+      650,
+      122,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 18,
+    "uuid": "e2c12bd8-1b0e-4453-a2fb-8e785266df3a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 126,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      126,
+      650,
+      132,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 18,
+    "uuid": "e2c12bd8-1b0e-4453-a2fb-8e785266df3a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 136,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      136,
+      650,
+      138,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 18,
+    "uuid": "e2c12bd8-1b0e-4453-a2fb-8e785266df3a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 142,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      142,
+      650,
+      148,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 18,
+    "uuid": "e2c12bd8-1b0e-4453-a2fb-8e785266df3a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 126,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      126,
+      644,
+      132,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 18,
+    "uuid": "e2c12bd8-1b0e-4453-a2fb-8e785266df3a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 126,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      126,
+      656,
+      132,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 19,
+    "uuid": "19d43715-76da-47a8-a640-a8dc211b3f8d",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 158,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      158,
+      650,
+      160,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 19,
+    "uuid": "19d43715-76da-47a8-a640-a8dc211b3f8d",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 164,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      164,
+      650,
+      170,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 19,
+    "uuid": "19d43715-76da-47a8-a640-a8dc211b3f8d",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 174,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      174,
+      650,
+      176,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 19,
+    "uuid": "19d43715-76da-47a8-a640-a8dc211b3f8d",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 180,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      180,
+      650,
+      186,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 19,
+    "uuid": "19d43715-76da-47a8-a640-a8dc211b3f8d",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 164,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      164,
+      644,
+      170,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 19,
+    "uuid": "19d43715-76da-47a8-a640-a8dc211b3f8d",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 164,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      164,
+      656,
+      170,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 20,
+    "uuid": "fe513fca-ba38-456e-af1a-def641b4ca59",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 196,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      196,
+      650,
+      198,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 20,
+    "uuid": "fe513fca-ba38-456e-af1a-def641b4ca59",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 202,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      202,
+      650,
+      208,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 20,
+    "uuid": "fe513fca-ba38-456e-af1a-def641b4ca59",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 212,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      212,
+      650,
+      214,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 20,
+    "uuid": "fe513fca-ba38-456e-af1a-def641b4ca59",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 218,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      218,
+      650,
+      224,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 20,
+    "uuid": "fe513fca-ba38-456e-af1a-def641b4ca59",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 202,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      202,
+      644,
+      208,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 20,
+    "uuid": "fe513fca-ba38-456e-af1a-def641b4ca59",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 202,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      202,
+      656,
+      208,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 21,
+    "uuid": "b096e794-1749-4148-a284-dcffa5c18220",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 234,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      234,
+      650,
+      236,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 21,
+    "uuid": "b096e794-1749-4148-a284-dcffa5c18220",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 240,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      240,
+      650,
+      246,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 21,
+    "uuid": "b096e794-1749-4148-a284-dcffa5c18220",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 250,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      250,
+      650,
+      252,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 21,
+    "uuid": "b096e794-1749-4148-a284-dcffa5c18220",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 256,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      256,
+      650,
+      262,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 21,
+    "uuid": "b096e794-1749-4148-a284-dcffa5c18220",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 240,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      240,
+      644,
+      246,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 21,
+    "uuid": "b096e794-1749-4148-a284-dcffa5c18220",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 240,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      240,
+      656,
+      246,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 22,
+    "uuid": "fb00f1ae-543a-442a-afaa-d4f578331425",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 272,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      272,
+      650,
+      274,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 22,
+    "uuid": "fb00f1ae-543a-442a-afaa-d4f578331425",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 278,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      278,
+      650,
+      284,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 22,
+    "uuid": "fb00f1ae-543a-442a-afaa-d4f578331425",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 288,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      288,
+      650,
+      290,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 22,
+    "uuid": "fb00f1ae-543a-442a-afaa-d4f578331425",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 294,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      294,
+      650,
+      300,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 22,
+    "uuid": "fb00f1ae-543a-442a-afaa-d4f578331425",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 278,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      278,
+      644,
+      284,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 22,
+    "uuid": "fb00f1ae-543a-442a-afaa-d4f578331425",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 278,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      278,
+      656,
+      284,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 23,
+    "uuid": "81f8f8dc-fda0-40b1-a4de-5b93cf7d0d53",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 310,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      310,
+      650,
+      312,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 23,
+    "uuid": "81f8f8dc-fda0-40b1-a4de-5b93cf7d0d53",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 316,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      316,
+      650,
+      322,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 23,
+    "uuid": "81f8f8dc-fda0-40b1-a4de-5b93cf7d0d53",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 326,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      326,
+      650,
+      328,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 23,
+    "uuid": "81f8f8dc-fda0-40b1-a4de-5b93cf7d0d53",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 332,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      332,
+      650,
+      338,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 23,
+    "uuid": "81f8f8dc-fda0-40b1-a4de-5b93cf7d0d53",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 316,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      316,
+      644,
+      322,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 23,
+    "uuid": "81f8f8dc-fda0-40b1-a4de-5b93cf7d0d53",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 316,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      316,
+      656,
+      322,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 24,
+    "uuid": "decd10a3-70ed-47f6-ad67-d0d75fd6d37f",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 348,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      348,
+      650,
+      350,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 24,
+    "uuid": "decd10a3-70ed-47f6-ad67-d0d75fd6d37f",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 354,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      354,
+      650,
+      360,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 24,
+    "uuid": "decd10a3-70ed-47f6-ad67-d0d75fd6d37f",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 364,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      364,
+      650,
+      366,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 24,
+    "uuid": "decd10a3-70ed-47f6-ad67-d0d75fd6d37f",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 370,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      370,
+      650,
+      376,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 24,
+    "uuid": "decd10a3-70ed-47f6-ad67-d0d75fd6d37f",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 354,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      354,
+      644,
+      360,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 24,
+    "uuid": "decd10a3-70ed-47f6-ad67-d0d75fd6d37f",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 354,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      354,
+      656,
+      360,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 25,
+    "uuid": "97e4dc71-06e9-43a7-adcc-862198f61192",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 386,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      386,
+      650,
+      388,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 25,
+    "uuid": "97e4dc71-06e9-43a7-adcc-862198f61192",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 392,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      392,
+      650,
+      398,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 25,
+    "uuid": "97e4dc71-06e9-43a7-adcc-862198f61192",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 402,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      402,
+      650,
+      404,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 25,
+    "uuid": "97e4dc71-06e9-43a7-adcc-862198f61192",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 408,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      408,
+      650,
+      414,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 25,
+    "uuid": "97e4dc71-06e9-43a7-adcc-862198f61192",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 392,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      392,
+      644,
+      398,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 25,
+    "uuid": "97e4dc71-06e9-43a7-adcc-862198f61192",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 392,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      392,
+      656,
+      398,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 26,
+    "uuid": "125622fd-9147-4def-a54e-feda392ddfee",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 424,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      424,
+      650,
+      426,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 26,
+    "uuid": "125622fd-9147-4def-a54e-feda392ddfee",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 430,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      430,
+      650,
+      436,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 26,
+    "uuid": "125622fd-9147-4def-a54e-feda392ddfee",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 440,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      440,
+      650,
+      442,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 26,
+    "uuid": "125622fd-9147-4def-a54e-feda392ddfee",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 446,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      446,
+      650,
+      452,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 26,
+    "uuid": "125622fd-9147-4def-a54e-feda392ddfee",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 430,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      430,
+      644,
+      436,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 26,
+    "uuid": "125622fd-9147-4def-a54e-feda392ddfee",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 430,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      430,
+      656,
+      436,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 27,
+    "uuid": "b7f35bd2-df27-4715-ad66-6b064c308681",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 462,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      462,
+      650,
+      464,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 27,
+    "uuid": "b7f35bd2-df27-4715-ad66-6b064c308681",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 468,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      468,
+      650,
+      474,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 27,
+    "uuid": "b7f35bd2-df27-4715-ad66-6b064c308681",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 478,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      478,
+      650,
+      480,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 27,
+    "uuid": "b7f35bd2-df27-4715-ad66-6b064c308681",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 484,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      484,
+      650,
+      490,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 27,
+    "uuid": "b7f35bd2-df27-4715-ad66-6b064c308681",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 468,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      468,
+      644,
+      474,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 27,
+    "uuid": "b7f35bd2-df27-4715-ad66-6b064c308681",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 468,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      468,
+      656,
+      474,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 28,
+    "uuid": "e6ffb925-fb25-4b49-ad3c-40a36f519e23",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 500,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      500,
+      650,
+      502,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 28,
+    "uuid": "e6ffb925-fb25-4b49-ad3c-40a36f519e23",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 506,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      506,
+      650,
+      512,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 28,
+    "uuid": "e6ffb925-fb25-4b49-ad3c-40a36f519e23",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 516,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      516,
+      650,
+      518,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 28,
+    "uuid": "e6ffb925-fb25-4b49-ad3c-40a36f519e23",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 522,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      522,
+      650,
+      528,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 28,
+    "uuid": "e6ffb925-fb25-4b49-ad3c-40a36f519e23",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 506,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      506,
+      644,
+      512,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 28,
+    "uuid": "e6ffb925-fb25-4b49-ad3c-40a36f519e23",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 506,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      506,
+      656,
+      512,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 29,
+    "uuid": "62d87515-ffd4-470f-a76d-085c98b4898a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "west",
+    "rect": {
+      "x": 538,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      538,
+      650,
+      540,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 29,
+    "uuid": "62d87515-ffd4-470f-a76d-085c98b4898a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "north",
+    "rect": {
+      "x": 544,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      544,
+      650,
+      550,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 29,
+    "uuid": "62d87515-ffd4-470f-a76d-085c98b4898a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "east",
+    "rect": {
+      "x": 554,
+      "y": 650,
+      "width": 2,
+      "height": 2
+    },
+    "uv": [
+      554,
+      650,
+      556,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 29,
+    "uuid": "62d87515-ffd4-470f-a76d-085c98b4898a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "south",
+    "rect": {
+      "x": 560,
+      "y": 650,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      560,
+      650,
+      566,
+      652
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 29,
+    "uuid": "62d87515-ffd4-470f-a76d-085c98b4898a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "up",
+    "rect": {
+      "x": 544,
+      "y": 644,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      544,
+      644,
+      550,
+      646
+    ],
+    "kind": "unfolded_box_net"
+  },
+  {
+    "elementIndex": 29,
+    "uuid": "62d87515-ffd4-470f-a76d-085c98b4898a",
+    "name": "卡带握持棱",
+    "group": "shell",
+    "material": "shell",
+    "face": "down",
+    "rect": {
+      "x": 544,
+      "y": 656,
+      "width": 6,
+      "height": 2
+    },
+    "uv": [
+      544,
+      656,
+      550,
+      658
+    ],
+    "kind": "unfolded_box_net"
+  }
+]

@@ -1,0 +1,9 @@
+BlastEm 1.0.1-pre, commit 1e0de94dc7e669c0925a22c0fccf6cdc837af0a0
+https://github.com/libretro/blastem
+GPL-3.0-or-later; see COPYING and the accompanying complete source archive.
+Included libchdr carries its own notice in libchdr-LICENSE.txt. Bundled zlib,
+LZMA and other original third-party source notices are retained in that archive.
+The build does not remove copyright headers or change upstream source logic.
+Build flags and generated-source steps: piq-md-home/tools/build_core.py.
+This addon enables only ordinary Mega Drive cartridge games, not the other
+platforms that may be present in the upstream core.

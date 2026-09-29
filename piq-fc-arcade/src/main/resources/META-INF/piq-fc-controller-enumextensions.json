@@ -1,0 +1,22 @@
+{
+  "entries": [
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "PIQ_FC_ARCADE_CONTROLLER_TWO_HANDS",
+      "constructor": "(ZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {"class": "cn/piq/fcarcade/client/ControllerArmPoseParameters", "field": "TWO_HANDS"}
+    },
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "PIQ_FC_ARCADE_CONTROLLER_SINGLE_HAND",
+      "constructor": "(ZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {"class": "cn/piq/fcarcade/client/ControllerArmPoseParameters", "field": "SINGLE_HAND"}
+    },
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "PIQ_FC_ARCADE_ZAPPER",
+      "constructor": "(ZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {"class": "cn/piq/fcarcade/client/zapper/ZapperArmPoseParameters", "field": "AIM"}
+    }
+  ]
+}

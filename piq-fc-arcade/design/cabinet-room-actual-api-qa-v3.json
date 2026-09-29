@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "minecraft_started": false,
+  "native_core_started": false,
+  "network_socket_opened": false,
+  "gradle_started": false,
+  "pure_production_tests": 42,
+  "real_api_ingress_and_codecs": {
+    "ok": true,
+    "assertions": 52,
+    "real_connection_and_context_api": true,
+    "minecraft_started": false,
+    "network_socket_opened": false,
+    "native_core_started": false
+  },
+  "real_transport_backpressure": {
+    "ok": true,
+    "assertions": 1018,
+    "actual_connection_and_embedded_channel": true,
+    "minecraft_started": false,
+    "network_socket_opened": false,
+    "native_core_started": false
+  },
+  "real_link_saved_data": {
+    "ok": true,
+    "assertions": 920,
+    "actual_minecraft_nbt_saved_data": true,
+    "holder_lookup": "RegistryAccess.EMPTY",
+    "world_or_chunk_started": false,
+    "network_or_core_started": false,
+    "scope": "production SavedData serialization; no live chunk-unload or protection-event simulation"
+  },
+  "common_client_isolation": true,
+  "sources": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomLedger.java": "F09568EAE9D9FEA8CEBD7C5241C25292F8139D980897B9280B8B4740278B78C8",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomMedia.java": "97D6A88B0A7CC38AE469C5AD7D022D107F1F3AFA38BF2AE5B41293C2E4929F46",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSendWindow.java": "84DC36041ECB2AA2AE6A9C269880DBE0F31E5C1347495C571019DCB6C3510DEB",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomLedgerTest.java": "75FEE48E7BBD330B745742115C7BB6708B3C9C595D48D395F58817F7F8D3B138",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomMediaTest.java": "79FD7CA476B73018A1E115F52E5FCA80F627C02941B3F3E896D2710E239CD9A0",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSendWindowTest.java": "9ADC0367E22D7C61ECC224E4C0BF8D0B1C6AC6B1DAA8EF51D58A493774ED9C87",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetBackends.java": "B74B6B39933ECF95F86D039C635FA5B061C29BE6D627B1D63FBE7DA70683452C",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetNetwork.java": "68F8792A9ACE4CF93353D6E020D32A4585146594CA31BC316D0901F76E1A8E9E",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomNetwork.java": "FD949E70BBD02038907F1A4FC717C66789A8A905D67801AD1307A64610D56791",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\ServerCabinets.java": "AAFBD2A3E2160AC6D9E2670E42931B6E1F377FC75A0219D7554E37535F24CF4F",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRooms.java": "5606AC5754F7F69332890A2DCCFD07CBB94D7492DBFA84369658DE1EDD7F4683",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetLinks.java": "53C620AC2B2992FCED5639EFCCCE43FE1EB9BE7368C287F8C21322C2BD31EE43",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetLinkLedger.java": "B1CC295B747556A281C7EA93086DB0372C4EA42C7C5FFA6296FABFB778ED820C",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetMediaPacket.java": "8E40566B8E4B674EE2F2911A82C54C85903C335BF07D5C6E153C044922CFC487",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetMediaSender.java": "0CB3C4047EBD4F9AA2B59F71F36B750CE021A47FC81DE4269FCA7B52FC662C5F",
+    "tools\\qa\\CabinetRoomIngressProbe.java": "B7F7559B8739773CBAC3D0D7F4C3FF430BB69B46CB34F8527A8F37A1E585D327",
+    "tools\\qa\\CabinetSendBackpressureProbe.java": "13A295C571570A31CEF7DBCDB07C6DA5797004A9D375D881DDA0E4D058BBCB17",
+    "tools\\qa\\CabinetLinksDataProbe.java": "A81DDC6B5C09FCE6840C6372C1F2BB99F205E0DC14F786003CB4E00F20E8B6B5"
+  },
+  "scope": "Executable production state machines and codec/ingress APIs; not a real Minecraft multiplayer playtest."
+}

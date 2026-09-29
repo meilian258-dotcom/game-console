@@ -1,0 +1,36 @@
+{
+  "ok": true,
+  "mode": "source-pure-and-real-MC-pose",
+  "jars": {},
+  "production_compiled": true,
+  "compiled_only_probes_and_tests": false,
+  "pure": {
+    "passed_tests": 15,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "visual": {
+    "ok": true,
+    "assertions": 47558,
+    "actual_camera_and_pose_stack": true,
+    "minecraft_instance_or_world_created": false
+  },
+  "source_sha256": {
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\layout\\RocketArcadeGeometry.java": "B1223FFF1E3D847B024B0675A45EB0752B8E1779081B458ED17C7BB01A3A7DE9",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\layout\\ControllerCableGeometry.java": "8D14198AED8E7112B57ADABB9DF112B81F7A36C9137A168B478A0C233FA93A81",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ControllerPoseLayout.java": "AB1CF7043D5B4B480B037F27FAB830A812CC5BA006C213B6D3B1982CF9580E8F",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\layout\\SfcConsoleScale.java": "05C514BAD247DFD78B179C6241D98ADBBE56978CEBE3CC451C9527D83B9A3663",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcControllerPoseLayout.java": "F68446AAEF63976C1FA4AAA7882CAE031D0FDAF7A4598D12F7C3593CCC5FB5F3",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\layout\\ControllerCableGeometryTest.java": "4E37CEDF371123AEBAEF5F54D0B80126F1E823A645C7F5CD9DCBCB6DDEC7E3FD",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\client\\ControllerCablePoseTest.java": "670B83C8FE4AB65679D4AD5EAFB7263A44E03F5BA57F0F071ED0730D26B69128",
+    "piq-sfc-home\\src\\test\\java\\cn\\piq\\sfchome\\client\\SfcControllerCableGeometryTest.java": "A007A9F18AA2763742D7BE21474C827C5FCD2396868DCDEBB071412A99514266",
+    "piq-fc-arcade\\tools\\qa\\ControllerCableVisualProbe.java": "2EBB221D2E6FA337D0FBA9B5DBADF26F6FD2101E32001F22AB73A3D43EFB0EFA",
+    "piq-fc-arcade\\tools\\qa\\CabinetRoomTestRunner.java": "76F1E13154E9C577B7E0632F97A031DE709F4F62669B03992387286881A150B3"
+  },
+  "assets_modified": false,
+  "minecraft_started": false,
+  "limits": [
+    "No running world, actual network/player or GPU renderer test. Real Camera/PoseStack plus production geometry/identity gate tested.",
+    "First-person idle equip with existing controller rig; third-person hand-region approximation, not exact animated arm bones. Non-default hand FOV/modded poses may offset cord attachment."
+  ]
+}

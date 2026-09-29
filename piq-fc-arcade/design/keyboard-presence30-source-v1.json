@@ -1,0 +1,80 @@
+{
+  "ok": true,
+  "mode": "explicit-source-qa",
+  "production_compiled": true,
+  "input": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-appliance29-v1\\piq_fc_arcade-0.31.0-alpha.29.jar",
+    "sha256": "80FD1512F69CCEB192EF78C02D5A3893924C835B322FC8CF9AF441FEB4B833C2"
+  },
+  "behavior": {
+    "passed_tests": 64,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "head_transform": {
+    "ok": true,
+    "assertions": 40,
+    "actual_mixin_transformer": true,
+    "minecraft_started": false,
+    "minecraft_classes_defined": 0,
+    "target_sha256": "08EFB37D5916C857C38A047BE0C731E1A42C00370D39AE341C0C1EC316F400FC",
+    "downstream_minecraft_sha256": "495F5DC97D07476E23835FCDD034019A020A58B980F7C764D4953CE4ED16D283",
+    "mixin_sha256": "D81B1CBA0EA97200218DCCD40E7AC902FE5D6431495F778E8B26B182B68C6779",
+    "transformed_sha256": "D8726E4F55B42AB572CDCC54EC76635329D864D2C78F837A485C223F8848BF7A",
+    "prefix_instructions": 18,
+    "original_instructions_preserved": 382,
+    "router_before_keymapping_click": true,
+    "vanilla_gui_uses_consumed_clicks": true,
+    "gui_key_gates": 3,
+    "cancel_return_before_vanilla": true,
+    "host": "read-only-classpath-service",
+    "transformer_origin": "file:/C:/Users/13498/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar"
+  },
+  "mapping_transform_and_queue": {
+    "ok": true,
+    "assertions": 95,
+    "actual_mixin_transformer": true,
+    "actual_keymapping_instances": true,
+    "actual_toggle_failure_reproduced": true,
+    "advancements_click_gate_verified": true,
+    "keyboard_queue_clear_and_mouse_preservation": true,
+    "selective_game_and_movement_only": true,
+    "minecraft_started": false,
+    "target_sha256": "65A4705D3E365D9ACAB956DE24701253CB400F908A00F099029B7F61B74BEC4F",
+    "accessor_sha256": "B28E1EFE717F433C16AE98F7A0D312F78A01DFAA2546AB167AED18A3C9B30FE4",
+    "transformed_sha256": "B9F8C9F7846EAD1C9613404CFA734FB822FFF7449A20F3FEE676AFD46E94024E",
+    "helper_sha256": "2F709E63E741FC4FFF095C62B3890D08BFA8A422CD1D110C1D2DA52E343078C9"
+  },
+  "mixin_config_sha256": "C7523E92A50127D670972062EA4F652E578F767FBB1DF83971FFE985A9F4529D",
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\retro\\client\\KeyboardConfig.java": "3B25C91CED10F120011871A0EEBC30FE83F8C04BFE33D579169CF4B754DAC4FF",
+    "src\\main\\java\\cn\\piq\\retro\\client\\KeyboardConfigStore.java": "218AB0A4B6F83317F03012C4EE2A53ACCF98A19C977530FEC583BD6BC91F98A4",
+    "src\\main\\java\\cn\\piq\\retro\\client\\KeyboardControlState.java": "9A2CBC341256339F812BEE3C03E38FECDF0647A3B976D504351F758F21F4131D",
+    "src\\main\\java\\cn\\piq\\retro\\client\\KeyboardRouting.java": "C2D696283004C1687E8D72BF601258BA2812732E38421C18273B10131380B564",
+    "src\\main\\java\\cn\\piq\\retro\\client\\KeyboardInput.java": "5B6A5A28224A7F2EAF2206405831BC805C0AF6A60CE7991B1B6C20F0C019356F",
+    "src\\main\\java\\cn\\piq\\retro\\client\\KeyboardMappingState.java": "E2299F6022CF9E49E9CDF2D38D18F14EA66C3CD33E56CE686CF8630F4E64BD9C",
+    "src\\main\\java\\cn\\piq\\fcarcade\\mixin\\KeyboardHandlerMixin.java": "3C87828FBAE3718993F371DE0C07A58E8EB0A7F68E80F184CBD8B3A4ACC91E35",
+    "src\\main\\java\\cn\\piq\\fcarcade\\mixin\\KeyMappingStateAccess.java": "E558CCE1654D9F81E4B504595EEC2FBC2E69C9EC7F21370A4B7EFB3EAC3501CE",
+    "src\\test\\java\\cn\\piq\\retro\\client\\KeyboardConfigTest.java": "01035B9FC13C751753B1E11DC6544DD3E4FDBF337D6FEB4F94735738CAB3FB2B",
+    "src\\test\\java\\cn\\piq\\retro\\client\\KeyboardControlStateTest.java": "5696DAA39DDD2D3F493650C47038276226AE8F02A5F820C6E188CB659D15DD61",
+    "src\\test\\java\\cn\\piq\\retro\\client\\KeyboardRoutingTest.java": "89F37F2C7B5F12552933E2F94617240DD5C5D45A74B7402F23D2332979056525",
+    "tools\\qa\\CabinetRoomTestRunner.java": "76F1E13154E9C577B7E0632F97A031DE709F4F62669B03992387286881A150B3",
+    "tools\\qa\\KeyboardMixinTransformProbe.java": "B589ECB2EE032E5B77A2E52303517E67AE17DA94E362BC168844B705C7190DE3",
+    "tools\\qa\\KeyboardCaptureMapping30Probe.java": "09FF6298EEE6828F2B48B8C140FD3B7F86EE9E68D7C10E51E36E232E89E9F098"
+  },
+  "minecraft_started": false,
+  "native_core_started": false,
+  "instance_or_options_modified": false,
+  "logs": {
+    "compile": "",
+    "behavior": "{\"passed_tests\":64,\"minecraft_started\":false,\"mode\":\"actual-production-pure-state-machines\"}\n",
+    "head": "{\"ok\":true,\"assertions\":40,\"actual_mixin_transformer\":true,\"minecraft_started\":false,\"minecraft_classes_defined\":0,\"target_sha256\":\"08EFB37D5916C857C38A047BE0C731E1A42C00370D39AE341C0C1EC316F400FC\",\"downstream_minecraft_sha256\":\"495F5DC97D07476E23835FCDD034019A020A58B980F7C764D4953CE4ED16D283\",\"mixin_sha256\":\"D81B1CBA0EA97200218DCCD40E7AC902FE5D6431495F778E8B26B182B68C6779\",\"transformed_sha256\":\"D8726E4F55B42AB572CDCC54EC76635329D864D2C78F837A485C223F8848BF7A\",\"prefix_instructions\":18,\"original_instructions_preserved\":382,\"router_before_keymapping_click\":true,\"vanilla_gui_uses_consumed_clicks\":true,\"gui_key_gates\":3,\"cancel_return_before_vanilla\":true,\"host\":\"read-only-classpath-service\",\"transformer_origin\":\"file:/C:/Users/13498/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar\"}\n",
+    "mapping": "WARN StatusConsoleListener Advanced terminal features are not available in this environment\n{\"ok\":true,\"assertions\":95,\"actual_mixin_transformer\":true,\"actual_keymapping_instances\":true,\"actual_toggle_failure_reproduced\":true,\"advancements_click_gate_verified\":true,\"keyboard_queue_clear_and_mouse_preservation\":true,\"selective_game_and_movement_only\":true,\"minecraft_started\":false,\"target_sha256\":\"65A4705D3E365D9ACAB956DE24701253CB400F908A00F099029B7F61B74BEC4F\",\"accessor_sha256\":\"B28E1EFE717F433C16AE98F7A0D312F78A01DFAA2546AB167AED18A3C9B30FE4\",\"transformed_sha256\":\"B9F8C9F7846EAD1C9613404CFA734FB822FFF7449A20F3FEE676AFD46E94024E\",\"helper_sha256\":\"2F709E63E741FC4FFF095C62B3890D08BFA8A422CD1D110C1D2DA52E343078C9\"}\n"
+  },
+  "limits": [
+    "Actual Sponge transforms cached NeoForge 21.1.236/Minecraft 1.21.1 classes, not a ModLauncher game boot or installed 21.1.250 interoperability run.",
+    "Actual transformed KeyMapping and ToggleKeyMapping instances execute production clearing. Transient click/down fields are seeded by reflection to avoid a GLFW window.",
+    "No Minecraft singleton, game window, physical keyboard/gamepad, remote server, options write, or gameplay is exercised.",
+    "HEAD interception covers the standard Minecraft/NeoForge key path; independent GLFW polling or higher-priority third-party mixins are outside this guarantee."
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "schema": "piq-gba-final-bundle-1",
+  "ok": true,
+  "production_compiled": false,
+  "compiled_only_probes": true,
+  "fc": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls30-v1\\piq_fc_arcade-0.31.0-alpha.30.jar",
+    "sha256": "72C330529A194582DD726921F12DBF37EBBCF6BB69DC328AF38DC213A6262821"
+  },
+  "gba": {
+    "path": "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\piq_gba-0.1.0-alpha.1.jar",
+    "sha256": "331202E4DEA6BF0EB4C2C1BA8752A2F62886BF2007F7F3BB99902BE0D70B0A3E"
+  },
+  "runtime": {
+    "piq-gba-helper.jar": {
+      "bytes": 20182,
+      "sha256": "AF687B20AFD470992F9C02C80173356E20E9D9E98FABDDCF3800979F11A4B28C"
+    },
+    "jna-5.14.0.jar": {
+      "bytes": 1878533,
+      "sha256": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6"
+    },
+    "mgba_libretro.dll": {
+      "bytes": 2955998,
+      "sha256": "D1BA96BC1AF23997D5C8003A6F6F8BE7ACBA9D770D4D42D14557AAEB469FA16B"
+    }
+  },
+  "core": {
+    "ok": true,
+    "assertions": 98434,
+    "production_origin": "final-jar-only",
+    "core_version": "0.11-219-e31759b",
+    "actual_rgb565": true,
+    "fps": 59.727500915527344,
+    "native_sample_rate": 65536.0,
+    "pcm48k_frames_first90": 71642,
+    "nonzero_samples": 76226,
+    "save_ram_bytes": 32768,
+    "state_bytes": 430144,
+    "diagnostic": "original-no-nintendo-logo-no-bios-no-commercial-data",
+    "minecraft_started": false,
+    "gameplay_compatibility_claimed": false
+  },
+  "process": {
+    "ok": true,
+    "assertions": 27,
+    "production_origin": "final-jar-only",
+    "actual_child_process_protocol": true,
+    "actual_save_restart": true,
+    "minecraft_started": false,
+    "user_rom_or_save_used": false
+  },
+  "fml": {
+    "mod_entry_points_executed": false,
+    "minecraft_or_native_core_started": false,
+    "assertions": 28,
+    "actual_common_registration": true,
+    "actual_fml_reader": true,
+    "production_origin": "final-jar-only",
+    "discovery": [
+      {
+        "scanned_classes": 1428,
+        "entry_points": [
+          "piq_fc_arcade"
+        ],
+        "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-gba-final-r8jnokxp\\fc.jar",
+        "mod_ids": [
+          "piq_fc_arcade"
+        ]
+      },
+      {
+        "scanned_classes": 8,
+        "entry_points": [
+          "piq_gba"
+        ],
+        "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-gba-final-r8jnokxp\\gba.jar",
+        "mod_ids": [
+          "piq_gba"
+        ]
+      }
+    ],
+    "ok": true,
+    "actual_annotation_scan": true,
+    "dependency_check": "Actual FML ModInfo and Maven VersionRange; not full bootstrap"
+  },
+  "source": {
+    "ok": true,
+    "executed": false,
+    "core_sha256": "D1BA96BC1AF23997D5C8003A6F6F8BE7ACBA9D770D4D42D14557AAEB469FA16B",
+    "embedded_commit": "e31759b24e7a4e3899285ff720d7b573ac328ae7",
+    "embedded_version": "0.11-219-e31759b",
+    "source_url": "https://codeload.github.com/libretro/mgba/tar.gz/e31759b24e7a4e3899285ff720d7b573ac328ae7",
+    "source_sha256": "396D749CCE8FE3358B29CBB1DB479B1816A151BD688EE45B1D241503CBC40243",
+    "source_archive_bytes": 16149683,
+    "source_extracted_total_bytes": 77210474,
+    "pe_imports": [
+      "kernel32.dll",
+      "msvcrt.dll",
+      "ole32.dll",
+      "shell32.dll",
+      "shlwapi.dll"
+    ],
+    "source_correspondence": "Official binary embeds full commit; official source archived at that commit. Not independently reproducible-build verified.",
+    "license": "MPL-2.0; full source archive retains third-party notices",
+    "headers": {
+      "Access-Control-Allow-Origin": "https://render.githubusercontent.com",
+      "content-disposition": "attachment; filename=mgba-e31759b24e7a4e3899285ff720d7b573ac328ae7.tar.gz",
+      "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+      "Content-Type": "application/x-gzip",
+      "cross-origin-resource-policy": "cross-origin",
+      "ETag": "\"b6e858fc7bdd2360ad96e2865fecfda45b0906c1286ad95b6afeda9be1864d5a\"",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Authorization,Accept-Encoding",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "deny",
+      "X-XSS-Protection": "1; mode=block",
+      "Date": "Fri, 11 Sep 2026 15:05:43 GMT",
+      "Transfer-Encoding": "chunked",
+      "X-GitHub-Request-Id": "B780:1066E8:2D76FB:4762E4:6AA418C6",
+      "x-github-edge-region": "sea",
+      "connection": "close"
+    }
+  },
+  "files_sha256": {
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls30-v1\\piq_fc_arcade-0.31.0-alpha.30.jar": "72C330529A194582DD726921F12DBF37EBBCF6BB69DC328AF38DC213A6262821",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\build-and-process-qa.json": "C949B66F8214C49AA16F6F3ED04A3D2BAF4B45F16AE7CD91AB2B816142501EAF",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\final-independent-audit.json": "C8358CD661C5606607D3F1544B0BE8B73C87A3D41A50980C2EDC26EC13387186",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\piq_gba-0.1.0-alpha.1.jar": "331202E4DEA6BF0EB4C2C1BA8752A2F62886BF2007F7F3BB99902BE0D70B0A3E",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\README.md": "2A26086AA2B09F74C4A3F4D9EE202897D787CA1723FDE73FD029834D15CDD6FE",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\licenses-and-source\\JNA-Apache-2.0.txt": "0D542E0C8804E39AA7F37EB00DA5A762149DC682D7829451287E11B938E94594",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\licenses-and-source\\JNA-LICENSE.txt": "521BB271AC56E0E29A1B1B688B94AF17D00D378FC8E63478D8C8B2A7C4A229D0",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\licenses-and-source\\mgba-LICENSE": "FAB3DD6BDAB226F1C08630B1DD917E11FCB4EC5E1E020E2C16F83A0A13863E85",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\licenses-and-source\\mgba-official-acquisition.json": "8525664D9A9318158CDDBD3486033F4A15F6812B995B3CA367D3456D5B2F93C5",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\licenses-and-source\\mgba-source-verification.json": "C9BDCBF05474AF9D02C1A2355BEBE404DCC2A4A64D176E66A847A12148F8EC07",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\licenses-and-source\\mgba-source.tar.gz": "396D749CCE8FE3358B29CBB1DB479B1816A151BD688EE45B1D241503CBC40243",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\licenses-and-source\\piq-gba-source.zip": "53069D5995EFED5B8B4B7BA3799EB1B61561D9C5EE19870E543A4A41E4B61044",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\licenses-and-source\\PIQ-GPL-3.0.txt": "3972DC9744F6499F0F9B2DBF76696F2AE7AD8AF9B23DDE66D6AF86C9DFB36986",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\piq-gba\\runtime\\jna-5.14.0.jar": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\piq-gba\\runtime\\mgba_libretro.dll": "D1BA96BC1AF23997D5C8003A6F6F8BE7ACBA9D770D4D42D14557AAEB469FA16B",
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\preview-v4\\piq-gba\\runtime\\piq-gba-helper.jar": "AF687B20AFD470992F9C02C80173356E20E9D9E98FABDDCF3800979F11A4B28C"
+  },
+  "minecraft_started": false,
+  "user_rom_or_save_used": false,
+  "diagnostic_rom_sha256": "12C1CDF5916C3C92CE18E09F4E3203CCF49E6234FF68AE662C72089E6C1F40EE",
+  "scope": "Original ARM ROM and actual owned native helper; no game instance, handheld item, commercial compatibility or multiplayer claim."
+}

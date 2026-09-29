@@ -1,0 +1,27 @@
+{
+  "authorization": "User approved exact UV programmatic compositing on 2026-09-08",
+  "generation_mode": "built-in image_gen; original generation prompt in GENERATION.md",
+  "operation": "full-canvas NEAREST 512x256; paste only original label UV and 4px edge padding",
+  "generated_size": [
+    1774,
+    887
+  ],
+  "generated_sha256": "E0B67298F946D1F80830A48D77527B287C29C773E8838A675825847890D1D761",
+  "original_skin_sha256": "3F071A850BBD033F4311982B7510EA5C214DE4991B64130DC93E0F5A2616F14C",
+  "label_sha256": "B14B8F632FF891487C133FD3974CB9BC7019C830E60E9E552FEF5B30DB4FDFB8",
+  "skin_sha256": "EBD76E0B5A56FC36C3F474CC0E4345377506E6AEA7B2EC14D8FECFECA246CCDA",
+  "label_rect_exclusive": [
+    32,
+    32,
+    544,
+    288
+  ],
+  "approved_rect_exclusive": [
+    28,
+    28,
+    548,
+    292
+  ],
+  "outside_rgba_identical": true,
+  "original_jar_sha256": "A928C4FBC984E756CFA939FEA8A60DB6000CCBB73C6AD19DE3B7413148F89D00"
+}

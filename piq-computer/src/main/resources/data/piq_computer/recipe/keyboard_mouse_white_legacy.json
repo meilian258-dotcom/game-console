@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "piq_computer:keyboard_white"
+    },
+    {
+      "item": "piq_computer:mouse_white"
+    }
+  ],
+  "result": {
+    "id": "piq_computer:keyboard_mouse_white",
+    "count": 1
+  }
+}

@@ -1,0 +1,7 @@
+.gradle/
+build/
+runtime/bin/
+runtime/obj/
+runtime/private-test/
+runtime/profiles/
+*.log

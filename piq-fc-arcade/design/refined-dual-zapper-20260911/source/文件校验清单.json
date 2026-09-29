@@ -1,0 +1,270 @@
+{
+  "files": [
+    {
+      "bytes": 583805,
+      "sha256": "A55A6550E4BDE2EBA0B0B8D2EB64FB1A2A840014713DEBCDAD74B2408E79F57B",
+      "path": "01_光枪_带展示支架/Zapper_橙灰光枪_展示支架版.bbmodel"
+    },
+    {
+      "bytes": 403309,
+      "sha256": "89CDFAD0A6C02F628AB4D50F7DD5FC66E3B0052FF66A1A18250EAFB4755CA9E1",
+      "path": "01_光枪_带展示支架/zapper_stand.json"
+    },
+    {
+      "bytes": 96900,
+      "sha256": "AB5C925B7BD21AD2CBBFCC96A0F38CC4FE6C4E9013BCE57DF8F866E9EA16167F",
+      "path": "01_光枪_带展示支架/Zapper_支架版完整UV.png"
+    },
+    {
+      "bytes": 62705,
+      "sha256": "2E832E9260FB8098DB9B4ECDA034C090E0347E23AC205E29603A191A76D6C0D8",
+      "path": "01_光枪_带展示支架/UV_透明线框.png"
+    },
+    {
+      "bytes": 646431,
+      "sha256": "74C0F26C998AD7796AF472AB2E6FAB7F4AB485A3D732A1562AAAEC969EA59BDB",
+      "path": "01_光枪_带展示支架/UV_部件索引.json"
+    },
+    {
+      "bytes": 691,
+      "sha256": "4B43C6187409F0C9AF14E5933192219735461088277E3E7609C3CC349055318B",
+      "path": "01_光枪_带展示支架/扳机分组映射.json"
+    },
+    {
+      "bytes": 802258,
+      "sha256": "928AADB846A0C88B7893F95FC743F1B2F1C18ED3352FC8D4D26008D4C6FBB678",
+      "path": "01_光枪_带展示支架/stand_manifest.json"
+    },
+    {
+      "bytes": 2291,
+      "sha256": "859E35719B1B7489F49FF831297DF7CA001A1095B3FDA8C5A62095929E58D25B",
+      "path": "01_光枪_带展示支架/使用说明.md"
+    },
+    {
+      "bytes": 30333,
+      "sha256": "675BFA645FC6EB42790A2CB822C584E95A75AC745E51974C4CD57AF38868B7D1",
+      "path": "01_光枪_带展示支架/预览_斜侧.png"
+    },
+    {
+      "bytes": 17602,
+      "sha256": "EA0DB8ADB9704D03EC37F992413DC097B009BB5CA009438313B0B8B31908530C",
+      "path": "01_光枪_带展示支架/预览_正面.png"
+    },
+    {
+      "bytes": 27882,
+      "sha256": "7052CB85570E1AA12BF06C1696392205830549903850CBABD632B0C3A662424A",
+      "path": "01_光枪_带展示支架/预览_背面.png"
+    },
+    {
+      "bytes": 32902,
+      "sha256": "4929FB24D9F53C1060B220EFAE5AE2809A9B864B17BB8DE1695B083DBB42CE68",
+      "path": "01_光枪_带展示支架/tools/validation.json"
+    },
+    {
+      "bytes": 1950,
+      "sha256": "A8B802DB53036F47C1775566BDB1E10926B448D5EB714043837DDDFF542FC957",
+      "path": "01_光枪_带展示支架/tools/layout_audit.json"
+    },
+    {
+      "bytes": 403309,
+      "sha256": "89CDFAD0A6C02F628AB4D50F7DD5FC66E3B0052FF66A1A18250EAFB4755CA9E1",
+      "path": "01_光枪_带展示支架/minecraft_assets/assets/zapper_stand/models/block/zapper_stand.json"
+    },
+    {
+      "bytes": 96900,
+      "sha256": "AB5C925B7BD21AD2CBBFCC96A0F38CC4FE6C4E9013BCE57DF8F866E9EA16167F",
+      "path": "01_光枪_带展示支架/minecraft_assets/assets/zapper_stand/textures/block/skin.png"
+    },
+    {
+      "bytes": 611115,
+      "sha256": "8EEB98567BB7A34598CCE7FE95E91FDA1EE263B45427F021BBDF908A55F0FF97",
+      "path": "02_双人街机_上半部重塑大屏版/街机_双人_上半部重塑大屏版.bbmodel"
+    },
+    {
+      "bytes": 331747,
+      "sha256": "142E29CC81B10AAAFD73662E11999F94CBE5AA2E4596C43D39405EB460EFE296",
+      "path": "02_双人街机_上半部重塑大屏版/arcade_refined_upper.json"
+    },
+    {
+      "bytes": 140603,
+      "sha256": "3E6081A5F18CBFD9277B229718996E3D9583C8A072C0119E9ED8380484DE5265",
+      "path": "02_双人街机_上半部重塑大屏版/双人街机_重塑版UV.png"
+    },
+    {
+      "bytes": 708507,
+      "sha256": "AEFD75E37E6111155027AF1EB464A85389A6280E54A96470A5C529843B0A47B7",
+      "path": "02_双人街机_上半部重塑大屏版/refined_manifest.json"
+    },
+    {
+      "bytes": 2333,
+      "sha256": "CEA003C6F32977D9C2FBAB84202ADB0C5ABC8741F1275DE1C0BF259604CA4E8F",
+      "path": "02_双人街机_上半部重塑大屏版/使用说明.md"
+    },
+    {
+      "bytes": 20913,
+      "sha256": "5D3B09FE979D8A9EB1D6CF1E751B873FC1C7AB7F64C99DD6935BC8D8468869AE",
+      "path": "02_双人街机_上半部重塑大屏版/按键动画映射.json"
+    },
+    {
+      "bytes": 1733,
+      "sha256": "BC4374B5A1028558FE2D7459FE9A6EF817D857922BC18A425CC6B35CBD844213",
+      "path": "02_双人街机_上半部重塑大屏版/按键动画映射.csv"
+    },
+    {
+      "bytes": 105546,
+      "sha256": "305F83C646B61B476335CE6427AFE21B54C5946DB845EE6DC6409CF0E7D0C792",
+      "path": "02_双人街机_上半部重塑大屏版/UV_部件索引.csv"
+    },
+    {
+      "bytes": 190848,
+      "sha256": "623DB1E79CDCAC3336267B669D36517855F483ADBEF07EF2536922F82BE17706",
+      "path": "02_双人街机_上半部重塑大屏版/UV_分区参考.png"
+    },
+    {
+      "bytes": 100061,
+      "sha256": "7A112654B4ACEDF851A76591D881004EAF0C906A24F4E8A800FD0C7FEDB77B4F",
+      "path": "02_双人街机_上半部重塑大屏版/UV_透明线框.png"
+    },
+    {
+      "bytes": 33938,
+      "sha256": "CC34F237914AE98F3197BA7A1F22B68087CF178D71945AEADA8DE6C7302C358A",
+      "path": "02_双人街机_上半部重塑大屏版/预览_重塑街机.png"
+    },
+    {
+      "bytes": 15253,
+      "sha256": "C1FDFCA0A6F86DD4C2AD3F4AEC7C7482D273285327F3F94CEB07B245E7939CAF",
+      "path": "02_双人街机_上半部重塑大屏版/预览_重塑侧面.png"
+    },
+    {
+      "bytes": 29773,
+      "sha256": "14FCDE71A3439E8C022EB385119D53C20C7F46B10FE7708CC357681D9B28EA95",
+      "path": "02_双人街机_上半部重塑大屏版/预览_重塑正面.png"
+    },
+    {
+      "bytes": 98953,
+      "sha256": "2AA8FEF06B2166B96846B4A6E1B673D71420C9A19D5FCB9FA77267BD20BFA2D1",
+      "path": "02_双人街机_上半部重塑大屏版/预览_调整前后对比.png"
+    },
+    {
+      "bytes": 19394,
+      "sha256": "1626C7FE7EA37659F6831C8CF1DE97F6497F8BFC245BD317E72C6B0E3628E7FA",
+      "path": "02_双人街机_上半部重塑大屏版/tools/validation.json"
+    },
+    {
+      "bytes": 331747,
+      "sha256": "142E29CC81B10AAAFD73662E11999F94CBE5AA2E4596C43D39405EB460EFE296",
+      "path": "02_双人街机_上半部重塑大屏版/minecraft_assets/assets/arcade_refined_upper/models/block/arcade_refined_upper.json"
+    },
+    {
+      "bytes": 140603,
+      "sha256": "3E6081A5F18CBFD9277B229718996E3D9583C8A072C0119E9ED8380484DE5265",
+      "path": "02_双人街机_上半部重塑大屏版/minecraft_assets/assets/arcade_refined_upper/textures/block/skin.png"
+    },
+    {
+      "bytes": 1279692,
+      "sha256": "A5555ED9AD562DA51F9717110D660E4F20A2BCEE0FDA73BFC62FE35A338DD394",
+      "path": "03_GBA_经典横版/GBA_经典横版_单张UV.bbmodel"
+    },
+    {
+      "bytes": 1011244,
+      "sha256": "2CE4632A2EC2FDDA98E0372221AC1FB398B0D987BCA96BCDC27C65B225F2EAEE",
+      "path": "03_GBA_经典横版/gba.json"
+    },
+    {
+      "bytes": 138809,
+      "sha256": "376FB935DEB9D6F5F4682A24FC4DF94D5EF9A5793D14B4255F573FE6FF921BCC",
+      "path": "03_GBA_经典横版/GBA_完整UV.png"
+    },
+    {
+      "bytes": 1835450,
+      "sha256": "F6229AABF48370E134E54DCD8D40F50812B52D425673D7D080C8C50D66A71B5A",
+      "path": "03_GBA_经典横版/gba_manifest.json"
+    },
+    {
+      "bytes": 1793,
+      "sha256": "317F9D11C5E2E8C080D0B11F65AE55000913FF4867B8F502EAB79E8E0B302BCA",
+      "path": "03_GBA_经典横版/皮肤区域.json"
+    },
+    {
+      "bytes": 3314,
+      "sha256": "23A5A76B8AFFE53486DDF80417EDB7EB121D8ABA4C32BD88B5C129F85EB1F962",
+      "path": "03_GBA_经典横版/屏幕模板_240x160.png"
+    },
+    {
+      "bytes": 76492,
+      "sha256": "27E2B0D93F99E9CD28CEE78F7B9CC2E13E485F836C348B0854D831AC52E499AB",
+      "path": "03_GBA_经典横版/UV_透明线框.png"
+    },
+    {
+      "bytes": 1398472,
+      "sha256": "5F1BC2FC009269CFC8A466137C2975ED426A4F38EEE646D6049E8A0C6B1741C8",
+      "path": "03_GBA_经典横版/UV_部件索引.json"
+    },
+    {
+      "bytes": 2425,
+      "sha256": "31E90DEF9029DBBC2934F6FCA76366DC7CB3CAF2A50686A04C22AF69B27516F0",
+      "path": "03_GBA_经典横版/按键映射.json"
+    },
+    {
+      "bytes": 2994,
+      "sha256": "9D0D00BF241EEE62F6BB44DC4B32CAC62DCD210E08CAF6980AE181C9960C0DD2",
+      "path": "03_GBA_经典横版/使用说明.md"
+    },
+    {
+      "bytes": 30958,
+      "sha256": "E916CCFC569FC7A412D12A844AB7F610478B6DA37AE383CE580D6BCDCA68A151",
+      "path": "03_GBA_经典横版/预览_正侧.png"
+    },
+    {
+      "bytes": 24305,
+      "sha256": "90EA3E96CA2BC694F8F65EA0733D87ED6C30C51FCDCC912B8028D3B30740110D",
+      "path": "03_GBA_经典横版/预览_俯视.png"
+    },
+    {
+      "bytes": 22392,
+      "sha256": "F58440E3DD4DBEC1D4C46E3C9EAE98C3F41BD245B18AE913FBB212A1BA566AA1",
+      "path": "03_GBA_经典横版/预览_背面.png"
+    },
+    {
+      "bytes": 29033,
+      "sha256": "FE9C6939B2BAB685ADF987386E1C6E72FEDE7B9282B8155BA887C533C8539472",
+      "path": "03_GBA_经典横版/tools/validation_gba.json"
+    },
+    {
+      "bytes": 1011244,
+      "sha256": "2CE4632A2EC2FDDA98E0372221AC1FB398B0D987BCA96BCDC27C65B225F2EAEE",
+      "path": "03_GBA_经典横版/minecraft_assets/assets/gba/models/block/gba.json"
+    },
+    {
+      "bytes": 138809,
+      "sha256": "376FB935DEB9D6F5F4682A24FC4DF94D5EF9A5793D14B4255F573FE6FF921BCC",
+      "path": "03_GBA_经典横版/minecraft_assets/assets/gba/textures/block/skin.png"
+    },
+    {
+      "bytes": 1214,
+      "sha256": "EF9A0874EA40CAD9B608A7E0F6A50CBD23F73073CA079A9FAC27FF98CBA8FAB4",
+      "path": "合集说明.md"
+    }
+  ],
+  "sources": [
+    {
+      "files": 15,
+      "sourceArchive": "Zapper_带展示支架_完整文件.zip",
+      "sha256": "B367CF0A75F9ED7F79098F3DA98FAAD18CD2DBE7777683BBABEE28A474785A60",
+      "folder": "01_光枪_带展示支架"
+    },
+    {
+      "files": 17,
+      "sourceArchive": "双人街机_上半部重塑大屏版_完整文件.zip",
+      "sha256": "CCA9454E218C16FEF6AFE28F62E817D782332B15D3D3CEA5272F925C08D5F3A0",
+      "folder": "02_双人街机_上半部重塑大屏版"
+    },
+    {
+      "files": 16,
+      "sourceArchive": "GBA_经典横版_完整文件.zip",
+      "sha256": "0A9002C407D44DBEE13347ED1C75981D6016501696EB13E42B030B2BA283954D",
+      "folder": "03_GBA_经典横版"
+    }
+  ],
+  "note": "SHA256 for all payloads except this checksum manifest itself."
+}

@@ -1,0 +1,268 @@
+{
+  "schema": "piq-fbneo-isolated-study-1",
+  "game": "mslug2",
+  "ok": true,
+  "sync_qualified": false,
+  "official_artifacts": {
+    "schema": "piq-fbneo-official-study-1",
+    "official_binary": {
+      "url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/fbneo_libretro.dll.zip",
+      "resolved_url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/fbneo_libretro.dll.zip",
+      "last_modified": "Fri, 11 Sep 2026 23:02:07 GMT",
+      "bytes": 17334074,
+      "sha256": "934FF65DC9A3229E62F39A8F26630B54473995BE631FCF9D277996765B2643AB"
+    },
+    "dll": {
+      "path": "G:\\服务器\\服务器Codex\\piq-native-arcade\\design\\fbneo-study\\vendor\\fbneo_libretro.dll",
+      "bytes": 61913629,
+      "sha256": "52343F65453C0E1FC06B3AA818B48CA4FED18361F7F336A684E9E3CFFA5F5F3C"
+    },
+    "fixed_source": {
+      "url": "https://codeload.github.com/libretro/FBNeo/zip/a251c76229f1637e433b93e29845039752771b6d",
+      "resolved_url": "https://codeload.github.com/libretro/FBNeo/zip/a251c76229f1637e433b93e29845039752771b6d",
+      "last_modified": null,
+      "bytes": 29731166,
+      "sha256": "55CC0F5BF305D8953FA0A20C3598164D39EFC03EF3740C7B01E7EBF143CD4D7A"
+    },
+    "source_commit": "a251c76229f1637e433b93e29845039752771b6d",
+    "commit_time": "2026-09-04T07:53:13Z",
+    "license_sha256": "BB2369F1B75F42242968A78191B47EE90F85682224D3AD1EF63044E244B3E202",
+    "binary_to_source_exact_mapping_verified": false,
+    "production_modified": false,
+    "installed": false,
+    "purpose": "Local isolated determinism research only; non-commercial licensing requires separate distribution review."
+  },
+  "inputs": {
+    "F:\\Minecraft\\HMCL\\versions\\1.21.1-NeoForge\\piq-native-arcade\\roms\\mslug2.zip": {
+      "sha256": "1A82D65E88050FDC75DBCEA180E48802D54C67A4748558FC4BD51C0103D56E4A",
+      "bytes": 17473893,
+      "mtime_ns": 1777530796963932400
+    },
+    "E:\\Dow\\rom\\WinKawaks1.65模拟器\\WinKawaks1.65\\roms\\neogeo\\neogeo.zip": {
+      "sha256": "E1FFD4AB180E2F6AA4A3AA4D2C6F991E19D8EF762BEC8B5A6283704A2EDC3BBC",
+      "bytes": 953500,
+      "mtime_ns": 1158274344000000000
+    }
+  },
+  "production_modified": false,
+  "production_compiled": false,
+  "minecraft_started": false,
+  "commercial_rom_loaded": true,
+  "source_roms_read_only": true,
+  "snapshot_frame": 2200,
+  "following_frames": 600,
+  "limitations": [
+    "Independent experimental core, not integrated into FC or Native production.",
+    "Finite traces for the provided existing ROM set only; not a universal FBNeo compatibility claim.",
+    "Entire canonical video and all signed stereo PCM samples are hashed per frame; no sound samples ignored.",
+    "Snapshot contents and ROM/BIOS copies exist only in owned temporary directories and are not report artifacts.",
+    "Actual sample rate is recorded, not relabeled or resampled. A production 48 kHz adapter needs a deterministic resampler whose pending samples/history are part of snapshots."
+  ],
+  "children": {
+    "a": {
+      "exit_code": 0,
+      "stderr_tail": "CORE FinalBurn Neo v1.0.0.03 260904 GITa251c76 fps=59.18 actual_sample_rate=47994.98\nFRAME 0\nFRAME 600\nFRAME 1200\nFRAME 1800\nNATIVE_TEARDOWN_COMPLETED\n",
+      "stdout_tail": "",
+      "native_teardown_completed": true,
+      "result": {
+        "ok": true,
+        "core_name": "FinalBurn Neo",
+        "core_version": "v1.0.0.03 260904 GITa251c76",
+        "sample_rate": 47994.98,
+        "fps": 59.18,
+        "pixel_format": 1,
+        "initial_sha256": "FD6971AEC11A2EC2D57BD7C27CFAEDF4547892239DEA55C4B7B5C4917A78C89F",
+        "snapshot_sha256": "793764C248AB3E6D44AE0EB913E9B8F0F7817BC6ED9974E6E71CD226ACF37DAE",
+        "immediate_repeat_save_sha256": "793764C248AB3E6D44AE0EB913E9B8F0F7817BC6ED9974E6E71CD226ACF37DAE",
+        "restored_before_step_sha256": "9CAF5D84953296141E88F5A434CC8E822BEC29BC37E9107FFF579F9DA59E81B8",
+        "ending_state_sha256": "75B0A49F816F573BBBF99D6CBFB1F7D70C9B9698D35004515944453898EE431F",
+        "restored_ending_state_sha256": "42F19C2584E124BDD7A24FC922449D07DB3C8C8BB0E9153C9F6CAD179D8FE44C",
+        "cross_ending_state_sha256": "",
+        "snapshot_bytes": 415155,
+        "real_video_frames": 3399,
+        "duplicate_video_frames": 1,
+        "nonzero_audio_frames": 2420,
+        "savestate_context": 0,
+        "savestate_context_queries": 14
+      }
+    },
+    "b": {
+      "exit_code": 0,
+      "stderr_tail": "CORE FinalBurn Neo v1.0.0.03 260904 GITa251c76 fps=59.18 actual_sample_rate=47994.98\nFRAME 0\nFRAME 600\nFRAME 1200\nFRAME 1800\nNATIVE_TEARDOWN_COMPLETED\n",
+      "stdout_tail": "",
+      "native_teardown_completed": true,
+      "result": {
+        "ok": true,
+        "core_name": "FinalBurn Neo",
+        "core_version": "v1.0.0.03 260904 GITa251c76",
+        "sample_rate": 47994.98,
+        "fps": 59.18,
+        "pixel_format": 1,
+        "initial_sha256": "FD6971AEC11A2EC2D57BD7C27CFAEDF4547892239DEA55C4B7B5C4917A78C89F",
+        "snapshot_sha256": "793764C248AB3E6D44AE0EB913E9B8F0F7817BC6ED9974E6E71CD226ACF37DAE",
+        "immediate_repeat_save_sha256": "793764C248AB3E6D44AE0EB913E9B8F0F7817BC6ED9974E6E71CD226ACF37DAE",
+        "restored_before_step_sha256": "9CAF5D84953296141E88F5A434CC8E822BEC29BC37E9107FFF579F9DA59E81B8",
+        "ending_state_sha256": "75B0A49F816F573BBBF99D6CBFB1F7D70C9B9698D35004515944453898EE431F",
+        "restored_ending_state_sha256": "42F19C2584E124BDD7A24FC922449D07DB3C8C8BB0E9153C9F6CAD179D8FE44C",
+        "cross_ending_state_sha256": "3D2379153E48E15610640C54AD0215D557B6726DA71AF937B62660EF407C25A5",
+        "snapshot_bytes": 415155,
+        "real_video_frames": 3999,
+        "duplicate_video_frames": 1,
+        "nonzero_audio_frames": 2992,
+        "savestate_context": 0,
+        "savestate_context_queries": 17
+      }
+    }
+  },
+  "comparisons": {
+    "independent_start": {
+      "equal": true,
+      "different_frames": 0,
+      "first_difference": null,
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        }
+      }
+    },
+    "a_local_restore": {
+      "equal": false,
+      "different_frames": 572,
+      "first_difference": {
+        "frame": 2200,
+        "header_equal": true,
+        "video_equal": true,
+        "audio_equal": false
+      },
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 572,
+          "first_index": 0,
+          "last_index": 599,
+          "last_60_mismatches": 60
+        }
+      }
+    },
+    "b_local_restore": {
+      "equal": false,
+      "different_frames": 572,
+      "first_difference": {
+        "frame": 2200,
+        "header_equal": true,
+        "video_equal": true,
+        "audio_equal": false
+      },
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 572,
+          "first_index": 0,
+          "last_index": 599,
+          "last_60_mismatches": 60
+        }
+      }
+    },
+    "a_snapshot_on_b": {
+      "equal": false,
+      "different_frames": 572,
+      "first_difference": {
+        "frame": 2200,
+        "header_equal": true,
+        "video_equal": true,
+        "audio_equal": false
+      },
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 572,
+          "first_index": 0,
+          "last_index": 599,
+          "last_60_mismatches": 60
+        }
+      }
+    }
+  },
+  "state_hashes": {
+    "initial_equal": true,
+    "independent_snapshot_equal": true,
+    "a_immediate_repeat_equal": true,
+    "b_immediate_repeat_equal": true,
+    "a_load_resave_equal": false,
+    "b_load_resave_equal": false,
+    "a_final_equal": false,
+    "b_final_equal": false,
+    "cross_final_equal": false
+  },
+  "options": "{fbneo-allow-depth-32=enabled, fbneo-allow-patched-romsets=enabled, fbneo-analog-speed=100%, fbneo-cpu-speed-adjust=100%, fbneo-debug-dip-1-1=disabled, fbneo-debug-dip-1-2=disabled, fbneo-debug-dip-1-3=disabled, fbneo-debug-dip-1-4=disabled, fbneo-debug-dip-1-5=disabled, fbneo-debug-dip-1-6=disabled, fbneo-debug-dip-1-7=disabled, fbneo-debug-dip-1-8=disabled, fbneo-debug-dip-2-1=disabled, fbneo-debug-dip-2-2=disabled, fbneo-debug-dip-2-3=disabled, fbneo-debug-dip-2-4=disabled, fbneo-debug-dip-2-5=disabled, fbneo-debug-dip-2-6=disabled, fbneo-debug-dip-2-7=disabled, fbneo-debug-dip-2-8=disabled, fbneo-diagnostic-input=Hold Start, fbneo-dipswitch-mslug2-Autofire=Off, fbneo-dipswitch-mslug2-BIOS=MVS Asia/Europe ver. 6 (1 slot), fbneo-dipswitch-mslug2-Coin_chutes_2=2, fbneo-dipswitch-mslug2-Commmunicaton=Disabled, fbneo-dipswitch-mslug2-Free_play=Off, fbneo-dipswitch-mslug2-Memory_card=Writable, fbneo-dipswitch-mslug2-New_card_type=Normal, fbneo-dipswitch-mslug2-Overscan=Auto, fbneo-dipswitch-mslug2-Setting_mode=Off, fbneo-dipswitch-mslug2-Stop_mode=Off, fbneo-dipswitch-mslug2-Turbo_hack=Off, fbneo-dipswitch-mslug2-Unibios_mode=MVS, fbneo-fixed-frameskip=0, fbneo-fm-interpolation=4-point 3rd order, fbneo-force-60hz=disabled, fbneo-hiscores=enabled, fbneo-lightgun-crosshair-emulation=hide with lightgun device, fbneo-lowpass-filter=disabled, fbneo-memcard-mode=disabled, fbneo-neogeo-mode=DIPSWITCH, fbneo-resolution=640x480, fbneo-sample-interpolation=4-point 3rd order, fbneo-samplerate=48000, fbneo-socd=3, fbneo-vertical-mode=disabled}",
+  "options_equal": true,
+  "actual_sample_rate": 47994.98,
+  "requested_sample_rate": 48000,
+  "savestate_context": "normal",
+  "pcm_signed_shorts_per_frame": [
+    1622
+  ],
+  "frames_per_comparison": {
+    "independent_start": 2800,
+    "a_local_restore": 600,
+    "b_local_restore": 600,
+    "a_snapshot_on_b": 600
+  },
+  "timing_equal": true,
+  "determinism_qualified": false,
+  "direct_48k_compatible": false,
+  "source_roms_unchanged": true,
+  "seconds": 4.443,
+  "qa_source_sha256": {
+    "tools\\run_study.py": "C19FC4CE53BC3352A73A0FFE519D228387C9E02F892AAB88CCC89D7BDFD195A4",
+    "tools\\FbneoStudy.java": "713B06E964DDB8BEA716CF138480348003DA2C02334AE9275D7B2FED25AB1E59"
+  }
+}

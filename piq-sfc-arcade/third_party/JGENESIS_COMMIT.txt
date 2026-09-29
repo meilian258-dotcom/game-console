@@ -1,0 +1,6 @@
+jgenesis source: https://github.com/jsgroth/jgenesis
+Pinned commit: 25fc9e55ff065284c7b5f5855e2fc6d0f26e8270
+Commit date: 2026-08-04T03:07:30Z
+License: GNU GPL v3
+
+Do not update this revision without rerunning the core ABI and ROM compatibility tests.

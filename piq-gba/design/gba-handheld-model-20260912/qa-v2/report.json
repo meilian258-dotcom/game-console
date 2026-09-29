@@ -1,0 +1,223 @@
+{
+  "ok": true,
+  "mode": "production-source-layout",
+  "production_compiled": true,
+  "layout": {
+    "center": [
+      8.0,
+      0.7215,
+      8.021
+    ],
+    "arms": {
+      "left": [
+        -0.8525,
+        -0.0683493649053891,
+        -0.25999999999999995,
+        30.0,
+        -60.0,
+        0.8
+      ],
+      "right": [
+        0.8525,
+        -0.0683493649053891,
+        -0.25999999999999995,
+        30.0,
+        60.0,
+        0.8
+      ]
+    },
+    "first_single": [
+      0.34,
+      -0.45,
+      -1.1,
+      0.0,
+      -20.0,
+      0.0,
+      1.0
+    ],
+    "ok": true,
+    "first_two": [
+      0.0,
+      -0.45,
+      -1.1,
+      0.0,
+      -20.0,
+      0.0,
+      1.0
+    ],
+    "screen": [
+      [
+        6.2,
+        1.302,
+        6.61
+      ],
+      [
+        6.2,
+        1.302,
+        9.01
+      ],
+      [
+        9.8,
+        1.302,
+        9.01
+      ],
+      [
+        9.8,
+        1.302,
+        6.61
+      ]
+    ],
+    "assertions": 5104,
+    "poses": {
+      "FIRST": [
+        0.5,
+        0.5,
+        0.5,
+        0.0,
+        90.0,
+        0.0,
+        1.2
+      ],
+      "THIRD": [
+        0.5,
+        0.5,
+        0.5,
+        0.0,
+        90.0,
+        0.0,
+        1.0
+      ],
+      "GUI": [
+        0.5,
+        0.5,
+        0.5,
+        -12.0,
+        75.0,
+        0.0,
+        1.6
+      ],
+      "GROUND": [
+        0.5,
+        0.07,
+        0.5,
+        0.0,
+        0.0,
+        0.0,
+        0.9
+      ],
+      "FIXED": [
+        0.5,
+        0.5,
+        0.5,
+        0.0,
+        90.0,
+        0.0,
+        1.3
+      ]
+    }
+  },
+  "actual_model_parser": {
+    "ok": true,
+    "assertions": 22598,
+    "elements": 735,
+    "faces": 4370,
+    "rotations": 451,
+    "actual_minecraft_parser": true
+  },
+  "import": {
+    "ok": true,
+    "zip_sha256": "8E4B502BA203892D7580D9B3A0DB4308737C70AA7543905AD42AFB8DA62C3FC7",
+    "source_sha256": {
+      "GBA_经典横版_单张UV.bbmodel": "A5555ED9AD562DA51F9717110D660E4F20A2BCEE0FDA73BFC62FE35A338DD394",
+      "gba.json": "2CE4632A2EC2FDDA98E0372221AC1FB398B0D987BCA96BCDC27C65B225F2EAEE",
+      "GBA_完整UV.png": "376FB935DEB9D6F5F4682A24FC4DF94D5EF9A5793D14B4255F573FE6FF921BCC",
+      "按键映射.json": "31E90DEF9029DBBC2934F6FCA76366DC7CB3CAF2A50686A04C22AF69B27516F0",
+      "使用说明.md": "9D0D00BF241EEE62F6BB44DC4B32CAC62DCD210E08CAF6980AE181C9960C0DD2",
+      "皮肤区域.json": "317F9D11C5E2E8C080D0B11F65AE55000913FF4867B8F502EAB79E8E0B302BCA",
+      "预览_俯视.png": "90EA3E96CA2BC694F8F65EA0733D87ED6C30C51FCDCC912B8028D3B30740110D",
+      "预览_正侧.png": "E916CCFC569FC7A412D12A844AB7F610478B6DA37AE383CE580D6BCDCA68A151",
+      "预览_背面.png": "F58440E3DD4DBEC1D4C46E3C9EAE98C3F41BD245B18AE913FBB212A1BA566AA1"
+    },
+    "elements": 735,
+    "rotated_elements": 451,
+    "faces": 4370,
+    "triangles": 8740,
+    "bounds_units": [
+      [
+        3.7499999999304157,
+        0.0,
+        5.56
+      ],
+      [
+        12.250000000069583,
+        1.443,
+        10.482
+      ]
+    ],
+    "part_elements": {
+      "body": 533,
+      "screen": 1,
+      "dpad": 5,
+      "button_a": 16,
+      "button_b": 16,
+      "button_select": 9,
+      "button_start": 9,
+      "shoulder_l": 73,
+      "shoulder_r": 73
+    },
+    "texture_bytes_preserved": true,
+    "resources_sha256": {
+      "models/item/handheld/body.json": "177AC4B8F0912B6964EFD5945BA282C4E1F3AE15A769043EA4E48A010783FAFD",
+      "models/item/handheld/screen.json": "5A1D7160489889AFA9522A42DF49AB4592086F111D7423556D21A894141E6F45",
+      "models/item/handheld/dpad.json": "037CE0214630D54A6044EF0821D084B8C0CCEAC60ECB79FB60341D0DB7C3A3EA",
+      "models/item/handheld/button_a.json": "E31D20B3E4F2E0A25D487A1593919991F3FBFB021AEECA9556348F16EF61FA5D",
+      "models/item/handheld/button_b.json": "86F1A72FF953C7C7037D873B3C65DBD48D1592B1705ACAD5D666F865B17E2442",
+      "models/item/handheld/button_select.json": "AF55448950D6D8FC9B3398E27E1498D2C1E4807F91507167734F446E667F36EF",
+      "models/item/handheld/button_start.json": "B9F19F7EE7C2B5310F71A11D616461C8523FA3C11901E5D98723A42ECC4791D4",
+      "models/item/handheld/shoulder_l.json": "419F9D972057640386EEAB669327695646537966477CB715F7AFDDA49C88FC60",
+      "models/item/handheld/shoulder_r.json": "3FD34E76635E293650A3A78D0950B9DFD32AAD7E01D8DFD0BE3A49DCDC4A9688",
+      "textures/item/handheld.png": "376FB935DEB9D6F5F4682A24FC4DF94D5EF9A5793D14B4255F573FE6FF921BCC",
+      "models/item/handheld.json": "42B687719F58F0A859DD5902508788B182BCA801C9F13F6BB9121170624D74F3"
+    },
+    "screen": {
+      "uuid": "6503a6c7-1ecc-438e-aefd-8729c45892ff",
+      "x": [
+        6.2,
+        9.8
+      ],
+      "z": [
+        6.61,
+        9.01
+      ],
+      "y": 1.301,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "top_direction": [
+        0,
+        0,
+        -1
+      ],
+      "resolution": [
+        240,
+        160
+      ]
+    },
+    "limitations": [
+      "Model/UV conversion only, not Minecraft gameplay.",
+      "Original static screen remains its own part; runtime texture overlays only the exact held local device.",
+      "No core, input, network, original ZIP or bitmap generation changes."
+    ]
+  },
+  "input_sha256": {
+    "G:\\服务器\\服务器Codex\\piq-gba\\tools\\qa\\GbaHandheldLayoutProbe.java": "43A34355774741329BA6D8BECF6D9E5AAF8BDC7039FABBC51B1E307D7F700E12",
+    "G:\\服务器\\服务器Codex\\piq-gba\\tools\\qa\\GbaHandheldModelProbe.java": "3A646B0216459BFDDA5192CB3DCE28DF861E2FF92F9D022412A53411F4658407",
+    "G:\\服务器\\服务器Codex\\piq-gba\\tools\\check_gba_handheld_visual.py": "84967B449DA877544B85DC82011C4F69041DC14115FF20BB8E02E52024ACE34B",
+    "G:\\服务器\\服务器Codex\\piq-gba\\src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldLayout.java": "203EAD5C4DC6EF00396E9323DC25DFBF07EA0FAA3CA0466B7D2BD379F86633F8"
+  },
+  "minecraft_started": false,
+  "native_core_started": false,
+  "preview": "G:\\服务器\\服务器Codex\\piq-gba\\design\\gba-handheld-model-20260912\\qa-v2\\poses.png"
+}

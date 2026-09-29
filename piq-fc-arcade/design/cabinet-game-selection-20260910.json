@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "tests": {
+    "found": 13,
+    "passed": 12,
+    "aborted": 1,
+    "failed": 0
+  },
+  "bytecode_checks": {
+    "normal_launch_uses_saved_game_without_picker": true,
+    "only_explicit_picker_confirms_binding": true,
+    "background_load_validate_then_remember_before_factory": true,
+    "no_default_or_first_rom_guess": true,
+    "exact_connection_and_physical_target": true,
+    "normal_and_error_exit_release_lease": true,
+    "configuration_intent_is_before_single_use_packet": true,
+    "menu_cancellation_drops_intent": true,
+    "identity_contains_world_or_server_and_backend": true,
+    "loaded_game_validates_readability_extensions_and_bios": true
+  },
+  "server_all_methods_unchanged_except_feedback": true,
+  "source_sha256": {
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetBackends.java": "B340D59DDDEFDB9AB54CB08DA8E6593A913451731278D2D35B830F29BBE406E8",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetEmulator.java": "E8C04E6D05A5674EBF93D762B72721DF74666C1F4BD3724213BF929349090E18",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRomBindings.java": "88B133C72F480F6DE1214B5CC5FE089A147B5BF35AAE8676ED10B9D983F08CAF",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetConfigureIntent.java": "84A0B23739C03F77A7FE333F448D1AD46A4B55468F47224A70F0BD4CC5F45327",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\ServerCabinets.java": "646F33F021C29D12515A5CA30ED874764BCD4EA548EBE7D424F99A17F342E703",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetClientBackends.java": "E7300D479C358EEEF1098B2C1E8AB449DCFE7242A7FC1F87E7C4D87B3AF20FA0",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetCleanup.java": "2A0DB8FC6B691523FB13E9DF5887D6F2DEC862EB6C230D1959C64F98E59FE0A5",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetGameSelection.java": "C13045F896C3A4FE951A3DC047B0EF5E20D99A62558610B747EC78D915C453B9",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetMenuScreen.java": "75E85477D3D74C68B2D958D0CD321EDCC4CA7D711D4BADB19F5C6AE5C5F42B92",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetSetupScreen.java": "54D31F3682D87206C9EBE0C35FD9A68902E652D7927F8ADA4F8F3C68E474C5CF",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceScreen.java": "6ABE21A4A170AA1F4E29B12A73A9D0DD5BFA16726A7FED20593D8CC1ABA0771A",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroBackendRegistry.java": "2B04C33C8877989E8F1ADC071672B4EA1E8BC05C2FAEBE44F5BE97D0705FA50A",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroEmulator.java": "A507D392066E2DE3EC4CC3F5E8F9FB8B35112D36A69BBD221330B6C158B5BB18",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroEmulatorFactory.java": "83AE3289370CD738CDAB281E2A82C1610C88B06FBEE0B3203A006E72720C38EF",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroFactoryRegistry.java": "15E2803BA3F6A96A2F351C95AD9A88BA3792D8F9CE55F62E5A095A2376F698CB",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroFrame.java": "E7563211DA48E98E045DD9DCA84704DCB55990229F458B7E488A98F9875F7F2F",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetConfigureIntentTest.java": "2E22E11F2D9F3486DB03B332FB319BCB403CBDA0C69FFD73EA6CD39870AD1DFB",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRomBindingsTest.java": "8B442AAC6BD1C7F53A6AAB5342EA99BE888214EED9342FA6DA14D770623FE5BA"
+  },
+  "minecraft_started": false,
+  "core_started": false,
+  "gradle_started": false,
+  "limits": [
+    "No GUI/game or live server tested.",
+    "A Windows symbolic-link test may abort only if the OS refuses link creation.",
+    "Config paths are metadata only; providers still validate/load ROM content on their own worker."
+  ]
+}

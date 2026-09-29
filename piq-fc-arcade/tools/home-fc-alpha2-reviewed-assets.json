@@ -1,0 +1,223 @@
+{
+  "schema": 1,
+  "version": "0.31.0-alpha.2",
+  "source": {
+    "archive": "\\\\Kkp220\\梅子共享\\传输\\最终模型合集_20260907.zip",
+    "archive_sha256": "1f1a5491a70b2c53f6134e2f08d1130574ce85552f9f340c296b866920009402",
+    "layout": "alpha2",
+    "models": [
+      {
+        "name": "home_famicom_console",
+        "elements": 208,
+        "original_sha256": "3b0871bd1598cffa7dc73377932ce24b661183d44d7e2580e77d26d3ba833246",
+        "sha256": "609f0e125c77ef480701a87d8dae4d7b0adac62c00a97a5798b42ae2ad23c8da",
+        "world_transform": {
+          "scale": 0.6,
+          "pivot_model_units": [
+            8,
+            0,
+            8
+          ]
+        }
+      },
+      {
+        "name": "home_retro_tv",
+        "elements": 182,
+        "original_sha256": "f927ceed3b96acd70e1e0f5c81a1a2367e909040952c5993f412e478a170da7b",
+        "sha256": "63ebda3a69e0abc05aa5fba39d4dee1262cae511e529b9efaa2c1f492680c4d0",
+        "world_transform": {
+          "scale": 2.0,
+          "pivot_model_units": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "home_fc_cartridge",
+        "elements": 107,
+        "original_sha256": "0ebfacca22ada61764b273648ea4cfc41034b9794870ee3667a4d46f9aeccc90",
+        "sha256": "d311209af1443f18566b588fbe0f35248e847acbdaf54d87043f326910f556fb",
+        "world_transform": null
+      }
+    ],
+    "textures": [
+      {
+        "name": "home_famicom_console",
+        "size": [
+          1024,
+          1024
+        ],
+        "original_sha256": "5ea8ee7c97f54bc0fc83949fdc7f196c4f053a798ec98b1aef9d18579d852935",
+        "sha256": "5ea8ee7c97f54bc0fc83949fdc7f196c4f053a798ec98b1aef9d18579d852935",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_fc_cartridge_skin",
+        "size": [
+          1024,
+          1024
+        ],
+        "original_sha256": "3f071a850bbd033f4311982b7510ea5c214de4991b64130dc93e0f5a2616f14c",
+        "sha256": "3f071a850bbd033f4311982b7510ea5c214de4991b64130dc93e0f5a2616f14c",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_retro_tv_back",
+        "size": [
+          32,
+          32
+        ],
+        "original_sha256": "294998b248da92695c5b4149664aa6fd37dd3ecad7a0e092a43bd2906caf3475",
+        "sha256": "294998b248da92695c5b4149664aa6fd37dd3ecad7a0e092a43bd2906caf3475",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_retro_tv_button",
+        "size": [
+          32,
+          32
+        ],
+        "original_sha256": "f0c2613a357f4add3f9fb5b849a364603dea600641cb7a118da27091cc1262e6",
+        "sha256": "f0c2613a357f4add3f9fb5b849a364603dea600641cb7a118da27091cc1262e6",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_retro_tv_dark",
+        "size": [
+          32,
+          32
+        ],
+        "original_sha256": "73c065a5b5b4bfc6a8ff3f9987dec63cf457ccb9c1085dc13531407c54d8ecf5",
+        "sha256": "73c065a5b5b4bfc6a8ff3f9987dec63cf457ccb9c1085dc13531407c54d8ecf5",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_retro_tv_fascia",
+        "size": [
+          32,
+          32
+        ],
+        "original_sha256": "67b742a1ee0d321d3b73dd49ce60c7eb68b3799056a6e0648a281325c6b35cb0",
+        "sha256": "67b742a1ee0d321d3b73dd49ce60c7eb68b3799056a6e0648a281325c6b35cb0",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_retro_tv_glass_edge",
+        "size": [
+          32,
+          32
+        ],
+        "original_sha256": "61e16a0ad5acdce6d7f4ab4965eace01d7c70d4ddb614c2472cd43dffb30976b",
+        "sha256": "61e16a0ad5acdce6d7f4ab4965eace01d7c70d4ddb614c2472cd43dffb30976b",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_retro_tv_housing",
+        "size": [
+          32,
+          32
+        ],
+        "original_sha256": "f8377e66cf9651d9de416dca2a426c6667a9b730649e97cb666da146d0959dbe",
+        "sha256": "f8377e66cf9651d9de416dca2a426c6667a9b730649e97cb666da146d0959dbe",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_retro_tv_metal",
+        "size": [
+          32,
+          32
+        ],
+        "original_sha256": "8caa25dc9830b114e0eb38986fe65380925bb36645056a4b30d147c8a8208c59",
+        "sha256": "8caa25dc9830b114e0eb38986fe65380925bb36645056a4b30d147c8a8208c59",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_retro_tv_red",
+        "size": [
+          32,
+          32
+        ],
+        "original_sha256": "235dd1b9ae01bfaba68461fc02cc47b9ff4f2ef857756b2e55203e2a9d760fde",
+        "sha256": "235dd1b9ae01bfaba68461fc02cc47b9ff4f2ef857756b2e55203e2a9d760fde",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_retro_tv_rim",
+        "size": [
+          32,
+          32
+        ],
+        "original_sha256": "e61b29cded4cb228a59690c3c4fdfe43b01a5e7e6e258f771d6584607a2b0b51",
+        "sha256": "e61b29cded4cb228a59690c3c4fdfe43b01a5e7e6e258f771d6584607a2b0b51",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_retro_tv_screen",
+        "size": [
+          256,
+          192
+        ],
+        "original_sha256": "325e22221425ad4e5910754b625c8600c363fe65b500a8ae69fccfad5442ac9f",
+        "sha256": "0540d603d36cf41c9d9450d646fef6d6141546d1589c0fc82a45169f7c92b1d8",
+        "black_idle_screen": true
+      },
+      {
+        "name": "home_retro_tv_white",
+        "size": [
+          32,
+          32
+        ],
+        "original_sha256": "78272c1ffdf15ebff7eef25abf98821d73fd7e7aad53a35c181101e301cc5e78",
+        "sha256": "78272c1ffdf15ebff7eef25abf98821d73fd7e7aad53a35c181101e301cc5e78",
+        "black_idle_screen": false
+      },
+      {
+        "name": "home_retro_tv_yellow",
+        "size": [
+          32,
+          32
+        ],
+        "original_sha256": "1857d29ebb641054748b345fbd28f9e0c4299de18dc9ac71a5bed927531882a5",
+        "sha256": "1857d29ebb641054748b345fbd28f9e0c4299de18dc9ac71a5bed927531882a5",
+        "black_idle_screen": false
+      }
+    ],
+    "item_display_baseline": {
+      "path": "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-FC街机\\piq_fc_arcade-0.31.0-alpha.1.jar",
+      "sha256": "7574cdef4896467e7b94ce65c519e1db7d425d8686d8fc8c1bb964540fa1928a",
+      "policy": "Inverse scale and rotated translation preserve all item-space vertices"
+    }
+  },
+  "assets": {
+    "assets/piq_fc_arcade/blockstates/retro_tv.json": "d28fb779446031b18017c4d55f842b07b1734b734bd117cfd436de75ee38815d",
+    "assets/piq_fc_arcade/models/block/famicom_console.json": "78322624a25fe1882f33398a937053aacf644c5c00430be6247558247ac03088",
+    "assets/piq_fc_arcade/models/block/home_famicom_console.json": "609f0e125c77ef480701a87d8dae4d7b0adac62c00a97a5798b42ae2ad23c8da",
+    "assets/piq_fc_arcade/models/block/home_fc_cartridge.json": "d311209af1443f18566b588fbe0f35248e847acbdaf54d87043f326910f556fb",
+    "assets/piq_fc_arcade/models/block/home_retro_tv.json": "63ebda3a69e0abc05aa5fba39d4dee1262cae511e529b9efaa2c1f492680c4d0",
+    "assets/piq_fc_arcade/models/item/av_cable.json": "a53aa3a10f4f5498c557ddd0dd1052da9845c1962e7ef2278e08006be7a8c0cc",
+    "assets/piq_fc_arcade/models/item/fc_cartridge.json": "c7a1198a823c221de0210d745e1f0f6c67caf3f82fdc7289b049d8a8e7e15174",
+    "assets/piq_fc_arcade/models/item/retro_tv.json": "d6dcff53e4965034bcf0e6b91ec30a6a203c06fef09650d221c8e43f8919ca7a",
+    "assets/piq_fc_arcade/textures/block/home_famicom_console.png": "5ea8ee7c97f54bc0fc83949fdc7f196c4f053a798ec98b1aef9d18579d852935",
+    "assets/piq_fc_arcade/textures/block/home_fc_cartridge_skin.png": "3f071a850bbd033f4311982b7510ea5c214de4991b64130dc93e0f5a2616f14c",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_back.png": "294998b248da92695c5b4149664aa6fd37dd3ecad7a0e092a43bd2906caf3475",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_button.png": "f0c2613a357f4add3f9fb5b849a364603dea600641cb7a118da27091cc1262e6",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_dark.png": "73c065a5b5b4bfc6a8ff3f9987dec63cf457ccb9c1085dc13531407c54d8ecf5",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_fascia.png": "67b742a1ee0d321d3b73dd49ce60c7eb68b3799056a6e0648a281325c6b35cb0",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_glass_edge.png": "61e16a0ad5acdce6d7f4ab4965eace01d7c70d4ddb614c2472cd43dffb30976b",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_housing.png": "f8377e66cf9651d9de416dca2a426c6667a9b730649e97cb666da146d0959dbe",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_metal.png": "8caa25dc9830b114e0eb38986fe65380925bb36645056a4b30d147c8a8208c59",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_red.png": "235dd1b9ae01bfaba68461fc02cc47b9ff4f2ef857756b2e55203e2a9d760fde",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_rim.png": "e61b29cded4cb228a59690c3c4fdfe43b01a5e7e6e258f771d6584607a2b0b51",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_screen.png": "0540d603d36cf41c9d9450d646fef6d6141546d1589c0fc82a45169f7c92b1d8",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_white.png": "78272c1ffdf15ebff7eef25abf98821d73fd7e7aad53a35c181101e301cc5e78",
+    "assets/piq_fc_arcade/textures/block/home_retro_tv_yellow.png": "1857d29ebb641054748b345fbd28f9e0c4299de18dc9ac71a5bed927531882a5"
+  },
+  "notes": [
+    "Only 03 console, 04 retro TV and 05 cartridge imported.",
+    "Console scaled uniformly by 0.6 about (8,0,8); TV scaled by 2 about origin; UV and every element preserved.",
+    "Item wrappers compensate scale and rotated translation to preserve original item-space geometry.",
+    "alpha.1 manifest and delivered JAR are preserved; optional AV icon is separate native pixel art."
+  ]
+}

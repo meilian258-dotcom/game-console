@@ -1,0 +1,22 @@
+{
+  "parent": "piq_computer:block/case",
+  "display": {
+    "gui": {
+      "rotation": [
+        15,
+        225,
+        0
+      ],
+      "translation": [
+        0,
+        -1.55,
+        0
+      ],
+      "scale": [
+        0.53,
+        0.53,
+        0.53
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+{"type":"minecraft:block","pools":[{"bonus_rolls":0.0,"conditions":[{"condition":"minecraft:survives_explosion"}],"entries":[{"type":"minecraft:item","name":"piq_fc_arcade:vintage_tv"}],"rolls":1.0}],"random_sequence":"piq_fc_arcade:blocks/vintage_tv"}

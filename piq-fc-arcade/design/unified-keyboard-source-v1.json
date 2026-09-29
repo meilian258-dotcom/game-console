@@ -1,0 +1,51 @@
+{
+  "ok": true,
+  "mode": "explicit-source-qa",
+  "production_compiled": true,
+  "minecraft_started": false,
+  "native_core_started": false,
+  "network_socket_opened": false,
+  "options_file_touched": false,
+  "behavior": {
+    "passed_tests": 42,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "real_api_compile": {
+    "minecraft": "1.21.1",
+    "neoforge": "21.1.236",
+    "explicit_sources": [
+      "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardInput.java",
+      "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\mixin\\KeyboardHandlerMixin.java",
+      "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ArcadeKeyMappings.java",
+      "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetClientBackends.java",
+      "piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\client\\NativeArcadeClient.java"
+    ],
+    "mixin_apply_in_game_tested": false
+  },
+  "mixin_contract": {
+    "actual_keyboard_handler_sha256": "08EFB37D5916C857C38A047BE0C731E1A42C00370D39AE341C0C1EC316F400FC",
+    "target": "keyPress(JIIII)V",
+    "head_cancellable": true,
+    "client_only_registration": true,
+    "settings_without_session": true,
+    "live_mixin_transform_tested": false
+  },
+  "source_sha256": {
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardConfig.java": "6E980D3D800178052FE15994F7CFBEC4A1DEB26B3D437B761A8C24829B0719F8",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardControlState.java": "597E717713E73845DAFC74976A1482D2D323653D784532E1568BC6D98784E881",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardConfigStore.java": "4C929B639374CBA9908B00AC2839AF623D19348A2F13FD8770073BCF45BBA7F5",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardRouting.java": "8852035539A74BDE4E4348EF04D631786108FD4EB69CDEA5AAF572DE6D04D930",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\retro\\client\\KeyboardControlStateTest.java": "6577A26F85790D46E2D215BC2C70A05175325343D28F04EBFFC98E7BE019AE20",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\retro\\client\\KeyboardConfigTest.java": "65371E86BD812514153169597FF69F4A81D301E7FD893D68F6F16CB925618141",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\retro\\client\\KeyboardRoutingTest.java": "D4365153AA1CCC697C753B628CEC6443DEB435AC3E75BAC58BB884E98F2D9797",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardInput.java": "896D05A47E592D66C9298E1F3745F1F3BAB0ECD04AD03603F184FCBCD4A074E0",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\mixin\\KeyboardHandlerMixin.java": "3C87828FBAE3718993F371DE0C07A58E8EB0A7F68E80F184CBD8B3A4ACC91E35",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ArcadeKeyMappings.java": "B04E29E9F53B0C4106A2673AA0755552E5EFA2BEBC39B0D0B49B456DA5976B70",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetClientBackends.java": "AC944A4A884F9DC4C84C28A9AD942A14A894A4E9767F39A576324EB4539CD11F",
+    "piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\client\\NativeArcadeClient.java": "E52716853CE26111BD594C6BCF7C109AC0F547B63D95EFEC576A8B722D0ABA7E"
+  },
+  "limits": [
+    "Real pure state/configuration behavior plus cached Minecraft API compilation; no live GLFW window, mixin transformation, dedicated server, physical device, or multiplayer gameplay was executed."
+  ]
+}

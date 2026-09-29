@@ -1,0 +1,26 @@
+// Internal library, compiled into the FC main mod; not a separately installed mod.
+plugins { id 'java-library' }
+group = 'cn.piq.retro'
+version = mod_version
+base { archivesName = 'piq_retro_internal' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+repositories {
+    // Match the host project's repository identity so its verified offline cache is reusable.
+    maven { url = 'https://maven.neoforged.net/releases' }
+    mavenCentral()
+}
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+def asciiRoot = new File(System.getProperty('java.io.tmpdir'), 'piq-retro-platform-tests')
+def asciiTests = new File(asciiRoot, 'tests'), asciiMain = new File(asciiRoot, 'main')
+def copyTests = tasks.register('prepareAsciiTestOutput', Sync) { dependsOn tasks.named('testClasses'); from sourceSets.test.output; into asciiTests }
+def copyMain = tasks.register('prepareAsciiMainOutput', Sync) { dependsOn tasks.named('classes'); from sourceSets.main.output; into asciiMain }
+tasks.named('test', Test) {
+    dependsOn copyTests, copyMain; useJUnitPlatform()
+    classpath = files(asciiTests, asciiMain) + configurations.testRuntimeClasspath
+}
+jar { manifest { attributes 'Implementation-Title': 'Game Console Internal Library (not a mod)', 'Implementation-Version': project.version } }

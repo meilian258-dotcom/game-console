@@ -1,0 +1,10 @@
+{
+  "itemGroup.piq_native_arcade":"方块电玩：街机",
+  "block.piq_native_arcade.cabinet":"双人街机",
+  "block.piq_native_arcade.cabinet_part":"双人街机占位部件",
+  "message.piq_native_arcade.cabinet_incomplete":"机柜不完整或部分区块未加载，暂不能使用。",
+  "message.piq_native_arcade.cabinet_denied":"机柜涉及的区域没有操作权限。",
+  "message.piq_native_arcade.cabinet_clean_item":"请使用无自定义方块数据的机柜物品。",
+  "message.piq_native_arcade.cabinet_space":"需要两格宽、三层高、一格深的完整放置空间。",
+  "message.piq_native_arcade.preview_unavailable":"技术预览尚未启动：仅支持 Windows 单人世界，由本机诊断核心提供画面。"
+}

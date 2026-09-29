@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "mode": "final-jar-only",
+  "production_compiled": false,
+  "fc_sha256": "74E16FEF0F69C88191C0A64DA4FCCDEFD2F3B18B231FC56C97839E60B885FBE5",
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
+      "sha256": "74E16FEF0F69C88191C0A64DA4FCCDEFD2F3B18B231FC56C97839E60B885FBE5"
+    }
+  },
+  "legacy_module_sha256": "110711E30B64444414A8BE2D0A3B1AB45A442CC9B9452AC7D74DAAB508C933FF",
+  "zapper_module_sha256": "C8D8824E5CAF727678C642E6B0539DEAA7C0084F33524D96779D90C7B5DA79EF",
+  "origin": {
+    "ok": true,
+    "production_origin": "final-jar-only",
+    "production_compiled": false,
+    "origin_assertions": 4
+  },
+  "diagnostic": {
+    "ok": true,
+    "assertions": 61,
+    "actual_wasm_core": true,
+    "minecraft_started": false,
+    "commercial_rom_used": false
+  },
+  "minecraft_started": false,
+  "commercial_rom_used": false,
+  "limits": [
+    "Original diagnostic ROM and actual independent WASM/native runtime are exercised without a Minecraft client.",
+    "Does not test game-item aiming, network/permissions or physical light-gun hardware."
+  ]
+}

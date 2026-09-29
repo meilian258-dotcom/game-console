@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","category":"misc","pattern":["III","RGR","IBI"],"key":{"I":{"item":"minecraft:iron_ingot"},"R":{"item":"minecraft:redstone"},"G":{"item":"minecraft:glass_pane"},"B":{"item":"minecraft:stone_button"}},"result":{"id":"piq_fc_arcade:portrait_cabinet","count":1}}

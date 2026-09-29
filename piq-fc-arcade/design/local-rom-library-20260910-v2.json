@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "stdout": "SKIP=linkedDirectoryAndLinkedParentAreRejectedWithoutCreatingChildren\r\nSKIP=linksToFilesAreSkippedAndCannotBeSelected\r\nLOCAL_ROM_LIBRARY_JUNIT=13 PASSED=11 SKIPPED=2\r\n",
+  "sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\rom\\LocalRomLibrary.java": "E71567A4CD6D617D335DF0E1501CC4FF1F350BF2CCF6F30165BDC8857AD36FE1",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\rom\\LocalRomLibraryTest.java": "90D5FCE034D89C7DA2044E550930171B96DB96E5438ACA89FE7DA54E5671B313",
+    "tools\\qa\\LocalRomLibraryProbe.java": "A32BAC7337882A008ED3FE4806B42E745D71E7511CF5405D4C06A1B692F439FB"
+  },
+  "boundary": "Real production Java metadata/creation/filter/cancellation/bounded daemon queue, controlled temporary fixture files; no actual ROM contents, Minecraft or emulator launched. Symlink tests explicitly skipped only when OS privilege absent."
+}

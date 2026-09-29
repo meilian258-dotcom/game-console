@@ -1,0 +1,6 @@
+{
+  "block.piq_flash_box.player_box": "Flash 播放盒（本机原型）",
+  "tooltip.piq_flash_box.local_prototype": "仅创造模式 OP 本机预览；未支持多人、省流同步或服务器托管。",
+  "tooltip.piq_flash_box.connect": "视频线连接电视，空手右键机身打开；空手右键后接口拔线。",
+  "tooltip.piq_flash_box.tv_scope": "优先测试四款新桌面电视；挂墙贴墙正下方及旧电视线材外观待适配。"
+}

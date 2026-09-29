@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "tests": 25,
+  "output": "\nTest run finished after 115 ms\n[         6 containers found      ]\n[         0 containers skipped    ]\n[         6 containers started    ]\n[         0 containers aborted    ]\n[         6 containers successful ]\n[         0 containers failed     ]\n[        25 tests found           ]\n[         0 tests skipped         ]\n[        25 tests started         ]\n[         0 tests aborted         ]\n[        25 tests successful      ]\n[         0 tests failed          ]\n\n",
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\sfchome\\client\\SfcCardLibrary.java": "160742E6346F57A6BB9A2A1D05827C0712EE8CF3B7CAE13D7A7BA45115531160",
+    "src\\main\\java\\cn\\piq\\sfchome\\client\\SfcEditorWork.java": "5019BA8EFD2A43F1688915CC59B213F57033C30F3AEB5D7F5278BD7ABB4507B3",
+    "src\\main\\java\\cn\\piq\\sfchome\\client\\SfcUploadTitle.java": "AE0ED197ACA06E1575D431B966C6D094A3438C1230C44EB066BD2A09D8498970",
+    "src\\main\\java\\cn\\piq\\sfchome\\client\\SfcCardEditorLayout.java": "FC1B867F0D522AB2979508A84A16C8804228A1B5F7841CC84E185FC48EB20886",
+    "src\\main\\java\\cn\\piq\\sfchome\\client\\SfcCardEditorScreen.java": "909E408E19260EF64C8E14F260B42234D1E99552C074806A54A262BCBF6B7790",
+    "src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetProvider.java": "F54C7312B9521E92C47007249025C0BF43DF77BCA941F322CB26D378BCDA950D"
+  },
+  "unchanged_boundary_sha256": {
+    "net/SfcHomeNetwork.java": "CB037EA99A7C995D4205D24C08A22ECFF10E8158F8AD65BBCA714210C0428F1D",
+    "server/SfcCartridgeEditorService.java": "525E1AC5DAA8432C4C9B84D5392ECF7AA1448AD7C974EC412349C2708D78C964",
+    "client/SfcClientFiles.java": "38D11EA960591679442BBF56A4CB5460BA96EA610398B355353675E0B7E9F39A",
+    "client/cabinet/SfcCabinetSession.java": "A358B143DE36568958078F198B9641C68FFACA9CDD9C0995F1F52A7775918B51"
+  },
+  "limitations": [
+    "Screen and provider integration require root full compilation.",
+    "No Minecraft scene, OS directory window, remote server or real upload was exercised.",
+    "Actual pure Java tests cover drafts, lists, paging, layout, late-work invalidation and exact-hash upload title gating; event wiring uses source contracts."
+  ]
+}

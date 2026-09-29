@@ -1,0 +1,6 @@
+{
+  "block.piq_flash_box.player_box": "Flash Player Box (Local Prototype)",
+  "tooltip.piq_flash_box.local_prototype": "Creative OP local preview only; no multiplayer, lockstep or server hosting.",
+  "tooltip.piq_flash_box.connect": "Use a video cable to connect a TV. Empty-hand right-click opens the box; its rear socket disconnects.",
+  "tooltip.piq_flash_box.tv_scope": "Test new tabletop TVs first. Flush-below-wall and legacy TV cable visuals need further adaptation."
+}

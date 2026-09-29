@@ -1,0 +1,266 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+
+group = mod_group_id
+version = mod_version
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+// FC remains built into the one required main mod. Shared code is an internal
+// source module, not a second Mod/JAR that players have to install.
+sourceSets.main.java.srcDir '../piq-retro-platform/src/main/java'
+sourceSets.test.java.srcDir '../piq-retro-platform/src/test/java'
+// Hosted registry/transport tests use the real Minecraft common types, not local stubs.
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+
+// Default libretro remains an isolated JNA worker. The separately confirmed JNI trial is optional.
+sourceSets {
+    libretroWorker {
+        java.srcDir 'libretro-helper/src/main/java'
+        compileClasspath = files('native/libretro/jna-5.14.0.jar')
+    }
+    genericLibretroWorker {
+        java.srcDir 'libretro-generic-helper/src/main/java'
+        compileClasspath = files('native/libretro/jna-5.14.0.jar')
+    }
+}
+def genericLibretroWorkerJar = tasks.register('genericLibretroWorkerJar', Jar) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+    dependsOn tasks.named('genericLibretroWorkerClasses')
+    from sourceSets.genericLibretroWorker.output
+    archiveFileName = 'worker.jar'
+    destinationDirectory = layout.buildDirectory.dir('libretro-generic-worker')
+}
+def prepareGenericLibretroRuntime = tasks.register('prepareGenericLibretroRuntime', Sync) {
+    dependsOn genericLibretroWorkerJar
+    from(genericLibretroWorkerJar)
+    into layout.buildDirectory.dir('generated/generic-libretro-resources/core/libretro-generic')
+    doLast {
+        def sha = { file -> java.security.MessageDigest.getInstance('SHA-256').digest(file.bytes).encodeHex().toString() }
+        new File(destinationDir, 'runtime.properties').setText(
+            "worker.sha256=${sha(new File(destinationDir, 'worker.jar'))}\njna.sha256=${sha(file('native/libretro/jna-5.14.0.jar'))}\n", 'UTF-8')
+    }
+}
+sourceSets.main.resources.srcDir layout.buildDirectory.dir('generated/generic-libretro-resources')
+tasks.named('processResources') { dependsOn prepareGenericLibretroRuntime }
+def libretroWorkerJar = tasks.register('libretroWorkerJar', Jar) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+    dependsOn tasks.named('libretroWorkerClasses')
+    from sourceSets.libretroWorker.output
+    archiveFileName = 'worker.jar'
+    destinationDirectory = layout.buildDirectory.dir('libretro-worker')
+}
+def prepareLibretroRuntime = tasks.register('prepareLibretroRuntime', Sync) {
+    dependsOn libretroWorkerJar
+    from('native/libretro') { include 'jna-5.14.0.jar', 'windows-x64/**', 'linux-x64/**' }
+    from(libretroWorkerJar)
+    into layout.buildDirectory.dir('generated/libretro-resources/core/libretro')
+    doLast {
+        def root = destinationDir
+        def sha = { name -> java.security.MessageDigest.getInstance('SHA-256').digest(new File(root, name).bytes).encodeHex().toString() }
+        new File(root, 'runtime.properties').setText(
+            "worker.sha256=${sha('worker.jar')}\njna.sha256=${sha('jna-5.14.0.jar')}\n" +
+            "windows-x64.sha256=${sha('windows-x64/mesen_libretro.dll')}\n" +
+            "linux-x64.sha256=${sha('linux-x64/mesen_libretro.so')}\n", 'UTF-8')
+    }
+}
+sourceSets.main.resources.srcDir layout.buildDirectory.dir('generated/libretro-resources')
+
+// Pinned local RetroArch bridge; no network downloads during a MOD build.
+def prepareNetplayRuntime = tasks.register('prepareNetplayRuntime', Sync) {
+    from('../outputs/jni-unified-20260929/crc-audit/fixed-native/piq-retroarch.exe')
+    into layout.buildDirectory.dir('generated/netplay-resources/core/netplay')
+    doLast {
+        def exe = new File(destinationDir, 'piq-retroarch.exe')
+        if (!exe.isFile()) throw new GradleException('Build netplay-native/build.py first')
+        def sha = java.security.MessageDigest.getInstance('SHA-256').digest(exe.bytes).encodeHex().toString()
+        new File(destinationDir, 'runtime.properties').setText("exe.sha256=${sha}\n", 'UTF-8')
+    }
+}
+sourceSets.main.resources.srcDir layout.buildDirectory.dir('generated/netplay-resources')
+tasks.named('processResources') { dependsOn prepareNetplayRuntime }
+tasks.named('processResources') { dependsOn prepareLibretroRuntime }
+
+// Build with native/libretro-jni/build_native.py or CMake first. This source-owned location
+// contains a generated artifact, never an arbitrary player/server-provided DLL.
+def jniRuntimeDir = providers.gradleProperty('jniRuntimeDir').map { file(it) }
+        .getOrElse(file('native/libretro-jni/dist'))
+def prepareJniRuntime = tasks.register('prepareJniRuntime', Sync) {
+    from(new File(jniRuntimeDir, 'piq-libretro-jni.dll')) { into 'windows-x64' }
+    from('native/libretro-jni/README.md')
+    into layout.buildDirectory.dir('generated/jni-resources/core/libretro-jni')
+    doLast {
+        def dll = new File(destinationDir, 'windows-x64/piq-libretro-jni.dll')
+        if (!dll.isFile()) throw new GradleException('Build native/libretro-jni into dist first; see its README')
+        def sha = java.security.MessageDigest.getInstance('SHA-256').digest(dll.bytes).encodeHex().toString()
+        new File(destinationDir, 'runtime.properties').setText("abi=1\nwindows-x64.sha256=${sha}\n", 'UTF-8')
+    }
+}
+sourceSets.main.resources.srcDir layout.buildDirectory.dir('generated/jni-resources')
+tasks.named('processResources') { dependsOn prepareJniRuntime }
+
+neoForge {
+    version = neo_version
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        configureEach {
+            logLevel = org.slf4j.event.Level.INFO
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    wasmtimeBundle
+    implementation.extendsFrom(wasmtimeBundle)
+}
+
+dependencies {
+    wasmtimeBundle "ai.tegmentum:wasmtime4j:${wasmtime4j_version}"
+    wasmtimeBundle "ai.tegmentum:wasmtime4j-jni:${wasmtime4j_version}"
+    wasmtimeBundle "ai.tegmentum:wasmtime4j-native-loader:${wasmtime4j_version}"
+
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'com.google.code.gson:gson:2.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'org.ow2.asm:asm:9.8'
+    testRuntimeOnly 'org.ow2.asm:asm-commons:9.8'
+    testRuntimeOnly 'org.ow2.asm:asm-tree:9.8'
+    testRuntimeOnly 'org.ow2.asm:asm-util:9.8'
+    testRuntimeOnly 'org.ow2.asm:asm-analysis:9.8'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+def asciiClasspathRoot = new File(
+        System.getProperty('java.io.tmpdir'),
+        "piq-fc-arcade-gradle-${Integer.toUnsignedString(rootDir.absolutePath.hashCode())}"
+)
+def asciiTestOutput = new File(asciiClasspathRoot, 'test-output')
+def asciiMainOutput = new File(asciiClasspathRoot, 'main-output')
+def asciiRuntimeJar = new File(asciiClasspathRoot, "${mod_id}-runtime.jar")
+def asciiGameDependencies = new File(asciiClasspathRoot, 'game-dependencies')
+def prepareAsciiGameDependencies = tasks.register('prepareAsciiGameDependencies', Sync) {
+    from sourceSets.main.compileClasspath
+    into asciiGameDependencies
+}
+
+def prepareAsciiTestOutput = tasks.register('prepareAsciiTestOutput', Sync) {
+    dependsOn tasks.named('testClasses')
+    from sourceSets.test.output
+    into asciiTestOutput
+}
+
+def prepareAsciiMainOutput = tasks.register('prepareAsciiMainOutput', Sync) {
+    dependsOn tasks.named('classes')
+    from sourceSets.main.output
+    into asciiMainOutput
+}
+
+tasks.named('test', Test).configure {
+    dependsOn prepareAsciiTestOutput, prepareAsciiMainOutput, prepareAsciiGameDependencies
+    useJUnitPlatform()
+    // JDK/Gradle worker argument files can corrupt non-ASCII paths on Windows.
+    classpath = files(asciiTestOutput, asciiMainOutput) + fileTree(asciiGameDependencies) + configurations.testRuntimeClasspath
+}
+
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    var replaceProperties = [
+            minecraft_version: minecraft_version,
+            neo_version      : neo_version,
+            mod_id           : mod_id,
+            mod_name         : mod_name,
+            mod_version      : mod_version
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    // Ship readable dependency attribution beside the verbatim license resources.
+    from('THIRD_PARTY_NOTICES.md')
+    from('LICENSE.md')
+    from {
+        configurations.wasmtimeBundle.collect { zipTree(it) }
+    }
+    exclude 'META-INF/MANIFEST.MF',
+            'META-INF/*.SF',
+            'META-INF/*.RSA',
+            'META-INF/*.DSA',
+            'module-info.class',
+            'natives/darwin-aarch64/**',
+            'natives/linux-aarch64/**'
+    manifest {
+        attributes 'Implementation-Title': mod_name,
+                'Implementation-Version': project.version
+    }
+}
+
+tasks.register('packagedRuntimeSmoke', JavaExec) {
+    dependsOn tasks.named('jar'), prepareAsciiTestOutput
+    doFirst {
+        asciiClasspathRoot.mkdirs()
+        copy {
+            from tasks.named('jar').get().archiveFile
+            into asciiClasspathRoot
+            rename { asciiRuntimeJar.name }
+        }
+    }
+    classpath = files(asciiTestOutput, asciiRuntimeJar)
+    mainClass = 'cn.piq.fcarcade.core.wasm.PackagedRuntimeSmoke'
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('packagedRuntimeSmoke')
+}
+
+tasks.register('packagedLibretroSmoke', JavaExec) {
+    dependsOn tasks.named('packagedRuntimeSmoke')
+    classpath = files(asciiTestOutput, asciiRuntimeJar)
+    mainClass = 'cn.piq.fcarcade.core.libretro.LibretroPackagedSmoke'
+}
+tasks.named('check') { dependsOn tasks.named('packagedLibretroSmoke') }
+
+tasks.register('packagedGenericLibretroSmoke', JavaExec) {
+    dependsOn tasks.named('packagedRuntimeSmoke')
+    classpath = files(asciiTestOutput, asciiRuntimeJar)
+    mainClass = 'cn.piq.fcarcade.core.libretro.GenericLibretroCompatibilitySmoke'
+    if (providers.gradleProperty('fc64BaselineJar').isPresent()) {
+        args providers.gradleProperty('fc64BaselineJar').get()
+    }
+}
+tasks.named('check') { dependsOn tasks.named('packagedGenericLibretroSmoke') }

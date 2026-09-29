@@ -1,0 +1,13 @@
+view	viewport	panel_xywh	rows	split	compact_split
+library	320x240	12,12,296,216	1	false	false
+cartridge-roms	320x240	12,12,296,216	2	false	false
+cartridge-covers	320x240	12,12,296,216	1	false	false
+library	512x278	31,19,450,239	6	true	true
+cartridge-roms	512x278	31,19,450,239	3	false	false
+cartridge-covers	512x278	31,19,450,239	2	false	false
+library	640x360	38,24,563,312	8	true	false
+cartridge-roms	640x360	38,25,563,309	6	true	false
+cartridge-covers	640x360	38,25,563,309	5	false	false
+library	1024x556	132,48,760,460	12	true	false
+cartridge-roms	1024x556	132,48,760,460	12	true	false
+cartridge-covers	1024x556	132,48,760,460	11	true	false

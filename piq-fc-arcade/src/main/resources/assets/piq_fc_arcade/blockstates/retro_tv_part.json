@@ -1,0 +1,5 @@
+{
+  "multipart": [
+    { "apply": { "model": "piq_fc_arcade:block/retro_tv_part" } }
+  ]
+}

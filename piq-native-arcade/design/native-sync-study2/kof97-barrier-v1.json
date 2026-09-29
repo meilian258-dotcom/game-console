@@ -1,0 +1,589 @@
+{
+  "schema": "piq-native-reload-barrier-1",
+  "ok": true,
+  "same_reload_qualified": false,
+  "production_modified": false,
+  "production_compiled": false,
+  "game": "kof97",
+  "source_roms_read_only": true,
+  "inputs": {
+    "F:\\Minecraft\\HMCL\\versions\\1.21.1-NeoForge\\piq-native-arcade\\roms\\kof97.zip": {
+      "sha256": "804F892924D4650545D3EA2D19FB85670094DC46DB882FECAF3E03009E2C4B9F",
+      "bytes": 28745740,
+      "mtime_ns": 1789019872695917100
+    },
+    "E:\\Dow\\rom\\WinKawaks1.65模拟器\\WinKawaks1.65\\roms\\neogeo\\neogeo.zip": {
+      "sha256": "E1FFD4AB180E2F6AA4A3AA4D2C6F991E19D8EF762BEC8B5A6283704A2EDC3BBC",
+      "bytes": 953500,
+      "mtime_ns": 1158274344000000000
+    }
+  },
+  "runtime": {
+    "G:\\服务器\\服务器Codex\\piq-native-arcade-poc\\vendor\\mame_libretro.dll": {
+      "sha256": "6172A988AB67FE68F4177A6FC8FBB82619EB2044C330930F0F572F7B1EDC2301",
+      "bytes": 372431360,
+      "mtime_ns": 1788825946000000000
+    },
+    "C:\\Users\\13498\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna\\5.14.0\\67bf3eaea4f0718cb376a181a629e5f88fa1c9dd\\jna-5.14.0.jar": {
+      "sha256": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6",
+      "bytes": 1878533,
+      "mtime_ns": 1781245930305499200
+    },
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq-native-arcade\\runtime\\piq-native-helper.jar": {
+      "sha256": "20F6F3028D76DAEB01212D1808BE90E35BFB5429D1E06153B7D8B32DD73E943C",
+      "bytes": 18571,
+      "mtime_ns": 1789117844694258000
+    }
+  },
+  "snapshot_frame": 2200,
+  "suffix_steps": 600,
+  "children": {
+    "a": {
+      "exit_code": 0,
+      "native_teardown_completed": true,
+      "result": {
+        "ok": true,
+        "helper_origin_verified": true,
+        "cold_start": false,
+        "fps": 59.18560791015625,
+        "loaded_snapshot_sha256": "4ADD27046FACAC0EC4F7A782B898D06836A650A13603907475631EF9DCF75027",
+        "timing": {
+          "initial": {
+            "steps": 2200,
+            "nanoseconds": 7048526299,
+            "steps_per_second_including_full_hashes": 312.12198219535935
+          },
+          "baseline": {
+            "steps": 600,
+            "nanoseconds": 2261303800,
+            "steps_per_second_including_full_hashes": 265.3336539743134
+          },
+          "barrier1": {
+            "steps": 600,
+            "nanoseconds": 2245589900,
+            "steps_per_second_including_full_hashes": 267.190371670268
+          },
+          "barrier2": {
+            "steps": 600,
+            "nanoseconds": 2099170999,
+            "steps_per_second_including_full_hashes": 285.82711950852365
+          }
+        }
+      }
+    },
+    "b": {
+      "exit_code": 0,
+      "native_teardown_completed": true,
+      "result": {
+        "ok": true,
+        "helper_origin_verified": true,
+        "cold_start": false,
+        "fps": 59.18560791015625,
+        "loaded_snapshot_sha256": "4ADD27046FACAC0EC4F7A782B898D06836A650A13603907475631EF9DCF75027",
+        "timing": {
+          "initial": {
+            "steps": 2200,
+            "nanoseconds": 7168142900,
+            "steps_per_second_including_full_hashes": 306.91352428255857
+          },
+          "baseline": {
+            "steps": 600,
+            "nanoseconds": 2283581499,
+            "steps_per_second_including_full_hashes": 262.74516598717634
+          },
+          "barrier1": {
+            "steps": 600,
+            "nanoseconds": 2295049600,
+            "steps_per_second_including_full_hashes": 261.43225837036374
+          },
+          "barrier2": {
+            "steps": 600,
+            "nanoseconds": 2101494500,
+            "steps_per_second_including_full_hashes": 285.51109698359903
+          }
+        }
+      }
+    },
+    "cold": {
+      "exit_code": 0,
+      "native_teardown_completed": true,
+      "result": {
+        "ok": true,
+        "helper_origin_verified": true,
+        "cold_start": true,
+        "fps": 59.18560791015625,
+        "loaded_snapshot_sha256": "4ADD27046FACAC0EC4F7A782B898D06836A650A13603907475631EF9DCF75027",
+        "timing": {
+          "initial": {
+            "steps": 8,
+            "nanoseconds": 45618599,
+            "steps_per_second_including_full_hashes": 175.36706903252335
+          },
+          "barrier1": {
+            "steps": 600,
+            "nanoseconds": 1102457700,
+            "steps_per_second_including_full_hashes": 544.2385680647883
+          },
+          "barrier2": {
+            "steps": 600,
+            "nanoseconds": 1222926300,
+            "steps_per_second_including_full_hashes": 490.6264588471112
+          }
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "independent_initial": {
+      "equal": true,
+      "different_frames": 0,
+      "first_difference": null,
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        }
+      }
+    },
+    "independent_baseline": {
+      "equal": true,
+      "different_frames": 0,
+      "first_difference": null,
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        }
+      }
+    },
+    "both_warm_same_reload": {
+      "equal": true,
+      "different_frames": 0,
+      "first_difference": null,
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        }
+      }
+    },
+    "warm_vs_cold_same_reload": {
+      "equal": false,
+      "different_frames": 600,
+      "first_difference": {
+        "frame": 2200,
+        "header_equal": true,
+        "video_equal": true,
+        "audio_equal": false
+      },
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 600,
+          "first_index": 0,
+          "last_index": 599,
+          "last_60_mismatches": 60
+        }
+      }
+    },
+    "warm_repeat_reload": {
+      "equal": false,
+      "different_frames": 600,
+      "first_difference": {
+        "frame": 2200,
+        "header_equal": true,
+        "video_equal": true,
+        "audio_equal": false
+      },
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 600,
+          "first_index": 0,
+          "last_index": 599,
+          "last_60_mismatches": 60
+        }
+      }
+    },
+    "cold_repeat_reload": {
+      "equal": false,
+      "different_frames": 600,
+      "first_difference": {
+        "frame": 2200,
+        "header_equal": true,
+        "video_equal": true,
+        "audio_equal": false
+      },
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 600,
+          "first_index": 0,
+          "last_index": 599,
+          "last_60_mismatches": 60
+        }
+      }
+    },
+    "baseline_vs_reload": {
+      "equal": false,
+      "different_frames": 600,
+      "first_difference": {
+        "frame": 2200,
+        "header_equal": true,
+        "video_equal": true,
+        "audio_equal": false
+      },
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 600,
+          "first_index": 0,
+          "last_index": 599,
+          "last_60_mismatches": 60
+        }
+      }
+    }
+  },
+  "state_differences": {
+    "independent_before": {
+      "equal": false,
+      "bytes": 1029356,
+      "different_bytes": 21,
+      "range_count": 12,
+      "first_ranges": [
+        [
+          1022377,
+          1022377
+        ],
+        [
+          1022422,
+          1022422
+        ],
+        [
+          1022512,
+          1022512
+        ],
+        [
+          1022872,
+          1022872
+        ],
+        [
+          1022917,
+          1022920
+        ],
+        [
+          1023142,
+          1023142
+        ],
+        [
+          1025437,
+          1025437
+        ],
+        [
+          1028182,
+          1028185
+        ],
+        [
+          1028227,
+          1028227
+        ],
+        [
+          1028272,
+          1028272
+        ],
+        [
+          1028317,
+          1028317
+        ],
+        [
+          1028767,
+          1028770
+        ]
+      ],
+      "first_scalar_words": [
+        {
+          "offset": 1022376,
+          "a_u64_le": 10555,
+          "b_u64_le": 12347
+        },
+        {
+          "offset": 1022416,
+          "a_u64_le": 11606010045136896,
+          "b_u64_le": 28494508647776256
+        },
+        {
+          "offset": 1022512,
+          "a_u64_le": 101,
+          "b_u64_le": 41
+        },
+        {
+          "offset": 1022872,
+          "a_u64_le": 41,
+          "b_u64_le": 111
+        },
+        {
+          "offset": 1022912,
+          "a_u64_le": 8378595519001919488,
+          "b_u64_le": 45335976738816
+        },
+        {
+          "offset": 1022920,
+          "a_u64_le": 153,
+          "b_u64_le": 0
+        },
+        {
+          "offset": 1023136,
+          "a_u64_le": 11606010045136896,
+          "b_u64_le": 28494508647776256
+        },
+        {
+          "offset": 1025432,
+          "a_u64_le": 111306674405376,
+          "b_u64_le": 45335976738816
+        },
+        {
+          "offset": 1028176,
+          "a_u64_le": 11606010045136896,
+          "b_u64_le": 5098140314183401472
+        },
+        {
+          "offset": 1028184,
+          "a_u64_le": 0,
+          "b_u64_le": 39284
+        },
+        {
+          "offset": 1028224,
+          "a_u64_le": 1815845578,
+          "b_u64_le": 691772106
+        },
+        {
+          "offset": 1028272,
+          "a_u64_le": 111,
+          "b_u64_le": 41
+        },
+        {
+          "offset": 1028312,
+          "a_u64_le": 45335976738816,
+          "b_u64_le": 115704720916480
+        },
+        {
+          "offset": 1028760,
+          "a_u64_le": 7006363837679009792,
+          "b_u64_le": 7798997372096217088
+        },
+        {
+          "offset": 1028768,
+          "a_u64_le": 6110834,
+          "b_u64_le": 29952
+        }
+      ],
+      "a_sha256": "4ADD27046FACAC0EC4F7A782B898D06836A650A13603907475631EF9DCF75027",
+      "b_sha256": "3B8F9E02E8BA92D26AC6AD1840A27DCDD47E2A4D278B87831FF875E3C7D902E1"
+    },
+    "load_save_changes": {
+      "equal": false,
+      "bytes": 1029356,
+      "different_bytes": 9,
+      "range_count": 2,
+      "first_ranges": [
+        [
+          1028439,
+          1028439
+        ],
+        [
+          1028473,
+          1028480
+        ]
+      ],
+      "first_scalar_words": [
+        {
+          "offset": 1028432,
+          "a_u64_le": 0,
+          "b_u64_le": 72057594037927936
+        },
+        {
+          "offset": 1028472,
+          "a_u64_le": 0,
+          "b_u64_le": 154303999851382784
+        },
+        {
+          "offset": 1028480,
+          "a_u64_le": 0,
+          "b_u64_le": 37
+        }
+      ],
+      "a_sha256": "4ADD27046FACAC0EC4F7A782B898D06836A650A13603907475631EF9DCF75027",
+      "b_sha256": "60D4AA1B7E58E2CEA9FE7B7E3599ACF24D104EF8A3EB4D94E9DA8696DA4A9A79"
+    },
+    "both_warm_postload": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "60D4AA1B7E58E2CEA9FE7B7E3599ACF24D104EF8A3EB4D94E9DA8696DA4A9A79",
+      "b_sha256": "60D4AA1B7E58E2CEA9FE7B7E3599ACF24D104EF8A3EB4D94E9DA8696DA4A9A79"
+    },
+    "warm_cold_postload": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "60D4AA1B7E58E2CEA9FE7B7E3599ACF24D104EF8A3EB4D94E9DA8696DA4A9A79",
+      "b_sha256": "60D4AA1B7E58E2CEA9FE7B7E3599ACF24D104EF8A3EB4D94E9DA8696DA4A9A79"
+    },
+    "both_warm_end": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "F09B7E072D182CAAB82C9095D3FAFD5E60BEFAF54C357EE3655EFAB5225AEE7F",
+      "b_sha256": "F09B7E072D182CAAB82C9095D3FAFD5E60BEFAF54C357EE3655EFAB5225AEE7F"
+    },
+    "warm_cold_end": {
+      "equal": false,
+      "bytes": 1029356,
+      "different_bytes": 1,
+      "range_count": 1,
+      "first_ranges": [
+        [
+          1029342,
+          1029342
+        ]
+      ],
+      "first_scalar_words": [
+        {
+          "offset": 1029336,
+          "a_u64_le": 1461699554058436608,
+          "b_u64_le": 1447625805222903808
+        }
+      ],
+      "a_sha256": "F09B7E072D182CAAB82C9095D3FAFD5E60BEFAF54C357EE3655EFAB5225AEE7F",
+      "b_sha256": "72A3888357BEA980F00994338B8C1C6F8E25098818C370AFAC5546AEBBE774CE"
+    },
+    "warm_repeat_end": {
+      "equal": false,
+      "bytes": 1029356,
+      "different_bytes": 1,
+      "range_count": 1,
+      "first_ranges": [
+        [
+          1029342,
+          1029342
+        ]
+      ],
+      "first_scalar_words": [
+        {
+          "offset": 1029336,
+          "a_u64_le": 1461699554058436608,
+          "b_u64_le": 1466203153685807104
+        }
+      ],
+      "a_sha256": "F09B7E072D182CAAB82C9095D3FAFD5E60BEFAF54C357EE3655EFAB5225AEE7F",
+      "b_sha256": "828CF21D86171952E30A55253E26BC94FAFE86284788358E231F2ADCC2DFD15C"
+    }
+  },
+  "options_equal": true,
+  "source_roms_unchanged": true,
+  "probe_sources_sha256": {
+    "tools\\qa\\NativeDeterminismProbe.java": "CAD242DF8C23935141568400741DC42C5478C504785C0956C76B7E4B464D6AED",
+    "tools\\qa\\NativeReloadBarrierProbe.java": "C7C9772620A8B6CE400BD80D564BEAE8C37F8F23568ADB37F1A57A7AE5129B9A"
+  },
+  "seconds": 20.61,
+  "limitations": [
+    "No Minecraft or socket; only actual pinned native core in separately owned QA JVMs.",
+    "No ignoring audio or unidentified state bytes; qualification includes every frame and complete serialized state.",
+    "Warm and cold postload histories differ deliberately; source ROMs/BIOS never written."
+  ]
+}

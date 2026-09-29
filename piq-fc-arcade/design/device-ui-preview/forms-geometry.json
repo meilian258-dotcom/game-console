@@ -1,0 +1,234 @@
+{
+  "boundary": "actual production geometry; no game launched; approximate font/content",
+  "sources": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceLayout.java": "1c63d1b5300c6e255846f7a30b39ddff59592fbebec940f168209ee90ae3c032",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceFormLayout.java": "c4c9cbea5316de7e777964bd6c6c343fd5ac744266f9b102b475ef685582802f"
+  },
+  "cases": [
+    {
+      "kind": "settings",
+      "width": 320,
+      "height": 240,
+      "panel": [
+        8,
+        17,
+        304,
+        206
+      ],
+      "left": 18,
+      "bodyWidth": 284,
+      "fieldX": 174,
+      "fieldWidth": 128,
+      "labelWidth": 148,
+      "statusY": 174,
+      "footerY": 193,
+      "rowY": [
+        61,
+        89,
+        117,
+        145
+      ]
+    },
+    {
+      "kind": "leaderboard",
+      "width": 320,
+      "height": 240,
+      "panel": [
+        8,
+        8,
+        304,
+        224
+      ],
+      "left": 18,
+      "bodyWidth": 284,
+      "fieldX": 174,
+      "fieldWidth": 128,
+      "labelWidth": 148,
+      "statusY": 183,
+      "footerY": 202,
+      "rowY": [
+        52,
+        73,
+        94,
+        115,
+        136,
+        157
+      ]
+    },
+    {
+      "kind": "slots",
+      "width": 320,
+      "height": 240,
+      "panel": [
+        8,
+        8,
+        304,
+        224
+      ],
+      "left": 18,
+      "bodyWidth": 284,
+      "fieldX": 174,
+      "fieldWidth": 128,
+      "labelWidth": 148,
+      "statusY": 183,
+      "footerY": 202,
+      "rowY": [
+        52,
+        78,
+        104,
+        130,
+        156
+      ]
+    },
+    {
+      "kind": "settings",
+      "width": 512,
+      "height": 278,
+      "panel": [
+        16,
+        36,
+        480,
+        206
+      ],
+      "left": 26,
+      "bodyWidth": 460,
+      "fieldX": 279,
+      "fieldWidth": 207,
+      "labelWidth": 245,
+      "statusY": 193,
+      "footerY": 212,
+      "rowY": [
+        80,
+        108,
+        136,
+        164
+      ]
+    },
+    {
+      "kind": "leaderboard",
+      "width": 512,
+      "height": 278,
+      "panel": [
+        16,
+        8,
+        480,
+        262
+      ],
+      "left": 26,
+      "bodyWidth": 460,
+      "fieldX": 279,
+      "fieldWidth": 207,
+      "labelWidth": 245,
+      "statusY": 221,
+      "footerY": 240,
+      "rowY": [
+        52,
+        80,
+        108,
+        136,
+        164,
+        192
+      ]
+    },
+    {
+      "kind": "slots",
+      "width": 512,
+      "height": 278,
+      "panel": [
+        16,
+        22,
+        480,
+        234
+      ],
+      "left": 26,
+      "bodyWidth": 460,
+      "fieldX": 279,
+      "fieldWidth": 207,
+      "labelWidth": 245,
+      "statusY": 207,
+      "footerY": 226,
+      "rowY": [
+        66,
+        94,
+        122,
+        150,
+        178
+      ]
+    },
+    {
+      "kind": "settings",
+      "width": 640,
+      "height": 360,
+      "panel": [
+        80,
+        77,
+        480,
+        206
+      ],
+      "left": 90,
+      "bodyWidth": 460,
+      "fieldX": 343,
+      "fieldWidth": 207,
+      "labelWidth": 245,
+      "statusY": 234,
+      "footerY": 253,
+      "rowY": [
+        121,
+        149,
+        177,
+        205
+      ]
+    },
+    {
+      "kind": "leaderboard",
+      "width": 640,
+      "height": 360,
+      "panel": [
+        80,
+        49,
+        480,
+        262
+      ],
+      "left": 90,
+      "bodyWidth": 460,
+      "fieldX": 343,
+      "fieldWidth": 207,
+      "labelWidth": 245,
+      "statusY": 262,
+      "footerY": 281,
+      "rowY": [
+        93,
+        121,
+        149,
+        177,
+        205,
+        233
+      ]
+    },
+    {
+      "kind": "slots",
+      "width": 640,
+      "height": 360,
+      "panel": [
+        80,
+        63,
+        480,
+        234
+      ],
+      "left": 90,
+      "bodyWidth": 460,
+      "fieldX": 343,
+      "fieldWidth": 207,
+      "labelWidth": 245,
+      "statusY": 248,
+      "footerY": 267,
+      "rowY": [
+        107,
+        135,
+        163,
+        191,
+        219
+      ]
+    }
+  ]
+}

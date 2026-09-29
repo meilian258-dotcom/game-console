@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "mode": "built-jar",
+  "jar_sha256": "8ef4a49da04289426ac0af71dc3dbc28ea4605445f8f2965fe669004ddb0a133",
+  "output": "SFC_METADATA_REAL_CLASSES_CHECKS=66 PASSED; no live-world or visual claim\r\n\nSLF4J: Class path contains multiple SLF4J providers.\r\nSLF4J: Found provider [org.apache.logging.slf4j.SLF4JServiceProvider@6fb554cc]\r\nSLF4J: Found provider [org.slf4j.simple.SimpleServiceProvider@614c5515]\r\nSLF4J: See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.\r\nSLF4J: Actual provider is of type [org.apache.logging.slf4j.SLF4JServiceProvider@6fb554cc]\r\n",
+  "compile_output": "\nע: G:\\������\\������Codex\\piq-sfc-home\\tools\\qa\\SfcCardMetadataProbe.javaʹ�û򸲸����ѹ�ʱ�� API��\r\nע: �й���ϸ��Ϣ, ��ʹ�� -Xlint:deprecation ���±��롣\r\n",
+  "source_sha256": {
+    "data/SfcCartridgeData": "863d46ef126d59752a02c0e2fa2f9ac39b3de8fcc21670c027b3086fab74110c",
+    "net/SfcHomeNetwork": "b10aea47616b8d10b44a4361cc33927187874e8754615b0ff690f52b97408be5",
+    "server/SfcCoverStore": "0482e04aaef7c9ae5b28a6ecb037593802b083aa01cee65e8a9e2d9e041e9deb",
+    "server/SfcCoverService": "dd508a3e2e39a34749089fc59004ae5c91f6177fc09a2aa59906054af72a1f8c",
+    "server/SfcCartridgeEditorService": "525e1ac5daa8432c4c9b84d5392ecf7aa1448ad7c974ec412349c2708d78c964",
+    "client/SfcCardEditorLayout": "fc1b867f0d522ab2979508a84a16c8804228a1b5f7841cc84e185fc48eb20886",
+    "client/SfcCardEditorScreen": "297efc37e4dea5868784b67680608023e612863982ddea04c324413a416bf6ab",
+    "client/SfcCartridgeCovers": "d4787ef44d07267fc1873a7563d055490edc294852eacf68ecad2e36b70f2e08",
+    "client/SfcCoverGeometry": "b1fa53c044a0fc0ab0f91b86506d54614e0c57220d8076b13e0ae5055a260a5b",
+    "client/SfcCartridgeRenderer": "dabc0b87354e932d518330f92fa2c207e1e1678034469daa9920393509f8f2de",
+    "client/SfcHardwareRenderer": "fd7a286f720ec4d5472f3b0b9c5097d1a7faba387d0622792981c93a4369a709",
+    "item/SfcCartridgeItem": "db4afd1d2ac0f6a2b659c9296f42da1e63e9acac96b97b37a8d8c412ab5ba632"
+  },
+  "scope": "Real MC ItemStack, NBT persistence, packet codecs, production metadata, FC PNG validator + SFC cover repository, real item-model wrapper and pure label geometry. No networked Minecraft session, UI screenshot, live upload permission or in-world visual verification."
+}

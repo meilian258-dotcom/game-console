@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"piq_sfc_home:block/sfc_console_body"},"facing=east":{"model":"piq_sfc_home:block/sfc_console_body","y":90},"facing=south":{"model":"piq_sfc_home:block/sfc_console_body","y":180},"facing=west":{"model":"piq_sfc_home:block/sfc_console_body","y":270}}}

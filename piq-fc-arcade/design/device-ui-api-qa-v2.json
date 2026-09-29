@@ -1,0 +1,38 @@
+{
+  "status": "passed",
+  "boundary": "Actual current UI Java source compiled against cached real MC APIs. Pure production geometry and source safety tests only. No Gradle, Minecraft, emulator or native core run.",
+  "compile_output": "",
+  "tests": {
+    "passed_tests": 45,
+    "minecraft_started": false,
+    "mode": "actual-api-and-production-layout"
+  },
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceUi.java": "85545dff195ba46414fa10c74feee98154961f58bf3494ca1a0c9c753708ec64",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceLayout.java": "1c63d1b5300c6e255846f7a30b39ddff59592fbebec940f168209ee90ae3c032",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceConfirmScreen.java": "eba306859cf6a73709642654f9d0c094ee2bcbff26609b23da5b857e2d9747ba",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\FcMenuLayout.java": "61fba52bce7d118afc91391e32b93d7f75d4128716ee7131cccd7ae85f7cb325",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\FcMenuState.java": "ec253228711c7d658165d416cb9dc5599c42aee251bb4b820f855f66621812f4",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ClientCartridgeEditor.java": "969b2bf8cbd2cd7d0275ac1ad8469a56bbb296a567d446b55b17cffd4364bee8",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\RomLibraryScreen.java": "023b0c6f500f1358d2af6f5113a78420226530cb0082d93000cd45ebaed3d091",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\RomRenameScreen.java": "a1b07195555f918356464268eb0ba8944a78a21185da5d2254ccefa421a3a1f1",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\FcRomDeleteScreen.java": "4ed58437f4ddb0a00102893b73431f541694838aef6744aef2fe24010712699f",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\rom\\LocalRomPickerLayout.java": "273f957ed4eeeef29f5e70096041a076c9b4e1d6e80a163c5f689380ea04dd86",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\rom\\LocalRomPickerScreen.java": "5944cef6e3ed7e7968fee46284a5208aed447a3def57e009ea5cd4029b3a40cf",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetMenuLayout.java": "6d2e41273d2d77d9e4ce142f91da59af94d5f152ae16aaa204c9c4879037b04d",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetMenuScreen.java": "ac537193a015d4b99a388cf1ca32187630d00eb6b2cfe873d2049ea994cf8129",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceFormLayout.java": "c4c9cbea5316de7e777964bd6c6c343fd5ac744266f9b102b475ef685582802f",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ArcadeSettingsScreen.java": "256738e568b2b050ad5fab936a8f23255192612da77bdee22ebbdda52626a8fd",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\LeaderboardPanelScreen.java": "9a01c3f82d4e9bd76d066410db6fb94a76a06b113878a65853938431bddafd8c",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ArcadeSaveSlotsScreen.java": "34ef378a37cfe7b55f2877a1764f1d0663ed9c939b669323d9124ac7e1d2ca20",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ArcadeSaveCatalogScreen.java": "7d19e0d83bf601087683d64634a62e0e2948475ffde91e0ba28d10e034bbd90e",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\SkinLibraryScreen.java": "cbba891fa4d23a1c78ddc02eb1d45ea309f58289c0446bca743bd69565004e05",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceLayoutTest.java": "806507ec423581db0c2eb92aa155f8b906a251fc5106c11c1ff0de5ac0116170",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\rom\\LocalRomPickerLayoutTest.java": "05eba58e2d03f35c66b1f40b88be839f2caeaf1e0c151e0b1014e40919a22488",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\rom\\LocalRomPickerSafetyTest.java": "49f6eed2f53c3ffe0056dfc46aa1448bc1d9e21253875f51c8dd709299eb982e",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetMenuLayoutTest.java": "b23f16fd9398952fdfd95662b33ebba906946a6a01038015fa4e7edd50880598",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetClientSafetyTest.java": "3587068d526bfbaf69d77ac6cef42420c1e4860183bd51a801763a0c43e739e3",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\FcMenuLayoutTest.java": "1ecbce0743019f81b9d6c9d506a39596762d725b84947a4f41e2a7f070d551bc",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceSecondaryUiTest.java": "4c10d1d8b425f146a78e34976d5e5ed0c117782de94765bdc02b33bc8bec705e"
+  }
+}

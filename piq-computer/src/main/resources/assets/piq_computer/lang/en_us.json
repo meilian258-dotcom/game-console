@@ -1,0 +1,18 @@
+{
+  "block.piq_computer.computer_black": "Black Modular Computer",
+  "block.piq_computer.computer_white": "White Modular Computer",
+  "block.piq_computer.keyboard_black": "Black Keyboard",
+  "block.piq_computer.keyboard_white": "White Keyboard",
+  "block.piq_computer.mouse_black": "Black Mouse",
+  "block.piq_computer.mouse_white": "White Mouse",
+  "item.piq_computer.motherboard": "Motherboard",
+  "item.piq_computer.cpu": "Processor",
+  "item.piq_computer.cooler": "CPU Cooler",
+  "item.piq_computer.ram": "Memory Module",
+  "item.piq_computer.gpu": "Graphics Card",
+  "item.piq_computer.hdd": "Hard Drive",
+  "item.piq_computer.psu": "Power Supply",
+  "item.piq_computer.connector": "USB Receiver Pairing Tool",
+  "block.piq_computer.keyboard_mouse_black": "Black Keyboard and Mouse Set",
+  "block.piq_computer.keyboard_mouse_white": "White Keyboard and Mouse Set"
+}

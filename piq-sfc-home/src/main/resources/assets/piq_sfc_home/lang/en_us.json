@@ -1,0 +1,19 @@
+{
+  "itemGroup.piq_sfc_home": "Game Console: SFC",
+  "block.piq_sfc_home.console": "Super Famicom",
+  "item.piq_sfc_home.cartridge": "SFC Game Cartridge",
+  "item.piq_sfc_home.controller": "SFC Controller",
+  "key.categories.piq_sfc_home": "Game Console: SFC",
+  "key.piq_sfc_home.b": "B Button",
+  "key.piq_sfc_home.y": "Y Button",
+  "key.piq_sfc_home.select": "SELECT",
+  "key.piq_sfc_home.start": "START",
+  "key.piq_sfc_home.up": "Up",
+  "key.piq_sfc_home.down": "Down",
+  "key.piq_sfc_home.left": "Left",
+  "key.piq_sfc_home.right": "Right",
+  "key.piq_sfc_home.a": "A Button",
+  "key.piq_sfc_home.x": "X Button",
+  "key.piq_sfc_home.l": "L Shoulder",
+  "key.piq_sfc_home.r": "R Shoulder"
+}

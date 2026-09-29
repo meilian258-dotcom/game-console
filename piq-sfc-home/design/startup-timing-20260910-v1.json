@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "frozen_jars_sha256": {
+    "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-SFC街机\\piq_sfc_arcade-0.2.0-alpha.6.jar": "38FA46C5D283EAD9E1F6666D01398F495E2E1A3260A1517BE8EE959710963363",
+    "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-FC街机\\alpha16-rom-browser\\piq_fc_arcade-0.31.0-alpha.16.jar": "9E02D350DAED8450F6C27651BC61F019C5229C4AED86FC9F398137F9BA049ADE"
+  },
+  "actual": {
+    "passed": true,
+    "commercial_roms": false,
+    "minecraft_gameplay": false,
+    "samples": [
+      {
+        "construct_ns": 863886700,
+        "original_fixture_and_parse_ns": 4014600,
+        "load_rom_ns": 2137300,
+        "probe_frame_ns": 5808900,
+        "reset_ns": 1456800,
+        "save_state_ns": 1603900,
+        "state_hash_ns": 15030600,
+        "first_game_frame_and_pixels_ns": 4355500,
+        "width": 256,
+        "height": 224,
+        "fps": 60.0988,
+        "state_bytes": 1294511,
+        "initial_state_sha256": "1aadb21e21dac6ad8db5eccf28ceed34fcbec846a6f5e60462eaccfe18bb44b0",
+        "close_ns": 8547200,
+        "total_ns": 906921800,
+        "ordinal": 1
+      },
+      {
+        "construct_ns": 554347500,
+        "original_fixture_and_parse_ns": 1095100,
+        "load_rom_ns": 1559600,
+        "probe_frame_ns": 4352500,
+        "reset_ns": 1491600,
+        "save_state_ns": 1364700,
+        "state_hash_ns": 722300,
+        "first_game_frame_and_pixels_ns": 4516900,
+        "width": 256,
+        "height": 224,
+        "fps": 60.0988,
+        "state_bytes": 1294511,
+        "initial_state_sha256": "1aadb21e21dac6ad8db5eccf28ceed34fcbec846a6f5e60462eaccfe18bb44b0",
+        "close_ns": 8981800,
+        "total_ns": 578490700,
+        "ordinal": 2
+      }
+    ]
+  },
+  "limits": [
+    "Two sequential core instances in one fresh JVM; first instance includes cold native/class initialization.",
+    "Tiny original 32 KiB ROM only; not representative of every commercial cartridge, server transfer or Minecraft render load.",
+    "No emulator internals altered or skipped; stage measurements do not demonstrate removal of cold-start cost.",
+    "No audio device, server ready barrier, network download or texture upload timing included."
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "minecraft_started": false,
+  "native_core_started": false,
+  "network_socket_opened": false,
+  "gradle_started": false,
+  "pure_production_tests": 34,
+  "real_api_ingress_and_codecs": {
+    "ok": true,
+    "assertions": 52,
+    "real_connection_and_context_api": true,
+    "minecraft_started": false,
+    "network_socket_opened": false,
+    "native_core_started": false
+  },
+  "common_client_isolation": true,
+  "sources": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomLedger.java": "F09568EAE9D9FEA8CEBD7C5241C25292F8139D980897B9280B8B4740278B78C8",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomMedia.java": "97D6A88B0A7CC38AE469C5AD7D022D107F1F3AFA38BF2AE5B41293C2E4929F46",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomLedgerTest.java": "75FEE48E7BBD330B745742115C7BB6708B3C9C595D48D395F58817F7F8D3B138",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomMediaTest.java": "79FD7CA476B73018A1E115F52E5FCA80F627C02941B3F3E896D2710E239CD9A0",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetBackends.java": "B74B6B39933ECF95F86D039C635FA5B061C29BE6D627B1D63FBE7DA70683452C",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetNetwork.java": "68F8792A9ACE4CF93353D6E020D32A4585146594CA31BC316D0901F76E1A8E9E",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomNetwork.java": "FD949E70BBD02038907F1A4FC717C66789A8A905D67801AD1307A64610D56791",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\ServerCabinets.java": "AAFBD2A3E2160AC6D9E2670E42931B6E1F377FC75A0219D7554E37535F24CF4F",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRooms.java": "FFAC57B1BA14472CD61FE96B715CAE1F2EFC2467EE4852ED36B9034D9F9164BC",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetLinks.java": "1DFD7D35FCA446C805E5AB4042EA35725B33AA8C927E5A6E81DD802937793D7B",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetLinkLedger.java": "B1CC295B747556A281C7EA93086DB0372C4EA42C7C5FFA6296FABFB778ED820C",
+    "tools\\qa\\CabinetRoomIngressProbe.java": "B7F7559B8739773CBAC3D0D7F4C3FF430BB69B46CB34F8527A8F37A1E585D327"
+  },
+  "scope": "Executable production state machines and codec/ingress APIs; not a real Minecraft multiplayer playtest."
+}

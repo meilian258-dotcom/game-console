@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"piq_fc_arcade:block/user_tv48/red_crt_tv"},"facing=east":{"model":"piq_fc_arcade:block/user_tv48/red_crt_tv","y":90},"facing=south":{"model":"piq_fc_arcade:block/user_tv48/red_crt_tv","y":180},"facing=west":{"model":"piq_fc_arcade:block/user_tv48/red_crt_tv","y":270}}}

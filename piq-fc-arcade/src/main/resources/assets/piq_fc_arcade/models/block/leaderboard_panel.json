@@ -1,0 +1,21 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "minecraft:block/black_concrete",
+    "screen": "minecraft:block/black_concrete"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 14],
+      "to": [16, 16, 16],
+      "faces": {
+        "north": {"texture": "#screen"},
+        "east": {"texture": "#screen"},
+        "south": {"texture": "#screen"},
+        "west": {"texture": "#screen"},
+        "up": {"texture": "#screen"},
+        "down": {"texture": "#screen"}
+      }
+    }
+  ]
+}

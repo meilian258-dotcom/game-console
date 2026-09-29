@@ -1,0 +1,128 @@
+{
+  "schema": "piq-controls25-independent-source-review-1",
+  "review_complete": true,
+  "final_jar_audit": false,
+  "production_modified": false,
+  "tests_rerun": false,
+  "minecraft_started": false,
+  "read_only_except_report": true,
+  "reviewed": [
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/KeyboardInput.java",
+      "sha256": "896D05A47E592D66C9298E1F3745F1F3BAB0ECD04AD03603F184FCBCD4A074E0"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/KeyboardRouting.java",
+      "sha256": "8852035539A74BDE4E4348EF04D631786108FD4EB69CDEA5AAF572DE6D04D930"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/KeyboardControlState.java",
+      "sha256": "597E717713E73845DAFC74976A1482D2D323653D784532E1568BC6D98784E881"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/KeyboardConfig.java",
+      "sha256": "6E980D3D800178052FE15994F7CFBEC4A1DEB26B3D437B761A8C24829B0719F8"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/KeyboardConfigStore.java",
+      "sha256": "4C929B639374CBA9908B00AC2839AF623D19348A2F13FD8770073BCF45BBA7F5"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/GamepadInput.java",
+      "sha256": "B3B2DC166836DEBDAFD7BBE85B158143A264F8B71FE9C9CB970BA6A11CFE5C35"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/GamepadConfig.java",
+      "sha256": "15E8BB1BF375C1C88409E2B3FDB324AD8C9547F2DB8CB807D096674E846D6D35"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/GamepadConfigStore.java",
+      "sha256": "47F8F16AC68089B860679B47726602216287C18DF186033C6E9BADDC26D5EE8D"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/GamepadMixer.java",
+      "sha256": "C15BB59DFC1E9FA9A4000066DA300E5A5EDFAA5F3925F6EA5B3469EAD4E790BE"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/ControlSettingsScreen.java",
+      "sha256": "7285FE8382FF925ED0E2B77D0C097CEA76B09874536D21ECC4A4BE495871DBC4"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/KeyboardBindingsScreen.java",
+      "sha256": "756837F7D6A81CC1D1C70703445DED887B6491408811A38EBA9EF4168C7E1100"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/GamepadSettingsScreen.java",
+      "sha256": "B7665A8527BC378F01604B63E73FB588F7D2273A9F5AD209912C5DB7794DBDCB"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/GamepadDeviceScreen.java",
+      "sha256": "47C453CB6F2512DAF80930E0E7F66E3A35A71824AF6554980FC916692BEE3A60"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/ControlPanelLayout.java",
+      "sha256": "56A1F89465E4887969C0D0FD1A1AC87ED254D2B49072826C3B6172409C8A1CE1"
+    },
+    {
+      "path": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/fcarcade/mixin/KeyboardHandlerMixin.java",
+      "sha256": "3C87828FBAE3718993F371DE0C07A58E8EB0A7F68E80F184CBD8B3A4ACC91E35"
+    }
+  ],
+  "confirmed": [
+    "Missing gamepad config selects enabled=true, deviceKey empty (automatic first mapped device); valid existing enabled=false is decoded unchanged.",
+    "Corrupt/unreadable gamepad config fails closed to disabled; GUI snapshots and Cancel do not persist; nested editors only change immutable parent drafts.",
+    "Both config stores use bounded no-follow reads, revision compare before writing and immediately before atomic replace; explicit save only.",
+    "Keyboard owner uses object identity and host authority suppliers; exact connection/alive/held or cabinet/range checks are retained by hosts. No new seat/ROM/network permission is created.",
+    "Keyboard pause/configure/toggle discard local held states; all assigned physical inputs must become neutral before rearming. Gamepad focus/device-generation/profile changes clear pad state; UI capture also resets neutral on changed DeviceId.",
+    "F7 settings route is available without a session while in focused in-world gameplay; it deliberately does not intercept an existing GUI/title screen. F8 route requires a current authorized owner.",
+    "Mixin is declared client-only and required; actual cached MC KeyboardHandler has keyPress(JIIII)V. Source injection is HEAD+cancellable. Actual Mixin transformer/application has not been executed.",
+    "320x240 and larger hub/device/mapping layouts are bounded; labels use vanilla Button rendering and fit+tooltip rather than scaled fonts."
+  ],
+  "findings": [
+    {
+      "id": "keyboard-custom-grid-one-pixel-overlap",
+      "severity": "minor",
+      "status": "fixed-by-root-and-source-rechecked",
+      "file": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/KeyboardBindingsScreen.java",
+      "line": 33,
+      "evidence": "Original -108 row formula overlapped pager by one pixel at panel height 228/252. Latest source uses -112, matching the tested layout formula."
+    },
+    {
+      "id": "arcade-preset-button-order",
+      "severity": "compatibility",
+      "status": "reported-awaiting-owner-decision",
+      "file": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/KeyboardConfig.java",
+      "line": 36,
+      "evidence": "ARCADE native bits 0/1/8 are labelled button1/2/3 but current NUMPAD maps KP1/KP3/KP2 and WASD maps J/L/K. UI shorthand suggests sequential 1/2/3 and J/K/L.",
+      "recommendation": "Make ARCADE non-legacy preset explicitly sequential, or show exact mapping prominently; retain LEGACY unchanged."
+    },
+    {
+      "id": "legacy-custom-hotkey-collision",
+      "severity": "compatibility",
+      "status": "reported-awaiting-owner-fix-or-explicit-policy",
+      "file": "G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/retro/client/KeyboardConfig.java",
+      "line": 23,
+      "evidence": "Config constructor checks presetKeys(LEGACY), not runtime MC custom/alternate/extras. Router gives settings/toggle priority, so a legacy A bound to F7/F8 or mute bound to a newly chosen settings key becomes unreachable.",
+      "recommendation": "Validate against effective legacy bindings and extras on save/attach, or explicitly warn/resolve priority without rewriting options.txt."
+    },
+    {
+      "id": "sfc-same-listener-disconnected",
+      "severity": "defense-in-depth",
+      "status": "reported-to-sfc-owner",
+      "file": "G:/服务器/服务器Codex/piq-sfc-home/src/main/java/cn/piq/sfchome/client/SfcHomeClient.java",
+      "line": 58,
+      "evidence": "New ownsController checks current listener identity but lacks actual Connection.isConnected, unlike the FC/cabinet/native keyboard authority. Brief same-reference closing-listener window may still be sampled.",
+      "recommendation": "Add isConnected to the new authority supplier only; no protocol change required."
+    }
+  ],
+  "recommended_final_probes": [
+    "Actual final-JAR class origin checks for KeyboardRouting/KeyboardControlState/GamepadMixer/config stores, then execute existing behavior tests against those final classes without production recompilation.",
+    "Apply actual Sponge Mixin to the actual cached KeyboardHandler in an isolated JVM; inspect transformed bytecode to prove intercept+cancel-return precedes vanilla key click/chat/inventory logic. A source substring or annotation-only check is not this proof.",
+    "Exercise neutral rearming, owner replacement, old release isolation, config/device switch and F7/F8 authority through the actual pure routing/state classes. Preserve separate real-game and physical-device acceptance limits."
+  ],
+  "limits": [
+    "No GUI screenshot, Minecraft window, physical controller/GLFW hotplug, Mixin transformed runtime or multiplayer gameplay executed.",
+    "Observed hotplug generations are based on polling; do not claim an actual hardware disconnect/reconnect test.",
+    "This report is a source review snapshot, not a release success gate; findings may be superseded by later owner fixes."
+  ]
+}

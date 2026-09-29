@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "mode": "source-contracts",
+  "source_contracts": {
+    "passed_tests": 4,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "actual_items": null,
+  "production_compiled": true,
+  "compiled_only_tests_and_probe": false,
+  "minecraft_started": false,
+  "limitations": [
+    "Source text checks lock route/permission call sites only; they are not a running protection callback/server/world test.",
+    "With --fc, actual NeoForge registry/ItemStack NBT/useOn inheritance/tooltip dispatch comes only from supplied final jar."
+  ],
+  "source_sha256": {
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\DataCableCompatibilityTest.java": "FA57BF690504F1C7D24B7C1BFD0D709DFEF8750E0E6CAE0FBCD80D5EDE15A18F",
+    "src\\main\\java\\cn\\piq\\fcarcade\\registry\\CreativeTabCatalog.java": "5EE5C46D3DEFCFF215DD1B84FD975DFE57124E80F1A91591D88B9C5F1FE2AE50",
+    "tools\\qa\\DataCableItemProbe.java": "B1FEE6E7C5D009C24BA096FF70DE634B3A7B00D705835F9E23A84393BA317D1E"
+  }
+}

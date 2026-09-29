@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="GPL-3.0-or-later"
+[[mods]]
+modId="piq_gba"
+version="0.1.0-alpha.11"
+displayName="方块电玩：GBA"
+authors="PIQ / Codex"
+description='''Portable GBA handheld and a one-seat cabinet backend. Default owned mGBA process retained; explicit local Windows x64 JNI trial supports the handheld and client-hosted cabinet with isolated trial battery saves. No GBA link or Netplay. Server hosting remains process-only. See capability and risk guide.'''
+[[dependencies.piq_gba]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.236,)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.piq_gba]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.21.2)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.piq_gba]]
+modId="piq_fc_arcade"
+type="required"
+versionRange="[0.31.0-alpha.76.24,0.31.0-alpha.77)"
+ordering="AFTER"
+side="BOTH"

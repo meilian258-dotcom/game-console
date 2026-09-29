@@ -1,0 +1,65 @@
+plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
+group = 'cn.piq.computer'
+version = '0.1.0-prototype.10'
+base { archivesName = 'game_console_computer' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+neoForge {
+    version = '21.1.236'
+    mods { piq_computer { sourceSet(sourceSets.main) } }
+}
+repositories { mavenCentral() }
+dependencies {
+    implementation files('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.22.jar')
+    compileOnly files('../piq-pvz-addon/build/libs/game_console_pvz-0.1.0-prototype.11.jar')
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8' }
+// Reuse the existing Flash helper bridge without installing the incompatible Flash box MOD.
+// Relocate its three IPC classes so a future Flash box cannot create a split package.
+def flashSource = file('vendor/flash-runtime').exists() ? 'vendor/flash-runtime' : '../piq-flash-box/src/main/java/cn/piq/flashbox/runtime'
+def flashBridge = tasks.register('prepareFlashBridge', Sync) {
+    from(flashSource) { include 'FlashRuntime.java', 'FlashProtocol.java', 'FrameImageDecoder.java', 'FlashCommands.java'
+        filter { line -> line.replace('package cn.piq.flashbox.runtime;', 'package cn.piq.computer.flash;')
+            .replace('gameDirectory.toAbsolutePath().normalize().resolve("piq-flash-box")', 'cn.piq.retro.storage.ConsoleStorage.root(gameDirectory).resolve("piq-flash-box")')
+            .replace('"/flash-runtime.sha256"','"/computer-flash-runtime.sha256"')
+            .replace('public boolean ready() {', 'public boolean finished() { return closed.get(); }\n    public boolean awaitExit() { try { return process.waitFor(8,TimeUnit.SECONDS); } catch (InterruptedException e) { Thread.currentThread().interrupt(); return false; } }\n    public boolean ready() {') }
+    }
+    into 'build/generated/flashBridge'
+}
+sourceSets.main.java.srcDir flashBridge
+tasks.named('compileJava') { dependsOn flashBridge }
+tasks.named('processResources') {
+    from(file('vendor/flash-runtime.sha256').exists() ? 'vendor/flash-runtime.sha256' : '../piq-flash-box/src/main/resources/flash-runtime.sha256') { rename { 'computer-flash-runtime.sha256' } }
+}
+def metadata = tasks.register('generateModMetadata', ProcessResources) {
+    inputs.property 'version', project.version
+    expand(version: project.version)
+    from 'src/main/templates'; into 'build/generated/modMetadata'
+}
+sourceSets.main.resources.srcDir metadata
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+neoForge.ideSyncTask metadata
+def asciiRoot = new File(System.getProperty('java.io.tmpdir'), 'piq-computer-tests')
+def prepareMain = tasks.register('prepareAsciiMain', Sync) {
+    dependsOn tasks.named('classes')
+    from sourceSets.main.output
+    // Bootstrap tests need vanilla translations/version; never package these in the addon.
+    from({zipTree(new File(gradle.gradleUserHomeDir,'caches/neoformruntime/artifacts/minecraft_1.21.1_client.jar'))}) {
+        include 'assets/minecraft/lang/en_us.json', 'version.json'
+    }
+    into new File(asciiRoot,'main')
+}
+def prepareTests = tasks.register('prepareAsciiTests', Sync) { dependsOn tasks.named('testClasses'); from sourceSets.test.output; into new File(asciiRoot,'tests') }
+def prepareDependencies = tasks.register('prepareAsciiDependencies', Sync) {
+    from sourceSets.main.compileClasspath
+    into new File(asciiRoot,'dependencies')
+}
+tasks.named('test', Test) {
+    dependsOn prepareMain, prepareTests, prepareDependencies
+    useJUnitPlatform()
+    testClassesDirs=files(new File(asciiRoot,'tests'))
+    classpath=files(new File(asciiRoot,'tests'),new File(asciiRoot,'main'))+fileTree(new File(asciiRoot,'dependencies'))+configurations.testRuntimeClasspath
+}
+jar { from(files('../piq-pvz-addon/LICENSE','ASSETS.md')) { into 'META-INF' } }

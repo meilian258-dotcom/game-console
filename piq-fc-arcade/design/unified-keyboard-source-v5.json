@@ -1,0 +1,61 @@
+{
+  "ok": true,
+  "mode": "explicit-source-qa",
+  "production_compiled": true,
+  "minecraft_started": false,
+  "native_core_started": false,
+  "network_socket_opened": false,
+  "options_file_touched": false,
+  "behavior": {
+    "passed_tests": 47,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "host_contracts_and_ownership": {
+    "passed_tests": 16,
+    "minecraft_started": false,
+    "mode": "14-source-wiring-contracts-and-2-actual-ownership-behaviors",
+    "source_wiring_tests": 14,
+    "behavior_tests": 2
+  },
+  "real_api_compile": {
+    "minecraft": "1.21.1",
+    "neoforge": "21.1.236",
+    "explicit_sources": [
+      "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardInput.java",
+      "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\mixin\\KeyboardHandlerMixin.java",
+      "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ArcadeKeyMappings.java",
+      "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetClientBackends.java",
+      "piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\client\\NativeArcadeClient.java"
+    ],
+    "mixin_apply_in_game_tested": false
+  },
+  "mixin_contract": {
+    "actual_keyboard_handler_sha256": "08EFB37D5916C857C38A047BE0C731E1A42C00370D39AE341C0C1EC316F400FC",
+    "target": "keyPress(JIIII)V",
+    "head_cancellable": true,
+    "client_only_registration": true,
+    "settings_without_session": true,
+    "live_mixin_transform_tested": false
+  },
+  "source_sha256": {
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardConfig.java": "3786BD3BB023E74DBE05E6DEC01E7FF751A473A372DF87E07192EA1864F37D5E",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardControlState.java": "597E717713E73845DAFC74976A1482D2D323653D784532E1568BC6D98784E881",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardConfigStore.java": "4C929B639374CBA9908B00AC2839AF623D19348A2F13FD8770073BCF45BBA7F5",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardRouting.java": "8852035539A74BDE4E4348EF04D631786108FD4EB69CDEA5AAF572DE6D04D930",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\retro\\client\\KeyboardControlStateTest.java": "F450678327EBE201ACB27A0D47CF90A0CD2A43B6EEFC66E0EFBE4E8A180399EB",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\retro\\client\\KeyboardConfigTest.java": "443F4D0749FB12FF2C6BF4AD7BF772CA438774C602100EB9D44E2B75A2C7263D",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\retro\\client\\KeyboardRoutingTest.java": "F77F0E636A238AC8A64A0C26511F9D77272AEB86F1955D7AFCDBDB75F3CA4F67",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\ImmersiveClientSafetyTest.java": "B878B1BE0655C2BAF3BE6F6290AFD1E126E993686B29EE3293F76BD40ABB1DA3",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetClientOwner.java": "E45A1202EBDD5B12C96DFEBA088E17A59BC66E7EFFB021C6DD6192889D3997D5",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\input\\InputOwnership.java": "BCC91B0C1456550D477DC1A8E11E029ADC620ACCBB287593A4DC5978639D123E",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardInput.java": "9B717ABCEC5989FD945D1C724089B8310F37D1E1530832BE894497E6F0C4D72A",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\mixin\\KeyboardHandlerMixin.java": "3C87828FBAE3718993F371DE0C07A58E8EB0A7F68E80F184CBD8B3A4ACC91E35",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ArcadeKeyMappings.java": "B04E29E9F53B0C4106A2673AA0755552E5EFA2BEBC39B0D0B49B456DA5976B70",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetClientBackends.java": "C539143A555DD443AC4B93CEB77AD8E418743E2B907B45B66EF842515D2EDE45",
+    "piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\client\\NativeArcadeClient.java": "3B2D61653440E954B41667FF849AB4D4D705B332CD1252279F0492F83F8011AA"
+  },
+  "limits": [
+    "Real pure state/configuration behavior plus cached Minecraft API compilation; no live GLFW window, mixin transformation, dedicated server, physical device, or multiplayer gameplay was executed."
+  ]
+}

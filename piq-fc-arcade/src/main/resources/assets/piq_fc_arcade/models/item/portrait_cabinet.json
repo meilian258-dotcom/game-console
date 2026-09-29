@@ -1,0 +1,1 @@
+{"parent":"builtin/entity","textures":{"particle":"piq_fc_arcade:block/portrait/skin"},"display":{"gui":{"rotation":[20,210,0],"translation":[0.05,-0.15,0],"scale":[0.82,0.82,0.82]},"fixed":{"rotation":[0,180,0],"translation":[0,0,0],"scale":[1,1,1]}}}

@@ -1,0 +1,159 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+
+group = mod_group_id
+version = mod_version
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = neo_version
+
+    runs {
+        client { client() }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        configureEach {
+            logLevel = org.slf4j.event.Level.INFO
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    // MicroEmulator 2.0.4 is split across four jars that intentionally share
+    // packages. NeoForge exposes nested jars as JPMS modules, where those
+    // split packages are illegal. Merge the four LGPL runtime jars into the
+    // mod's single automatic module instead.
+    microemuEmbed {
+        canBeConsumed = false
+        canBeResolved = true
+        transitive = false
+    }
+}
+
+dependencies {
+    ['microemu-cldc', 'microemu-midp', 'microemu-javase', 'microemu-javase-swing'].each { artifact ->
+        implementation("org.microemu:${artifact}:${microemu_version}") {
+            transitive = false
+        }
+        microemuEmbed("org.microemu:${artifact}:${microemu_version}") {
+            transitive = false
+        }
+        additionalRuntimeClasspath("org.microemu:${artifact}:${microemu_version}") {
+            transitive = false
+        }
+    }
+
+    // Do not package the 2009 ASM 3.1 dependency: NeoForge already supplies a
+    // modern org.objectweb.asm implementation under the same package names.
+
+}
+
+tasks.named('jar', Jar).configure {
+    dependsOn configurations.microemuEmbed
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.microemuEmbed.collect { zipTree(it) }
+    }
+    exclude 'META-INF/MANIFEST.MF'
+    exclude 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/*.DSA'
+    exclude 'module-info.class', 'META-INF/versions/**/module-info.class'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('test', Test).configure {
+    // ModDevGradle does not expose ordinary test classes to its transformed
+    // JUnit launcher in this project. Compatibility checks run as explicit
+    // JavaExec probes below so their classpath and exit status are deterministic.
+    enabled = false
+}
+
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def replaceProperties = [
+            minecraft_version: minecraft_version,
+            neo_version      : neo_version,
+            mod_id           : mod_id,
+            mod_name         : mod_name,
+            mod_version      : mod_version
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.register('microemuClasspathReport') {
+    doLast {
+        configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts
+                .findAll { it.moduleVersion.id.group == 'org.microemu' }
+                .sort { it.moduleVersion.id.toString() }
+                .each { println "${it.moduleVersion.id} -> ${it.file}" }
+    }
+}
+
+tasks.register('microemuSmokeTest', JavaExec) {
+    group = 'verification'
+    description = 'Loads the embedded MicroEmulator runtime in a plain Java 21 process.'
+    dependsOn tasks.named('testClasses')
+    classpath = files(sourceSets.test.output.classesDirs) + sourceSets.test.runtimeClasspath
+    mainClass = 'cn.piq.j2mearcade.core.MicroEmuSmokeMain'
+    systemProperty 'java.awt.headless', 'true'
+}
+
+tasks.register('packagedRuntimeSmoke', JavaExec) {
+    group = 'verification'
+    description = 'Verifies that the distributable jar contains one merged MicroEmulator runtime.'
+    dependsOn tasks.named('jar')
+    classpath = files(tasks.named('jar').flatMap { it.archiveFile })
+    mainClass = 'cn.piq.j2mearcade.core.PackagedRuntimeSmokeMain'
+}
+
+tasks.register('realGameSmokeTest', JavaExec) {
+    group = 'verification'
+    description = 'Starts an explicitly supplied Java ME game and captures a real framebuffer.'
+    dependsOn tasks.named('testClasses')
+    def testJar = providers.gradleProperty('j2meTestJar')
+    // The supplied game must not leak onto the JVM/application class path;
+    // the runtime probe verifies the same isolated loader used by Minecraft.
+    classpath = files(sourceSets.test.output.classesDirs) + sourceSets.test.runtimeClasspath
+    mainClass = 'cn.piq.j2mearcade.core.RealGameSmokeMain'
+    systemProperty 'java.awt.headless', 'true'
+
+    def outputPng = providers.gradleProperty('j2meOutputPng')
+            .orElse(layout.buildDirectory.file('test-results/j2me-real-game.png').map { it.asFile.absolutePath })
+    doFirst {
+        if (!testJar.isPresent()) {
+            throw new GradleException('Pass -Pj2meTestJar=<path-to-game.jar>')
+        }
+        systemProperty 'piq.j2me.testJar', testJar.get()
+        systemProperty 'piq.j2me.outputPng', outputPng.get()
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('microemuSmokeTest'), tasks.named('packagedRuntimeSmoke')
+}

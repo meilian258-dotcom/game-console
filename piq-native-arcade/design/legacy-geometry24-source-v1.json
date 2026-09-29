@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "mode": "compiled-workspace-production",
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.24.jar",
+      "sha256": "743EE9229816DA5D555E51585EC64CE53EC666A52E3D1E2DC5F886CC45F51901"
+    },
+    "native": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+      "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A"
+    }
+  },
+  "frozen_oracles": {
+    "piq_fc_arcade-0.31.0-alpha.21.jar": "0147D49C542E82DDF2DD37CDAFFBDB135CDA20E11907B4060B471A2FBC0D3F93",
+    "piq_native_arcade-0.1.0-alpha.7.jar": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A"
+  },
+  "probe": {
+    "ok": true,
+    "assertions": 424,
+    "junit_tests": 12,
+    "exact_original_double_bits": true,
+    "production_origin": "compiled-workspace-production",
+    "minecraft_or_core_started": false
+  },
+  "production_compiled": true,
+  "source_sha256": "82B0A7AB4B1A02CA12C9CE9BBE1072611F896F7E937FFDB9A5AA5D05DE172C78",
+  "limits": [
+    "No Minecraft renderer/window or emulator launch; exact final/pure geometry and original video tests only."
+  ]
+}

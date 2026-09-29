@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "actual": {
+    "passed": true,
+    "assertions": 792,
+    "live_core_instances": 2,
+    "before_join_frames": 127,
+    "synchronized_following_frames": 240,
+    "state_bytes": 1294513,
+    "state_sha256": "9a092578d525028f048cfbc17a056bd52ce7de8c5e4f63038d611fe24b9baa1f",
+    "compared_video_bytes": 55050240,
+    "compared_pcm_shorts": 383368,
+    "minecraft_started": false,
+    "commercial_roms": false
+  },
+  "frozen_jars_sha256": {
+    "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-SFC街机\\piq_sfc_arcade-0.2.0-alpha.6.jar": "38FA46C5D283EAD9E1F6666D01398F495E2E1A3260A1517BE8EE959710963363",
+    "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-FC街机\\alpha17-immersive\\piq_fc_arcade-0.31.0-alpha.17.jar": "BB80909B99B4F357F71C3CBC86E580CA7F80D172C5153D52B9F14F6F90494540"
+  },
+  "scope": "Two real frozen WASM core instances, original legal diagnostic ROM, actual save/load and subsequent matching video/audio/state. Current pure approval gate used for ordered transfer/commit.",
+  "limitations": [
+    "No Minecraft clients or live network/protection plugins exercised.",
+    "Diagnostic ROM only; not a claim that every commercial game enables simultaneous two-player midgame.",
+    "No production SfcPlayback thread/packet dispatch execution; separate root compilation and integration audit required."
+  ]
+}

@@ -1,0 +1,558 @@
+{
+  "schema": "piq-native-fixed-rtc-replay-1",
+  "ok": true,
+  "initial_replay_qualified": true,
+  "production_modified": false,
+  "production_compiled": false,
+  "game": "kof97",
+  "inputs": {
+    "F:\\Minecraft\\HMCL\\versions\\1.21.1-NeoForge\\piq-native-arcade\\roms\\kof97.zip": {
+      "sha256": "804F892924D4650545D3EA2D19FB85670094DC46DB882FECAF3E03009E2C4B9F",
+      "bytes": 28745740,
+      "mtime_ns": 1789019872695917100
+    },
+    "E:\\Dow\\rom\\WinKawaks1.65模拟器\\WinKawaks1.65\\roms\\neogeo\\neogeo.zip": {
+      "sha256": "E1FFD4AB180E2F6AA4A3AA4D2C6F991E19D8EF762BEC8B5A6283704A2EDC3BBC",
+      "bytes": 953500,
+      "mtime_ns": 1158274344000000000
+    }
+  },
+  "runtime": {
+    "G:\\服务器\\服务器Codex\\piq-native-arcade-poc\\vendor\\mame_libretro.dll": {
+      "sha256": "6172A988AB67FE68F4177A6FC8FBB82619EB2044C330930F0F572F7B1EDC2301",
+      "bytes": 372431360,
+      "mtime_ns": 1788825946000000000
+    },
+    "C:\\Users\\13498\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna\\5.14.0\\67bf3eaea4f0718cb376a181a629e5f88fa1c9dd\\jna-5.14.0.jar": {
+      "sha256": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6",
+      "bytes": 1878533,
+      "mtime_ns": 1781245930305499200
+    },
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq-native-arcade\\runtime\\piq-native-helper.jar": {
+      "sha256": "20F6F3028D76DAEB01212D1808BE90E35BFB5429D1E06153B7D8B32DD73E943C",
+      "bytes": 18571,
+      "mtime_ns": 1789117844694258000
+    }
+  },
+  "frames": 12000,
+  "source_roms_read_only": true,
+  "mode": "sequential-independent-owned-JVMs-fixed-rtc",
+  "fixed_rtc": "20000101000000",
+  "command_template": "mame -rtc 20000101000000 -verbose -rp \"<isolated-work-directory>\" kof97",
+  "shell_invoked": false,
+  "children": {
+    "original": {
+      "exit_code": 0,
+      "native_teardown_completed": true,
+      "fixed_rtc_confirmed_by_native_log": true,
+      "rtc_log_lines": [
+        "RTC Override: Parsed '20000101000000' successfully.",
+        "RTC Override Success: Base time set to 946656000 (2000-01-01 00:00:00)"
+      ],
+      "command_file_sha256": "74CCDC309F536DA8FB9D2E6972A4E53290116299885CCB14188D20408D6FC843",
+      "result": {
+        "ok": true,
+        "helper_origin_verified": true,
+        "canonical_bootstrap_steps": 32,
+        "history_frames": 12000,
+        "history_packed_bytes": 96000,
+        "initial_snapshot_bytes": 1029356,
+        "initial_snapshot_sha256": "B5E9EEC39F42A3C3056E19144601E8DAB12C6AA77F33072DB52959463DD0AB1F",
+        "fps": 59.18560791015625,
+        "replay_nanoseconds_including_full_hashes_checkpoints_io": 22549866900,
+        "steps_per_second": 532.1539170592621,
+        "blocks": [
+          {
+            "through_frame": 600,
+            "steps": 600,
+            "nanoseconds": 1053997700
+          },
+          {
+            "through_frame": 1200,
+            "steps": 600,
+            "nanoseconds": 944997000
+          },
+          {
+            "through_frame": 1800,
+            "steps": 600,
+            "nanoseconds": 1066737900
+          },
+          {
+            "through_frame": 2400,
+            "steps": 600,
+            "nanoseconds": 1030816600
+          },
+          {
+            "through_frame": 3000,
+            "steps": 600,
+            "nanoseconds": 1118032000
+          },
+          {
+            "through_frame": 3600,
+            "steps": 600,
+            "nanoseconds": 1166013800
+          },
+          {
+            "through_frame": 4200,
+            "steps": 600,
+            "nanoseconds": 1170651000
+          },
+          {
+            "through_frame": 4800,
+            "steps": 600,
+            "nanoseconds": 1129478900
+          },
+          {
+            "through_frame": 5400,
+            "steps": 600,
+            "nanoseconds": 1145594100
+          },
+          {
+            "through_frame": 6000,
+            "steps": 600,
+            "nanoseconds": 1161306900
+          },
+          {
+            "through_frame": 6600,
+            "steps": 600,
+            "nanoseconds": 1154719500
+          },
+          {
+            "through_frame": 7200,
+            "steps": 600,
+            "nanoseconds": 1110039300
+          },
+          {
+            "through_frame": 7800,
+            "steps": 600,
+            "nanoseconds": 1149761900
+          },
+          {
+            "through_frame": 8400,
+            "steps": 600,
+            "nanoseconds": 1154395200
+          },
+          {
+            "through_frame": 9000,
+            "steps": 600,
+            "nanoseconds": 1120732200
+          },
+          {
+            "through_frame": 9600,
+            "steps": 600,
+            "nanoseconds": 1157554800
+          },
+          {
+            "through_frame": 10200,
+            "steps": 600,
+            "nanoseconds": 1195408800
+          },
+          {
+            "through_frame": 10800,
+            "steps": 600,
+            "nanoseconds": 1182586500
+          },
+          {
+            "through_frame": 11400,
+            "steps": 600,
+            "nanoseconds": 1170352800
+          },
+          {
+            "through_frame": 12000,
+            "steps": 600,
+            "nanoseconds": 1166431200
+          }
+        ]
+      }
+    },
+    "rebuilt": {
+      "exit_code": 0,
+      "native_teardown_completed": true,
+      "fixed_rtc_confirmed_by_native_log": true,
+      "rtc_log_lines": [
+        "RTC Override: Parsed '20000101000000' successfully.",
+        "RTC Override Success: Base time set to 946656000 (2000-01-01 00:00:00)"
+      ],
+      "command_file_sha256": "42D584F1670FEF1012CF0214E31C787134D337A62C405C254CC7FC6C2A18A380",
+      "result": {
+        "ok": true,
+        "helper_origin_verified": true,
+        "canonical_bootstrap_steps": 32,
+        "history_frames": 12000,
+        "history_packed_bytes": 96000,
+        "initial_snapshot_bytes": 1029356,
+        "initial_snapshot_sha256": "B5E9EEC39F42A3C3056E19144601E8DAB12C6AA77F33072DB52959463DD0AB1F",
+        "fps": 59.18560791015625,
+        "replay_nanoseconds_including_full_hashes_checkpoints_io": 22734641700,
+        "steps_per_second": 527.8288595153008,
+        "blocks": [
+          {
+            "through_frame": 600,
+            "steps": 600,
+            "nanoseconds": 1075130000
+          },
+          {
+            "through_frame": 1200,
+            "steps": 600,
+            "nanoseconds": 942948700
+          },
+          {
+            "through_frame": 1800,
+            "steps": 600,
+            "nanoseconds": 1060914000
+          },
+          {
+            "through_frame": 2400,
+            "steps": 600,
+            "nanoseconds": 1037688000
+          },
+          {
+            "through_frame": 3000,
+            "steps": 600,
+            "nanoseconds": 1120855700
+          },
+          {
+            "through_frame": 3600,
+            "steps": 600,
+            "nanoseconds": 1165324100
+          },
+          {
+            "through_frame": 4200,
+            "steps": 600,
+            "nanoseconds": 1158409900
+          },
+          {
+            "through_frame": 4800,
+            "steps": 600,
+            "nanoseconds": 1109481900
+          },
+          {
+            "through_frame": 5400,
+            "steps": 600,
+            "nanoseconds": 1130473900
+          },
+          {
+            "through_frame": 6000,
+            "steps": 600,
+            "nanoseconds": 1149781000
+          },
+          {
+            "through_frame": 6600,
+            "steps": 600,
+            "nanoseconds": 1137899200
+          },
+          {
+            "through_frame": 7200,
+            "steps": 600,
+            "nanoseconds": 1108260900
+          },
+          {
+            "through_frame": 7800,
+            "steps": 600,
+            "nanoseconds": 1134735400
+          },
+          {
+            "through_frame": 8400,
+            "steps": 600,
+            "nanoseconds": 1146521800
+          },
+          {
+            "through_frame": 9000,
+            "steps": 600,
+            "nanoseconds": 1105771400
+          },
+          {
+            "through_frame": 9600,
+            "steps": 600,
+            "nanoseconds": 1149351100
+          },
+          {
+            "through_frame": 10200,
+            "steps": 600,
+            "nanoseconds": 1251620600
+          },
+          {
+            "through_frame": 10800,
+            "steps": 600,
+            "nanoseconds": 1298969900
+          },
+          {
+            "through_frame": 11400,
+            "steps": 600,
+            "nanoseconds": 1262694600
+          },
+          {
+            "through_frame": 12000,
+            "steps": 600,
+            "nanoseconds": 1187606500
+          }
+        ]
+      }
+    }
+  },
+  "frames_comparison": {
+    "equal": true,
+    "different_frames": 0,
+    "first_difference": null,
+    "fields": {
+      "header": {
+        "mismatches": 0,
+        "first_index": null,
+        "last_index": null,
+        "last_60_mismatches": 0
+      },
+      "video": {
+        "mismatches": 0,
+        "first_index": null,
+        "last_index": null,
+        "last_60_mismatches": 0
+      },
+      "audio": {
+        "mismatches": 0,
+        "first_index": null,
+        "last_index": null,
+        "last_60_mismatches": 0
+      }
+    }
+  },
+  "checkpoints": {
+    "0": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "B7E25C914DA20FE8FB067B688AEDAD1B5B9CCE5D58E555174140EDDF00C6299F",
+      "b_sha256": "B7E25C914DA20FE8FB067B688AEDAD1B5B9CCE5D58E555174140EDDF00C6299F"
+    },
+    "600": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "BE819E5F56FD36A4DF802266EAA4DADA3E5AA7A4EB78BDDC8624A802B151D7CA",
+      "b_sha256": "BE819E5F56FD36A4DF802266EAA4DADA3E5AA7A4EB78BDDC8624A802B151D7CA"
+    },
+    "1200": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "9585B65ADB11F10BD5A8207ACE941D00921BE35ECC4AF9AEAE426F4D38965011",
+      "b_sha256": "9585B65ADB11F10BD5A8207ACE941D00921BE35ECC4AF9AEAE426F4D38965011"
+    },
+    "1800": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "69632B4FD2240BBD506F07BC72960D5CF9F615EF6759C03BFE8762A2827CE297",
+      "b_sha256": "69632B4FD2240BBD506F07BC72960D5CF9F615EF6759C03BFE8762A2827CE297"
+    },
+    "2400": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "F9C546B893F4BE7BB13220260CAC83AEFF8A040160DA5AD219AD5D909B1230FF",
+      "b_sha256": "F9C546B893F4BE7BB13220260CAC83AEFF8A040160DA5AD219AD5D909B1230FF"
+    },
+    "3000": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "1135879A2F39EB76A1BDB1FC37480C12C09A02911B82DE1D76396704359E0CF3",
+      "b_sha256": "1135879A2F39EB76A1BDB1FC37480C12C09A02911B82DE1D76396704359E0CF3"
+    },
+    "3600": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "0B5E06090A6B8255D64456689DB3853A73DAA197FA971D80BF3BE2D80AAC9724",
+      "b_sha256": "0B5E06090A6B8255D64456689DB3853A73DAA197FA971D80BF3BE2D80AAC9724"
+    },
+    "4200": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "8218D30D8CB4061E27B5D828149DA7E83872488C7D91E5B4022F006A53196345",
+      "b_sha256": "8218D30D8CB4061E27B5D828149DA7E83872488C7D91E5B4022F006A53196345"
+    },
+    "4800": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "804349BEC9CA2E8F9EBA29EC91589D82268E3446A18A6B2343C2F8463DEE02CB",
+      "b_sha256": "804349BEC9CA2E8F9EBA29EC91589D82268E3446A18A6B2343C2F8463DEE02CB"
+    },
+    "5400": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "40BE929287A874799C6BA8A82AD91566D9381D26C08D0AB9A4C1C7DF11067DC6",
+      "b_sha256": "40BE929287A874799C6BA8A82AD91566D9381D26C08D0AB9A4C1C7DF11067DC6"
+    },
+    "6000": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "A78829AD60C385581298DE659473D67F107B78EE2E73EFBF770CF0CBAF9F203E",
+      "b_sha256": "A78829AD60C385581298DE659473D67F107B78EE2E73EFBF770CF0CBAF9F203E"
+    },
+    "6600": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "1B81A573D587D8269CAB245A16FF44572CE9A07BF7B3B241EF0C60908EB1B821",
+      "b_sha256": "1B81A573D587D8269CAB245A16FF44572CE9A07BF7B3B241EF0C60908EB1B821"
+    },
+    "7200": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "6B4B3C885E65A402F4D677A2004A6F1D6E9D176A7B44DE97CC752E5D7B133077",
+      "b_sha256": "6B4B3C885E65A402F4D677A2004A6F1D6E9D176A7B44DE97CC752E5D7B133077"
+    },
+    "7800": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "7DFB9B78F6F4DDBFF4FFAD25C59E766230383B43AF6397A6FF90FD2C6120B882",
+      "b_sha256": "7DFB9B78F6F4DDBFF4FFAD25C59E766230383B43AF6397A6FF90FD2C6120B882"
+    },
+    "8400": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "1A8339F50E19B410D2E797CDD206B3CA64A0E65118271B3B3C05D8FC553AB328",
+      "b_sha256": "1A8339F50E19B410D2E797CDD206B3CA64A0E65118271B3B3C05D8FC553AB328"
+    },
+    "9000": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "CFFCEB99A52DCFF58880009B2245CB901EF8FD6EE1EEB7DB2225FF4345278086",
+      "b_sha256": "CFFCEB99A52DCFF58880009B2245CB901EF8FD6EE1EEB7DB2225FF4345278086"
+    },
+    "9600": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "2DFCC03D067D7D2A04F83C0CA4DECAE904C56112E60E9D4B95F7E249ED280F06",
+      "b_sha256": "2DFCC03D067D7D2A04F83C0CA4DECAE904C56112E60E9D4B95F7E249ED280F06"
+    },
+    "10200": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "57A701B9191509299D4FA636A4325E96028D5990FD91D2BEE6218FEAAA16941D",
+      "b_sha256": "57A701B9191509299D4FA636A4325E96028D5990FD91D2BEE6218FEAAA16941D"
+    },
+    "10800": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "CD425CE483F601292F01FA62022E457B4BA1A62EC457F9091C9B56460B9A6A89",
+      "b_sha256": "CD425CE483F601292F01FA62022E457B4BA1A62EC457F9091C9B56460B9A6A89"
+    },
+    "11400": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "1C07FB074776D56C8F70DB2CEF4CB15075141F5A8228425F9129DC5DEC00ABAA",
+      "b_sha256": "1C07FB074776D56C8F70DB2CEF4CB15075141F5A8228425F9129DC5DEC00ABAA"
+    },
+    "12000": {
+      "equal": true,
+      "bytes": 1029356,
+      "different_bytes": 0,
+      "range_count": 0,
+      "first_ranges": [],
+      "first_scalar_words": [],
+      "a_sha256": "0DA26C90A3CF181712A428231A8116EE5BB08CF3482278E6AF18C5C1E5FE0F10",
+      "b_sha256": "0DA26C90A3CF181712A428231A8116EE5BB08CF3482278E6AF18C5C1E5FE0F10"
+    }
+  },
+  "effective_options": "{mame_alternate_renderer=disabled, mame_altres=640x480, mame_auto_save=disabled, mame_autoloadfastforward=disabled, mame_boot_to_bios=disabled, mame_boot_to_osd=disabled, mame_buttons_profiles=disabled, mame_cheats_enable=disabled, mame_coin_limit=0, mame_cpu_overclock=default, mame_cpu_sound_overclock=default, mame_joystick_deadzone=0.15, mame_joystick_saturation=0.85, mame_joystick_threshold=0.30, mame_lightgun_mode=none, mame_lightgun_offscreen_mode=free, mame_mame_4way_enable=disabled, mame_mame_paths_enable=disabled, mame_media_type=rom, mame_mouse_enable=enabled, mame_read_config=disabled, mame_rotation_mode=libretro, mame_saves=game, mame_softlists_auto_media=enabled, mame_softlists_enable=enabled, mame_thread_mode=disabled, mame_throttle=disabled, mame_write_config=disabled}",
+  "effective_options_equal": true,
+  "cost": {
+    "replay_seconds": 22.7346417,
+    "simulated_seconds": 202.7519936640002,
+    "measured_speed_ratio": 8.918196131676893,
+    "packed_input_history_bytes": 96000,
+    "input_plus_initial_state_bytes": 1125356,
+    "one_hour_replay_seconds_linear_estimate_not_tested": 403.66907689022645,
+    "one_hour_input_history_bytes": 1704544,
+    "catchup_seconds_with_host_running_linear_estimate_not_tested": 25.605831213612785
+  },
+  "source_roms_unchanged": true,
+  "probe_sources_sha256": {
+    "tools\\qa\\NativeDeterminismProbe.java": "CAD242DF8C23935141568400741DC42C5478C504785C0956C76B7E4B464D6AED",
+    "tools\\qa\\NativeInitialReplayProbe.java": "9FA7B55F554E9D19B167D942C932B87B0E44511A67F0DAD482DF3D948C5C721A",
+    "tools\\check_native_fixed_rtc_replay.py": "B8C24468229BAD03228F805AB28E55903AD1020E57D17AF0D3C0335D93CF284F",
+    "tools\\check_native_determinism.py": "9A3A91F16B19CD195B085444AB5B298FC0108C0FE12DD77FCE88ECF05FFF2C31",
+    "tools\\check_native_reload_barrier.py": "B9AEC218075B72686D1D29E312D0EE931E000E4973EE1F89105F01C43D087C58"
+  },
+  "seconds": 49.204,
+  "limitations": [
+    "No Minecraft, network or production helper loop; unchanged actual core and callback implementation.",
+    "Only fixed RTC, bootstrap32 and complete input replay tested; not arbitrary current-state restore or general MAME support.",
+    "Same machine/platform/locale; not cross-architecture or cross-timezone proof.",
+    "Every RGB/PCM frame and every complete checkpoint byte compared, no excluded bytes or muted audio.",
+    "Temporary command is generated from a fixed schema and passed only as libretro content; read_config remains disabled."
+  ]
+}

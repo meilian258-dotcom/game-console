@@ -1,0 +1,21 @@
+package cn.piq.fcarcade.cabinet;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+class CabinetRoomMediaTest {
+    CabinetRoomMedia.Part video(long seq,int index,int count,int size){return new CabinetRoomMedia.Part(seq,0,index,count,384,288,4F/3,0,384*288*2,new byte[size]);}
+    CabinetRoomMedia.Part audio(long seq,int size){return new CabinetRoomMedia.Part(seq,1,0,1,0,0,1,0,size,new byte[size]);}
+    @Test void fullSixPartBoundIsLegalAndOnlyCompleteFrameEscapes(){var media=new CabinetRoomMedia();for(int n=0;n<5;n++)assertTrue(media.accept(video(0,n,6,24576),0).isEmpty());var complete=media.accept(video(0,5,6,8192),0);assertEquals(6,complete.size());assertEquals(131072,complete.stream().mapToInt(p->p.data().length).sum());}
+    @Test void oversizedFramesShortIntermediateAndExcessChunksFail(){assertThrows(IllegalArgumentException.class,()->video(0,5,6,8193));assertThrows(IllegalArgumentException.class,()->video(0,0,2,10));assertThrows(IllegalArgumentException.class,()->video(0,0,7,24576));assertThrows(IllegalArgumentException.class,()->video(0,0,1,24577));}
+    @Test void dimensionsAspectRotationAndRawLengthAreExact(){assertThrows(IllegalArgumentException.class,()->new CabinetRoomMedia.Part(0,0,0,1,385,288,1,0,385*288*2,new byte[1]));assertThrows(IllegalArgumentException.class,()->new CabinetRoomMedia.Part(0,0,0,1,1,1,Float.NaN,0,2,new byte[1]));assertThrows(IllegalArgumentException.class,()->new CabinetRoomMedia.Part(0,0,0,1,1,1,1,4,2,new byte[1]));assertThrows(IllegalArgumentException.class,()->new CabinetRoomMedia.Part(0,0,0,1,1,1,1,0,3,new byte[1]));}
+    @Test void pcmIsBoundedCompleteStereoFrames(){assertNotNull(audio(0,19200));for(int n:new int[]{0,1,2,3,19204})assertThrows(IllegalArgumentException.class,()->audio(0,n));assertThrows(IllegalArgumentException.class,()->new CabinetRoomMedia.Part(0,1,0,1,1,0,1,0,4,new byte[4]));}
+    @Test void payloadArraysAreOwnedAtIngressAndImmutableToReaders(){byte[] bytes={1,2,3,4};var p=new CabinetRoomMedia.Part(0,1,0,1,0,0,1,0,4,bytes);bytes[0]=99;assertEquals(1,p.data()[0]);p.data()[0]=88;assertEquals(1,p.data()[0]);}
+    @Test void replayAndWrongOrderNeverComplete(){var m=new CabinetRoomMedia();assertTrue(m.accept(video(0,1,2,10),0).isEmpty());assertTrue(m.accept(video(0,0,2,24576),0).isEmpty());assertTrue(m.accept(video(0,0,2,24576),0).isEmpty());assertEquals(2,m.accept(video(0,1,2,10),0).size());assertTrue(m.accept(video(0,0,2,24576),0).isEmpty());assertTrue(m.accept(video(0,1,2,10),0).isEmpty());}
+    @Test void inconsistentHeadersCannotBeCombined(){var m=new CabinetRoomMedia();m.accept(video(0,0,2,24576),0);var bad=new CabinetRoomMedia.Part(0,0,1,2,320,240,4F/3,0,320*240*2,new byte[10]);assertTrue(m.accept(bad,0).isEmpty());assertEquals(2,m.accept(video(0,1,2,10),0).size());}
+    @Test void expiredOrSupersededIncompleteFramesStayClosed(){var m=new CabinetRoomMedia();m.accept(video(0,0,2,24576),0);assertTrue(m.accept(video(0,1,2,10),40).isEmpty());m.accept(video(1,0,2,24576),40);m.accept(video(2,0,2,24576),40);assertTrue(m.accept(video(1,1,2,10),40).isEmpty());assertEquals(2,m.accept(video(2,1,2,10),40).size());}
+    @Test void audioSampleClockMaySkipAndIsIndependentFromVideo(){var m=new CabinetRoomMedia();assertEquals(1,m.accept(audio(0,19200),0).size());assertEquals(1,m.accept(audio(4800,19200),1).size());assertEquals(1,m.accept(audio(14400,19200),2).size());assertTrue(m.accept(audio(4800,19200),2).isEmpty());assertEquals(1,m.accept(video(0,0,1,1),2).size());}
+    @Test void thirtyTwoFramesPerKindIsSliding(){var m=new CabinetRoomMedia();for(int n=0;n<32;n++)assertEquals(1,m.accept(video(n,0,1,1),19).size());assertTrue(m.accept(video(32,0,1,1),20).isEmpty());assertEquals(1,m.accept(audio(0,4),20).size());assertEquals(1,m.accept(video(33,0,1,1),39).size());}
+    @Test void actualBytesAndBadOrderedPartsConsumeRoomBudget(){var m=new CabinetRoomMedia();for(int n=0;n<63;n++)m.accept(video(0,1,2,24576),0);assertEquals(1,m.accept(audio(0,16000),0).size());assertTrue(m.accept(video(1,0,1,1000),0).isEmpty());assertEquals(1,m.accept(video(2,0,1,1000),20).size());}
+    @Test void completeListCannotBeMutated(){var m=new CabinetRoomMedia();var all=m.accept(audio(0,4),0);assertThrows(UnsupportedOperationException.class,()->all.clear());}
+}

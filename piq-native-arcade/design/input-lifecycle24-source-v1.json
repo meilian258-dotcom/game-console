@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "mode": "source-api-compile-and-mc-free-production-behavior",
+  "pure_tests": 14,
+  "source_sha256": {
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetImmersiveInput.java": "92866315B10B9E8594EFF50278346AE58205693586D56C7C41AFC3DF077CEB60",
+    "piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\client\\NativeArcadeClient.java": "2C47DC8A7183696781F8A85D9BFD99C7A4D732BA389C26D37FCF97C077113821",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetImmersiveInputTest.java": "2A310AB78F7D96D035ED2F0D9162DB5B1F0BFFEB322D32C5B85F42B50BFAF8AE",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetInputLifecycleTest.java": "0E100ED737EE47917D762A870B66451456DC7819AF4FCB0AF47565E02605817E"
+  },
+  "compiled_classes": [
+    "DeviceUiTestRunner.class",
+    "cn/piq/fcarcade/client/cabinet/CabinetImmersiveInput.class",
+    "cn/piq/fcarcade/client/cabinet/CabinetImmersiveInputTest.class",
+    "cn/piq/fcarcade/client/cabinet/CabinetInputLifecycleTest.class",
+    "cn/piq/nativearcade/client/NativeArcadeClient$Setup.class",
+    "cn/piq/nativearcade/client/NativeArcadeClient.class"
+  ],
+  "frozen_api_dependency_sha256": {
+    "piq_fc_arcade-0.31.0-alpha.23.jar": "B7BF04BEEA5F58E8E9C0DFA23E1BD8F2CAF6B11455085D843F568B42D9021686",
+    "piq_native_arcade-0.1.0-alpha.7.jar": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A"
+  },
+  "production_compiled": true,
+  "minecraft_started": false,
+  "core_started": false,
+  "physical_device_tested": false,
+  "network_or_instance_operations": false,
+  "limits": [
+    "Source test, not a final-JAR audit.",
+    "No physical keyboard/gamepad, Minecraft window or real focus-event verification.",
+    "Native core still runs while menu/focus suppresses local inputs; no pause protocol added."
+  ]
+}

@@ -1,0 +1,663 @@
+{
+  "schemaVersion": 1,
+  "model": "街机_双人通用_加深机柜版.bbmodel",
+  "coordinateSystem": "Blockbench model units; 16 units per block; Y up",
+  "runtimeBindingConfigured": false,
+  "warning": "Groups and pivots are saved in BBModel. Static Java model JSON does not contain groups or animation. Runtime binding depends on FC mod support.",
+  "groups": [
+    {
+      "groupName": "p1_button_1",
+      "groupUuid": "caa144ad-84f0-44b0-a5e1-ec8fef210832",
+      "parentGroupName": "1P_左玩家_摇杆六键",
+      "parentGroupUuid": "4ee10efd-b453-4cce-ba29-93b738821203",
+      "player": 1,
+      "kind": "button",
+      "pivot": [
+        17.285,
+        13.3825,
+        1.397
+      ],
+      "elementUuids": [
+        "1f358c0d-e3f9-45b6-825c-28dfd494d4c4",
+        "e0a9d5b7-a7a3-4749-9343-42f2fd825ea1",
+        "af4108a9-ed3e-4e6e-8265-a067258dd679",
+        "fec96cce-04ac-4af2-a4b9-aa4925d3cace",
+        "7a6b3493-8ab4-4397-903d-5d36a0b26b45",
+        "3b7cf688-e7f8-4206-be44-ff47d3b78b7f"
+      ],
+      "elementNames": [
+        "1P/操作按钮1·横芯",
+        "1P/操作按钮1·竖芯",
+        "1P/操作按钮1·倒角",
+        "1P/操作按钮1·倒角",
+        "1P/操作按钮1·倒角",
+        "1P/操作按钮1·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p1_button_2",
+      "groupUuid": "b3b72611-ecdb-455e-a2ab-4e546a4d50fa",
+      "parentGroupName": "1P_左玩家_摇杆六键",
+      "parentGroupUuid": "4ee10efd-b453-4cce-ba29-93b738821203",
+      "player": 1,
+      "kind": "button",
+      "pivot": [
+        16.053,
+        13.3825,
+        1.529
+      ],
+      "elementUuids": [
+        "5ab55781-ee73-4b79-8ad4-f269d718446c",
+        "7d0bd1ef-e124-416c-ad15-65726302af66",
+        "e47adb63-3901-4ad3-ada5-10627ca28822",
+        "1452dfb6-d5b7-4b71-b88f-6539d38aaec1",
+        "bc263010-7894-42ec-a0a1-7cc958853d37",
+        "ce336e12-fe81-4c3b-bb1d-39863f68adef"
+      ],
+      "elementNames": [
+        "1P/操作按钮2·横芯",
+        "1P/操作按钮2·竖芯",
+        "1P/操作按钮2·倒角",
+        "1P/操作按钮2·倒角",
+        "1P/操作按钮2·倒角",
+        "1P/操作按钮2·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p1_button_3",
+      "groupUuid": "a210d4d1-7cdf-49c0-ab16-d3e6b24d3350",
+      "parentGroupName": "1P_左玩家_摇杆六键",
+      "parentGroupUuid": "4ee10efd-b453-4cce-ba29-93b738821203",
+      "player": 1,
+      "kind": "button",
+      "pivot": [
+        14.821,
+        13.3825,
+        1.397
+      ],
+      "elementUuids": [
+        "95861c5a-7f82-4dd8-b7ff-d7dcc8890e2b",
+        "53a71054-5b15-449e-b031-e5727fdca191",
+        "2f9149e4-f173-492b-bfef-57c9049e7179",
+        "f5e70336-e671-4fce-a68e-49838b0219b9",
+        "a7d6b63a-3c91-4858-a337-602bf6d92247",
+        "e858d08a-9df1-480c-938e-02c0998d7a31"
+      ],
+      "elementNames": [
+        "1P/操作按钮3·横芯",
+        "1P/操作按钮3·竖芯",
+        "1P/操作按钮3·倒角",
+        "1P/操作按钮3·倒角",
+        "1P/操作按钮3·倒角",
+        "1P/操作按钮3·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p1_button_4",
+      "groupUuid": "9e573b26-b751-44a1-a79c-fada0b819173",
+      "parentGroupName": "1P_左玩家_摇杆六键",
+      "parentGroupUuid": "4ee10efd-b453-4cce-ba29-93b738821203",
+      "player": 1,
+      "kind": "button",
+      "pivot": [
+        17.285,
+        13.3825,
+        2.75
+      ],
+      "elementUuids": [
+        "a09bf130-d147-4794-8e0e-fa49e188cb87",
+        "898dbd20-586d-4ccb-9fca-d0ef41639b45",
+        "12dbfae6-68a8-4e9f-9368-023080f15053",
+        "8f980d76-76c2-4986-aa5e-63e1c01fd970",
+        "36003a86-7b0e-457e-a40f-1ed557088d09",
+        "6789168b-a001-46b6-aef7-eeb179a1defa"
+      ],
+      "elementNames": [
+        "1P/操作按钮4·横芯",
+        "1P/操作按钮4·竖芯",
+        "1P/操作按钮4·倒角",
+        "1P/操作按钮4·倒角",
+        "1P/操作按钮4·倒角",
+        "1P/操作按钮4·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p1_button_5",
+      "groupUuid": "08534d7f-e301-432a-ad14-5419e307a043",
+      "parentGroupName": "1P_左玩家_摇杆六键",
+      "parentGroupUuid": "4ee10efd-b453-4cce-ba29-93b738821203",
+      "player": 1,
+      "kind": "button",
+      "pivot": [
+        16.053,
+        13.3825,
+        2.882
+      ],
+      "elementUuids": [
+        "ab7204f0-f978-4820-8915-28255af2dd7e",
+        "ee53d636-9768-4c29-9022-66a18cb333ae",
+        "49141f7b-f04e-44ec-a703-98d352111580",
+        "324e9ada-a73b-4b07-ae23-96b316864236",
+        "094c3c5a-422b-4480-a064-1237922d1063",
+        "490edf7e-31a5-431c-92c4-4fb4b9d4dc53"
+      ],
+      "elementNames": [
+        "1P/操作按钮5·横芯",
+        "1P/操作按钮5·竖芯",
+        "1P/操作按钮5·倒角",
+        "1P/操作按钮5·倒角",
+        "1P/操作按钮5·倒角",
+        "1P/操作按钮5·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p1_button_6",
+      "groupUuid": "9ae9a300-5b1e-4f38-a042-a653c5e0f4c4",
+      "parentGroupName": "1P_左玩家_摇杆六键",
+      "parentGroupUuid": "4ee10efd-b453-4cce-ba29-93b738821203",
+      "player": 1,
+      "kind": "button",
+      "pivot": [
+        14.821,
+        13.3825,
+        2.75
+      ],
+      "elementUuids": [
+        "f53d2904-17fb-42a5-9423-2632be492fc8",
+        "b913fa2c-6bfb-47c4-9e94-c9078fd58515",
+        "8bf7719d-a575-4fee-964a-1ff317f625a5",
+        "aa556f3e-bbba-4862-85a4-83a5718a844b",
+        "f099dfc1-6043-40db-8ecb-3031b221595b",
+        "357c08f8-df7a-4d20-b471-1caa8a72cc67"
+      ],
+      "elementNames": [
+        "1P/操作按钮6·横芯",
+        "1P/操作按钮6·竖芯",
+        "1P/操作按钮6·倒角",
+        "1P/操作按钮6·倒角",
+        "1P/操作按钮6·倒角",
+        "1P/操作按钮6·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p1_start",
+      "groupUuid": "08ed52eb-e5ae-46d1-ae96-7b7110d1a3ac",
+      "parentGroupName": "1P_左玩家_摇杆六键",
+      "parentGroupUuid": "4ee10efd-b453-4cce-ba29-93b738821203",
+      "player": 1,
+      "kind": "start",
+      "pivot": [
+        18.759,
+        13.333,
+        1.386
+      ],
+      "elementUuids": [
+        "d7db4f69-cdcb-4e41-9638-c86f15e24342",
+        "77660a57-7c77-4c87-a72e-4d312a26ef18",
+        "be1565b9-5fae-48f3-98eb-bb48b9d4eaaf",
+        "e623d55c-61e5-4bfe-87ea-9d0bf7154bcb",
+        "b21f3832-6f70-4533-b772-17a313d28647",
+        "ec715459-fd2c-4c99-addb-62c00c4162c4"
+      ],
+      "elementNames": [
+        "1P/开始键·横芯",
+        "1P/开始键·竖芯",
+        "1P/开始键·倒角",
+        "1P/开始键·倒角",
+        "1P/开始键·倒角",
+        "1P/开始键·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.08,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p1_joystick",
+      "groupUuid": "d59103bf-11b0-4988-a4b1-daed388fcf01",
+      "parentGroupName": "1P_左玩家_摇杆六键",
+      "parentGroupUuid": "4ee10efd-b453-4cce-ba29-93b738821203",
+      "player": 1,
+      "kind": "joystick",
+      "pivot": [
+        20.86,
+        13.3495,
+        2.97
+      ],
+      "elementUuids": [
+        "08481d81-aa68-400b-8642-dd8d31d73816",
+        "1277c2eb-dc82-4b9b-941a-1356e2822955",
+        "351f3234-6c4a-4181-b190-80a482c012c8",
+        "f79ce3ef-8a55-46a5-8f4b-aafe40707a70",
+        "41e3cfe3-f4f9-40bc-9ec5-3e86cf9f2b39",
+        "0db4185e-906c-471e-9e75-33b83a49e924",
+        "66928c29-da5c-4226-896d-323261e6aef8",
+        "b62b3f87-bfc5-441f-bf6d-6680c6ec10b8",
+        "1b763ad1-5484-4abc-8b03-1456efb8df06",
+        "7d1fd3a4-c592-4c21-8495-bb0307b33c83",
+        "a60bf12d-eb28-41c5-aa22-79333bbbe2cb",
+        "37351e6c-aeab-4571-9d23-c4780161ebcd",
+        "53c2c186-b371-4e46-9279-8a72a4a7a145",
+        "78f9baab-3d1e-4074-be00-e4fcacd94848",
+        "5b3e3b59-96a9-4042-b26a-06fe82533b1a",
+        "1443cac1-493d-4540-a2fc-abadbcb3101e",
+        "4601f4a4-25de-4601-9db5-d2f915bfa4f8",
+        "bd3dcbfe-d8dc-450d-bcc7-d719d7178c7a",
+        "53d32a1f-29e4-46b1-8811-98996775733a"
+      ],
+      "elementNames": [
+        "1P/摇杆金属杆",
+        "1P/摇杆握球中段·横芯",
+        "1P/摇杆握球中段·竖芯",
+        "1P/摇杆握球中段·倒角",
+        "1P/摇杆握球中段·倒角",
+        "1P/摇杆握球中段·倒角",
+        "1P/摇杆握球中段·倒角",
+        "1P/摇杆握球顶面·横芯",
+        "1P/摇杆握球顶面·竖芯",
+        "1P/摇杆握球顶面·倒角",
+        "1P/摇杆握球顶面·倒角",
+        "1P/摇杆握球顶面·倒角",
+        "1P/摇杆握球顶面·倒角",
+        "1P/摇杆握球下端·横芯",
+        "1P/摇杆握球下端·竖芯",
+        "1P/摇杆握球下端·倒角",
+        "1P/摇杆握球下端·倒角",
+        "1P/摇杆握球下端·倒角",
+        "1P/摇杆握球下端·倒角"
+      ],
+      "movable": true,
+      "tiltAxes": [
+        "x",
+        "z"
+      ],
+      "suggestedTiltDegrees": 8,
+      "restRotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "groupName": "p1_joystick_base",
+      "groupUuid": "fa3e0a78-6d23-46b6-a1f2-d71d2e53101f",
+      "parentGroupName": "1P_左玩家_摇杆六键",
+      "parentGroupUuid": "4ee10efd-b453-4cce-ba29-93b738821203",
+      "player": 1,
+      "kind": "fixed",
+      "pivot": [
+        20.86,
+        13.3055,
+        2.97
+      ],
+      "elementUuids": [
+        "fab3e588-11a7-434a-a27a-05e1435e7b06",
+        "3b4afff6-1e5c-46d3-9616-183cffa27f0a",
+        "ec898549-a01a-40ee-8e24-d59db8d8d9e5",
+        "04b46ea6-2ef9-4d77-a9e6-050e2843af3e",
+        "ce03ed90-2b34-4ffc-90a0-be8e3aafa845",
+        "4e04b041-a19f-4c38-8959-e4fdb1b2116a"
+      ],
+      "elementNames": [
+        "1P/摇杆胶套·横芯",
+        "1P/摇杆胶套·竖芯",
+        "1P/摇杆胶套·倒角",
+        "1P/摇杆胶套·倒角",
+        "1P/摇杆胶套·倒角",
+        "1P/摇杆胶套·倒角"
+      ],
+      "movable": false
+    },
+    {
+      "groupName": "p2_button_1",
+      "groupUuid": "2919ac3a-4bb2-409f-af4e-0bdeffab51eb",
+      "parentGroupName": "2P_右玩家_摇杆六键",
+      "parentGroupUuid": "bfd888f9-759f-4595-944f-0bd213efa76a",
+      "player": 2,
+      "kind": "button",
+      "pivot": [
+        5.285,
+        13.3825,
+        1.397
+      ],
+      "elementUuids": [
+        "37c99fab-5c17-4fb8-9099-cd7d238dd4c7",
+        "8e46fade-f2ce-4a4f-a713-3f7db733679c",
+        "7d3ae5b1-8813-49f1-8c72-46e7aa59aa93",
+        "105ddbf6-1801-4ed4-aa52-ff00032e6f46",
+        "c849da75-7e31-4785-83e8-b9fcb0abb489",
+        "7ebc8c56-b36c-491f-88fe-c0913cb321bd"
+      ],
+      "elementNames": [
+        "2P/操作按钮1·横芯",
+        "2P/操作按钮1·竖芯",
+        "2P/操作按钮1·倒角",
+        "2P/操作按钮1·倒角",
+        "2P/操作按钮1·倒角",
+        "2P/操作按钮1·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p2_button_2",
+      "groupUuid": "7345fb39-aae5-4cda-a77d-356ab8519461",
+      "parentGroupName": "2P_右玩家_摇杆六键",
+      "parentGroupUuid": "bfd888f9-759f-4595-944f-0bd213efa76a",
+      "player": 2,
+      "kind": "button",
+      "pivot": [
+        4.053,
+        13.3825,
+        1.529
+      ],
+      "elementUuids": [
+        "09626846-4404-4970-bc85-8e98d3fe4df3",
+        "3699e9d7-201e-4cfc-8310-4afbac2d2c2d",
+        "ae3c1666-729a-4859-99ff-86c2489d5252",
+        "9cfc3275-07f5-4e1e-b045-895b072c1668",
+        "b31fadc4-6391-4e06-8f96-19603416ca41",
+        "d7945ebb-ba98-4d57-a25a-cc87230eeb30"
+      ],
+      "elementNames": [
+        "2P/操作按钮2·横芯",
+        "2P/操作按钮2·竖芯",
+        "2P/操作按钮2·倒角",
+        "2P/操作按钮2·倒角",
+        "2P/操作按钮2·倒角",
+        "2P/操作按钮2·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p2_button_3",
+      "groupUuid": "ad82e499-a630-4a8d-af9f-ab16a93705ae",
+      "parentGroupName": "2P_右玩家_摇杆六键",
+      "parentGroupUuid": "bfd888f9-759f-4595-944f-0bd213efa76a",
+      "player": 2,
+      "kind": "button",
+      "pivot": [
+        2.8209999999999997,
+        13.3825,
+        1.397
+      ],
+      "elementUuids": [
+        "547d16a5-018a-411a-a947-61b2dd27be97",
+        "0d6590ac-c65c-49c6-bff8-50eba4ec6a3b",
+        "b857e5e5-c8c8-47a4-9729-f38d5a8b7c9d",
+        "624c2208-7b4b-4178-91ff-4aaf3e6efc50",
+        "fca475ce-6359-4894-8e6c-c2afa569ad2b",
+        "a1f99fe6-462b-46ae-b242-f564a50c484c"
+      ],
+      "elementNames": [
+        "2P/操作按钮3·横芯",
+        "2P/操作按钮3·竖芯",
+        "2P/操作按钮3·倒角",
+        "2P/操作按钮3·倒角",
+        "2P/操作按钮3·倒角",
+        "2P/操作按钮3·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p2_button_4",
+      "groupUuid": "afae98d9-fc3d-4c1c-a71d-0363e4e0bf2f",
+      "parentGroupName": "2P_右玩家_摇杆六键",
+      "parentGroupUuid": "bfd888f9-759f-4595-944f-0bd213efa76a",
+      "player": 2,
+      "kind": "button",
+      "pivot": [
+        5.285,
+        13.3825,
+        2.75
+      ],
+      "elementUuids": [
+        "bb58416c-7388-417e-a728-ababf14075d5",
+        "f1c50612-5c6f-42e0-aa71-99543b397b00",
+        "236eba93-53eb-4340-88cf-b4e313d2eafb",
+        "254380b7-2d0f-416e-801a-2306cb3bee5b",
+        "02f36d23-2077-49d2-9ce1-9a9f1a26f876",
+        "b2f5ccc3-721b-42ce-a06c-0fa4aa866b20"
+      ],
+      "elementNames": [
+        "2P/操作按钮4·横芯",
+        "2P/操作按钮4·竖芯",
+        "2P/操作按钮4·倒角",
+        "2P/操作按钮4·倒角",
+        "2P/操作按钮4·倒角",
+        "2P/操作按钮4·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p2_button_5",
+      "groupUuid": "5e1f991d-09f3-48f5-ab4a-0f73a4c403a6",
+      "parentGroupName": "2P_右玩家_摇杆六键",
+      "parentGroupUuid": "bfd888f9-759f-4595-944f-0bd213efa76a",
+      "player": 2,
+      "kind": "button",
+      "pivot": [
+        4.053,
+        13.3825,
+        2.882
+      ],
+      "elementUuids": [
+        "dd68c6d6-eb40-455a-916a-39b6ac1a40a8",
+        "7571b3b5-abc2-443f-9bf2-fb718af6dfae",
+        "fd0c7504-94a5-467c-8c7d-5585b53f0d8b",
+        "ec8d3d13-967f-4b9c-861a-44c264bc42fc",
+        "63cc5dbe-f900-47dc-9dba-acb085ddf8e7",
+        "7ec0ff3a-1dfc-4bbd-8bff-477e2e42afec"
+      ],
+      "elementNames": [
+        "2P/操作按钮5·横芯",
+        "2P/操作按钮5·竖芯",
+        "2P/操作按钮5·倒角",
+        "2P/操作按钮5·倒角",
+        "2P/操作按钮5·倒角",
+        "2P/操作按钮5·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p2_button_6",
+      "groupUuid": "e961dfe8-bc21-4f52-a05b-d40c97754043",
+      "parentGroupName": "2P_右玩家_摇杆六键",
+      "parentGroupUuid": "bfd888f9-759f-4595-944f-0bd213efa76a",
+      "player": 2,
+      "kind": "button",
+      "pivot": [
+        2.8209999999999997,
+        13.3825,
+        2.75
+      ],
+      "elementUuids": [
+        "8371e7ba-e37b-402a-96c4-6a136b9da6a0",
+        "419fd4b1-7985-4b5e-b57f-5ef41a0a1685",
+        "40bc99c0-05c9-4b86-9acf-05695dd68de8",
+        "c0192be8-a920-41d0-9862-43ecb3df460e",
+        "548f45be-2548-4256-a2a6-f1b58b53a56a",
+        "40de6166-a206-4363-8179-31f87ba41085"
+      ],
+      "elementNames": [
+        "2P/操作按钮6·横芯",
+        "2P/操作按钮6·竖芯",
+        "2P/操作按钮6·倒角",
+        "2P/操作按钮6·倒角",
+        "2P/操作按钮6·倒角",
+        "2P/操作按钮6·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.12,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p2_start",
+      "groupUuid": "9a830bae-69a6-47fe-a82a-ff39888602c6",
+      "parentGroupName": "2P_右玩家_摇杆六键",
+      "parentGroupUuid": "bfd888f9-759f-4595-944f-0bd213efa76a",
+      "player": 2,
+      "kind": "start",
+      "pivot": [
+        6.759,
+        13.333,
+        1.386
+      ],
+      "elementUuids": [
+        "c33824a6-f8fa-4c15-890f-9cc41fdc6222",
+        "82a5869e-7827-4e9c-a4e3-0699b0d9cf66",
+        "36d237ce-53fd-4993-8b10-e6aa8dd8fd50",
+        "5ac3ec68-4788-4fbe-90e6-24af3227c6b8",
+        "9eb8192f-7807-4af4-9d97-e362e6128203",
+        "ce1579e2-70ec-4fca-9e2d-6918510458b4"
+      ],
+      "elementNames": [
+        "2P/开始键·横芯",
+        "2P/开始键·竖芯",
+        "2P/开始键·倒角",
+        "2P/开始键·倒角",
+        "2P/开始键·倒角",
+        "2P/开始键·倒角"
+      ],
+      "movable": true,
+      "pressAxis": "y",
+      "suggestedPressOffset": -0.08,
+      "restOffset": 0
+    },
+    {
+      "groupName": "p2_joystick",
+      "groupUuid": "926ec39f-1985-4768-a2b3-3a50914d3582",
+      "parentGroupName": "2P_右玩家_摇杆六键",
+      "parentGroupUuid": "bfd888f9-759f-4595-944f-0bd213efa76a",
+      "player": 2,
+      "kind": "joystick",
+      "pivot": [
+        8.86,
+        13.3495,
+        2.97
+      ],
+      "elementUuids": [
+        "ff3ecc96-60fb-4776-af7a-626507d8ec16",
+        "f3205c0c-f5b6-4f8d-9d1f-827d30475bca",
+        "b8894433-c9a1-48c2-aac3-0bd387513027",
+        "781fd3c6-3b0e-440f-9beb-fbc999046615",
+        "46391ec1-0e5d-4726-bece-9520dacfba14",
+        "1904a3e3-82e9-40e1-a932-69b77c238dc8",
+        "4862e61d-dd84-4418-9ad8-d671cf78d62a",
+        "dc460f39-f39a-4626-887e-3ae61ff8d046",
+        "f69051e5-71e3-497d-bf30-5d369b842c31",
+        "627b042f-eb37-45aa-a28b-92818f92003b",
+        "39398f7b-f3f8-418c-a67e-236cd04406f5",
+        "1bb27a7b-ea82-4249-8682-3abbeb1e5e9a",
+        "5d67db4f-cfb3-486f-b518-b9d4f88fd2b7",
+        "8b2e6aa1-1ada-4002-9f6d-97b4b0e2832f",
+        "d202e201-ab15-48e5-bee2-4a7632aa8241",
+        "d652f11f-e4d7-4d42-883b-b2524f902b1b",
+        "6d0f4673-4e2e-49ff-ad52-7f18e59d8fa1",
+        "c9488296-83f6-488a-add5-d35b81964f98",
+        "a9dc1518-7cb7-4442-b09b-8aaa5a8d91fe"
+      ],
+      "elementNames": [
+        "2P/摇杆金属杆",
+        "2P/摇杆握球中段·横芯",
+        "2P/摇杆握球中段·竖芯",
+        "2P/摇杆握球中段·倒角",
+        "2P/摇杆握球中段·倒角",
+        "2P/摇杆握球中段·倒角",
+        "2P/摇杆握球中段·倒角",
+        "2P/摇杆握球顶面·横芯",
+        "2P/摇杆握球顶面·竖芯",
+        "2P/摇杆握球顶面·倒角",
+        "2P/摇杆握球顶面·倒角",
+        "2P/摇杆握球顶面·倒角",
+        "2P/摇杆握球顶面·倒角",
+        "2P/摇杆握球下端·横芯",
+        "2P/摇杆握球下端·竖芯",
+        "2P/摇杆握球下端·倒角",
+        "2P/摇杆握球下端·倒角",
+        "2P/摇杆握球下端·倒角",
+        "2P/摇杆握球下端·倒角"
+      ],
+      "movable": true,
+      "tiltAxes": [
+        "x",
+        "z"
+      ],
+      "suggestedTiltDegrees": 8,
+      "restRotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "groupName": "p2_joystick_base",
+      "groupUuid": "62fcabf0-578a-4b3b-a31e-e3b0f8dd58e2",
+      "parentGroupName": "2P_右玩家_摇杆六键",
+      "parentGroupUuid": "bfd888f9-759f-4595-944f-0bd213efa76a",
+      "player": 2,
+      "kind": "fixed",
+      "pivot": [
+        8.86,
+        13.3055,
+        2.97
+      ],
+      "elementUuids": [
+        "68387f7f-12a7-476a-b1a2-5bcb2791a27c",
+        "722e6686-87a3-4d01-8958-e50b73deb845",
+        "da7da4b8-dc1e-4649-a26b-dcc3e3f5508a",
+        "9966bc9e-dffa-47c9-a044-bbf73500f739",
+        "e6bbfa58-6106-405a-860f-d1e5c03ee8ad",
+        "d682deb7-dbb2-42c7-8be4-1b0afddc1591"
+      ],
+      "elementNames": [
+        "2P/摇杆胶套·横芯",
+        "2P/摇杆胶套·竖芯",
+        "2P/摇杆胶套·倒角",
+        "2P/摇杆胶套·倒角",
+        "2P/摇杆胶套·倒角",
+        "2P/摇杆胶套·倒角"
+      ],
+      "movable": false
+    }
+  ]
+}

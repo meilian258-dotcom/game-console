@@ -1,0 +1,69 @@
+{
+  "schema": "piq-fc38-wasmtime-attribution-1",
+  "checked_on": "2026-09-14",
+  "scope": "Selected upstream release LICENSE texts and attribution, not a complete native dependency SBOM or legal certification.",
+  "projects": [
+    {
+      "name": "Wasmtime4j",
+      "version": "46.0.1-1.2.0",
+      "tag": "v46.0.1-1.2.0",
+      "commit": "a377267cc70f891bb7c9618259251380ba26e57b",
+      "license": "Apache-2.0",
+      "copyright": "Copyright 2025 Tegmentum AI",
+      "git_license_blob": "1d23d8deaee61ef882624f1deb4e156f4f1fc526",
+      "license_path": "META-INF/licenses/wasmtime4j-LICENSE.txt",
+      "license_url": "https://raw.githubusercontent.com/tegmentum/wasmtime4j/a377267cc70f891bb7c9618259251380ba26e57b/LICENSE",
+      "license_sha256": "FA99513714F03ECD011265DA8A31C0D2B331A9D95B0F0AEF2F9C8543CE028346",
+      "license_bytes": 11266,
+      "notice_files_in_checked_tree": [],
+      "cargo_lock_in_checked_tree": false
+    },
+    {
+      "name": "Wasmtime",
+      "version": "46.0.1",
+      "tag": "v46.0.1",
+      "commit": "823d1b8f251494a06288194d0df746191f535ff7",
+      "license": "Apache-2.0 WITH LLVM-exception",
+      "authors": "The Wasmtime Project Developers",
+      "git_license_blob": "f9d81955f4bcb8f96a025e2ecc46f39ec536d465",
+      "license_path": "META-INF/licenses/wasmtime-LICENSE.txt",
+      "license_url": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/823d1b8f251494a06288194d0df746191f535ff7/LICENSE",
+      "license_sha256": "268872B9816F90FD8E85DB5A28D33F8150EBB8DD016653FB39EF1F94F2686BC5",
+      "license_bytes": 12243,
+      "notice_files_in_checked_tree": []
+    }
+  ],
+  "maven_artifacts": [
+    {
+      "name": "wasmtime4j",
+      "group": "ai.tegmentum",
+      "version": "46.0.1-1.2.0",
+      "bytes": 740061,
+      "sha256": "B599DC64D990A27E37A45D6FAD2A10A4CFA478312DB0B92536D041ACBE1D2013"
+    },
+    {
+      "name": "wasmtime4j-jni",
+      "group": "ai.tegmentum",
+      "version": "46.0.1-1.2.0",
+      "bytes": 50425172,
+      "sha256": "C4E55D01C334C2F9C5700E4D75077D79CC8D6172825FF1FA02E03694034F5530"
+    },
+    {
+      "name": "wasmtime4j-native-loader",
+      "group": "ai.tegmentum",
+      "version": "46.0.1-1.2.0",
+      "bytes": 29611,
+      "sha256": "B7AFCA4A7888F9403F4A7C9B68E71E828440B3AA4F7415E7BF4DF492A7CB3DF2"
+    }
+  ],
+  "version_evidence": "https://raw.githubusercontent.com/tegmentum/wasmtime4j/a377267cc70f891bb7c9618259251380ba26e57b/Cargo.toml",
+  "unchanged_nes_mit": {
+    "path": "META-INF/licenses/nes-rust-LICENSE.txt",
+    "bytes": 1065,
+    "sha256": "7D368C9793C495BD52DBE075D792C004A1AD3C073A1BE6D901FC138E32B888FA"
+  },
+  "limitations": [
+    "Native binary transitive Rust dependency versions are not reconstructible from the release tag alone because it has no Cargo.lock.",
+    "No game ROM, BIOS, runtime upgrade or changes to upstream Java/native code are part of this license correction."
+  ]
+}

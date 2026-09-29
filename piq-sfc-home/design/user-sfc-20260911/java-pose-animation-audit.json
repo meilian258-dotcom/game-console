@@ -1,0 +1,491 @@
+{
+  "ok": true,
+  "source_bbmodel_sha256": {
+    "piq-fc-arcade\\design\\user-models-20260911\\source\\02_SFC双手柄\\SFC_日版双手柄_线材肩键修正版.bbmodel": "35C487534089F8B24BD836076EF52883BFE43E90C823C0AEEF6E58B44DFBF509",
+    "piq-fc-arcade\\design\\user-models-20260911\\source\\03_SFC独立卡带\\SFC卡带_独立版_单张UV.bbmodel": "3A324F90FE080708B70739FC628EFE493ECF82CD02204F9A085B9379E90FE2E3"
+  },
+  "source_elements": {
+    "console_set": 872,
+    "independent_card": 86
+  },
+  "excluded_old_card": 38,
+  "represented_world_elements": 920,
+  "docked_plugs_moved": {
+    "1": 7,
+    "2": 7
+  },
+  "triangles": {
+    "body": 2402,
+    "p1_docked": 3628,
+    "p2_docked": 3628,
+    "slot_cover": 0,
+    "inserted": 1012,
+    "cartridge": 1012,
+    "controller": 3364
+  },
+  "contract": {
+    "source": "user Blockbench 20260911",
+    "insert_translation": [
+      0.0,
+      2.18,
+      3.711
+    ],
+    "item_translation": [
+      0.0,
+      6.55,
+      0.0
+    ],
+    "held_source_center": [
+      11.5,
+      0.375,
+      1.7225
+    ],
+    "held_scale": 2.0,
+    "front_label": [
+      6.075,
+      0.845,
+      9.925,
+      2.58,
+      7.5985
+    ],
+    "multi_out_center": [
+      5.55,
+      0.695,
+      15.5375
+    ],
+    "controller_socket_centers": [
+      [
+        10.025,
+        0.745,
+        5.795
+      ],
+      [
+        5.975,
+        0.745,
+        5.795
+      ]
+    ]
+  },
+  "textures": {
+    "hardware": {
+      "source": "piq-fc-arcade\\design\\user-models-20260911\\source\\02_SFC双手柄\\SFC_单张UV.png",
+      "sha256": "4BBBA0F53697D69A919F5FC12750E608AA50A4D71D8281F23D6428A5D02BD920"
+    },
+    "card": {
+      "source": "piq-fc-arcade\\design\\user-models-20260911\\source\\03_SFC独立卡带\\SFC卡带_完整UV.png",
+      "sha256": "7608F10AD4205635C321AA423F348CA68515B16FDDC7BDF9F111811121D4892A"
+    }
+  },
+  "notes": [
+    "Actual converted model/UV; not a Minecraft screenshot.",
+    "Source atlases copied byte-for-byte; no bitmap editing.",
+    "No network/core/server changes. Borrowed controller and its original fixed cord/plug hide together.",
+    "No remote-owner world wire is invented; existing block metadata exposes only docked masks."
+  ],
+  "junit_tests": 30,
+  "junit_output": "\nTest run finished after 1940 ms\n[         5 containers found      ]\n[         0 containers skipped    ]\n[         5 containers started    ]\n[         0 containers aborted    ]\n[         5 containers successful ]\n[         0 containers failed     ]\n[        30 tests found           ]\n[         0 tests skipped         ]\n[        30 tests started         ]\n[         0 tests aborted         ]\n[        30 tests successful      ]\n[         0 tests failed          ]\n\n",
+  "actual_java_source_sha256": {
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcHardwareMeshData.java": "2AAEA49E747D2434A12327D80DDDADAB90B4ECB46447BE006B4DBBB6A0BC0C88",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcControllerPoseLayout.java": "F68446AAEF63976C1FA4AAA7882CAE031D0FDAF7A4598D12F7C3593CCC5FB5F3",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcButtonAnimation.java": "D2EBC160A5DCCDED0A9E5CDEEA64D93D96196D77A66C22EB7E8AF4EEAD953ADC",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcCoverGeometry.java": "2A1A2F9DE91DAE44CE24F251C43928C5B4FEBE15286222875928E600421D0467",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcAvCableGeometry.java": "903408648203A6D0A9E15F05C78ACCAE248FFCADEBFE12AB7AA2BA82EBEE0187"
+  },
+  "mesh_sha256": "4B944A5A98CF926A38092BCDF3B8FA5E8D1B07631B116E554E7DD551B4D80E64",
+  "perspective_scenarios": [
+    {
+      "swing": "0.0",
+      "fov": 60,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.35259985651850523,
+        0.7859888495707177,
+        0.6474001434814948,
+        0.9567883746240466
+      ]
+    },
+    {
+      "swing": "0.0",
+      "fov": 60,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.38944989238887895,
+        0.7859888495707177,
+        0.610550107611121,
+        0.9567883746240466
+      ]
+    },
+    {
+      "swing": "0.0",
+      "fov": 70,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.3784624445272069,
+        0.7358097139414596,
+        0.6215375554727931,
+        0.8766410337800443
+      ]
+    },
+    {
+      "swing": "0.0",
+      "fov": 70,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.4088468333954052,
+        0.7358097139414596,
+        0.5911531666045948,
+        0.8766410337800443
+      ]
+    },
+    {
+      "swing": "0.05",
+      "fov": 60,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.3545796207641833,
+        0.7742341076923336,
+        0.6454203792358166,
+        0.9445163373075673
+      ]
+    },
+    {
+      "swing": "0.05",
+      "fov": 60,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.3909347155731375,
+        0.7742341076923336,
+        0.6090652844268625,
+        0.9445163373075673
+      ]
+    },
+    {
+      "swing": "0.05",
+      "fov": 70,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.3800948425775003,
+        0.72611743984071,
+        0.6199051574224996,
+        0.8665222280524023
+      ]
+    },
+    {
+      "swing": "0.05",
+      "fov": 70,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.4100711319331252,
+        0.72611743984071,
+        0.5899288680668747,
+        0.8665222280524023
+      ]
+    },
+    {
+      "swing": "0.125",
+      "fov": 60,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.3553329197388738,
+        0.7697869801865316,
+        0.6446670802611262,
+        0.9398313808665923
+      ]
+    },
+    {
+      "swing": "0.125",
+      "fov": 60,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.39149968980415534,
+        0.7697869801865316,
+        0.6085003101958446,
+        0.9398313808665923
+      ]
+    },
+    {
+      "swing": "0.125",
+      "fov": 70,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.38071596894659054,
+        0.7224505980509741,
+        0.6192840310534095,
+        0.8626592864033389
+      ]
+    },
+    {
+      "swing": "0.125",
+      "fov": 70,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.4105369767099429,
+        0.7224505980509741,
+        0.5894630232900571,
+        0.8626592864033389
+      ]
+    },
+    {
+      "swing": "0.25",
+      "fov": 60,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.3556443455368716,
+        0.7679526898619532,
+        0.6443556544631284,
+        0.9378919754139741
+      ]
+    },
+    {
+      "swing": "0.25",
+      "fov": 60,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.39173325915265367,
+        0.7679526898619532,
+        0.6082667408473463,
+        0.9378919754139741
+      ]
+    },
+    {
+      "swing": "0.25",
+      "fov": 70,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.3809727524836063,
+        0.7209381493055993,
+        0.6190272475163936,
+        0.8610601658583075
+      ]
+    },
+    {
+      "swing": "0.25",
+      "fov": 70,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.41072956436270475,
+        0.7209381493055993,
+        0.5892704356372952,
+        0.8610601658583075
+      ]
+    },
+    {
+      "swing": "0.5",
+      "fov": 60,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.3550313260286966,
+        0.7715657236807704,
+        0.6449686739713034,
+        0.9417081172578408
+      ]
+    },
+    {
+      "swing": "0.5",
+      "fov": 60,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.39127349452152244,
+        0.7715657236807704,
+        0.6087265054784776,
+        0.9417081172578408
+      ]
+    },
+    {
+      "swing": "0.5",
+      "fov": 70,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.38046729237535293,
+        0.7239172461219786,
+        0.6195327076246471,
+        0.8642067336979732
+      ]
+    },
+    {
+      "swing": "0.5",
+      "fov": 70,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.4103504692815147,
+        0.7239172461219786,
+        0.5896495307184852,
+        0.8642067336979732
+      ]
+    },
+    {
+      "swing": "0.75",
+      "fov": 60,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.353857217562625,
+        0.7785122095662069,
+        0.646142782437375,
+        0.9490010371897559
+      ]
+    },
+    {
+      "swing": "0.75",
+      "fov": 60,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.3903929131719688,
+        0.7785122095662069,
+        0.6096070868280312,
+        0.9490010371897559
+      ]
+    },
+    {
+      "swing": "0.75",
+      "fov": 70,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.37949919105973806,
+        0.7296449129593464,
+        0.6205008089402618,
+        0.8702200498308374
+      ]
+    },
+    {
+      "swing": "0.75",
+      "fov": 70,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.4096243932948036,
+        0.7296449129593464,
+        0.5903756067051964,
+        0.8702200498308374
+      ]
+    },
+    {
+      "swing": "1.0",
+      "fov": 60,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.35259985651850523,
+        0.7859888495707177,
+        0.6474001434814948,
+        0.9567883746240466
+      ]
+    },
+    {
+      "swing": "1.0",
+      "fov": 60,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.38944989238887895,
+        0.7859888495707177,
+        0.610550107611121,
+        0.9567883746240466
+      ]
+    },
+    {
+      "swing": "1.0",
+      "fov": 70,
+      "aspect": 1.3333333333333333,
+      "screen_ltrb": [
+        0.3784624445272069,
+        0.7358097139414596,
+        0.6215375554727931,
+        0.8766410337800443
+      ]
+    },
+    {
+      "swing": "1.0",
+      "fov": 70,
+      "aspect": 1.7777777777777777,
+      "screen_ltrb": [
+        0.4088468333954052,
+        0.7358097139414596,
+        0.5911531666045948,
+        0.8766410337800443
+      ]
+    }
+  ],
+  "unobstructed_center_rays": 252,
+  "item_gui": {
+    "console": {
+      "display": {
+        "rotation": [
+          30,
+          225,
+          0
+        ],
+        "translation": [
+          -0.625,
+          5.125,
+          0
+        ],
+        "scale": [
+          0.81,
+          0.81,
+          0.81
+        ]
+      },
+      "xy_bounds": [
+        [
+          -0.43256410923887156,
+          -0.26353691746479463
+        ],
+        [
+          0.4327245078691684,
+          0.26318789881018734
+        ]
+      ]
+    },
+    "controller": {
+      "display": {
+        "rotation": [
+          82,
+          188,
+          0
+        ],
+        "scale": [
+          1.04,
+          1.04,
+          1.04
+        ]
+      },
+      "xy_bounds": [
+        [
+          -0.3752908799487632,
+          -0.19504695704465158
+        ],
+        [
+          0.37529087994876303,
+          0.21044655986346084
+        ]
+      ]
+    },
+    "cartridge": {
+      "display": {
+        "rotation": [
+          10,
+          165,
+          0
+        ],
+        "scale": [
+          1.22,
+          1.22,
+          1.22
+        ]
+      },
+      "xy_bounds": [
+        [
+          -0.19572040291713316,
+          -0.12060374906240334
+        ],
+        [
+          0.19637165633937234,
+          0.12164732422370306
+        ]
+      ]
+    }
+  },
+  "av_quads": 893,
+  "limits": [
+    "Pure production Java + actual mesh/UV, no Minecraft launched.",
+    "SFC input visual getter is read-only; no networking changes.",
+    "Hand volumes are diagnostic standard/slim models, not player screenshots."
+  ]
+}

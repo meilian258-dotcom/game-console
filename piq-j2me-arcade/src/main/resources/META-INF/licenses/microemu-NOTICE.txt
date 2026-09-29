@@ -1,0 +1,9 @@
+MicroEmulator 2.0.4
+Copyright (c) the MicroEmulator contributors.
+
+This mod distributes unmodified MicroEmulator Maven modules as separate nested
+JAR files. MicroEmulator is licensed under the GNU Lesser General Public
+License, version 2.1. Source and project information:
+https://github.com/barteo/microemu
+
+Java ME game JAR/JAD files are supplied by users and are not part of this mod.

@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "tests": 25,
+  "mode": "actual-pure-keyboard-state-and-sfc-source-contracts",
+  "source_sha256": {
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardConfig.java": "09275B2DF1995D656A7484CC735AD8F24ECA28DC1CDD5D88C93701F295E2847F",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardControlState.java": "6FB0C6FFBD981B467EC0FCC98496DEDAD3261F454C5B0D8D0F085925A92A5661",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcInputFocus.java": "59B3B4DD2C33645D45570037AF3B8208254AD0FE7FEBC5C7337EE66E59323745",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcInputSendPolicy.java": "7E186FC57448A520CBAA29B143AC31BCF7D2126C55140D553DDB2314781BE281",
+    "piq-sfc-home\\src\\test\\java\\cn\\piq\\sfchome\\client\\SfcUnifiedKeyboardTest.java": "E49CD6DB9C89EA23302599BB4ED5BD631B154A6665C6B5539ACDE0A5324C1C9F",
+    "piq-sfc-home\\src\\test\\java\\cn\\piq\\sfchome\\client\\SfcInputFocusTest.java": "DEC3BCCB9FFE62BA7F9107A43350A007F0E9FA7DA170E782E8945D9132862889",
+    "piq-sfc-home\\src\\test\\java\\cn\\piq\\sfchome\\client\\SfcInputSendPolicyTest.java": "C8DA38F4EA57B716C6051FF07F7134A5DB8286036DBA085D4B42B5945D636F37",
+    "piq-sfc-home\\src\\test\\java\\cn\\piq\\sfchome\\server\\SfcFcInteractionSourceTest.java": "72447A56ECD66D8800428D73E554115FC98EEDAB15703B483FEA06BE8EBFD79C",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcHomeKeys.java": "7E461117D5EA9D21516F8ABB494B8191D22E2796E7D27B9E1B491C72DD457DB7",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcHomeClient.java": "4480E42A0552B0181EAB8336F46F42AA77912556FB88678C67C0AB145C53D2F7"
+  },
+  "minecraft_started": false,
+  "native_core_started": false,
+  "limits": [
+    "Pure Java production state executes; Minecraft host integration is checked by source contracts.",
+    "Not real keyboard/GLFW event injection, a live Minecraft client, multiplayer socket or gamepad hardware test."
+  ]
+}

@@ -1,0 +1,26 @@
+plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
+group = 'cn.piq.mdhome'
+version = mod_version
+base { archivesName = 'game_console_md' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+neoForge { version = '21.1.236'; mods { piq_md_home { sourceSet(sourceSets.main) } } }
+repositories { mavenCentral() }
+def fc = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.24.jar'))
+dependencies {
+    implementation fc
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+def asciiRoot = new File(System.getProperty('java.io.tmpdir'), 'piq-md-home-tests')
+def stageTests = tasks.register('stageAsciiTests', Sync) { dependsOn testClasses; from sourceSets.test.output; into new File(asciiRoot,'tests') }
+def stageMain = tasks.register('stageAsciiMain', Sync) { dependsOn classes; from sourceSets.main.output; into new File(asciiRoot,'main') }
+def stageDeps = tasks.register('stageAsciiDeps', Sync) { from sourceSets.main.compileClasspath; into new File(asciiRoot,'dependencies') }
+test {
+    dependsOn stageTests,stageMain,stageDeps
+    useJUnitPlatform()
+    classpath=files(new File(asciiRoot,'tests'),new File(asciiRoot,'main'))+fileTree(new File(asciiRoot,'dependencies'))+configurations.testRuntimeClasspath.filter { !fc.files.contains(it) }
+}
+jar { manifest { attributes 'Implementation-Title': 'Game Console MD', 'Implementation-Version': project.version } }

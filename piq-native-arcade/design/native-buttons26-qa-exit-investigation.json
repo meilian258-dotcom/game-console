@@ -1,0 +1,20 @@
+{
+  "schema": "piq-native-direct-qa-exit-investigation-1",
+  "date": "2026-09-11",
+  "evidence_kind": "manual transcription of captured QA command output; no earlier report overwritten",
+  "production_changed_during_investigation": false,
+  "native_jar_sha256": "F4011CBDE8DC3F3F3FA44FD03077638421C7D3334B33A55AFFB0E78C740C2453",
+  "helper_sha256": "20F6F3028D76DAEB01212D1808BE90E35BFB5429D1E06153B7D8B32DD73E943C",
+  "prior_same_bytes_passed": "native-buttons26-final-v1.json",
+  "attempts": [
+    {"attempt": 1, "limit_seconds": 40, "result": "Direct NativeCoreOptions26Probe process timeout; exact owned process tree terminated. Original tool did not retain phase output."},
+    {"attempt": 2, "limit_seconds": 40, "result": "Same timeout when retried independently without changing assertions or production; exact owned process tree terminated."},
+    {"attempt": 3, "limit_seconds": 40, "result": "Diagnostic jcmd Thread.print also timed out after 6 seconds, masking phase logs and bypassing that QA wrapper's cleanup. Verified command line of QA Java PID 42952 and stopped only that process. Cleanup subsequently changed to unconditional finally."},
+    {"attempt": 4, "limit_seconds": 40, "result": "File-backed stdout/stderr preserved complete successful native work and teardown. Only JVM exit timed out; exact owned JVM terminated."}
+  ],
+  "last_captured_stdout_result": {"ok": true, "assertions": 251, "actual_mame_core_started": true, "actual_core_option_queries": 1, "game_profiles_forced_disabled": true, "pinned_default_was_already_disabled": true, "original_frames": 120, "commercial_rom_loaded": false, "minecraft_started": false},
+  "last_captured_phase_tail": ["QA_PHASE game_loaded=true", "QA_PHASE frame=0", "QA_PHASE frame=30", "QA_PHASE frame=60", "QA_PHASE frame=90", "QA_PHASE unload", "QA_PHASE deinit", "QA_PHASE finished"],
+  "conclusion": "Latest direct-DLL probe completed all assertions, game frames, unload and deinit before failing to terminate its JVM naturally. No claim is made that callback garbage collection or working directory caused the prior timeouts.",
+  "qa_only_resolution": "Keep callback and Engine reachable through native teardown. Only after every assertion and teardown succeeds and the success JSON is flushed, explicitly halt the dedicated direct-DLL QA JVM. Error paths cannot reach successful halt. Preserve a separate actual NativeProcessSession parent/child termination test.",
+  "limits": ["Natural JVM exit of a process directly loading the MAME DLL is not guaranteed or claimed.", "The production Minecraft JVM does not load MAME; NativeProcessSession owns and explicitly terminates its exact helper child.", "No Minecraft, commercial ROM, user instance, options or save was modified or tested."]
+}

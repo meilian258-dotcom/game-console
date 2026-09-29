@@ -1,0 +1,1 @@
+{"required":true,"minVersion":"0.8","package":"cn.piq.fcarcade.mixin","compatibilityLevel":"JAVA_21","client":["KeyboardHandlerMixin","KeyMappingStateAccess","CreativeHardwareOrderMixin"],"injectors":{"defaultRequire":1}}

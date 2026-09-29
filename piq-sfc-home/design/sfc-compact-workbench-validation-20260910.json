@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "pure_tests": {
+    "passed": true,
+    "tests": 36,
+    "failed": 0
+  },
+  "actual_mc_api_compilation": true,
+  "unchanged_non_ui_screen_methods": 21,
+  "source_sha256": {
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcCardEditorScreen.java": "8D90D853F8228339797E91C1DA629D1BEC7E7E86265047C323F076303879A9BD",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcCardLibrary.java": "B3515D9B453D75559160404C55F6A3010EFBF3A72AD4545417F9C8EEC24FF2E8",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcWorkbenchDisplay.java": "EB35623D407224F5CE9694970A03BE3404B271CBDCFE3570FF3C37341E1A62E2",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcEditorWork.java": "5019BA8EFD2A43F1688915CC59B213F57033C30F3AEB5D7F5278BD7ABB4507B3",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcUploadTitle.java": "AE0ED197ACA06E1575D431B966C6D094A3438C1230C44EB066BD2A09D8498970",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcCardEditorLayout.java": "FC1B867F0D522AB2979508A84A16C8804228A1B5F7841CC84E185FC48EB20886",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceUi.java": "657A886505E588C8484CFC6586BABB54797AB786FF85264B868B62B808905C00",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceLayout.java": "B98F57AEAF37E1A6BE830C6D19291DB5423FBD0AE73722A30B4227611400D8DE",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\CartridgeWorkbenchLayout.java": "6B661824ACF150715C934D6CBD9D0A6535B982890E3D8F052B3E485E2F6DB02A",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceScreen.java": "6ABE21A4A170AA1F4E29B12A73A9D0DD5BFA16726A7FED20593D8CC1ABA0771A"
+  },
+  "limits": [
+    "No Minecraft GUI rendering, live uploads, filesystem dialog, client/server or native core executed.",
+    "Displayed aliases do not change Row identity, original filename, hash, path or wire protocol."
+  ]
+}

@@ -1,0 +1,589 @@
+{
+  "ok": true,
+  "minecraft_started": false,
+  "gradle_started": false,
+  "source_preserved": {
+    "街机_双人_上半部重塑大屏版.bbmodel": "8EEB98567BB7A34598CCE7FE95E91FDA1EE263B45427F021BBDF908A55F0FF97",
+    "arcade_refined_upper.json": "142E29CC81B10AAAFD73662E11999F94CBE5AA2E4596C43D39405EB460EFE296",
+    "双人街机_重塑版UV.png": "3E6081A5F18CBFD9277B229718996E3D9583C8A072C0119E9ED8380484DE5265",
+    "按键动画映射.json": "5D3B09FE979D8A9EB1D6CF1E751B873FC1C7AB7F64C99DD6935BC8D8468869AE"
+  },
+  "geometry_uv_exact_faces": 1424,
+  "elements": 239,
+  "render_models": 17,
+  "animated_groups": 16,
+  "production_tests": {
+    "passed_tests": 41,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "production_geometry": {
+    "xOffset": 0.25,
+    "yOffset": 0.0,
+    "screenOffset": 0.0015,
+    "facings": [
+      {
+        "screen": [
+          [
+            0.4375,
+            0.9121159269831868,
+            0.300220429532392
+          ],
+          [
+            1.5625,
+            0.9121159269831868,
+            0.300220429532392
+          ],
+          [
+            1.5625,
+            1.691639282539585,
+            0.6231095755904363
+          ],
+          [
+            0.4375,
+            1.691639282539585,
+            0.6231095755904363
+          ]
+        ],
+        "normal": [
+          0.0,
+          0.3826834323650898,
+          -0.9238795325112867
+        ],
+        "bounds": [
+          [
+            0.25,
+            0.0,
+            0.023875631329235484
+          ],
+          [
+            1.75,
+            2.0,
+            1.1238756313125
+          ]
+        ]
+      },
+      {
+        "screen": [
+          [
+            0.699779570467608,
+            0.9121159269831868,
+            0.4375
+          ],
+          [
+            0.699779570467608,
+            0.9121159269831868,
+            1.5625
+          ],
+          [
+            0.37689042440956366,
+            1.691639282539585,
+            1.5625
+          ],
+          [
+            0.37689042440956366,
+            1.691639282539585,
+            0.4375
+          ]
+        ],
+        "normal": [
+          0.9238795325112867,
+          0.3826834323650898,
+          0.0
+        ],
+        "bounds": [
+          [
+            -0.12387563131250001,
+            0.0,
+            0.25
+          ],
+          [
+            0.9761243686707645,
+            2.0,
+            1.75
+          ]
+        ]
+      },
+      {
+        "screen": [
+          [
+            0.5625,
+            0.9121159269831868,
+            0.699779570467608
+          ],
+          [
+            -0.5625,
+            0.9121159269831868,
+            0.699779570467608
+          ],
+          [
+            -0.5625,
+            1.691639282539585,
+            0.37689042440956366
+          ],
+          [
+            0.5625,
+            1.691639282539585,
+            0.37689042440956366
+          ]
+        ],
+        "normal": [
+          0.0,
+          0.3826834323650898,
+          0.9238795325112867
+        ],
+        "bounds": [
+          [
+            -0.75,
+            0.0,
+            -0.12387563131250001
+          ],
+          [
+            0.75,
+            2.0,
+            0.9761243686707645
+          ]
+        ]
+      },
+      {
+        "screen": [
+          [
+            0.300220429532392,
+            0.9121159269831868,
+            0.5625
+          ],
+          [
+            0.300220429532392,
+            0.9121159269831868,
+            -0.5625
+          ],
+          [
+            0.6231095755904363,
+            1.691639282539585,
+            -0.5625
+          ],
+          [
+            0.6231095755904363,
+            1.691639282539585,
+            0.5625
+          ]
+        ],
+        "normal": [
+          -0.9238795325112867,
+          0.3826834323650898,
+          0.0
+        ],
+        "bounds": [
+          [
+            0.023875631329235484,
+            0.0,
+            -0.75
+          ],
+          [
+            1.1238756313125,
+            2.0,
+            0.75
+          ]
+        ]
+      }
+    ],
+    "parts": [
+      {
+        "name": "p1_button_1",
+        "player": 0,
+        "pivot": [
+          17.285,
+          13.3825,
+          1.397
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p1_button_2",
+        "player": 0,
+        "pivot": [
+          16.053,
+          13.3825,
+          1.529
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p1_button_3",
+        "player": 0,
+        "pivot": [
+          14.821,
+          13.3825,
+          1.397
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p1_button_4",
+        "player": 0,
+        "pivot": [
+          17.285,
+          13.3825,
+          2.75
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p1_button_5",
+        "player": 0,
+        "pivot": [
+          16.053,
+          13.3825,
+          2.882
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p1_button_6",
+        "player": 0,
+        "pivot": [
+          14.821,
+          13.3825,
+          2.75
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p1_start",
+        "player": 0,
+        "pivot": [
+          18.759,
+          13.333,
+          1.386
+        ],
+        "pressY": -0.08,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p1_joystick",
+        "player": 0,
+        "pivot": [
+          20.86,
+          13.3495,
+          2.97
+        ],
+        "pressY": 0.0,
+        "tiltX": 8.0,
+        "tiltZ": 8.0
+      },
+      {
+        "name": "p2_button_1",
+        "player": 1,
+        "pivot": [
+          5.285,
+          13.3825,
+          1.397
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p2_button_2",
+        "player": 1,
+        "pivot": [
+          4.053,
+          13.3825,
+          1.529
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p2_button_3",
+        "player": 1,
+        "pivot": [
+          2.821,
+          13.3825,
+          1.397
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p2_button_4",
+        "player": 1,
+        "pivot": [
+          5.285,
+          13.3825,
+          2.75
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p2_button_5",
+        "player": 1,
+        "pivot": [
+          4.053,
+          13.3825,
+          2.882
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p2_button_6",
+        "player": 1,
+        "pivot": [
+          2.821,
+          13.3825,
+          2.75
+        ],
+        "pressY": -0.12,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p2_start",
+        "player": 1,
+        "pivot": [
+          6.759,
+          13.333,
+          1.386
+        ],
+        "pressY": -0.08,
+        "tiltX": 0.0,
+        "tiltZ": 0.0
+      },
+      {
+        "name": "p2_joystick",
+        "player": 1,
+        "pivot": [
+          8.86,
+          13.3495,
+          2.97
+        ],
+        "pressY": 0.0,
+        "tiltX": 8.0,
+        "tiltZ": 8.0
+      }
+    ],
+    "video": [
+      {
+        "point": [
+          1.5625,
+          0.9121159269831868,
+          0.300220429532392
+        ],
+        "uv": [
+          0.0,
+          1.0
+        ]
+      },
+      {
+        "point": [
+          0.4375,
+          0.9121159269831868,
+          0.300220429532392
+        ],
+        "uv": [
+          1.0,
+          1.0
+        ]
+      },
+      {
+        "point": [
+          0.4375,
+          1.691639282539585,
+          0.6231095755904363
+        ],
+        "uv": [
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "point": [
+          1.5625,
+          1.691639282539585,
+          0.6231095755904363
+        ],
+        "uv": [
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  "facings": [
+    {
+      "turn": 0,
+      "bounds": [
+        [
+          0.25,
+          0.0,
+          0.023875631329235484
+        ],
+        [
+          1.75,
+          2.0,
+          1.1238756313125
+        ]
+      ],
+      "screen_aligned": true
+    },
+    {
+      "turn": 1,
+      "bounds": [
+        [
+          -0.12387563131250001,
+          0.0,
+          0.25
+        ],
+        [
+          0.9761243686707645,
+          2.0,
+          1.75
+        ]
+      ],
+      "screen_aligned": true
+    },
+    {
+      "turn": 2,
+      "bounds": [
+        [
+          -0.75,
+          0.0,
+          -0.12387563131250001
+        ],
+        [
+          0.75,
+          2.0,
+          0.9761243686707645
+        ]
+      ],
+      "screen_aligned": true
+    },
+    {
+      "turn": 3,
+      "bounds": [
+        [
+          0.023875631329235484,
+          0.0,
+          -0.75
+        ],
+        [
+          1.1238756313125,
+          2.0,
+          0.75
+        ]
+      ],
+      "screen_aligned": true
+    }
+  ],
+  "item_and_skin": {
+    "pixel_bounds": [
+      [
+        3.068578310985232,
+        1.1826796146472045
+      ],
+      [
+        12.98623417818287,
+        14.593005361700705
+      ]
+    ],
+    "front_normal_camera": [
+      -0.22211570402898403,
+      0.046297586219894465,
+      0.25322153844789785
+    ],
+    "unique_static_glass": 1,
+    "custom_old_skin_not_projected": true,
+    "world_collision_matches": true
+  },
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\RocketArcadeGeometry.java": "B1223FFF1E3D847B024B0675A45EB0752B8E1779081B458ED17C7BB01A3A7DE9",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\DualCabinetGeometry.java": "857CA7D16D6461FC1F40512EB1B1E57A2D295833044DB8AC75FE174EC0D4A10B",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\DualCabinetControls.java": "A431CD17CC85565DB4921A0C072D72D3A7334CFAB86CE72946C3DF40017F3292",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\ScreenAspectFit.java": "E4FCD716A6EF4BD732B33F6CADBD7D24E4B29037DBACDCB6C64DC0F27DD3C8E4",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\DualScreenPresentation.java": "628601462D7B3BC95260EA3C59F8CDB44B634E1CE0D7CAEB29C532AB104F9458",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\CabinetVideoGeometry.java": "626D4C585A551698D1643D8EE98AB61C9942B70C7A1BF19A2B4D87E408827FA6",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\ArcadeScreenBounds.java": "9C3725F6CCCA81AFD625D593BCB734C9C867FB1F83A94943245E91B663FA5BFA",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\ArcadeDisplayStyle.java": "BF42960F220E9D4EB2458637B01C39E174A6E5C7944AE757F6E01980B1D42E9E",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\ScreenSurfaceGeometry.java": "CB6E1C9E8879B40538C0CD18F777ED5125F5CEB312F9AA1C68CF5102837FB60F",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\ScreenRayMapping.java": "D2A98ACE32DC748008FFD836D7A2B4617E7B30E77C92B915120AAA8EDE4709BF",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\WideLcdPresentation.java": "5B4075CF510D155DCD9F50866C28744DD048C86DA2CE5B2B7A38D63DA413FC8C",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\LargeLcdPresentation.java": "F3099FD8115B0A9CAE6F7C3B8E3B58C4F623EEB39CD80790550527C1EBA2C63A",
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\HomeHardwareScale.java": "39039775FE31776FF39CF091236479CF78A8102ED12EFDFAD3528A28E9632A19",
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\VintageTvLayout.java": "D8EEFA86EFD2669B03F730519A8896442B2D22418D909F85C3A068D00A535E14",
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\WideLcdTvLayout.java": "11FC36105C98E9872FA806EC72BE3853E33E5531DA59F8799CE10391A42E41F5",
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\LargeLcdTvLayout.java": "20B824616BED39B118ED471CDA21CA3DAA6CF919FFAC71602B5E3ED8F142D7D6",
+    "src\\main\\java\\cn\\piq\\fcarcade\\world\\DualCabinetFootprint.java": "85F04997225E5AD66557A050BADEBB91E6EE6A04F18D4DDF141167F2EBED69F0",
+    "src\\test\\java\\cn\\piq\\fcarcade\\layout\\DualCabinetGeometryTest.java": "F4C368A29925EC32D13DEA8EC945A333807571732A533C270A29B342FCEDC508",
+    "src\\test\\java\\cn\\piq\\fcarcade\\layout\\DualCabinetControlsTest.java": "69A7DABB838C3E60B5B287F756D6A7524BC5454016CFF962D2D62CFB88BCC828",
+    "src\\test\\java\\cn\\piq\\fcarcade\\layout\\CabinetVideoGeometryTest.java": "62B6CC1C9EFE80AF9A32343581C5623F219B0CC06055E39528ED29C0E8C173F7",
+    "src\\test\\java\\cn\\piq\\fcarcade\\layout\\ScreenAspectFitTest.java": "FC54201112EFDA88BC7EF4BE9F13F05DDE76D06FAC8B5941ADA2EC832A083795",
+    "src\\test\\java\\cn\\piq\\fcarcade\\layout\\ScreenSurfaceGeometryTest.java": "F0B272C7E63D733B8537CB3E1BE3FAF81D547A5BD7589091734F0C4FDF6B8C96",
+    "src\\test\\java\\cn\\piq\\fcarcade\\layout\\ScreenRayMappingTest.java": "B2B655891BF5F25A62068B7F115C0FE69B4948006DE55B2EC56D8F0B38CCF8B3",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\DualCabinetRenderer.java": "3487A992FCC264C5C11E6ACAA568FD0EE838210A7F4FE9248A3F4DC1E680078D"
+  },
+  "previews": [
+    {
+      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v2\\front.png",
+      "sha256": "27F5120273CF85485CDF518354EF23689012C9253B2509FCF5D10F81022A5310",
+      "camera_from_center": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "visible_quads": 347,
+      "sampling": "nearest texel at pixel center; Lanczos supersample resolve"
+    },
+    {
+      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v2\\front-angle.png",
+      "sha256": "D28CA284907105ED506AF53E5DEA444C41712A21BE476CC90E51BC07A83A82F2",
+      "camera_from_center": [
+        0.5515413083678437,
+        0.26378062574114264,
+        -0.7913418772234277
+      ],
+      "visible_quads": 713,
+      "sampling": "nearest texel at pixel center; Lanczos supersample resolve"
+    },
+    {
+      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v2\\rear-angle.png",
+      "sha256": "04C79C1063AAF6378F42CE5717D519624CED9362F77ABC7CDA371114608A64CA",
+      "camera_from_center": [
+        -0.5942283606769104,
+        0.2614604786978406,
+        0.7606123016664453
+      ],
+      "visible_quads": 711,
+      "sampling": "nearest texel at pixel center; Lanczos supersample resolve"
+    },
+    {
+      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v2\\controls.png",
+      "sha256": "D0B8F0C383209DDDAFD0D5337C9858B67E79026E93C21AC639366315AC79F32A",
+      "camera_from_center": [
+        0.28066816183499277,
+        0.6548923776149831,
+        -0.7016704045874819
+      ],
+      "visible_quads": 713,
+      "sampling": "nearest texel at pixel center; Lanczos supersample resolve"
+    }
+  ]
+}

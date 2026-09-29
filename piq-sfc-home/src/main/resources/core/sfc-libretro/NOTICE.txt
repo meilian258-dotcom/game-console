@@ -1,0 +1,11 @@
+SFC37 local Windows x64 evaluation / Mesen-S (GPL-3.0-or-later)
+Author: M. Bibaud (Sour) and Mesen-S / libretro contributors.
+Official core: https://github.com/libretro/Mesen-S
+Documentation: https://docs.libretro.com/library/mesen-s/
+Binary source: https://buildbot.libretro.com/nightly/windows/x86_64/latest/mesen-s_libretro.dll.zip
+Pinned DLL SHA256: 8aca17e76efbd7a70b0c247b42aaba04d0c1c90f693213bd1e76573986670b42
+Source reviewed: 9e4fdeb9b336470bc96beb8765b2e79c86a2da1e
+The reviewed source revision has NOT yet been proven to correspond exactly to the buildbot binary.
+Before public distribution: establish exact corresponding source and reproducible build provenance.
+GPL text is provided in LICENSE-Mesen-S.txt. No commercial ROM or firmware is included.
+This addon is a libretro frontend adapter; it does not embed RetroArch Netplay.

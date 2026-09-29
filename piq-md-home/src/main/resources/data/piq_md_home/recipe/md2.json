@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","category":"misc","pattern":["III","RCR","III"],"key":{"I":{"item":"minecraft:iron_ingot"},"R":{"item":"minecraft:redstone"},"C":{"item":"minecraft:copper_ingot"}},"result":{"id":"piq_md_home:md2","count":1}}

@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "mode": "source-pure",
+  "production_compiled": true,
+  "pure": {
+    "passed_tests": 18,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "source_geometry_unchanged": true,
+  "new_png": 0,
+  "assets": {
+    "assets/piq_fc_arcade/models/block/zapper_stand/stand.json": "B230833E8B2A7423FB61B8CAEB9FDF80FBC5718C07BE49A25F6706CC279CED8E",
+    "assets/piq_fc_arcade/models/block/zapper_stand/cable.json": "EE3BC01026113DDB507909A703C2A291936D35C12DB1D01543806B82EF2228AF",
+    "assets/piq_fc_arcade/models/block/zapper_stand/connector.json": "5A92B1E62E2852F1ABC88AEADE009E3BB2ABE0B5D00464788D3440A0814231E4",
+    "assets/piq_fc_arcade/models/item/zapper_stand.json": "1654F6EE8638424397A0F0C8B9871BAF102E1D0A3083C1EC356FE963ACA688BC",
+    "assets/piq_fc_arcade/models/item/zapper_stand_cable.json": "3F76659EC7EFDBDC3BDA6F861CA3E465E7EE83C35A762951E2AA78586B7C512B",
+    "assets/piq_fc_arcade/blockstates/zapper_stand.json": "E59C837E7E30E3C455005616AE2E0DCF086ABB4375456A791F51B75B72261C95",
+    "data/piq_fc_arcade/loot_table/blocks/zapper_stand.json": "0343F2ED72A2789DF1533DA87F98882CACA519E71B7158504AA1322C8B8D5210"
+  },
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\ZapperDock.java": "CC3CCE4D3392086D581AC8F89B45DBA9519C74F15C3F917313A6CB69378D237D",
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\ZapperStandLinks.java": "FB123E9AA95D3198135436FEDF7C4D8C5F3E6ADC7962E85797FAEE3AF8EE8D88",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\ZapperStandGeometry.java": "FB2B2450D6D3B72EF3BD67BCAA21C8F99E4A048337D4AB9CCD75BE0E4022A9AA",
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\ZapperStandTest.java": "4320F6251B329A4FD32BD02F999E885ED4812E6D81A345D6C8A7CD0A15C936D2",
+    "src\\test\\java\\cn\\piq\\fcarcade\\layout\\ZapperStandGeometryTest.java": "A868817F517E307B6F0959C5D7730D86EF7D14D3793E0748822B17919E2D14CF"
+  },
+  "minecraft_started": false,
+  "limits": [
+    "Pure state/geometry and deterministic asset derivation only; not a running Minecraft world or physical interaction test."
+  ]
+}

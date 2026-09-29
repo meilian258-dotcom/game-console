@@ -1,0 +1,40 @@
+{
+  "ok": true,
+  "mode": "explicit-source-pure-qa",
+  "production_compiled": true,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.32.jar",
+      "sha256": "F26A4F96DC8A9C6919B0681BE8F2BC3C5B97AF483D3DA7AEFC6B3222C00776E6"
+    }
+  },
+  "behavior": {
+    "passed_tests": 29,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "wire": null,
+  "minecraft_world_or_socket_started": false,
+  "native_core_started": false,
+  "sources": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncState.java": "7A2D75969EDA9F348495261E6AA5DA34124F8F0EC71EBC19FD1FA5F62B083540",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncTimeline.java": "B2FE07F99C833BA848FBFB4E138BD0032D2DC85893CDE3E73507986DEF2CAD1C",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncGate.java": "E347A46D1B01A34BCC3901765F1491353FCFA5689DF3B8232308A1E144BE995D",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetSyncWorker.java": "2E9D12DB0B486DC57BEAC0A8A12A4FC0D01A9CD34C80AF0C777F2B6DA1894C62",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncStateTest.java": "46E2C9549F02D6FCAA89D72037167CD07E34AA850A5FE921C61EAB419E82CEEF",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncTimelineTest.java": "443063748D49536F46CFD07E8296F70160A5D7AB97D1450855B507DDF6F97350",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSyncGateTest.java": "29AA45D8D48241AB6D39421142F68860C7E626364C802208D1BAC93BAC708118",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetSyncWorkerTest.java": "698BE0556B25CDBF82E7D11A34D7E702C2D2DEA2B6B1A705E298E23D32756CB6",
+    "tools\\qa\\CabinetRoomTestRunner.java": "76F1E13154E9C577B7E0632F97A031DE709F4F62669B03992387286881A150B3"
+  },
+  "logs": {
+    "compile": "",
+    "behavior": "{\"passed_tests\":29,\"minecraft_started\":false,\"mode\":\"actual-production-pure-state-machines\"}\n",
+    "wire": ""
+  },
+  "limits": [
+    "Worker tests execute real production worker against a deterministic diagnostic Java core; separate SFC Wasm probes establish the actual emulator path.",
+    "Real cached Minecraft/NeoForge outer packet codecs are used without starting a world, graphical client, socket, or native core.",
+    "No remote-play latency, public server, installed instance, private ROM, or real hardware behavior is claimed."
+  ]
+}

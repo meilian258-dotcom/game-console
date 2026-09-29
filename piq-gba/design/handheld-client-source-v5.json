@@ -1,0 +1,43 @@
+{
+  "schema": "piq-gba-handheld-client-1",
+  "ok": true,
+  "mode": "source-actual-api",
+  "production_compiled": true,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync33-v1\\piq_fc_arcade-0.31.0-alpha.33.jar",
+      "sha256": "F36169E46B13CF46868851447B8518BC38C10967A03994AF26E89CE7B1E4FE00"
+    }
+  },
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\gba\\bridge\\GbaProcessSession.java": "2E4C02F8053614A34A7B556DE6A01DBAB076498AE8C0B38674EBD8DD9848F61A",
+    "src\\main\\java\\cn\\piq\\gba\\bridge\\GbaProtocol.java": "88713FEBEF209BB2B0438AE78152F9754170FC3DF0E77181717A63CBABC47B74",
+    "src\\main\\java\\cn\\piq\\gba\\bridge\\GbaSaveScope.java": "7B87569A05F4E4365AFBA01E1DBC9DB0D5587502E17F19E81E3EF0ED3B2279CF",
+    "src\\main\\java\\cn\\piq\\gba\\bridge\\GbaSaveStore.java": "84BCE15FE509A0F7DDA2C0DB516ED78ED6F4837600B0D12093AFC10ACE43E337",
+    "src\\main\\java\\cn\\piq\\gba\\GbaMod.java": "347B0E604AE6975E913049ECCE2A589763838896D05C48DF8A23E583C9C25D25",
+    "src\\main\\java\\cn\\piq\\gba\\item\\GbaHandheldItem.java": "F3D87B6499A963CFD104BE9FAA5168CB7F4B484B9C216EC1BD69D73878B97979",
+    "src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldClient.java": "B18C37BB4720871F6F4182DA01765A3A0CE56083CF0901BA740A1251B7BDCD59",
+    "src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldScreen.java": "C18A2D4F4612339A8F2DC4E4AA8259F3CC4BBCD6430031AC13EFC75BE623D3C7",
+    "src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldAudio.java": "AC5FEC307294037CA4F81C71B4BF728C6217C7481A7B8A9E93538BCD17F7E6DE",
+    "src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldGate.java": "8DB1CAA8C8C08A4DFE62EAE1B1AD7D464BB30B295F66D00F2A2726B227246258",
+    "src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldSelectionStore.java": "0AD6B5C3A7C8AC5585A0F5284C953FB31F3294C7C71A2FAAF1763BC2088DDD16"
+  },
+  "probe_source_sha256": {
+    "tools\\qa\\GbaHandheldClientProbe.java": "4526213E93B2A6C56D01E9B4ACCBF8B236CF1E0A2CB878DE815EAA3246914AC3"
+  },
+  "pure_tests": {
+    "ok": true,
+    "assertions": 4359,
+    "pure_assertions": 4359,
+    "origin_assertions": 0,
+    "production_origin": "source-actual-api",
+    "minecraft_or_native_core_started": false
+  },
+  "minecraft_started": false,
+  "native_core_started": false,
+  "audio_device_started": false,
+  "limitations": [
+    "No interactive Minecraft client/world, physical input device or UI window was started.",
+    "Pure gate/store tests do not assert a live client handshake, visible model or final native save completion."
+  ]
+}

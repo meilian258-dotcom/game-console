@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"piq_fc_arcade:block/user_tv48/panel_tv_3"},"facing=east":{"model":"piq_fc_arcade:block/user_tv48/panel_tv_3","y":90},"facing=south":{"model":"piq_fc_arcade:block/user_tv48/panel_tv_3","y":180},"facing=west":{"model":"piq_fc_arcade:block/user_tv48/panel_tv_3","y":270}}}

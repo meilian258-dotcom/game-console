@@ -1,0 +1,37 @@
+{
+  "ok": true,
+  "mode": "explicit-production-source-against-real-mc",
+  "gradle_started": false,
+  "minecraft_started": false,
+  "network_socket_opened": false,
+  "pure": {
+    "passed_tests": 22,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines",
+    "behavior_tests": 18,
+    "source_wiring_tests": 4
+  },
+  "real_api": {
+    "ok": true,
+    "assertions": 42,
+    "actual_minecraft_codecs": true,
+    "actual_queued_connection_guard": true,
+    "minecraft_started": false,
+    "network_socket_opened": false,
+    "server_world_authority_simulated": false
+  },
+  "common_client_isolation": true,
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetJoinGate.java": "38104E6A70BBC6880DEB6339D2AEB311543788B50BC44E5A66345A6783B58F2C",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomLedger.java": "F09568EAE9D9FEA8CEBD7C5241C25292F8139D980897B9280B8B4740278B78C8",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetJoinGateTest.java": "7D0DCF7066011AC9A7E7F6C105885D013DB5448C505F239024B27A1F0826CD5C",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetJoinSourceContractTest.java": "D6BC3CF3E4E8E12F4671D40A34AF0158814AE11B4B87275C163550C079753FAE",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetJoinNetwork.java": "C631813C5E8EA6B6BCBEEE01387C7C284082ECAA4D522786C7153D56FD1ADDD4",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRooms.java": "CDADDC9924D73F686888B8C8EE924EAE5D8F0EDAEFD5E09FE1224BDF461164D3",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetNetwork.java": "BEA800E666F7B0966FAAA4795481D8BEE33A6901C9312C05EC4B63DF87634404",
+    "tools\\qa\\CabinetJoinCodecProbe.java": "CE8B1C6079DDDDFFB5CDB8489DC3FCF1D84DBB59F0E9017B0379DC6DE16F2F08"
+  },
+  "limits": [
+    "Pure consent/seat behavior and actual codecs/queued client Connection only; not a real player/world/protection-plugin integration test."
+  ]
+}

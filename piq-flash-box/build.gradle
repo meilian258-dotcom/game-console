@@ -1,0 +1,43 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+group = 'cn.piq.flashbox'
+version = '0.1.0-prototype.8'
+base { archivesName = 'game_console_flash_box' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+neoForge {
+    version = '21.1.236'
+    mods { piq_flash_box { sourceSet(sourceSets.main) } }
+}
+repositories { mavenCentral() }
+dependencies {
+    implementation files('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.61.jar')
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+def metadata = tasks.register('generateModMetadata', ProcessResources) {
+    inputs.property 'version', project.version
+    expand(version: project.version)
+    from 'src/main/templates'
+    into 'build/generated/modMetadata'
+}
+sourceSets.main.resources.srcDir metadata
+neoForge.ideSyncTask metadata
+def asciiRoot = new File(System.getProperty('java.io.tmpdir'), 'piq-flash-box-tests-' + UUID.randomUUID())
+def asciiTests = new File(asciiRoot, 'tests')
+def asciiMain = new File(asciiRoot, 'main')
+def copyTests = tasks.register('prepareAsciiTests', Sync) {
+    dependsOn tasks.named('testClasses'); from sourceSets.test.output; into asciiTests
+}
+def copyMain = tasks.register('prepareAsciiMain', Sync) {
+    dependsOn tasks.named('classes'); from sourceSets.main.output; into asciiMain
+}
+tasks.named('test', Test) {
+    dependsOn copyTests, copyMain
+    useJUnitPlatform()
+    classpath = files(asciiTests,asciiMain) + configurations.testRuntimeClasspath
+}
+jar { manifest { attributes 'Implementation-Title': 'Game Console Flash Box Prototype', 'Implementation-Version': project.version } }

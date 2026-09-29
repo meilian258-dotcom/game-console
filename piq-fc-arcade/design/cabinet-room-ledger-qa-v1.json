@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "minecraft_started": false,
+  "native_core_started": false,
+  "network_socket_opened": false,
+  "gradle_started": false,
+  "pure_production_tests": 34,
+  "sources": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomLedger.java": "F09568EAE9D9FEA8CEBD7C5241C25292F8139D980897B9280B8B4740278B78C8",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomMedia.java": "97D6A88B0A7CC38AE469C5AD7D022D107F1F3AFA38BF2AE5B41293C2E4929F46",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomLedgerTest.java": "75FEE48E7BBD330B745742115C7BB6708B3C9C595D48D395F58817F7F8D3B138",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomMediaTest.java": "79FD7CA476B73018A1E115F52E5FCA80F627C02941B3F3E896D2710E239CD9A0"
+  },
+  "scope": "Executable production state machines and codec/ingress APIs; not a real Minecraft multiplayer playtest."
+}

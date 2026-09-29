@@ -1,0 +1,244 @@
+{
+  "schema": "piq-gba-shutdown-1",
+  "ok": true,
+  "mode": "isolated-source",
+  "production_compiled": true,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync33-v1\\piq_fc_arcade-0.31.0-alpha.33.jar",
+      "sha256": "F36169E46B13CF46868851447B8518BC38C10967A03994AF26E89CE7B1E4FE00"
+    },
+    "gba": {
+      "path": "G:\\服务器\\服务器Codex\\piq-gba\\build\\handheld-v3-3\\piq_gba-0.1.0-alpha.3.jar",
+      "sha256": "590C01BA8BF3B066C7EE8678A59B2A0387E2A9FB9DDB73FC1F7FE6524BD3ABDC"
+    }
+  },
+  "runtime": {
+    "mgba_libretro.dll": {
+      "path": "G:\\服务器\\服务器Codex\\piq-gba\\build\\handheld-v3-3\\piq-gba\\runtime\\mgba_libretro.dll",
+      "sha256": "D1BA96BC1AF23997D5C8003A6F6F8BE7ACBA9D770D4D42D14557AAEB469FA16B"
+    },
+    "jna-5.14.0.jar": {
+      "path": "G:\\服务器\\服务器Codex\\piq-gba\\build\\handheld-v3-3\\piq-gba\\runtime\\jna-5.14.0.jar",
+      "sha256": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6"
+    },
+    "piq-gba-helper.jar": {
+      "path": "G:\\服务器\\服务器Codex\\piq-gba\\build\\handheld-v3-3\\piq-gba\\runtime\\piq-gba-helper.jar",
+      "sha256": "AF687B20AFD470992F9C02C80173356E20E9D9E98FABDDCF3800979F11A4B28C"
+    }
+  },
+  "source_sha256": {
+    "G:\\服务器\\服务器Codex\\piq-gba\\build\\handheld-v3-3\\piq_gba-0.1.0-alpha.3.jar": "590C01BA8BF3B066C7EE8678A59B2A0387E2A9FB9DDB73FC1F7FE6524BD3ABDC",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync33-v1\\piq_fc_arcade-0.31.0-alpha.33.jar": "F36169E46B13CF46868851447B8518BC38C10967A03994AF26E89CE7B1E4FE00",
+    "G:\\服务器\\服务器Codex\\piq-gba\\src\\main\\java\\cn\\piq\\gba\\bridge\\GbaProcessSession.java": "AF048CDFF78ECDEEE6B394E9BFAFBC6D5C9EE35E39CC12E7811C999B0DCEFC7B",
+    "G:\\服务器\\服务器Codex\\piq-gba\\src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldClient.java": "7553A71EB06D8ED95A901D04DB34ECDF119D39DCDF17A3249833E02724F1CE5B",
+    "G:\\服务器\\服务器Codex\\piq-gba\\tools\\qa\\GbaShutdownRegression.java": "176CA54D269C77638F7B0941A042E116D58DA035A49CF2EA5C962EFC61B4F644",
+    "G:\\服务器\\服务器Codex\\piq-gba\\tools\\check_gba_shutdown.py": "49DFDF54B0CEA2BD4F823E9A411F060B9690964FEEDBF1786F5551CD338C6527",
+    "G:\\服务器\\服务器Codex\\piq-gba\\tools\\diagnostic_rom.py": "AF3E34AF286046070FF2A430FB04CF04F8C05BB8FD25E109DA7C27BAA73158C0"
+  },
+  "original_rom": {
+    "path": "G:\\服务器\\服务器Codex\\piq-gba\\design\\shutdown-fixes-20260913\\source-v1\\original-arm-sram-diagnostic.gba",
+    "sha256": "12C1CDF5916C3C92CE18E09F4E3203CCF49E6234FF68AE662C72089E6C1F40EE",
+    "provenance": "tools/diagnostic_rom.py original ARM instructions; no user/commercial ROM"
+  },
+  "results": [
+    {
+      "scenario": "inactive",
+      "elapsed_seconds": 0.43699999999807915,
+      "exit_code": 0,
+      "stdout": "{\"ok\":true,\"mode\":\"inactive\",\"assertions\":6,\"owned_pid\":-1,\"close_ns\":0,\"shutdown_ns\":70379100,\"repeat_shutdown_ns\":0}\n",
+      "stderr": "",
+      "probe": {
+        "ok": true,
+        "mode": "inactive",
+        "assertions": 6,
+        "owned_pid": -1,
+        "close_ns": 0,
+        "shutdown_ns": 70379100,
+        "repeat_shutdown_ns": 0
+      },
+      "saves": [],
+      "owned_child_dead_after_jvm_exit": true
+    },
+    {
+      "scenario": "await",
+      "elapsed_seconds": 0.8439999999973224,
+      "exit_code": 0,
+      "stdout": "{\"ok\":true,\"mode\":\"await\",\"assertions\":90,\"owned_pid\":39408,\"close_ns\":20800,\"shutdown_ns\":0,\"repeat_shutdown_ns\":0}\n",
+      "stderr": "",
+      "probe": {
+        "ok": true,
+        "mode": "await",
+        "assertions": 90,
+        "owned_pid": 39408,
+        "close_ns": 20800,
+        "shutdown_ns": 0,
+        "repeat_shutdown_ns": 0
+      },
+      "saves": [
+        {
+          "path": "G:\\服务器\\服务器Codex\\piq-gba\\design\\shutdown-fixes-20260913\\source-v1\\saves-1-await\\mgba-e31759b\\12C1CDF5916C3C92CE18E09F4E3203CCF49E6234FF68AE662C72089E6C1F40EE\\sram.bin",
+          "sha256": "57FF18425122E581EF3906F72D04AA275B363D092030BD66E0664ABED333A475",
+          "bytes": 32768,
+          "first_byte": 3
+        }
+      ],
+      "owned_child_dead_after_jvm_exit": true
+    },
+    {
+      "scenario": "immediate",
+      "elapsed_seconds": 0.8129999999946449,
+      "exit_code": 0,
+      "stdout": "{\"ok\":true,\"mode\":\"immediate\",\"assertions\":79,\"owned_pid\":41888,\"close_ns\":17500,\"shutdown_ns\":0,\"repeat_shutdown_ns\":0}\n",
+      "stderr": "",
+      "probe": {
+        "ok": true,
+        "mode": "immediate",
+        "assertions": 79,
+        "owned_pid": 41888,
+        "close_ns": 17500,
+        "shutdown_ns": 0,
+        "repeat_shutdown_ns": 0
+      },
+      "saves": [
+        {
+          "path": "G:\\服务器\\服务器Codex\\piq-gba\\design\\shutdown-fixes-20260913\\source-v1\\saves-2-immediate\\mgba-e31759b\\12C1CDF5916C3C92CE18E09F4E3203CCF49E6234FF68AE662C72089E6C1F40EE\\sram.bin",
+          "sha256": "57FF18425122E581EF3906F72D04AA275B363D092030BD66E0664ABED333A475",
+          "bytes": 32768,
+          "first_byte": 3
+        }
+      ],
+      "owned_child_dead_after_jvm_exit": true
+    },
+    {
+      "scenario": "immediate",
+      "elapsed_seconds": 0.8289999999979045,
+      "exit_code": 0,
+      "stdout": "{\"ok\":true,\"mode\":\"immediate\",\"assertions\":80,\"owned_pid\":40136,\"close_ns\":17400,\"shutdown_ns\":0,\"repeat_shutdown_ns\":0}\n",
+      "stderr": "",
+      "probe": {
+        "ok": true,
+        "mode": "immediate",
+        "assertions": 80,
+        "owned_pid": 40136,
+        "close_ns": 17400,
+        "shutdown_ns": 0,
+        "repeat_shutdown_ns": 0
+      },
+      "saves": [
+        {
+          "path": "G:\\服务器\\服务器Codex\\piq-gba\\design\\shutdown-fixes-20260913\\source-v1\\saves-3-immediate\\mgba-e31759b\\12C1CDF5916C3C92CE18E09F4E3203CCF49E6234FF68AE662C72089E6C1F40EE\\sram.bin",
+          "sha256": "57FF18425122E581EF3906F72D04AA275B363D092030BD66E0664ABED333A475",
+          "bytes": 32768,
+          "first_byte": 3
+        }
+      ],
+      "owned_child_dead_after_jvm_exit": true
+    },
+    {
+      "scenario": "hook-only",
+      "elapsed_seconds": 0.8439999999973224,
+      "exit_code": 0,
+      "stdout": "{\"ok\":true,\"mode\":\"hook-only\",\"assertions\":83,\"owned_pid\":37024,\"close_ns\":0,\"shutdown_ns\":0,\"repeat_shutdown_ns\":0}\n",
+      "stderr": "",
+      "probe": {
+        "ok": true,
+        "mode": "hook-only",
+        "assertions": 83,
+        "owned_pid": 37024,
+        "close_ns": 0,
+        "shutdown_ns": 0,
+        "repeat_shutdown_ns": 0
+      },
+      "saves": [
+        {
+          "path": "G:\\服务器\\服务器Codex\\piq-gba\\design\\shutdown-fixes-20260913\\source-v1\\saves-4-hook-only\\mgba-e31759b\\12C1CDF5916C3C92CE18E09F4E3203CCF49E6234FF68AE662C72089E6C1F40EE\\sram.bin",
+          "sha256": "57FF18425122E581EF3906F72D04AA275B363D092030BD66E0664ABED333A475",
+          "bytes": 32768,
+          "first_byte": 3
+        }
+      ],
+      "owned_child_dead_after_jvm_exit": true
+    },
+    {
+      "scenario": "spawn-close",
+      "elapsed_seconds": 0.48400000000401633,
+      "exit_code": 0,
+      "stdout": "{\"ok\":true,\"mode\":\"spawn-close\",\"assertions\":8,\"owned_pid\":11976,\"close_ns\":33800,\"shutdown_ns\":0,\"repeat_shutdown_ns\":0}\n",
+      "stderr": "",
+      "probe": {
+        "ok": true,
+        "mode": "spawn-close",
+        "assertions": 8,
+        "owned_pid": 11976,
+        "close_ns": 33800,
+        "shutdown_ns": 0,
+        "repeat_shutdown_ns": 0
+      },
+      "saves": [],
+      "owned_child_dead_after_jvm_exit": true
+    },
+    {
+      "scenario": "spawn-shutdown",
+      "elapsed_seconds": 0.48400000000401633,
+      "exit_code": 0,
+      "stdout": "{\"ok\":true,\"mode\":\"spawn-shutdown\",\"assertions\":9,\"owned_pid\":33676,\"close_ns\":0,\"shutdown_ns\":15830900,\"repeat_shutdown_ns\":0}\n",
+      "stderr": "",
+      "probe": {
+        "ok": true,
+        "mode": "spawn-shutdown",
+        "assertions": 9,
+        "owned_pid": 33676,
+        "close_ns": 0,
+        "shutdown_ns": 15830900,
+        "repeat_shutdown_ns": 0
+      },
+      "saves": [],
+      "owned_child_dead_after_jvm_exit": true
+    },
+    {
+      "scenario": "constructor-failure",
+      "elapsed_seconds": 0.5149999999994179,
+      "exit_code": 0,
+      "stdout": "{\"ok\":true,\"mode\":\"constructor-failure\",\"assertions\":5,\"owned_pid\":-1,\"close_ns\":0,\"shutdown_ns\":0,\"repeat_shutdown_ns\":0}\n",
+      "stderr": "9�� 13, 2026 2:00:35 ���� cn.piq.gba.bridge.GbaProcessSession complete\n����: GBA session closed with an error; final save may be incomplete: GBA: IOException: Controlled process creation failure\n",
+      "probe": {
+        "ok": true,
+        "mode": "constructor-failure",
+        "assertions": 5,
+        "owned_pid": -1,
+        "close_ns": 0,
+        "shutdown_ns": 0,
+        "repeat_shutdown_ns": 0
+      },
+      "saves": [],
+      "owned_child_dead_after_jvm_exit": true
+    },
+    {
+      "scenario": "timeout",
+      "elapsed_seconds": 6.5,
+      "exit_code": 0,
+      "stdout": "{\"ok\":true,\"mode\":\"timeout\",\"assertions\":7,\"owned_pid\":-1,\"close_ns\":0,\"shutdown_ns\":6003259900,\"repeat_shutdown_ns\":784400}\n",
+      "stderr": "9�� 13, 2026 2:00:40 ���� cn.piq.gba.bridge.GbaProcessSession shutdown\n����: GBA shutdown save did not finish within 5 seconds; last durable save is preserved\n9�� 13, 2026 2:00:41 ���� cn.piq.gba.bridge.GbaProcessSession shutdown\n����: GBA shutdown save did not finish within 5 seconds; last durable save is preserved\n9�� 13, 2026 2:00:41 ���� cn.piq.gba.bridge.GbaProcessSession complete\n����: GBA session closed with an error; final save may be incomplete: GBA: EOFException: null\n",
+      "probe": {
+        "ok": true,
+        "mode": "timeout",
+        "assertions": 7,
+        "owned_pid": -1,
+        "close_ns": 0,
+        "shutdown_ns": 6003259900,
+        "repeat_shutdown_ns": 784400
+      },
+      "saves": [],
+      "owned_child_dead_after_jvm_exit": true
+    }
+  ],
+  "limits": [
+    "Normal System.exit and production shutdown hook tested in independent JVMs, not a live Minecraft shutdown.",
+    "Spawn delay and timeout use a labelled ChildLauncher seam. Timeout Process is controlled, not a claim that the real core hung.",
+    "The six-second budget bounds Java waiting. A pathological OS process-start/termination or filesystem call cannot be given an absolute OS-level deadline. Late returned children remain exact-owned."
+  ],
+  "minecraft_started": false,
+  "user_rom_or_save_used": false,
+  "assertions": 367
+}

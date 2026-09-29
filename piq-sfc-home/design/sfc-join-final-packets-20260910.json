@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "mode": "production-source",
+  "jar_sha256": null,
+  "output": "{\"passed\":true,\"assertions\":37,\"max_upload_outer_packet_bytes\":30856,\"outer_codec\":\"NeoForge21.1.236 ServerboundCustomPayloadPacket.STREAM_CODEC\",\"minecraft_started\":false}\r\n\nSLF4J: Class path contains multiple SLF4J providers.\r\nSLF4J: Found provider [org.apache.logging.slf4j.SLF4JServiceProvider@1e730495]\r\nSLF4J: Found provider [org.slf4j.simple.SimpleServiceProvider@7d3a22a9]\r\nSLF4J: See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.\r\nSLF4J: Actual provider is of type [org.apache.logging.slf4j.SLF4JServiceProvider@1e730495]\r\n",
+  "compile": "\nG:\\������\\������Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcHomeClient.java:39: ����: [removal] EventBusSubscriber �е� bus() �ѹ�ʱ, �ұ��Ϊ��ɾ��\r\n    @EventBusSubscriber(modid=\"piq_sfc_home\",bus=EventBusSubscriber.Bus.MOD,value=Dist.CLIENT)\r\n                                             ^\r\nG:\\������\\������Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcHomeClient.java:39: ����: [removal] EventBusSubscriber �е� Bus �ѹ�ʱ, �ұ��Ϊ��ɾ��\r\n    @EventBusSubscriber(modid=\"piq_sfc_home\",bus=EventBusSubscriber.Bus.MOD,value=Dist.CLIENT)\r\n                                                                   ^\r\nע: ĳЩ�����ļ�ʹ�û򸲸����ѹ�ʱ�� API��\r\nע: �й���ϸ��Ϣ, ��ʹ�� -Xlint:deprecation ���±��롣\r\n2 ������\r\n",
+  "scope": "Actual production new codecs, real NeoForge outer serverbound codec and maximum upload size. No Minecraft world or network socket opened."
+}

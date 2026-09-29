@@ -1,0 +1,31 @@
+{
+  "schema": "piq-server-hosted39-adapter-source-validation-1",
+  "author": "Codex/server_core39",
+  "date": "2026-09-14",
+  "status": "source_compilation_and_fixture_tests_passed",
+  "production_sources": [
+    "piq-fc-arcade/src/main/java/cn/piq/fcarcade/server/hosted/*.java",
+    "piq-sfc-home/src/main/java/cn/piq/sfchome/server/hosted/SfcServerCoreFactory.java",
+    "piq-native-arcade/src/main/java/cn/piq/nativearcade/server/NativeServerCoreFactory.java",
+    "piq-gba/src/main/java/cn/piq/gba/server/GbaServerCoreFactory.java",
+    "piq-native-arcade/src/main/java/cn/piq/nativearcade/bridge/NativeProcessSession.java",
+    "piq-sfc-home/src/main/java/cn/piq/sfchome/SfcHomeMod.java",
+    "piq-native-arcade/src/main/java/cn/piq/nativearcade/NativeArcadeMod.java",
+    "piq-gba/src/main/java/cn/piq/gba/GbaMod.java",
+    "piq-gba/src/main/java/cn/piq/gba/client/GbaHandheldScreen.java",
+    "piq-gba/src/main/java/cn/piq/gba/client/GbaHandheldSyncInfoScreen.java"
+  ],
+  "compiler": "C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin/javac.exe --release 21 -proc:none",
+  "baseline_jars": "piq-fc-arcade/build/review-release38-v1",
+  "class_output": "C:/Users/13498/AppData/Local/Temp/piq-hosted39-57fcccdb6ea34aa8b46dcd9f3ab0a48a",
+  "tests": {"found": 20, "started": 20, "passed": 20, "failed": 0, "skipped": 0, "elapsed_ms": 6865},
+  "prior_launcher_issues": ["Missing Netty classpath entry", "Old DataFixer classpath priority; corrected with MC 1.21.1 manifest"],
+  "client_imports_in_new_server_packages": 0,
+  "gradle_run": false,
+  "core_executed": false,
+  "minecraft_started": false,
+  "user_rom_or_save_used": false,
+  "runtime_binaries_changed": false,
+  "installed_or_published": false,
+  "not_claimed": ["final-JAR linkage", "actual dedicated-server loading", "multiplayer delivery", "runtime performance", "home/room integration acceptance", "actual handheld GUI rendering"]
+}

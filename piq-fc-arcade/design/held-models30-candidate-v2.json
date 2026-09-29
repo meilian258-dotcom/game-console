@@ -1,0 +1,453 @@
+{
+  "ok": false,
+  "mode": "final-jar-only",
+  "artifact_stage": "candidate",
+  "production_compiled": false,
+  "compiled_only_probe": true,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.30.jar",
+      "sha256": "32F96C167698ED90F6A8F0B289B5ED57AC086AD6651EFCD8AF45983BE78CDD77"
+    },
+    "sfc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-sfc-home\\build\\libs\\piq_sfc_home-0.1.0-alpha.18.jar",
+      "sha256": "320737C0DD74CD6A99C1D9AFE3C1676C3C9AE7EA3F7B637EEDA453511DB5B478"
+    }
+  },
+  "baseline_jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-appliance29-v1\\piq_fc_arcade-0.31.0-alpha.29.jar",
+      "sha256": "80FD1512F69CCEB192EF78C02D5A3893924C835B322FC8CF9AF441FEB4B833C2"
+    },
+    "sfc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-appliance29-v1\\piq_sfc-0.1.0-alpha.17.jar",
+      "sha256": "9D033CDF969E53F7642C7AC52C69065231D497FF51A134C3DF952095B2971D2E"
+    }
+  },
+  "assets": {
+    "assets/piq_fc_arcade/models/item/zapper_stand.json": {
+      "sha256": "861251E833DA6D8FAAC274368F788565A1130220A75907FFAE1A7E740CC75831",
+      "old_geometry_uv_gui_preserved": true,
+      "display": {
+        "gui": {
+          "rotation": [
+            25,
+            225,
+            0
+          ],
+          "translation": [
+            0.220971,
+            7.059978,
+            4.268315
+          ],
+          "scale": [
+            1.25,
+            1.25,
+            1.25
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            25,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            7.196246,
+            2.698894
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "thirdperson_righthand": {
+          "rotation": [
+            75,
+            45,
+            0
+          ],
+          "translation": [
+            -0.141421,
+            4.347876,
+            4.48393
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            25,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            7.196246,
+            2.698894
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            75,
+            45,
+            0
+          ],
+          "translation": [
+            -0.141421,
+            4.347876,
+            4.48393
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "ground": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            4.925,
+            -0.125
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            90,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            0.25,
+            5.85
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "assets/piq_fc_arcade/models/item/zapper_stand_cable.json": {
+      "sha256": "336F35126844E0E81695A720F9CB892B604190476F623A29B7570B2E9A6CEF6A",
+      "old_geometry_uv_gui_preserved": true,
+      "display": {
+        "gui": {
+          "rotation": [
+            75,
+            225,
+            0
+          ],
+          "translation": [
+            5.060974,
+            6.943014,
+            19.95226
+          ],
+          "scale": [
+            3,
+            3,
+            3
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            25,
+            180,
+            0
+          ],
+          "translation": [
+            3.485708,
+            16.873004,
+            9.604758
+          ],
+          "scale": [
+            2.5,
+            2.5,
+            2.5
+          ]
+        },
+        "thirdperson_righthand": {
+          "rotation": [
+            75,
+            45,
+            0
+          ],
+          "translation": [
+            -3.340357,
+            6.048756,
+            13.708978
+          ],
+          "scale": [
+            2,
+            2,
+            2
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            25,
+            180,
+            0
+          ],
+          "translation": [
+            3.485708,
+            16.873004,
+            9.604758
+          ],
+          "scale": [
+            2.5,
+            2.5,
+            2.5
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            75,
+            45,
+            0
+          ],
+          "translation": [
+            -3.340357,
+            6.048756,
+            13.708978
+          ],
+          "scale": [
+            2,
+            2,
+            2
+          ]
+        },
+        "ground": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            -1.742854,
+            10.769333,
+            -1.209632
+          ],
+          "scale": [
+            1.25,
+            1.25,
+            1.25
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            90,
+            0,
+            0
+          ],
+          "translation": [
+            -3.485708,
+            2.419264,
+            17.538665
+          ],
+          "scale": [
+            2.5,
+            2.5,
+            2.5
+          ]
+        }
+      }
+    }
+  },
+  "bytecode_sha256": {
+    "SfcControllerPose": "E93F91BC17038B16A8E800E9B701D3187A6A9B3DAC16C70F3EEB315E25C73408",
+    "SfcHardwareItems$1": "4A328642F462559E0BDE5BF7737BB64B2D6E564A0FFF2CAA7E69FF22820D3B30",
+    "SfcHardwareItems$ItemModel": "498A425F6210202403EF2B608105C566ADF669927482D9EAB7598D5EF051865C",
+    "ControllerArmPoseParameters": "B3CBBC7964F5848F7D5D5921A02DC5D7ED384E223FEDBED49FA2B9EC2B367E40"
+  },
+  "actual": {
+    "ok": false,
+    "assertions": 283229,
+    "failures": [
+      "hand/item centered zapper_stand_cablefirstperson hand=1 axis=0 bounds=[-0.79757464, 0.015247658, -0.16474827, -0.07385242, 0.15341038, 0.1662327]",
+      "mirrored geometry x-min: -0.36186110973358154 / 0.07385241985321045",
+      "mirrored geometry x-max: 0.36186110973358154 / 0.7975746393203735",
+      "hand/item centered zapper_stand_cablethirdperson hand=1 axis=0 bounds=[0.010283589, -0.27044445, -0.036844432, 0.53263456, 0.15174514, 0.14712086]",
+      "hand/item centered zapper_stand_cablethirdperson hand=1 axis=1 bounds=[0.010283589, -0.27044445, -0.036844432, 0.53263456, 0.15174514, 0.14712086]",
+      "mirrored geometry x-min: -0.21050578355789185 / -0.5326345562934875",
+      "mirrored geometry x-max: 0.21470916271209717 / -0.010283589363098145",
+      "mirror geometry y/z: -0.05206120014190674 / -0.27044445276260376",
+      "mirror geometry y/z: 0.46304190158843994 / 0.15174514055252075"
+    ],
+    "production_origin": "supplied-final-jar-only",
+    "production_compiled": false,
+    "actual_minecraft_itemtransform": true,
+    "actual_pose_stack": true,
+    "actual_sfc_third_transform": true,
+    "actual_fc_apply_arms": true,
+    "minecraft_instance_world_or_gpu_started": false,
+    "measurements": {
+      "zapper_stand_cable/firstperson/0": [
+        -0.3618611,
+        0.015247658,
+        -0.16474827,
+        0.3618611,
+        0.15341038,
+        0.1662327
+      ],
+      "zapper_stand_cable/firstperson/1": [
+        -0.79757464,
+        0.015247658,
+        -0.16474827,
+        -0.07385242,
+        0.15341038,
+        0.1662327
+      ],
+      "zapper_stand_cable/thirdperson/0": [
+        -0.21050578,
+        -0.0520612,
+        -0.11795105,
+        0.21470916,
+        0.4630419,
+        0.060913026
+      ],
+      "zapper_stand_cable/thirdperson/1": [
+        0.010283589,
+        -0.27044445,
+        -0.036844432,
+        0.53263456,
+        0.15174514,
+        0.14712086
+      ],
+      "zapper_stand_cable/gui/0": [
+        -0.31891143,
+        -0.37956178,
+        -0.16985315,
+        0.31891108,
+        0.3795616,
+        0.16985291
+      ],
+      "zapper_stand_cable/ground/0": [
+        -0.18093055,
+        0.09488018,
+        -0.076851964,
+        0.18093055,
+        0.15686046,
+        0.07685202
+      ],
+      "zapper_stand_cable/fixed/0": [
+        -0.3618611,
+        -0.15370405,
+        -0.06023953,
+        0.3618611,
+        0.15370393,
+        0.063721016
+      ],
+      "zapper_stand/firstperson/0": [
+        -0.28125,
+        -0.044130106,
+        -0.16973776,
+        0.28125,
+        0.2575515,
+        0.09921571
+      ],
+      "zapper_stand/firstperson/1": [
+        -0.28125,
+        -0.044130106,
+        -0.16973776,
+        0.28125,
+        0.2575515,
+        0.09921571
+      ],
+      "zapper_stand/thirdperson/0": [
+        -0.22026378,
+        -0.05152853,
+        -0.15636168,
+        0.22026381,
+        0.37821504,
+        0.13040987
+      ],
+      "zapper_stand/thirdperson/1": [
+        -0.22026381,
+        -0.051528543,
+        -0.1563617,
+        0.22026376,
+        0.37821507,
+        0.09033009
+      ],
+      "zapper_stand/gui/0": [
+        -0.34416217,
+        -0.25630966,
+        -0.31783816,
+        0.34416217,
+        0.2563097,
+        0.31783822
+      ],
+      "zapper_stand/ground/0": [
+        -0.140625,
+        0.057812512,
+        -0.064062506,
+        0.140625,
+        0.19218752,
+        0.064062506
+      ],
+      "zapper_stand/fixed/0": [
+        -0.28125,
+        -0.12812495,
+        -0.13437498,
+        0.28124997,
+        0.12812504,
+        0.134375
+      ],
+      "sfc/third/false": [
+        -0.3727199,
+        -0.28662148,
+        -0.17455384,
+        0.0026264265,
+        0.04258623,
+        0.021035679
+      ],
+      "sfc/third/true": [
+        -0.0026264489,
+        -0.2866215,
+        -0.17455383,
+        0.37272105,
+        0.042586207,
+        0.021039218
+      ],
+      "sfc/first/idle": [
+        -0.32399997,
+        -0.72122306,
+        -1.594499,
+        0.32399997,
+        -0.5200157,
+        -1.3293699
+      ]
+    }
+  },
+  "tools_sha256": {
+    "tools\\check_held_models30.py": "700967ED8AC6DBFB54939F4DA41C5B0CDE71F10743F078C0A8D43DE53193BC1A",
+    "tools\\qa\\HeldModels30Probe.java": "12DCF93D6C59A2800B16C0BB3B1421138A14CB735A02EFA043AA583004A2CF87"
+  },
+  "limits": [
+    "No Minecraft instance, live player, GPU screenshot or enum-extension transformer boot. Actual SFC transform, actual MC ItemTransform/PoseStack, existing FC applyArms and final-bytecode call/gate checks only.",
+    "Mirroring/visible-size bounds are model-space diagnostics, not a claim of physical device or in-game visual testing."
+  ]
+}

@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="GPL-3.0-or-later (mod code); FBNeo core: separate non-commercial license in META-INF/piq-native/fbneo"
+[[mods]]
+modId="piq_native_arcade"
+version="${version}"
+displayName="方块电玩：街机"
+authors="PIQ"
+description='''Windows x64 arcade with fixed-version MAME and separately licensed FBNeo runtimes. Experimental RetroArch Netplay supports up to four fixed player ports for compatible FBNeo ZIP sets; the game and its cabinet settings must also support four players. Legacy local input sync retains the verified two-player kof97/mslug2 MAME profiles; audio/video streaming retains up to four input ports. No ROMs, BIOS or GBA runtime included. Local evaluation candidate, not a public-release or universal compatibility certification.'''
+[[dependencies.piq_native_arcade]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.236,22)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.piq_native_arcade]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.21.2)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.piq_native_arcade]]
+modId="piq_fc_arcade"
+type="required"
+versionRange="[0.31.0-alpha.76.22,0.31.0-alpha.77)"
+ordering="AFTER"
+side="BOTH"

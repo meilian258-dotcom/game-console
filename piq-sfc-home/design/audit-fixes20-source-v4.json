@@ -1,0 +1,73 @@
+{
+  "ok": true,
+  "mode": "production-source",
+  "production_compiled": true,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync33-v1\\piq_fc_arcade-0.31.0-alpha.33.jar",
+      "sha256": "F36169E46B13CF46868851447B8518BC38C10967A03994AF26E89CE7B1E4FE00"
+    },
+    "sfc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync32-v1\\piq_sfc-0.1.0-alpha.19.jar",
+      "sha256": "DC50C9378C83E38907C259373CE92B06FAD403B3779D0E4B6772D94AA0343BC3"
+    }
+  },
+  "repair": {
+    "diagnostic_completed": true,
+    "fixed_backlog_gate": true,
+    "actual_worker": "cn.piq.sfchome.client.SfcPlayback",
+    "actual_wasm": true,
+    "minecraft_started": false,
+    "original_diagnostic_rom_only": true,
+    "checkpoint_frame": 600,
+    "resume_goal": 720,
+    "server_head": 920,
+    "ack_frame": 916,
+    "queued_four_frame_batches_at_ack": 0,
+    "observed_at_ack": 916,
+    "observed_after_500ms": 920,
+    "elapsed_ms_after_ack": 518,
+    "server_ledger_accepts_caught_up_ack": true,
+    "server_ledger_rejects_200_frame_lag": true,
+    "assertions": 266
+  },
+  "downloads": {
+    "ok": true,
+    "assertions": 10016,
+    "unknown_hash_permission_calls": 0,
+    "unknown_hash_file_reads": 0,
+    "minecraft_started": false
+  },
+  "download_sending": {
+    "ok": true,
+    "assertions": 58,
+    "actual_production_guard": true,
+    "compiled_send_wiring": true,
+    "minecraft_started": false,
+    "event_runtime_executed": false
+  },
+  "source_sha256": {
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcPlayback.java": "54A5303E495C037699FBA9838A0F0050A6E08EB31AA352A2AC92DC8BB51EF1BE",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcRepairProgress.java": "EBCE934974CCC334325C65A40DB9126EE70E7D9AEBBB96A9C5DAD1458C025F16",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\server\\SfcRepairLedger.java": "AA895652DCBA90CE56B245E29170C5621E35EB4D8C38D325F20EB565B778C640",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\net\\SfcRepairNetwork.java": "315A7E96DEDFBE47B093A90FCE4FC283CBD10F49908C4A756A108F860A129C45",
+    "piq-sfc-arcade\\src\\main\\java\\cn\\piq\\sfcarcade\\server\\SfcDownloadGate.java": "72C06798D4C27EF93C36EA79F3BC6B62CD6CF38AF20E3DFDF812CBF2BA24D566",
+    "piq-sfc-arcade\\src\\main\\java\\cn\\piq\\sfcarcade\\server\\SfcServerManager.java": "C9B79ED4A42F85E012EE41B84DA4121C716DD2CE9C5C5D130537204BC22630C5",
+    "piq-sfc-arcade\\src\\main\\java\\cn\\piq\\sfcarcade\\net\\SfcNetwork.java": "705B75BC00C8CBD8FB8D90EC619BECB9338123FF8D04F1FB887E1890E19E1CB9",
+    "piq-sfc-arcade\\src\\main\\java\\cn\\piq\\sfcarcade\\rom\\SfcRomRepository.java": "6961514EFE00F8744B5FF96CB91E892998FCADF62BE7CCC9133508C80A88C574",
+    "piq-sfc-home\\tools\\qa\\SfcRepairBacklogFixedProbe.java": "A0B778E69E44EFE1DF22BAA959E636439BBFEE627E67573E6F32D31F7C7D3803",
+    "piq-sfc-home\\tools\\qa\\SfcDownloadSendProbe.java": "6CFB399A6572C3C353DB8DCB18CC916C70E2DA0826D9385A5FB40515FD5ACEDD",
+    "piq-fc-arcade\\tools\\qa\\SfcTwoPortInputProbe.java": "E69C500BFC00303A3F2B65507AD29207EF5B30AA839D04AC8E146CBEF207C839",
+    "piq-sfc-arcade\\src\\test\\java\\cn\\piq\\sfcarcade\\core\\SfcLegalTestRom.java": "EF75502FB38B15197C2221D3937B00A9AD13A2762C1E0E2DF46BBB1767EE58B3",
+    "piq-sfc-arcade\\src\\test\\java\\cn\\piq\\sfcarcade\\server\\SfcDownloadGateSelfTest.java": "B18DBF2DB8A81C7E470ABE8AF4F2D31EC24E51034D1C148DA9C453BCAFA6FE8B",
+    "piq-sfc-home\\tools\\check_sfc_audit_fixes.py": "02286CA3F5D16880B0778164BF5D99A008A76392691B0B8302C221DE796C04EB",
+    "piq-sfc-home\\tools\\run_sfc_playback_multiplayer_probe.py": "00D85217115CC690635B8A89466827222FCFCAB22BFE78EF85F7278D4E8A92B3"
+  },
+  "compile_log": "",
+  "elapsed_seconds": 18.312,
+  "limits": [
+    "Actual WASM/core worker with controlled host callbacks, not a real Minecraft server/socket.",
+    "Actual download admission/send guard and exact-file repository IO; ASM validates compiled send wiring, but session/world/protection callbacks are not constructed by this probe.",
+    "Only original diagnostic ROM fixtures; no user files or sound device."
+  ]
+}

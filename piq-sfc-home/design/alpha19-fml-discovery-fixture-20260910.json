@@ -1,0 +1,179 @@
+{
+  "ok": true,
+  "fixture_only": true,
+  "not_a_final_release_validation": true,
+  "probes": {
+    "fml_discovery": {
+      "minecraft_or_native_core_started": false,
+      "discovery": [
+        {
+          "mods": [
+            {
+              "id": "piq_fc_arcade",
+              "version": "0.31.0-alpha.19",
+              "dependencies": [
+                {
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "neoforge",
+                  "range": "[21.1.236,22)"
+                },
+                {
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.21.2)"
+                },
+                {
+                  "ordering": "AFTER",
+                  "type": "OPTIONAL",
+                  "side": "BOTH",
+                  "id": "waterframes",
+                  "range": "[2.1.23,3)"
+                }
+              ]
+            }
+          ],
+          "module_name": "piq_fc_arcade",
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\alpha19-fml-fixture-x6q4zpj7\\fc-metadata-fixture.jar",
+          "scanned_classes": 1175,
+          "entry_points": [
+            "piq_fc_arcade"
+          ],
+          "access_transformers": 1
+        },
+        {
+          "mods": [
+            {
+              "id": "piq_sfc_arcade",
+              "version": "0.2.0-alpha.6",
+              "dependencies": [
+                {
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "neoforge",
+                  "range": "[21.1.236,)"
+                },
+                {
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.22)"
+                },
+                {
+                  "ordering": "AFTER",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "piq_fc_arcade",
+                  "range": "[0.26.0,)"
+                }
+              ]
+            },
+            {
+              "id": "piq_sfc_home",
+              "version": "0.1.0-alpha.6",
+              "dependencies": [
+                {
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "neoforge",
+                  "range": "[21.1.236,22)"
+                },
+                {
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.21.2)"
+                },
+                {
+                  "ordering": "AFTER",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "piq_fc_arcade",
+                  "range": "[0.31.0-alpha.19,0.32.0)"
+                },
+                {
+                  "ordering": "AFTER",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "piq_sfc_arcade",
+                  "range": "[0.2.0-alpha.6,0.3.0)"
+                }
+              ]
+            }
+          ],
+          "module_name": "piq_sfc_arcade",
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\alpha19-fml-fixture-x6q4zpj7\\sfc-metadata-fixture.jar",
+          "scanned_classes": 170,
+          "entry_points": [
+            "piq_sfc_arcade",
+            "piq_sfc_home"
+          ],
+          "access_transformers": 1
+        },
+        {
+          "mods": [
+            {
+              "id": "piq_native_arcade",
+              "version": "0.1.0-alpha.6",
+              "dependencies": [
+                {
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "neoforge",
+                  "range": "[21.1.236,22)"
+                },
+                {
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.21.2)"
+                },
+                {
+                  "ordering": "AFTER",
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "piq_fc_arcade",
+                  "range": "[0.31.0-alpha.19,0.32.0)"
+                }
+              ]
+            }
+          ],
+          "module_name": "piq_native_arcade",
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\alpha19-fml-fixture-x6q4zpj7\\native-metadata-fixture.jar",
+          "scanned_classes": 41,
+          "entry_points": [
+            "piq_native_arcade"
+          ],
+          "access_transformers": 0
+        }
+      ],
+      "ok": true,
+      "mod_entry_points_executed": false,
+      "dependency_check": "Actual FML ModInfo + Maven VersionRange; not full FML ModSorter/bootstrap",
+      "level": "actual JarModsDotTomlModFileReader + ModFile.identifyMods + ASM compileContent",
+      "assertions": 28,
+      "loader": "FancyModLoader 4.0.43",
+      "production_origin": "final-jar-only"
+    },
+    "sfc_real_neoforge_outer_packet_codec": {
+      "passed": true,
+      "assertions": 37,
+      "max_upload_outer_packet_bytes": 30856,
+      "outer_codec": "NeoForge21.1.236 ServerboundCustomPayloadPacket.STREAM_CODEC",
+      "minecraft_started": false
+    },
+    "production_compiled": false,
+    "old_separate_core_on_classpath": false
+  },
+  "installed": false,
+  "minecraft_or_native_core_started": false
+}

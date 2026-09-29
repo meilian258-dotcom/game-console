@@ -1,0 +1,5 @@
+{
+  "item.piq_gba.handheld": "Game Boy Advance",
+  "tooltip.piq_gba.handheld.use": "Right-click: power · Shift + right-click: choose game",
+  "tooltip.piq_gba.handheld.local": "Local games and battery saves · No GBA link cable"
+}

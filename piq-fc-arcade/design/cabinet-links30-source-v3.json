@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "mode": "explicit-source-qa",
+  "production_compiled": true,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-appliance29-v1\\piq_fc_arcade-0.31.0-alpha.29.jar",
+      "sha256": "80FD1512F69CCEB192EF78C02D5A3893924C835B322FC8CF9AF441FEB4B833C2"
+    }
+  },
+  "behavior": {
+    "passed_tests": 63,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "actual": {
+    "ok": true,
+    "assertions": 3403,
+    "max_outer_bytes": 240,
+    "actual_registered_outer_codecs": true,
+    "actual_nbt_saveddata_blockentity": true,
+    "production_origin": "explicit-source-qa",
+    "minecraft_world_or_socket_started": false,
+    "server_permission_events_executed": false
+  },
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSeats.java": "8EFAB45C674752E8A64321B51C84982F43371F1CB5D86E32E000DFDE70E4F1A7",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetLinkLedger.java": "91B09623FB992C2A6EAB479C4A3AA54F45879A891FC1E783EA70DB1EDB440CE1",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetLinks.java": "D3887BF51B29F90B25098D14F158F14FD5A5B86FA8906548D6552051C5FBBDE6",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRooms.java": "DF8139BDB6D2ADA4FFBBC51A3BA01AE9035A0E905A3F33089160F9C7C96A6DA3",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomNetwork.java": "1C40EB6075A1EAEB43C2D2ADF570A9E24B28BE49A4B5C07F325FA27C7BD029FD",
+    "src\\main\\java\\cn\\piq\\fcarcade\\world\\LegacyFcArcadeBlockEntity.java": "37A4AE30519B9D2883F5871A2ED5AB22E4F73BFF14975F97AF5D8D6CAFC8DF5C",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\CabinetDataCableRenderer.java": "0B5E2C0D4A545504F2470E1EE22E8C68AB1181CB3AA768AAB9D04800133E1FDF",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\CabinetDataCableGeometry.java": "F14D303077361FE64C0450690C0090FDB978096D80119F15FB2F0BEDC9816B90",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\LegacyArcadeSkinRenderer.java": "EEA47CE6BF7C8EFBF101CFDF1A4640B1A07D784C279AAF70FFD02C8CA3362EDB",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\DualCabinetRenderer.java": "D611C3121BD27B89CF7D7965B27F717B16D43F13AF26DD4F1A066D1B4C7710A5",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetPeerInputs.java": "360359C213F6E72CF0ACF70ABED82185DA7C217363A7A65C7C668B0A1AE0AFC3",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetClientBackends.java": "9B5A3C57BC0DEED66A3EB4CDBD74937D939E82E937757DFE18DD82C7743FE8D1",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSeatsTest.java": "019D6C0147FB618D0824C41F914607BB514FCEFDE8B856AA18B6FB9EEF96F135",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetLinkLedgerTest.java": "074DAEF860B2C8CBCB0A58C5A16EC2A230F1AF4C735C5B8A831924D25C30F7E9",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomLedgerTest.java": "75FEE48E7BBD330B745742115C7BB6708B3C9C595D48D395F58817F7F8D3B138",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetLinksSourceContractTest.java": "E397CB7F81EC59C69E6B654436F4E4923DAE67E531F357327D894E676D9ACAAE",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetLinkedClientContractTest.java": "8EB90CBCBB9649849B4920633F95F40BB6E020949D335132405A036ECE2C91DC",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetPeerInputsTest.java": "D2FC4A3676DE148165BDDCEA70DDC7C46A0AF7B34EBDDDA07F377D0F70E71F7B",
+    "src\\test\\java\\cn\\piq\\fcarcade\\layout\\CabinetDataCableGeometryTest.java": "413304B24EEF58C125715789EC8C2B889EAFD9A280D921BCDE47737567827FCF",
+    "tools\\qa\\CabinetRoomTestRunner.java": "76F1E13154E9C577B7E0632F97A031DE709F4F62669B03992387286881A150B3",
+    "tools\\qa\\CabinetLinks30Probe.java": "36957E5602FACBAC7CCC559FB36BFCBD6230F578B506158C10B6154AEEBD73C9"
+  },
+  "minecraft_or_server_started": false,
+  "compile_log": "",
+  "limitations": [
+    "Actual cached MC/NeoForge codecs and BE serialization, not live world/chunk/protection-plugin or socket gameplay.",
+    "Pure cable paths avoid the two cabinets; arbitrary terrain/other blocks are not scanned or modified."
+  ]
+}

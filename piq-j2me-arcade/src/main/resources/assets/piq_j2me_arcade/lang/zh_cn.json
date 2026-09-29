@@ -1,0 +1,18 @@
+{
+  "block.piq_j2me_arcade.j2me_arcade": "PIQ Java 手机游戏机",
+  "message.piq_j2me_arcade.scan_failed": "读取 Java 游戏失败：%s",
+  "message.piq_j2me_arcade.game_selected": "这台机器已更换游戏：%s",
+  "message.piq_j2me_arcade.op_only": "只有管理员可以更换这台机器的游戏",
+  "message.piq_j2me_arcade.unconfigured": "这台机器尚未配置游戏，请联系管理员",
+  "message.piq_j2me_arcade.game_missing": "本地缺少游戏文件：%s",
+  "screen.piq_j2me_arcade.library_title": "Java 手机游戏",
+  "screen.piq_j2me_arcade.open_folder": "打开游戏文件夹",
+  "screen.piq_j2me_arcade.no_games": "没有找到游戏；请把合法拥有的 .jar 放入此文件夹",
+  "screen.piq_j2me_arcade.page": "第 %s / %s 页",
+  "screen.piq_j2me_arcade.load_failed": "游戏启动失败：%s",
+  "screen.piq_j2me_arcade.machine_control": "Java 游戏机控制",
+  "screen.piq_j2me_arcade.select_for_machine": "选择后会保存到当前机器（仅管理员）",
+  "screen.piq_j2me_arcade.controls.primary": "方向键：移动　Enter/空格：确认或开火　Z/Q：左软键　X/E：右软键",
+  "screen.piq_j2me_arcade.controls.secondary": "主键盘 0–9：手机数字　小键盘按位置映射（8 上 / 2 下）　Esc：退出",
+  "screen.piq_j2me_arcade.starting": "正在启动 Java 游戏……"
+}

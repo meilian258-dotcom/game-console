@@ -1,0 +1,224 @@
+{
+  "ambientocclusion": true,
+  "textures": {
+    "particle": "#body"
+  },
+  "elements": [
+    {
+      "from": [1, 0, 2],
+      "to": [15, 2, 16],
+      "faces": {
+        "down": {"texture": "#dark"},
+        "up": {"texture": "#dark"},
+        "north": {"texture": "#dark"},
+        "south": {"texture": "#dark"},
+        "west": {"texture": "#dark"},
+        "east": {"texture": "#dark"}
+      }
+    },
+    {
+      "from": [2, 2, 2],
+      "to": [14, 4, 16],
+      "faces": {
+        "down": {"texture": "#body"},
+        "up": {"texture": "#body"},
+        "north": {"texture": "#body"},
+        "south": {"texture": "#body"},
+        "west": {"texture": "#body"},
+        "east": {"texture": "#body"}
+      }
+    },
+    {
+      "from": [3, 2.25, 1.5],
+      "to": [13, 4, 2.25],
+      "faces": {
+        "down": {"texture": "#panel"},
+        "up": {"texture": "#panel"},
+        "north": {"texture": "#panel"},
+        "south": {"texture": "#panel"},
+        "west": {"texture": "#panel"},
+        "east": {"texture": "#panel"}
+      }
+    },
+    {
+      "from": [4, 3, 1.25],
+      "to": [5, 4.5, 1.5],
+      "faces": {
+        "down": {"texture": "#metal"},
+        "up": {"texture": "#metal"},
+        "north": {"texture": "#metal"},
+        "south": {"texture": "#metal"},
+        "west": {"texture": "#metal"},
+        "east": {"texture": "#metal"}
+      }
+    },
+    {
+      "from": [11, 3, 1.25],
+      "to": [12, 4.5, 1.5],
+      "faces": {
+        "down": {"texture": "#metal"},
+        "up": {"texture": "#metal"},
+        "north": {"texture": "#metal"},
+        "south": {"texture": "#metal"},
+        "west": {"texture": "#metal"},
+        "east": {"texture": "#metal"}
+      }
+    },
+    {
+      "from": [1, 4, 0],
+      "to": [15, 4.75, 8],
+      "faces": {
+        "down": {"texture": "#body"},
+        "up": {"texture": "#body"},
+        "north": {"texture": "#body"},
+        "south": {"texture": "#body"},
+        "west": {"texture": "#body"},
+        "east": {"texture": "#body"}
+      }
+    },
+    {
+      "from": [1.5, 4.75, 0.5],
+      "to": [14.5, 5, 7.5],
+      "faces": {
+        "down": {"texture": "#accent"},
+        "up": {"texture": "#accent"},
+        "north": {"texture": "#accent"},
+        "south": {"texture": "#accent"},
+        "west": {"texture": "#accent"},
+        "east": {"texture": "#accent"}
+      }
+    },
+    {
+      "from": [4.5, 4.75, 3],
+      "to": [5.5, 5.1, 4],
+      "faces": {
+        "down": {"texture": "#dark"},
+        "up": {"texture": "#dark"},
+        "north": {"texture": "#dark"},
+        "south": {"texture": "#dark"},
+        "west": {"texture": "#dark"},
+        "east": {"texture": "#dark"}
+      }
+    },
+    {
+      "from": [4, 5, 2.5],
+      "to": [6, 5.2, 4.5],
+      "faces": {
+        "down": {"texture": "#button"},
+        "up": {"texture": "#button"},
+        "north": {"texture": "#button"},
+        "south": {"texture": "#button"},
+        "west": {"texture": "#button"},
+        "east": {"texture": "#button"}
+      }
+    },
+    {
+      "from": [9, 4.8, 2.5],
+      "to": [10.5, 5.15, 4],
+      "faces": {
+        "down": {"texture": "#button"},
+        "up": {"texture": "#button"},
+        "north": {"texture": "#button"},
+        "south": {"texture": "#button"},
+        "west": {"texture": "#button"},
+        "east": {"texture": "#button"}
+      }
+    },
+    {
+      "from": [11.5, 4.8, 2.5],
+      "to": [13, 5.15, 4],
+      "faces": {
+        "down": {"texture": "#button"},
+        "up": {"texture": "#button"},
+        "north": {"texture": "#button"},
+        "south": {"texture": "#button"},
+        "west": {"texture": "#button"},
+        "east": {"texture": "#button"}
+      }
+    },
+    {
+      "from": [1, 5, 1],
+      "to": [15, 14.5, 16],
+      "faces": {
+        "down": {"texture": "#body"},
+        "up": {"texture": "#body"},
+        "north": {"texture": "#body"},
+        "south": {"texture": "#body"},
+        "west": {"texture": "#body"},
+        "east": {"texture": "#body"}
+      }
+    },
+    {
+      "from": [1.5, 5, 0.25],
+      "to": [14.5, 14.5, 2],
+      "faces": {
+        "down": {"texture": "#dark"},
+        "up": {"texture": "#dark"},
+        "north": {"texture": "#dark"},
+        "south": {"texture": "#dark"},
+        "west": {"texture": "#dark"},
+        "east": {"texture": "#dark"}
+      }
+    },
+    {
+      "from": [2, 5.25, 0],
+      "to": [14, 14.25, 0.25],
+      "faces": {
+        "down": {"texture": "#screen"},
+        "up": {"texture": "#screen"},
+        "north": {"texture": "#screen"},
+        "south": {"texture": "#screen"},
+        "west": {"texture": "#screen"},
+        "east": {"texture": "#screen"}
+      }
+    },
+    {
+      "from": [1, 14, 0],
+      "to": [15, 16, 6],
+      "faces": {
+        "down": {"texture": "#body"},
+        "up": {"texture": "#body"},
+        "north": {"texture": "#body"},
+        "south": {"texture": "#body"},
+        "west": {"texture": "#body"},
+        "east": {"texture": "#body"}
+      }
+    },
+    {
+      "from": [2, 14.25, 0],
+      "to": [14, 15.75, 0.25],
+      "faces": {
+        "down": {"texture": "#accent"},
+        "up": {"texture": "#accent"},
+        "north": {"texture": "#accent"},
+        "south": {"texture": "#accent"},
+        "west": {"texture": "#accent"},
+        "east": {"texture": "#accent"}
+      }
+    },
+    {
+      "from": [1, 2, 0.5],
+      "to": [1.5, 14, 1.5],
+      "faces": {
+        "down": {"texture": "#accent"},
+        "up": {"texture": "#accent"},
+        "north": {"texture": "#accent"},
+        "south": {"texture": "#accent"},
+        "west": {"texture": "#accent"},
+        "east": {"texture": "#accent"}
+      }
+    },
+    {
+      "from": [14.5, 2, 0.5],
+      "to": [15, 14, 1.5],
+      "faces": {
+        "down": {"texture": "#accent"},
+        "up": {"texture": "#accent"},
+        "north": {"texture": "#accent"},
+        "south": {"texture": "#accent"},
+        "west": {"texture": "#accent"},
+        "east": {"texture": "#accent"}
+      }
+    }
+  ]
+}

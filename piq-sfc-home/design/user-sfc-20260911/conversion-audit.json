@@ -1,0 +1,88 @@
+{
+  "ok": true,
+  "source_bbmodel_sha256": {
+    "piq-fc-arcade\\design\\user-models-20260911\\source\\02_SFC双手柄\\SFC_日版双手柄_线材肩键修正版.bbmodel": "35C487534089F8B24BD836076EF52883BFE43E90C823C0AEEF6E58B44DFBF509",
+    "piq-fc-arcade\\design\\user-models-20260911\\source\\03_SFC独立卡带\\SFC卡带_独立版_单张UV.bbmodel": "3A324F90FE080708B70739FC628EFE493ECF82CD02204F9A085B9379E90FE2E3"
+  },
+  "source_elements": {
+    "console_set": 872,
+    "independent_card": 86
+  },
+  "excluded_old_card": 38,
+  "represented_world_elements": 920,
+  "docked_plugs_moved": {
+    "1": 7,
+    "2": 7
+  },
+  "triangles": {
+    "body": 2402,
+    "p1_docked": 3628,
+    "p2_docked": 3628,
+    "slot_cover": 0,
+    "inserted": 1012,
+    "cartridge": 1012,
+    "controller": 3364
+  },
+  "contract": {
+    "source": "user Blockbench 20260911",
+    "insert_translation": [
+      0.0,
+      2.18,
+      3.711
+    ],
+    "item_translation": [
+      0.0,
+      6.55,
+      0.0
+    ],
+    "held_source_center": [
+      11.5,
+      0.375,
+      1.7225
+    ],
+    "held_scale": 2.0,
+    "front_label": [
+      6.075,
+      0.845,
+      9.925,
+      2.58,
+      7.5985
+    ],
+    "multi_out_center": [
+      5.55,
+      0.695,
+      15.5375
+    ],
+    "controller_socket_centers": [
+      [
+        10.025,
+        0.745,
+        5.795
+      ],
+      [
+        5.975,
+        0.745,
+        5.795
+      ]
+    ]
+  },
+  "textures": {
+    "hardware": {
+      "source": "piq-fc-arcade\\design\\user-models-20260911\\source\\02_SFC双手柄\\SFC_单张UV.png",
+      "sha256": "4BBBA0F53697D69A919F5FC12750E608AA50A4D71D8281F23D6428A5D02BD920"
+    },
+    "card": {
+      "source": "piq-fc-arcade\\design\\user-models-20260911\\source\\03_SFC独立卡带\\SFC卡带_完整UV.png",
+      "sha256": "7608F10AD4205635C321AA423F348CA68515B16FDDC7BDF9F111811121D4892A"
+    }
+  },
+  "notes": [
+    "Actual converted model/UV; not a Minecraft screenshot.",
+    "Source atlases copied byte-for-byte; no bitmap editing.",
+    "No network/core/server changes. Borrowed controller and its original fixed cord/plug hide together.",
+    "No remote-owner world wire is invented; existing block metadata exposes only docked masks."
+  ],
+  "mesh_sha256": "4B944A5A98CF926A38092BCDF3B8FA5E8D1B07631B116E554E7DD551B4D80E64",
+  "bytes": 2974181,
+  "console_item_sha256": "466510B9D2073126A07593BB9DB5A4083A0EBDDBF6CFBDC2D73579D37E00F33D"
+}

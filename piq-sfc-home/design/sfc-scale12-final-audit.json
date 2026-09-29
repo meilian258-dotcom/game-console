@@ -1,0 +1,434 @@
+{
+  "ok": true,
+  "schema": "piq-sfc-scale12-independent-1",
+  "visual_only": true,
+  "jars": {
+    "sfc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_sfc-0.1.0-alpha.12.jar",
+      "sha256": "EEE8BDCC710BEEBEBF58CF85CA1B19B2D314FE4DA9EBE8D36470B62BD383E8D1"
+    },
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
+      "sha256": "B7BF04BEEA5F58E8E9C0DFA23E1BD8F2CAF6B11455085D843F568B42D9021686"
+    }
+  },
+  "baseline_sfc11": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-v1\\piq_sfc-0.1.0-alpha.11.jar",
+    "sha256": "ADF7172C0997983A61C0566AAEE4AE6F19C7D574D6D5B1971490EB69F4B92393"
+  },
+  "strict_scope": {
+    "identical_entries": 210,
+    "changed_classes": [
+      "cn/piq/sfchome/client/SfcAvCableGeometry.class",
+      "cn/piq/sfchome/client/SfcAvCableRenderer.class",
+      "cn/piq/sfchome/client/SfcHardwareMesh.class",
+      "cn/piq/sfchome/client/SfcHardwareRenderer.class",
+      "cn/piq/sfchome/world/SfcHomeConsoleBlock.class"
+    ],
+    "metadata_only_pending": [
+      "cn/piq/sfchome/client/SfcHardwareMesh$Part.class",
+      "cn/piq/sfchome/world/SfcHomeConsoleBlock$1.class"
+    ],
+    "added_classes": [
+      "cn/piq/sfchome/layout/SfcConsoleScale$Bounds.class",
+      "cn/piq/sfchome/layout/SfcConsoleScale$Point.class",
+      "cn/piq/sfchome/layout/SfcConsoleScale.class"
+    ],
+    "changed_assets": {
+      "assets/piq_sfc_home/models/item/cartridge.json": {
+        "before": {
+          "rotation": [
+            10,
+            165,
+            0
+          ],
+          "scale": [
+            1.22,
+            1.22,
+            1.22
+          ]
+        },
+        "after": {
+          "rotation": [
+            10,
+            165,
+            0
+          ],
+          "scale": [
+            2.4,
+            2.4,
+            2.4
+          ]
+        }
+      },
+      "assets/piq_sfc_home/models/item/console.json": {
+        "before": {
+          "rotation": [
+            30,
+            225,
+            0
+          ],
+          "translation": [
+            -0.625,
+            5.125,
+            0
+          ],
+          "scale": [
+            0.81,
+            0.81,
+            0.81
+          ]
+        },
+        "after": {
+          "rotation": [
+            30,
+            225,
+            0
+          ],
+          "translation": [
+            0.17252,
+            3.57112,
+            0
+          ],
+          "scale": [
+            0.669155,
+            0.669155,
+            0.669155
+          ]
+        }
+      }
+    },
+    "old_network_server_watch_playback_preserved": true,
+    "standalone_controller_preserved": true,
+    "mesh_png_resources_preserved": true,
+    "removed_entries": 0
+  },
+  "old_methods": {
+    "cn.piq.sfchome.client.SfcAvCableGeometry": {
+      "protected_old_methods": 15,
+      "visual_method_exceptions": [
+        " console(",
+        " fanout(",
+        " multiPlug("
+      ]
+    },
+    "cn.piq.sfchome.client.SfcAvCableRenderer": {
+      "protected_old_methods": 7,
+      "visual_method_exceptions": [
+        " bounds("
+      ]
+    },
+    "cn.piq.sfchome.client.SfcHardwareMesh": {
+      "protected_old_methods": 5,
+      "visual_method_exceptions": [
+        " reload(",
+        " lambda$reload$",
+        " binding("
+      ]
+    },
+    "cn.piq.sfchome.client.SfcHardwareRenderer": {
+      "protected_old_methods": 10,
+      "visual_method_exceptions": [
+        " render(cn.piq.sfchome.world.SfcHomeConsoleBlockEntity,"
+      ]
+    },
+    "cn.piq.sfchome.world.SfcHomeConsoleBlock": {
+      "protected_old_methods": 14,
+      "visual_method_exceptions": [
+        " getShape(",
+        " box("
+      ]
+    },
+    "cn.piq.sfchome.client.SfcHardwareMesh$Part": {
+      "protected_old_methods": 7,
+      "visual_method_exceptions": []
+    },
+    "cn.piq.sfchome.world.SfcHomeConsoleBlock$1": {
+      "protected_old_methods": 1,
+      "visual_method_exceptions": []
+    }
+  },
+  "frozen_sfc6_entries_preserved": 60,
+  "negative_controls": [
+    "watch",
+    "wire",
+    "server",
+    "playback",
+    "handheld",
+    "mesh",
+    "rom",
+    "deleted_id"
+  ],
+  "geometry": {
+    "production_origin": "final-jar-only",
+    "visited_vertices": 45138,
+    "gui": {
+      "cartridge": {
+        "display": {
+          "rotation": [
+            10,
+            165,
+            0
+          ],
+          "scale": [
+            2.4,
+            2.4,
+            2.4
+          ]
+        },
+        "bounds_centered_16px": [
+          [
+            -6.160380856961335,
+            -3.79605200228159,
+            -2.742212146738847
+          ],
+          [
+            6.180878511374844,
+            3.8288987748284464,
+            2.8686866817908943
+          ]
+        ]
+      },
+      "console": {
+        "display": {
+          "rotation": [
+            30,
+            225,
+            0
+          ],
+          "translation": [
+            0.17252,
+            3.57112,
+            0
+          ],
+          "scale": [
+            0.669155,
+            0.669155,
+            0.669155
+          ]
+        },
+        "bounds_centered_16px": [
+          [
+            -6.999996051969232,
+            -4.441857090054427,
+            -8.720976488407945
+          ],
+          [
+            6.999997528203609,
+            4.441858600231537,
+            3.408450376820009
+          ]
+        ]
+      }
+    },
+    "ok": true,
+    "triangles": 15046,
+    "standalone_unchanged_vertices": 13128,
+    "assertions": 457128,
+    "minecraft_or_core_started": false,
+    "final_jar_only": true
+  },
+  "real_fml_and_outer_codec": {
+    "fml_discovery": {
+      "mod_entry_points_executed": false,
+      "dependency_check": "Actual FML ModInfo + Maven VersionRange; not full FML ModSorter/bootstrap",
+      "level": "actual JarModsDotTomlModFileReader + ModFile.identifyMods + ASM compileContent",
+      "assertions": 28,
+      "loader": "FancyModLoader 4.0.43",
+      "production_origin": "final-jar-only",
+      "minecraft_or_native_core_started": false,
+      "discovery": [
+        {
+          "access_transformers": 1,
+          "mods": [
+            {
+              "id": "piq_fc_arcade",
+              "version": "0.31.0-alpha.23",
+              "dependencies": [
+                {
+                  "id": "neoforge",
+                  "range": "[21.1.236,22)",
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                },
+                {
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.21.2)",
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                },
+                {
+                  "id": "waterframes",
+                  "range": "[2.1.23,3)",
+                  "ordering": "AFTER",
+                  "type": "OPTIONAL",
+                  "side": "BOTH"
+                }
+              ]
+            }
+          ],
+          "module_name": "piq_fc_arcade",
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\fc.jar",
+          "scanned_classes": 1291,
+          "entry_points": [
+            "piq_fc_arcade"
+          ]
+        },
+        {
+          "access_transformers": 1,
+          "mods": [
+            {
+              "id": "piq_sfc_arcade",
+              "version": "0.2.0-alpha.6",
+              "dependencies": [
+                {
+                  "id": "neoforge",
+                  "range": "[21.1.236,)",
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                },
+                {
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.22)",
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                },
+                {
+                  "id": "piq_fc_arcade",
+                  "range": "[0.26.0,)",
+                  "ordering": "AFTER",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                }
+              ]
+            },
+            {
+              "id": "piq_sfc_home",
+              "version": "0.1.0-alpha.12",
+              "dependencies": [
+                {
+                  "id": "neoforge",
+                  "range": "[21.1.236,22)",
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                },
+                {
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.21.2)",
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                },
+                {
+                  "id": "piq_fc_arcade",
+                  "range": "[0.31.0-alpha.23,0.32.0)",
+                  "ordering": "AFTER",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                },
+                {
+                  "id": "piq_sfc_arcade",
+                  "range": "[0.2.0-alpha.6,0.3.0)",
+                  "ordering": "AFTER",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                }
+              ]
+            }
+          ],
+          "module_name": "piq_sfc_arcade",
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\sfc.jar",
+          "scanned_classes": 196,
+          "entry_points": [
+            "piq_sfc_arcade",
+            "piq_sfc_home"
+          ]
+        },
+        {
+          "access_transformers": 0,
+          "mods": [
+            {
+              "id": "piq_native_arcade",
+              "version": "0.1.0-alpha.7",
+              "dependencies": [
+                {
+                  "id": "neoforge",
+                  "range": "[21.1.236,22)",
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                },
+                {
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.21.2)",
+                  "ordering": "NONE",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                },
+                {
+                  "id": "piq_fc_arcade",
+                  "range": "[0.31.0-alpha.21,0.32.0)",
+                  "ordering": "AFTER",
+                  "type": "REQUIRED",
+                  "side": "BOTH"
+                }
+              ]
+            }
+          ],
+          "module_name": "piq_native_arcade",
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\native.jar",
+          "scanned_classes": 42,
+          "entry_points": [
+            "piq_native_arcade"
+          ]
+        }
+      ],
+      "ok": true
+    },
+    "sfc_real_neoforge_outer_packet_codec": {
+      "passed": true,
+      "assertions": 37,
+      "max_upload_outer_packet_bytes": 30856,
+      "outer_codec": "NeoForge21.1.236 ServerboundCustomPayloadPacket.STREAM_CODEC",
+      "minecraft_started": false
+    },
+    "hash_checked_temporary_copies": {
+      "fc": {
+        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
+        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\fc.jar",
+        "sha256": "B7BF04BEEA5F58E8E9C0DFA23E1BD8F2CAF6B11455085D843F568B42D9021686",
+        "byte_identical_before": true,
+        "byte_identical_after": true
+      },
+      "sfc": {
+        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_sfc-0.1.0-alpha.12.jar",
+        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\sfc.jar",
+        "sha256": "EEE8BDCC710BEEBEBF58CF85CA1B19B2D314FE4DA9EBE8D36470B62BD383E8D1",
+        "byte_identical_before": true,
+        "byte_identical_after": true
+      },
+      "native": {
+        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\native.jar",
+        "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A",
+        "byte_identical_before": true,
+        "byte_identical_after": true
+      }
+    },
+    "production_compiled": false,
+    "old_separate_core_on_classpath": false
+  },
+  "production_compiled": false,
+  "minecraft_or_native_core_started": false,
+  "network_socket_opened": false,
+  "installed": false,
+  "limits": [
+    "No live Minecraft render, input, networking or audio-device test.",
+    "Pure final classes verify geometry and item projection; real FML/outer codecs do not constitute full game startup."
+  ]
+}

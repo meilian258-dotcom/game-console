@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PIQ 游戏机模组玩家教程</title>
+<style>
+body{margin:0;background:#f4f4f4;color:#202020;font:16px/1.75 "Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+main{max-width:880px;margin:24px auto;padding:32px 38px;background:white}h1,h2,h3{color:#111;line-height:1.4}h1{font-size:28px;margin:0 0 12px}h2{font-size:22px;margin:34px 0 12px}h3{font-size:18px;margin:22px 0 8px}p,ul,ol{margin:10px 0}li{margin:7px 0}a{color:#154f91}code{font:14px/1.6 Consolas,monospace;overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;margin:16px 0;font-size:15px}th,td{text-align:left;vertical-align:top;border:1px solid #bbb;padding:8px 10px}th{background:#eee}small{color:#555}nav ul{display:flex;flex-wrap:wrap;gap:8px 24px;padding-left:20px}pre{padding:12px;background:#f5f5f5;white-space:pre-wrap;overflow-wrap:anywhere}footer{margin-top:32px;color:#555;font-size:14px}@media(max-width:650px){main{margin:0;padding:20px}h1{font-size:24px}table{font-size:13px}th,td{padding:6px}}@media print{body{background:white;font-size:11pt}main{max-width:none;margin:0;padding:0}nav{display:none}h2,h3{break-after:avoid}tr{break-inside:avoid}a{color:inherit}}
+</style></head><body><main>
+<h1>PIQ 游戏机模组玩家教程</h1>
+<p>先装配套模组并检查运行环境，再添加自己持有的游戏文件。家用机通过电视显示画面，拿起手柄才接管操作；街机直接在机柜上进入或退出控制。</p>
+<p><small>适用测试版：FC37 / SFC21 / Native13 / GBA5 · Minecraft 1.21.1 · NeoForge · 2026 年 9 月 13 日。外部运行库面向 Windows x64 客户端。本教程不提供 ROM、BIOS 或游戏存档。</small></p>
+<nav aria-label="目录"><ul><li><a href="#install">首次安装</a></li><li><a href="#files">游戏文件</a></li><li><a href="#home">家用机</a></li><li><a href="#controls">按键和手柄</a></li><li><a href="#arcade">街机与联机</a></li><li><a href="#gun">光枪和线材</a></li><li><a href="#gba">GBA</a></li><li><a href="#furniture">家具</a></li><li><a href="#help">排错</a></li></ul></nav>
+
+<h2 id="install">1 首次安装</h2>
+<ol><li>先退出 Minecraft，备份原有模组与存档。客户端和服务器使用本次成套版本，不把新旧同名模组同时放在 <code>mods</code> 中。</li>
+<li>把测试包中的 <code>mods</code> 文件夹合并到你实际启动的游戏实例目录。完整配置有四个 JAR：FC 主模组、SFC 附属、原生街机附属、GBA 附属。SFC 的两个旧内部模块已合并到一个 SFC JAR，不再另放旧 <code>piq_sfc_arcade</code> 或 <code>piq_sfc_home</code>。</li>
+<li>把测试包里的 <code>piq-runtime-packs</code> 文件夹也放到同一个游戏实例目录。不要放进 <code>mods</code>，不要先解开里面的 <code>piq-runtime-pack-v1.zip</code>。</li>
+<li>启动游戏。首次缺少外部运行库时会出现检查页；以后可从主菜单的“模组 → PIQ FC Arcade → 设置”打开“运行环境”。街机的 Shift＋右键配置页也有“运行环境”入口。</li>
+<li>在主菜单检查页点击“一键补齐”，等待完成。它会校验离线包并只安装缺少的文件。已有不同版本不会被覆盖。安装时不要进入世界；在世界内只能检查，需退出世界再安装。</li>
+<li>检查所需项目显示“已就绪”后进入游戏。通常无需重启电脑；如果之前的模拟器进程未退出，先正常退出 Minecraft 再启动。</li></ol>
+<p>这里的一键补齐是<strong>随包离线安装</strong>，不是联网下载。只收到 MOD JAR 的玩家不会凭空获得外部运行库，服主还需把配套离线包一并发给玩家。核心源码包供许可查阅和开发使用，不要放进游戏目录。</p>
+<table><thead><tr><th>组件</th><th>是否另装运行库</th><th>安装位置</th></tr></thead><tbody>
+<tr><td>FC 与 SFC</td><td>无需，核心随各自模组提供</td><td>配套 MOD JAR</td></tr>
+<tr><td>街机媒体模式</td><td>需要</td><td><code>piq-native-arcade/runtime</code></td></tr>
+<tr><td>街机本地同步实验</td><td>需要另一套专用核心</td><td><code>piq-native-arcade/runtime-snapshot-v1</code></td></tr>
+<tr><td>GBA 掌机与机柜</td><td>需要，共用一套</td><td><code>piq-gba/runtime</code></td></tr>
+</tbody></table>
+<p>服务器负责机器、权限和同步协调，不在服务器上执行这些 Windows DLL。外部运行库放到需要运行相应模拟器的客户端。完整离线库解压约 418 MiB，建议游戏盘预留至少 1 GiB 空间用于安装校验。</p>
+
+<h2 id="files">2 添加游戏和写卡</h2>
+<p>游戏目录指启动器为当前实例设置的目录，不一定是最外层的 <code>.minecraft</code>。在“运行环境”点“游戏目录”可打开实际位置。</p>
+<table><thead><tr><th>游戏类型</th><th>本地目录</th><th>文件说明</th></tr></thead><tbody>
+<tr><td>FC</td><td><code>piq-fc/roms</code></td><td>使用 <code>.nes</code> 游戏文件。</td></tr>
+<tr><td>SFC</td><td>piq-sfc-home/roms；也可在写卡界面点“ROM 目录”</td><td>使用 <code>.sfc</code> 或 <code>.smc</code>，以界面实际支持格式为准。</td></tr>
+<tr><td>原生街机</td><td><code>piq-native-arcade/roms</code></td><td>保留游戏 ZIP 原样，不解压。需要的 BIOS ZIP 放在同一目录。</td></tr>
+<tr><td>GBA</td><td><code>piq-gba/roms</code></td><td>使用 <code>.gba</code>。</td></tr>
+</tbody></table>
+<ol><li>由有管理员权限的玩家手持对应卡带，在写卡电脑上右键打开工作台；把游戏文件放入该界面的 ROM 目录，再刷新列表。普通玩家可以使用已写好的卡带，不需要自行写卡。</li><li>先选择游戏，再点击写入按钮。名称、封面和人数是独立设置，按界面按钮保存。双人卡允许 P2 申请加入，P1 也可先玩，不必为了开机等待第二个人。</li><li>“本地”表示文件只在自己电脑；“已同步”表示服务器已有可用副本。首次分享需要传输游戏；原生街机还可能传输同目录下所需的 BIOS。以后有匹配缓存就复用，不应每次开机重新上传。</li><li>FC 写卡工作台的“当前卡存档”设置为关闭、个人或机器；它改变同一 ROM 在所有卡带和街机上的存档方式，下次开机生效，不会删除已有存档。选择“个人”后，按电源开机时才选择或管理开机玩家的三个存档槽；光枪另用独立存档空间。SFC 本版没有 FC 式个人存档槽，其本机恢复备份也不会自动载入。不要把其他游戏或不同核心版本的状态直接互换。</li></ol>
+<p>运行库检查不检查游戏版权或为你下载 BIOS。街机启动需要的 <code>neogeo.zip</code> 不是 DLL 运行库，二者缺失时的处理不同。</p>
+
+<h2 id="home">3 FC 和 SFC 家用机</h2>
+<ol><li>放置游戏机和电视，使用音视频线连接对应设备，再插入已写好的卡带。</li><li>瞄准电视电源按钮右键开电视。没有信号时显示彩条并有提示音；音量由电视的音量按钮控制。</li><li>瞄准游戏机的电源按钮右键开机。此时电视可以显示游戏，周围玩家可以旁观，不必每个人右键加入。</li><li>空手瞄准对应手柄右键领取，游戏运行时申请该席位控制；关机时也可以先领取手柄。拿着手柄普通右键对应游戏机机身可归还，不需要 Shift；归还时避开电源和重置按钮，以免触发按钮功能。</li><li>归还手柄用于退出控制，不等于关闭电视电源。要结束游戏，请使用游戏机电源按钮，或按现有连接规则关闭电视；重置按钮会重新开始当前游戏。</li></ol>
+<p>有线手柄离开主机超过 6 格会断开并归还。双人控制需要另一位 Minecraft 玩家领取另一席，并按邀请页面确认；不能在同一个键盘上同时占据两个玩家席位。</p>
+<p>本版普通右键不再反复弹出领取、归还、启动进度等文字。准星指向电源或重置按钮时，才显示“右键 · 开机”“右键 · 关机”或“右键 · 重置”。联机邀请、确认页面和短错误提醒仍保留。</p>
+
+<h2 id="controls">4 键盘和实体手柄</h2>
+<p>拿起手柄或进入街机控制席后，游戏功能键立即生效，相同按键的原版功能会被屏蔽。默认未锁定位置时，WASD 仍用于 Minecraft 走路；按 <strong>Z</strong> 开启位置锁后，WASD 才控制游戏方向，同时停止走动、跳跃和潜行。再按 Z 解除位置锁，鼠标转视角仍可用；归还手柄后恢复普通操作。</p>
+<p>默认 <strong>F7</strong> 打开控制设置，或者从“运行环境 → 控制设置”进入。旧配置保留，若你改过快捷键，以设置页显示的实际按键为准。</p>
+<table><thead><tr><th>方案</th><th>游戏方向</th><th>功能键</th><th>世界移动</th></tr></thead><tbody>
+<tr><td>WASD 方案 默认</td><td>位置锁内用 WASD</td><td>JKL / IOP</td><td>解锁时 WASD 走路</td></tr>
+<tr><td>方向键方案</td><td>方向键</td><td>JKL / IOP</td><td>WASD 可走路</td></tr>
+<tr><td>小键盘方案</td><td>方向键</td><td>数字小键盘 1 至 6</td><td>WASD 可走路</td></tr>
+<tr><td>自定义</td><td colspan="3">逐项改键，保存后应用。与世界移动重合的方向键只在位置锁内用于游戏。</td></tr>
+<tr><td>跟随 Minecraft 按键设置</td><td colspan="3">兼容原有设置；下方列出实际生效键位，不是固定的一组键。</td></tr>
+</tbody></table>
+<table><thead><tr><th>键盘键</th><th>FC</th><th>SFC</th><th>街机</th></tr></thead><tbody>
+<tr><td>J / K</td><td>B / A</td><td>B / A</td><td>按钮 1 / 2</td></tr><tr><td>L / I</td><td>不使用</td><td>Y / X</td><td>按钮 3 / 4</td></tr><tr><td>O / P</td><td>不使用</td><td>L / R 肩键</td><td>按钮 5 / 6</td></tr><tr><td>Backspace / Enter</td><td>选择 / 开始</td><td>选择 / 开始</td><td>投币 / 开始</td></tr></tbody></table>
+<p>表格对应 JKL / IOP 两套固定方案。小键盘 1、2、3、4、5、6 分别替代 J、K、L、I、O、P；必须使用数字小键盘，不是键盘上排数字键。具体游戏可能只用其中一部分按钮。</p>
+<h3>使用 Xbox 或其他实体手柄</h3>
+<ol><li>先让 Windows 识别手柄，再进入“控制设置 → 实体手柄设置”。</li><li>检查启用状态、设备名称和连接状态，选择实际使用的设备。支持的 Xbox、Switch、PlayStation 手柄能否直接识别，取决于系统连接方式和游戏手柄映射；品牌名称本身不保证所有第三方型号可用。</li><li>在按键测试区逐个测试方向、按钮和肩键，必要时调整映射和摇杆死区，保存手柄设置。键盘与实体手柄设置分别保存。</li><li>联机时每人选择自己电脑上的手柄，游戏中的 P1/P2 席位由机器领取和邀请决定，不是按 USB 插入顺序决定。</li></ol>
+
+<h2 id="arcade">5 街机和多人同步</h2>
+<p>配置好的街机，空手普通右键进入，再普通右键退出控制。Shift＋右键才打开管理菜单，用于配置游戏、同步模式和外观；管理员权限不足时不能更改机器配置。双人专属模型暂不套用旧皮肤 UV。</p>
+<p>朋友可向已经运行的机器申请 P2，由 P1 在邀请界面确认。旁观玩家不占输入席位，靠近运行中的机柜应能看到画面。启动者退出导致房间结束后，朋友可以重新启动一局；这不是不中断的主机接管。</p>
+<table><thead><tr><th>同步模式</th><th>如何显示</th><th>使用边界</th></tr></thead><tbody>
+<tr><td>媒体模式</td><td>计算主机运行游戏，向其他玩家发送画面和声音。</td><td>沿用较广的街机兼容范围；网络差时优先检查主机运行速度、上传和丢包。</td></tr>
+<tr><td>街机本地同步实验</td><td>参与同步的客户端使用配套核心运行游戏，并通过状态和输入保持同步。</td><td>当前仅固定版本的 <code>kof97.zip</code>、<code>mslug2.zip</code>，两席；需要匹配的 Neo Geo BIOS。不是所有街机游戏都支持。</td></tr>
+</tbody></table>
+<p>更换同步模式前先结束当前局，再从“Shift＋右键 → 同步 / 网络”选择可用模式。切换后重新启动，不在一局中途强行转换。FC、SFC 的同步页以各自实际提供的选项为准，不套用街机实验核心。</p>
+<h3>两台机器用数据线连接</h3>
+<ol><li>由管理员先结束两台机器的游戏，选择支持对应人数的同一种后端。用“数据线”先右键主柜，再在 60 秒内右键副柜。</li><li>单人柜加单人柜为 2 席，单人柜加双人柜为 3 席，双人柜加双人柜为 4 席。副柜席位接在主柜之后，两边显示同一局画面。</li><li>两柜需在同一维度、16 格以内；操作时要靠近两柜之间，两端都在可操作范围内。机柜外观各自保留，连接线可见。</li><li>拆线前结束两柜游戏，再手持数据线 Shift＋右键已连接机柜。不能把“能接 4 席”理解为任意游戏都支持 4 人。</li></ol>
+<p>四席要求后端和游戏本身支持四人。当前街机本地同步实验仍只支持两席；旧 FC 街机路径不支持这套跨机柜通讯线，GBA 机柜也不支持多人通讯线。</p>
+
+<h2 id="gun">6 光枪和线材</h2>
+<ol><li>放置光枪支架并把光枪放入支架。主机停止游戏后，手持数据线先右键支架，再右键 FC 主机完成连接。</li><li>用音视频线把 FC 主机连接到电视。这是显示连线，和数据线不是同一种用途。</li><li>插入支持光枪的游戏，开电视和主机。空手右键支架领取光枪，获得控制或通过主机批准后，用准星瞄准电视上实际的游戏画面，按鼠标左键射击。大电视以可见游戏区域为准，黑边不算有效靶区。</li><li>光枪获准控制后，在 P1 没有人操作时可使用 FC 的选择、开始和手柄功能键；如果另一位玩家领取 P1 手柄，就由对方操作这些按键。光枪局的第二口留给光枪，普通手柄请领取 P1。</li><li>拿光枪右键支架可归还；也可在主机关机但已连接时取下。当前光枪离主机和所连电视都超过 8 格会失去控制，但不会像有线手柄一样自动归还，实物需放回支架。手持数据线 Shift＋右键支架或对应主机可拆光枪连线。</li></ol>
+<p>光枪不是鼠标光标点击整个显示器。请用准星瞄准游戏画面测试；如果《打鸭子》不响应，先确认当前游戏支持光枪、选对游戏模式、光枪已接到这台 FC、电视正在显示这台主机。</p>
+
+<h2 id="gba">7 GBA 掌机</h2>
+<p>将 <code>.gba</code> 放进 <code>piq-gba/roms</code>，主手拿着一个 GBA 掌机右键，首次在列表选择游戏。后续普通右键可按已选游戏启动，运行中再右键关闭；Shift＋右键进入选择或设置。不要同时接管其他模拟器。</p>
+<p>掌机游戏和电池存档在自己的电脑运行和保存。把掌机带到服务器里不等于 GBA 游戏支持联机，也不代表手持屏幕正在向旁人直播。GBA 机柜可供附近玩家旁观，但仍为单人核心，没有 GBA 游戏内连线对战。</p>
+
+<h2 id="furniture">8 长凳和马扎</h2>
+<p>长凳、马扎现在与游戏机放在同一创造模式分类页。可选 11 种木材；老世界里的物品和方块不需要替换。</p>
+<ul><li>长凳占两格，最多坐两人。双手空着右键坐下，Shift 下座。</li><li>马扎坐一人。双手空着 Shift＋右键切换展开与收起；有人坐着时不能折叠，折叠时不能坐。</li><li>长凳配方使用同一种木板和木棍；马扎使用蓝色羊毛、对应木板、木棍和铁粒，完整摆法可查看游戏配方。</li></ul>
+
+<h2 id="help">9 常见问题</h2>
+<h3>提示缺少 piqneogeo_libretro.dll</h3>
+<p>缺的是街机本地同步实验运行库。退出世界，在“运行环境”检查并补齐。不要拿 <code>mame_libretro.dll</code> 改名冒充，也不要放到旧的通用 <code>runtime</code> 目录。</p>
+<h3>提示缺少 neogeo.zip 或 NoSuchFileException</h3>
+<p>这通常是游戏或 BIOS 文件问题，不是 Java 重装问题。先在“复制诊断”查已记录的文件名；没有详情时查看客户端 logs/latest.log。将配套 BIOS 放在街机游戏 ZIP 同一目录；实验模式还会核对版本，文件名相同不代表内容正确。如果机器先前分享的游戏清单里没有 BIOS，补到本地后要由管理员重新选择一次游戏，更新服务器共享清单。</p>
+<h3>已有不同版本不能一键覆盖</h3>
+<p>这是保护原文件的设计。先退出游戏，根据“复制诊断”列出的精确文件路径备份冲突文件，再自行移出该运行库目录，重新补齐。不要直接删除整个模组数据目录，里面可能有游戏和存档。</p>
+<h3>缺少离线包或安装失败</h3>
+<p>检查 <code>piq-runtime-packs/piq-runtime-pack-v1.zip</code> 是否位于实际启动实例目录。校验不通过时重新获取同一套完整文件，不关闭安全校验。当前安装器要求 Windows x64，建议使用本地 NTFS 游戏目录；安装需要同一文件系统支持硬链接。只读目录、符号链接、FAT/exFAT 或网络共享可能被拒绝。</p>
+<p>正常点击取消会等待本轮清理后返回。安装中不要强制结束游戏进程或断电；这可能留下隐藏的 <code>.install-*</code> 临时目录或部分已校验的新文件。再次检查会复用合格文件，但不会自行删除来历不明的旧临时目录，也不保证断电时九个文件同时完成或同时撤回。</p>
+<h3>为什么仍然有短错误提醒</h3>
+<p>这版去掉的是普通操作说明，不是把失败也藏起来。邀请、确认、上传窗口和短错误仍有必要；“运行环境 → 复制诊断”包含运行库检查结果和已记录的近期异常，不保证收录每条游戏错误。若详情不足，请同时查看客户端 <code>logs/latest.log</code>。复制内容可能包含本机路径，发给别人前可以遮住用户名和服务器地址。</p>
+<h3>每次启动都上传 或朋友不能重新开机</h3>
+<p>先确认所有玩家和服务器都使用本次成套版本，机器配置已保存，服务器游戏库和客户端缓存没有被清理。管理员首次重新选择并分享完整游戏后，普通开机应复用共享版本。如果仍异常，记录谁配置、谁启动、谁退出，再从两边复制诊断；不要反复清空 ROM 和存档目录。</p>
+<h3>只有合金弹头画面慢 但 Minecraft 很流畅</h3>
+<p>这不一定是 Minecraft 帧率问题。可能是游戏本身的原机减速、模拟器计算速度不足，或媒体同步链路慢。先比较启动者本机与旁观者是否同时变慢，记下具体关卡和同步模式。切换实验本地同步仅对当前已适配游戏有效，不保证消除原游戏的所有减速。</p>
+<h3>没有画面 不想占玩家席位</h3>
+<p>先确认游戏已开机、电视已开且接到正确主机，再走到机器附近等待同步。旁观无需领取手柄。如果控制者正常而旁观者持续黑屏，请收集旁观者的诊断，并注明设备、同步模式和双方版本。</p>
+<h3>控制键和其他模组冲突</h3>
+<p>先在控制设置页确认实际按键，测试领取与归还后是否恢复；WASD 方案需按 Z 才把方向交给游戏。若其他模组使用特殊的全局输入钩子仍抢键，记录冲突模组和按键，可暂时换方向键方案或自定义，不要修改服务器按键配置。</p>
+<footer>本教程根据本次代码和离线验证编写。自动化测试不等于所有游戏、手柄、资源包和真实多人网络均已通过实机验收；建议先在备份测试世界验证，再用于正式服。分享测试包时请保留配套许可证和对应源码资料。</footer>
+</main></body></html>

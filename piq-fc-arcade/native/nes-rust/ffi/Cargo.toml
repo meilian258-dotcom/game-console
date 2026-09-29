@@ -1,0 +1,11 @@
+[package]
+name = "piq_nes_ffi"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+nes_rust = { path = ".." }
+
+[lib]
+crate-type = ["cdylib"]

@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "tests": 45,
+  "minecraft_or_native_core_started": false,
+  "output": "\nTest run finished after 133 ms\n[         6 containers found      ]\n[         0 containers skipped    ]\n[         6 containers started    ]\n[         0 containers aborted    ]\n[         6 containers successful ]\n[         0 containers failed     ]\n[        45 tests found           ]\n[         0 tests skipped         ]\n[        45 tests started         ]\n[         0 tests aborted         ]\n[        45 tests successful      ]\n[         0 tests failed          ]\n\n{\"ok\":true,\"tests\":45,\"minecraft_or_native_core_started\":false}\n",
+  "production_sha256": {
+    "src\\main\\java\\cn\\piq\\sfchome\\server\\SfcControllerAuthority.java": "3217b68c956bac91d47f4d0ec748580e719d6f06329c501a30fb95be01571b53",
+    "src\\main\\java\\cn\\piq\\sfchome\\server\\SfcJoinGate.java": "171b760fa4a79b2ae23d0f4c4fd1d69b6d4c2f80b4a26456620916a0d5c1fa8c",
+    "src\\main\\java\\cn\\piq\\sfchome\\server\\SfcInputHealth.java": "0285db735d12aeebd5e8a688e8e93626d3afb97928564b370fc117005a2ac188",
+    "src\\main\\java\\cn\\piq\\sfchome\\server\\SfcInputTimeline.java": "14d9c4313bfea5713f1a46598bba5e8e69eea82a44f7dc49c69b82bf073ee991"
+  },
+  "limits": [
+    "Actual pure authority, gate, queue, watchdog behaviors; not a live Minecraft multiplayer session.",
+    "Production SfcHomeServer integration is compiled/tested separately by root."
+  ]
+}

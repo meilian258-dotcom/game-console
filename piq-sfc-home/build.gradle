@@ -1,0 +1,59 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+group = 'cn.piq.sfchome'
+version = mod_version
+base { archivesName = 'piq_sfc_home' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// Protocol tests exercise the real Minecraft/Netty codecs, not local stubs.
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+neoForge {
+    version = '21.1.236'
+    mods { piq_sfc_home { sourceSet(sourceSets.main) } }
+}
+repositories { mavenCentral() }
+def localModJars = files('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.22.jar',
+        '../piq-sfc-arcade/build/libs/piq_sfc_arcade-0.2.0-alpha.9.jar')
+dependencies {
+    implementation localModJars
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'com.google.code.gson:gson:2.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+def metadata = tasks.register('generateModMetadata', ProcessResources) {
+    inputs.property 'version', project.version
+    expand(version: project.version)
+    from 'src/main/templates'
+    into 'build/generated/modMetadata'
+}
+sourceSets.main.resources.srcDir metadata
+neoForge.ideSyncTask metadata
+def asciiRoot = new File(System.getProperty('java.io.tmpdir'), 'piq-sfc-home-tests')
+def asciiTests = new File(asciiRoot, 'tests')
+def asciiMain = new File(asciiRoot, 'main')
+def asciiDependencies = new File(asciiRoot, 'dependencies')
+def copyDependencies = tasks.register('prepareAsciiModDependencies', Sync) {
+    // Keep Minecraft and mod JARs on ASCII paths for Windows Gradle workers.
+    from sourceSets.main.compileClasspath; into asciiDependencies
+}
+def copyTests = tasks.register('prepareAsciiTestOutput', Sync) {
+    dependsOn tasks.named('testClasses'); from sourceSets.test.output; into asciiTests
+}
+def copyMain = tasks.register('prepareAsciiMainOutput', Sync) {
+    dependsOn tasks.named('classes'); from sourceSets.main.output; into asciiMain
+}
+tasks.named('test', Test) {
+    dependsOn copyTests, copyMain, copyDependencies
+    useJUnitPlatform()
+    classpath = files(asciiTests, asciiMain) + fileTree(asciiDependencies) + configurations.testRuntimeClasspath.filter { !localModJars.files.contains(it) }
+}
+jar {
+    from('LICENSE') { into 'META-INF' }
+    // Internal thin build; tools/build_audit34.py in the FC project merges the
+    // reviewed core7 into one SFC delivery while preserving both legacy mod IDs.
+    // FC owns the public platform and runtime: do not embed duplicate copies.
+    manifest { attributes 'Implementation-Title': 'Game Console: SFC', 'Implementation-Version': project.version }
+}

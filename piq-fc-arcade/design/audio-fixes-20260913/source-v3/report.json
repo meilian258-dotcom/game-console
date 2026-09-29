@@ -1,0 +1,50 @@
+{
+  "schema": "piq-cabinet-audio-fixes-1",
+  "ok": true,
+  "mode": "isolated-source",
+  "production_compiled": true,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync33-v1\\piq_fc_arcade-0.31.0-alpha.33.jar",
+      "sha256": "F36169E46B13CF46868851447B8518BC38C10967A03994AF26E89CE7B1E4FE00"
+    },
+    "native": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync33-v1\\piq_native_arcade-0.1.0-alpha.11.jar",
+      "sha256": "F582314F64A2DC556FAC1704719C04EE9E5A05154C146FA1C49FCAD9615E2C5E"
+    }
+  },
+  "negative_control": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync33-v1\\piq_native_arcade-0.1.0-alpha.11.jar",
+    "sha256": "F582314F64A2DC556FAC1704719C04EE9E5A05154C146FA1C49FCAD9615E2C5E"
+  },
+  "source_sha256": {
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetAudio.java": "4AB4055A6BEB2699EBDFEE515F54DA3620E4D3080EA1998BDBED02B0F8B278E9",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetClientBackends.java": "5FB086BA03C45A5826861668DE58AE6556BB7B113D5CF01C26FC6CF4946E987C",
+    "piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\client\\NativeArcadeClient.java": "BDF42B93F70091722138EC19D5DE9D0B630704B099D6DAAE211F096263668047",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetAudioGenerationTest.java": "DE06B8D5DC33289B7A55C9119B1612D3E61C5449C22E15EF0DF64CB59B7E9E0F",
+    "piq-fc-arcade\\tools\\qa\\CabinetAudioFixProbe.java": "D882ABBA83ACA7417B334658797339E167E8FEB02F1433B1A692372C835CFA6D",
+    "piq-fc-arcade\\tools\\check_audio_fixes.py": "AC4D6B807DAA80824F9619C46AF670946FCB06F42AC6CB2A70B1F8B2135BB77E"
+  },
+  "probe": {
+    "ok": true,
+    "assertions": 38,
+    "audio_behavior_tests": 10,
+    "actual_mc_event_and_frustum": true,
+    "bytecode_wiring": true,
+    "real_worker_mailbox_audio_queue": true,
+    "controlled_audio_endpoint": true,
+    "physical_audio_device": false,
+    "minecraft_started": false,
+    "native_core_started": false
+  },
+  "logs": {
+    "production_compile": "",
+    "probe_compile": "",
+    "probe": "WARN StatusConsoleListener Advanced terminal features are not available in this environment\n\nTest run finished after 104 ms\n[         2 containers found      ]\n[         0 containers skipped    ]\n[         2 containers started    ]\n[         0 containers aborted    ]\n[         2 containers successful ]\n[         0 containers failed     ]\n[        10 tests found           ]\n[         0 tests skipped         ]\n[        10 tests started         ]\n[         0 tests aborted         ]\n[        10 tests successful      ]\n[         0 tests failed          ]\n\n{\"ok\":true,\"assertions\":38,\"audio_behavior_tests\":10,\"actual_mc_event_and_frustum\":true,\"bytecode_wiring\":true,\"real_worker_mailbox_audio_queue\":true,\"controlled_audio_endpoint\":true,\"physical_audio_device\":false,\"minecraft_started\":false,\"native_core_started\":false}\n"
+  },
+  "limits": [
+    "No physical sound device or live Minecraft was started. Device write/open/flush races use a controlled SourceDataLine with real production worker code.",
+    "A reset is nonblocking; an already executing driver write must return before its old device buffer can be flushed. Already audible samples cannot be recalled.",
+    "Global Native pump registration and single-consumption wiring are checked in bytecode; real NeoForge event constants and front/back frustum tests are exercised, not an in-game visual test."
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "ok": true,
+  "mode": "explicit-source-qa",
+  "production_compiled": true,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync33-v1\\piq_fc_arcade-0.31.0-alpha.33.jar",
+      "sha256": "F36169E46B13CF46868851447B8518BC38C10967A03994AF26E89CE7B1E4FE00"
+    },
+    "gba": {
+      "path": "G:\\服务器\\服务器Codex\\piq-gba\\build\\handheld-v3-1\\piq_gba-0.1.0-alpha.3.jar",
+      "sha256": "590C01BA8BF3B066C7EE8678A59B2A0387E2A9FB9DDB73FC1F7FE6524BD3ABDC"
+    }
+  },
+  "source_sha256": {
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\tools\\check_control_settings34.py": "AEF342B445C357054C7B33D8B2A3FF05CF84DBE82CDCE09E8B111CB4E5017975",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\tools\\qa\\ControlSettings34Probe.java": "B76BC7B50AD0678F2DF0B64B35456F4FB6EA9199C37459DDC0FA90181C10C21D",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardConfig.java": "3B25C91CED10F120011871A0EEBC30FE83F8C04BFE33D579169CF4B754DAC4FF",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardConfigStore.java": "218AB0A4B6F83317F03012C4EE2A53ACCF98A19C977530FEC583BD6BC91F98A4",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardControlState.java": "4CBF033794ADC16F2AAF46C6EF9B2A5B13F48924DE808AC48BCA08F1D09921EA",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardRouting.java": "8965AEB2670CB134C4AC480E5BB8315C0988F0AFD8F57672A0CB196CB6B6BAA9",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardInput.java": "AC71A6549D4B9A7FE1800AFA461F3B281CFB57049F571EDA5FBC236B9432CE40",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\KeyboardMappingState.java": "F44405C7861E0E399B6D7F3F68215155DDB2036506BB380732D99AAC880F4888",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\ControlSettingsScreen.java": "92A87FA59FEB19C1C0B9F0A0A20E7BDC19FF2E55AC10FAE0B14B61FF4A48441A",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\GamepadInput.java": "58429A63823C925F76D0E4929EE15A8E1652B47703B8ABC1384C21DB56F7E317",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\retro\\client\\GamepadSettingsScreen.java": "B55143BDB82C56CA63FD1A18421FB41376A0A7741F3A47CC397634776C794CB5",
+    "G:\\服务器\\服务器Codex\\piq-gba\\src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldScreen.java": "5FB7594B082CC5B2777498F2ACCD84A4719DD40A97FD89C0616160ECF5583919"
+  },
+  "probe": {
+    "ok": true,
+    "assertions": 278,
+    "actual_canceled_neoforge_events": 16,
+    "actual_production_state": true,
+    "gui_verification": "production-bytecode-only",
+    "minecraft_started": false,
+    "native_core_started": false
+  },
+  "logs": {
+    "compile": "",
+    "run": "{\"ok\":true,\"assertions\":278,\"actual_canceled_neoforge_events\":16,\"actual_production_state\":true,\"gui_verification\":\"production-bytecode-only\",\"minecraft_started\":false,\"native_core_started\":false}\n"
+  },
+  "limits": [
+    "Canceled NeoForge mouse events and pure production state execute directly; GUI and uncanceled world interaction are bytecode contracts, not a game boot.",
+    "No options/config writes, physical input devices, render window, native core or remote Minecraft server is used."
+  ]
+}

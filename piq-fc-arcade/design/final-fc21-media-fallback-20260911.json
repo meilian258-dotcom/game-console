@@ -1,0 +1,118 @@
+{
+  "ok": true,
+  "final_jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_fc_arcade-0.31.0-alpha.21.jar",
+  "final_jar_sha256": "0147D49C542E82DDF2DD37CDAFFBDB135CDA20E11907B4060B471A2FBC0D3F93",
+  "exact_tested_source_class_match": true,
+  "comparison_javac_flags": [
+    "-g"
+  ],
+  "executed_production_origin": {
+    "ok": true,
+    "classes": 3,
+    "production_origin": "final-jar-only",
+    "minecraft_or_native_core_started": false
+  },
+  "tests": {
+    "ok": true,
+    "tests": 19,
+    "minecraft_or_native_core_started": false
+  },
+  "cpu": {
+    "passed": true,
+    "synthetic_pixels": true,
+    "commercial_roms": false,
+    "network_test": false,
+    "iterations_per_case": 60,
+    "cases": [
+      {
+        "name": "solid_320x224",
+        "width": 320,
+        "height": 224,
+        "compressed_bytes": 649,
+        "rgb565_raw_bytes": 143360,
+        "encode_median_ms": 0.4562,
+        "encode_p95_ms": 0.7365,
+        "decode_median_ms": 0.3255,
+        "decode_p95_ms": 0.5173,
+        "dropped": 0,
+        "video_payload_bytes_per_second_at_20fps": 12980,
+        "video_plus_stereo_pcm_bytes_per_second_at_20fps": 204980,
+        "estimated_fps_with_1MiB_budget_and_pcm": 20.0
+      },
+      {
+        "name": "checker_320x224",
+        "width": 320,
+        "height": 224,
+        "compressed_bytes": 1646,
+        "rgb565_raw_bytes": 143360,
+        "encode_median_ms": 0.3441,
+        "encode_p95_ms": 0.3869,
+        "decode_median_ms": 0.2515,
+        "decode_p95_ms": 0.301,
+        "dropped": 0,
+        "video_payload_bytes_per_second_at_20fps": 32920,
+        "video_plus_stereo_pcm_bytes_per_second_at_20fps": 224920,
+        "estimated_fps_with_1MiB_budget_and_pcm": 20.0
+      },
+      {
+        "name": "gradient_384x288",
+        "width": 384,
+        "height": 288,
+        "compressed_bytes": 28841,
+        "rgb565_raw_bytes": 221184,
+        "encode_median_ms": 0.952,
+        "encode_p95_ms": 0.9882,
+        "decode_median_ms": 0.6067,
+        "decode_p95_ms": 0.636,
+        "dropped": 0,
+        "video_payload_bytes_per_second_at_20fps": 576820,
+        "video_plus_stereo_pcm_bytes_per_second_at_20fps": 768820,
+        "estimated_fps_with_1MiB_budget_and_pcm": 20.0
+      },
+      {
+        "name": "entropy_384x288",
+        "width": 288,
+        "height": 216,
+        "compressed_bytes": 124462,
+        "rgb565_raw_bytes": 124416,
+        "encode_median_ms": 4.9552,
+        "encode_p95_ms": 5.3287,
+        "decode_median_ms": 0.1809,
+        "decode_p95_ms": 0.2396,
+        "dropped": 0,
+        "video_payload_bytes_per_second_at_20fps": 2489240,
+        "video_plus_stereo_pcm_bytes_per_second_at_20fps": 2681240,
+        "estimated_fps_with_1MiB_budget_and_pcm": 6.882
+      },
+      {
+        "name": "scaled_checker_1024x768",
+        "width": 384,
+        "height": 288,
+        "compressed_bytes": 1228,
+        "rgb565_raw_bytes": 221184,
+        "encode_median_ms": 0.511,
+        "encode_p95_ms": 0.5537,
+        "decode_median_ms": 0.3577,
+        "decode_p95_ms": 0.3951,
+        "dropped": 0,
+        "video_payload_bytes_per_second_at_20fps": 24560,
+        "video_plus_stereo_pcm_bytes_per_second_at_20fps": 216560,
+        "estimated_fps_with_1MiB_budget_and_pcm": 20.0
+      }
+    ]
+  },
+  "class_sha256": {
+    "cn/piq/fcarcade/cabinet/CabinetMediaCodec.class": "677C5B4BEE512B7230C3EE105535C42FD0D93C54E2FC285D044EBACBEFC92FD5",
+    "cn/piq/fcarcade/cabinet/CabinetMediaCodec$Encoded.class": "4964BEAE75B2742B89CE849B43E99093551CC7FED4DC82178CC47C89B2A6B087",
+    "cn/piq/retro/api/RetroFrame.class": "2E633E02AA38C15723E5195F3E0785EF09E94B196EDCBAA91CA95D37E5BFCA0C"
+  },
+  "source_sha256": {
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroFrame.java": "E7563211DA48E98E045DD9DCA84704DCB55990229F458B7E488A98F9875F7F2F",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetMediaCodec.java": "E5344B208472E52AC97AF5E247C74873F23EA03142BF43D5830957F1A7A81008"
+  },
+  "limits": [
+    "Source compiled only into isolated comparison directory for exact byte equality; no comparison classes executed.",
+    "All executed production classes came from final JAR only; no Minecraft, native core or network connection started.",
+    "Synthetic CPU and payload estimates are not game/network performance guarantees."
+  ]
+}

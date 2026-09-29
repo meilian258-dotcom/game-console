@@ -1,0 +1,13 @@
+{
+  "parent": "piq_fc_arcade:block/deluxe_arcade_base",
+  "textures": {
+    "body": "minecraft:block/red_concrete",
+    "dark": "minecraft:block/polished_blackstone",
+    "panel": "minecraft:block/black_concrete",
+    "screen": "minecraft:block/black_concrete",
+    "accent": "minecraft:block/orange_concrete",
+    "button": "minecraft:block/redstone_block",
+    "metal": "minecraft:block/iron_block",
+    "particle": "minecraft:block/red_concrete"
+  }
+}

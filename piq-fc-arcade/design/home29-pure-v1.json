@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "tests": 65,
+  "production_origin": "source-pure",
+  "minecraft_or_native_core_started": false,
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\HomeRuntimeAuthority.java": "2DD70F2B6E5D969DE0C7BA6FC3CCD9CC0D570DCD339D64E3CB4DCE9C52CF2F12",
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\HomeControllerLedger.java": "F7BB0657DEF29E2DA017AD349582A2996D937F06E8D4647777F4CDC38794FFF9",
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\HomeControllerInventory.java": "4DEA1F06A521BADD5EF9844A368210F939525AE4CC289A10C7F4D8F3C04A399C",
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\HomeSaveIntent.java": "DD90940B150596E83D23CA4E3C4BE93A8ECAEA8F756C8CA9F39A3CA250550236",
+    "src\\main\\java\\cn\\piq\\fcarcade\\session\\LockstepState.java": "5AF181EBDB426607E24AB748C03560E6599B7CB271B9F0C4AE24058CA363A51A",
+    "src\\main\\java\\cn\\piq\\fcarcade\\session\\ControllerInputTransitions.java": "ED0C8BBE51CDDB90B400940F7814C753741B735F710EDB22502C9A2E7AC6B184",
+    "src\\main\\java\\cn\\piq\\fcarcade\\session\\ControllerDepartureInputs.java": "3D920509A3079635C07FF481457CBC2C5CCBB57BF42A0404D7C4322DADD321BC",
+    "src\\main\\java\\cn\\piq\\fcarcade\\session\\ZapperInput.java": "7E36921D4D1C34E48C11165E5834D35BDA863B105CB9F89FE692E38F686E6792",
+    "src\\main\\java\\cn\\piq\\fcarcade\\session\\ZapperInputQueue.java": "6347F257D6E26328A98EA7B3534763DACAF3EA9642DECBAFA0625AA9E3CBC7C9",
+    "src\\main\\java\\cn\\piq\\fcarcade\\session\\SessionRoster.java": "AD4477E3BF930F6E2986AC6703CAFBCE9C3BCEA6D98F924F5D5ABDB20CD11002",
+    "src\\main\\java\\cn\\piq\\fcarcade\\session\\ArcadeRole.java": "05A9AFB7DC9AC15F6C0ED6AD432E65668CA8B6873D734DF6E01561180801B959",
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\HomeRuntimeAuthorityTest.java": "083203BB0757CD7B23B36B1E3BB9AB55615C1F1479338E91D804346D5EF7CBB2",
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\HomeGunController29Test.java": "B83E1505340249F2CB0658F754AAAAFEDF7DB9BF28376511F499A79CBE54DB3A",
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\HomeIdleController29Test.java": "F60FC35261365AA25714E3632CF7ED270862F52EBAEDA28B94747068BD664CD0",
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\HomeSaveIntent29Test.java": "63BF1EC3176A5F9E122824E15C2FCAEA5A86B808BE7B8E2987851763C92C68A3",
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\HomeControllerLedgerTest.java": "1204F8D6B03E1A9BC6AA1410058846C7D8F38E220DE759A245ED314B0D319EBB",
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\HomeControllerInventoryTest.java": "CA5A193E58FCD26200F74FC8170C1F9E918BE1917AEF4780A6B3919EA1936C5C",
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\HomeControllerRecyclingTest.java": "456300434B085D16A0986C8C3EE1956FBDE5515C3FCC1F97F0E7C3CE364D5A29",
+    "tools\\qa\\Home29PureProbe.java": "57A77DD86918BD32B8B62A652F8C909A0A24840920F262509E34E55295478213"
+  }
+}

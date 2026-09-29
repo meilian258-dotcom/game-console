@@ -1,0 +1,22 @@
+[package]
+name = "piq-sfc-wasm"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+bincode = "2"
+getrandom = "0.4.3"
+jgenesis-common = { path = "../../third_party/jgenesis/common/jgenesis-common" }
+snes-config = { path = "../../third_party/jgenesis/config/snes-config" }
+snes-core = { path = "../../third_party/jgenesis/backend/snes-core" }
+
+[profile.release]
+lto = "thin"
+opt-level = 3
+panic = "abort"
+strip = true

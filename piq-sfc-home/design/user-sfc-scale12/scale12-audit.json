@@ -1,0 +1,291 @@
+{
+  "ok": true,
+  "tests": {
+    "passed_tests": 16,
+    "minecraft_started": false,
+    "mode": "actual-api-and-production-layout"
+  },
+  "source_sha256": {
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcHardwareMeshData.java": "2AAEA49E747D2434A12327D80DDDADAB90B4ECB46447BE006B4DBBB6A0BC0C88",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcButtonAnimation.java": "D2EBC160A5DCCDED0A9E5CDEEA64D93D96196D77A66C22EB7E8AF4EEAD953ADC",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcAvCableGeometry.java": "DEF4921EA1648903F99008954FAFC141C1BD172BF28397BA7A943F0F5F31ACF4",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\layout\\SfcConsoleScale.java": "05C514BAD247DFD78B179C6241D98ADBBE56978CEBE3CC451C9527D83B9A3663",
+    "piq-sfc-home\\src\\test\\java\\cn\\piq\\sfchome\\client\\SfcConsoleScaleTest.java": "B85718CFE2D2288D57B691F9C482505FA13B56C0B83B5D42452A0CE3ED84A101",
+    "piq-sfc-home\\src\\test\\java\\cn\\piq\\sfchome\\client\\SfcAvCableGeometryTest.java": "0CFF63D8F041A28C13A123AC96765DF0C0E440AE66FE0D42BFAE99CFE68602A9",
+    "piq-sfc-home\\tools\\qa\\SfcConsoleScaleProbe.java": "84495278B771B8F1FDD6693F837BC5BF7A7A1AE92E254500DCF5805846A1AB7B",
+    "piq-fc-arcade\\tools\\qa\\DeviceUiTestRunner.java": "035E30EDC80EDFE4DF3925DBFDC7E41F51D77C2E9601E0152C4A4DC96105561E"
+  },
+  "gui_bounds": {
+    "console_before": {
+      "display": {
+        "rotation": [
+          30,
+          225,
+          0
+        ],
+        "translation": [
+          -0.625,
+          5.125,
+          0
+        ],
+        "scale": [
+          0.81,
+          0.81,
+          0.81
+        ]
+      },
+      "min": [
+        -0.4325641206224069,
+        -0.26353692326395417
+      ],
+      "max": [
+        0.43272451187846384,
+        0.26318790167396977
+      ]
+    },
+    "console_after": {
+      "display": {
+        "rotation": [
+          30,
+          225,
+          0
+        ],
+        "translation": [
+          0.17252,
+          3.57112,
+          0
+        ],
+        "scale": [
+          0.669155,
+          0.669155,
+          0.669155
+        ]
+      },
+      "min": [
+        -0.4374997340539456,
+        -0.2776160707335141
+      ],
+      "max": [
+        0.43749984439151773,
+        0.2776161603626143
+      ]
+    },
+    "cartridge_before": {
+      "display": {
+        "rotation": [
+          10,
+          165,
+          0
+        ],
+        "scale": [
+          1.22,
+          1.22,
+          1.22
+        ]
+      },
+      "min": [
+        -0.19572040291713316,
+        -0.12060374906240334
+      ],
+      "max": [
+        0.19637165633937234,
+        0.12164731399209616
+      ]
+    },
+    "cartridge_after": {
+      "display": {
+        "rotation": [
+          10,
+          165,
+          0
+        ],
+        "scale": [
+          2.4,
+          2.4,
+          2.4
+        ]
+      },
+      "min": [
+        -0.38502374344354073,
+        -0.23725327684407227
+      ],
+      "max": [
+        0.38630489771679805,
+        0.2393061914598611
+      ]
+    }
+  },
+  "other_item_bounds": {
+    "console/gui": [
+      [
+        -0.4374997340539456,
+        -0.2776160707335141,
+        -0.5450610129790969
+      ],
+      [
+        0.43749984439151773,
+        0.2776161603626143,
+        0.21302814487862903
+      ]
+    ],
+    "console/firstperson_righthand": [
+      [
+        -0.35073269932277984,
+        -0.08750000000000002,
+        -0.3507327020451409
+      ],
+      [
+        0.36845757519508954,
+        0.06538280149999998,
+        0.3684575751950895
+      ]
+    ],
+    "console/firstperson_lefthand": [
+      [
+        -0.35073269932277984,
+        -0.08750000000000002,
+        -0.3507327020451409
+      ],
+      [
+        0.36845757519508954,
+        0.06538280149999998,
+        0.3684575751950895
+      ]
+    ],
+    "console/thirdperson_righthand": [
+      [
+        -0.2391359313564408,
+        -0.13175480184653562,
+        -0.24233675923381848
+      ],
+      [
+        0.25122107399665194,
+        0.3418329134508112,
+        -0.03172307880480579
+      ]
+    ],
+    "console/thirdperson_lefthand": [
+      [
+        -0.2391359313564408,
+        -0.13175480184653562,
+        -0.24233675923381848
+      ],
+      [
+        0.25122107399665194,
+        0.3418329134508112,
+        -0.03172307880480579
+      ]
+    ],
+    "cartridge/gui": [
+      [
+        -0.38502374344354073,
+        -0.23725327684407227,
+        -0.17138832653958125
+      ],
+      [
+        0.38630489771679805,
+        0.2393061914598611,
+        0.17929291634173405
+      ]
+    ],
+    "cartridge/ground": [
+      [
+        -0.07999999999999999,
+        0.1109375,
+        -0.01254688000000001
+      ],
+      [
+        0.08000000000000002,
+        0.20156249999999998,
+        0.012546865000000018
+      ]
+    ],
+    "cartridge/fixed": [
+      [
+        -0.15999999999999998,
+        -0.09062500000000001,
+        -0.025093730000000036
+      ],
+      [
+        0.15999999999999998,
+        0.09062499999999996,
+        0.025093760000000076
+      ]
+    ],
+    "cartridge/firstperson_righthand": [
+      [
+        -0.10822557423695478,
+        0.06156250000000002,
+        -0.06305088811164139
+      ],
+      [
+        0.10883572935234284,
+        0.18843749999999998,
+        0.06174240624410726
+      ]
+    ],
+    "cartridge/firstperson_lefthand": [
+      [
+        -0.10822557423695478,
+        0.06156250000000002,
+        -0.06305088811164139
+      ],
+      [
+        0.10883572935234284,
+        0.18843749999999998,
+        0.06174240624410726
+      ]
+    ],
+    "cartridge/thirdperson_righthand": [
+      [
+        -0.10400000000000004,
+        0.06609375,
+        -0.016310924500000046
+      ],
+      [
+        0.10399999999999998,
+        0.18390625,
+        0.01631094400000005
+      ]
+    ],
+    "cartridge/thirdperson_lefthand": [
+      [
+        -0.10400000000000004,
+        0.06609375,
+        -0.016310924500000046
+      ],
+      [
+        0.10399999999999998,
+        0.18390625,
+        0.01631094400000005
+      ]
+    ]
+  },
+  "body_bounds": {
+    "minX": 2.0,
+    "minY": 0.0,
+    "minZ": 3.344375,
+    "maxX": 14.0,
+    "maxY": 4.4475,
+    "maxZ": 17.976125
+  },
+  "inserted_bounds": {
+    "minX": 4.16,
+    "minY": 3.27,
+    "minZ": 11.634125,
+    "maxX": 11.84,
+    "maxY": 7.62,
+    "maxZ": 12.838625
+  },
+  "render_bounds": {
+    "minX": 1.62,
+    "minY": 0.0,
+    "minZ": -0.7875,
+    "maxX": 14.38,
+    "maxY": 7.65,
+    "maxZ": 17.976125
+  },
+  "mesh_sha256": "4B944A5A98CF926A38092BCDF3B8FA5E8D1B07631B116E554E7DD551B4D80E64",
+  "minecraft_started": false,
+  "new_bitmap_assets": false
+}

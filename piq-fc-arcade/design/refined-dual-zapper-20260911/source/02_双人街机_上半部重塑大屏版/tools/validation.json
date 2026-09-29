@@ -1,0 +1,836 @@
+{
+  "passed": true,
+  "errors": [],
+  "warnings": [],
+  "source": {
+    "file": "C:\\codex\\我的世界服务端\\新蒸程服务端\\model_deliveries\\双人街机_SFC_卡带合集_20260911\\01_双人街机\\街机_双人通用_加深机柜版.bbmodel",
+    "sha256": "ebed5c823e371f80b85e8a9210091369c20746f3c2cbdfdfa7cd6ba2050fdc58",
+    "unchanged": true
+  },
+  "elements": 239,
+  "groups": 25,
+  "bounds": {
+    "min": [
+      0,
+      0,
+      0.38201010126776774
+    ],
+    "max": [
+      24,
+      32,
+      17.982010101
+    ],
+    "size": [
+      24,
+      32,
+      17.599999999732233
+    ]
+  },
+  "preservation": {
+    "originalUUIDsPreserved": 236,
+    "unchangedElements": 201,
+    "controlElementsStrictlyPreserved": 154,
+    "lowerElementsGeometryPreserved": 56,
+    "sideProjectionUVChanges": [
+      {
+        "uuid": "6fadcd92-1363-46d0-8558-15e3a63189ef",
+        "name": "左侧板·鼻部下斜面",
+        "face": "east",
+        "projectionGroup": "left_tilt"
+      },
+      {
+        "uuid": "dc5c24c9-5f97-44b4-9b89-a341556adb32",
+        "name": "左侧板·屏下连接",
+        "face": "east",
+        "projectionGroup": "left_tilt"
+      },
+      {
+        "uuid": "f8654aff-32e2-484a-9492-2cb3ca806c1a",
+        "name": "右侧板·鼻部下斜面",
+        "face": "west",
+        "projectionGroup": "right_tilt"
+      },
+      {
+        "uuid": "61455f86-48be-4dbe-8b10-724df8726175",
+        "name": "右侧板·屏下连接",
+        "face": "west",
+        "projectionGroup": "right_tilt"
+      }
+    ],
+    "actualChanges": [
+      {
+        "uuid": "05b76df7-c621-4cc4-b5ff-c8b34bfcac9e",
+        "name": "左侧板·连续后脊",
+        "keys": [
+          "from",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "b2a0a0c7-1a71-4334-908f-4c93a2c97f76",
+        "name": "左侧板·肩部闭合片",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "eb79e4a2-0d8c-48ea-89c1-9e67e771d8ac",
+        "name": "左側板·后仰屏边",
+        "keys": [
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "6fadcd92-1363-46d0-8558-15e3a63189ef",
+        "name": "左侧板·鼻部下斜面",
+        "keys": [
+          "faces"
+        ]
+      },
+      {
+        "uuid": "dc5c24c9-5f97-44b4-9b89-a341556adb32",
+        "name": "左侧板·屏下连接",
+        "keys": [
+          "faces"
+        ]
+      },
+      {
+        "uuid": "fee98480-4951-4565-a409-7e7f6b113021",
+        "name": "左侧板·灯箱回弯斜肩",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "rotation",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "05225824-3e84-4ae7-9047-17e1a810b4db",
+        "name": "左侧板·灯箱颊板",
+        "keys": [
+          "from",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "9bbbe3db-00f2-413a-b3a1-ae298bc4c7d7",
+        "name": "左屏幕前包边",
+        "keys": [
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "93255c1d-7424-4c6d-a1f2-dba8a740b3a3",
+        "name": "左灯箱前包边",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "51cc0a9b-f671-4bb0-af81-db0f6b57fc24",
+        "name": "右侧板·连续后脊",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "438e34e9-df36-4159-bc93-11d6678f97c3",
+        "name": "右侧板·肩部闭合片",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "94f8944a-1d06-4f4f-967e-6f5a707e6438",
+        "name": "右側板·后仰屏边",
+        "keys": [
+          "from",
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "f8654aff-32e2-484a-9492-2cb3ca806c1a",
+        "name": "右侧板·鼻部下斜面",
+        "keys": [
+          "faces"
+        ]
+      },
+      {
+        "uuid": "61455f86-48be-4dbe-8b10-724df8726175",
+        "name": "右侧板·屏下连接",
+        "keys": [
+          "faces"
+        ]
+      },
+      {
+        "uuid": "1339f37e-8c3f-4e64-a37f-a5a238744cf7",
+        "name": "右侧板·灯箱回弯斜肩",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "rotation",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "5fe7e0e0-5bd9-4596-86f3-ec7e60e2e54d",
+        "name": "右侧板·灯箱颊板",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "6d6390fc-29b1-47d4-8dd7-74a6deb30f69",
+        "name": "右屏幕前包边",
+        "keys": [
+          "from",
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "e5b02648-05a6-4a7f-8b63-0c9b9948d8a2",
+        "name": "右灯箱前包边",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "01825ec0-3173-4f10-b574-928c950361c0",
+        "name": "屏幕厚背壳",
+        "keys": [
+          "from",
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "88a74b91-8220-46c8-af66-c5a84a78d494",
+        "name": "屏幕左厚框",
+        "keys": [
+          "from",
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "db7e1a60-4fa2-4559-8af1-234bfc459335",
+        "name": "屏幕右厚框",
+        "keys": [
+          "from",
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "9f692d68-5b32-4bdd-9e44-ccd22d6e2d6a",
+        "name": "屏幕下厚框",
+        "keys": [
+          "from",
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "fb9f4c06-88ce-4a75-b959-f336a159010e",
+        "name": "屏幕上厚框",
+        "keys": [
+          "from",
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "8184933b-17bb-467c-9642-25829949e3a6",
+        "name": "可贴图边框_左",
+        "keys": [
+          "from",
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "13238812-b7c3-432c-a953-3127188e3d8f",
+        "name": "可贴图边框_右",
+        "keys": [
+          "from",
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "07aa5522-0e5a-4282-a2e5-2fe90d143dff",
+        "name": "可贴图边框_上",
+        "keys": [
+          "from",
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "db1459be-054b-49b4-ad44-0db86e5bb6c1",
+        "name": "可贴图边框_下",
+        "keys": [
+          "from",
+          "to",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "808ee99f-a604-41e7-928d-ff7286a7d1fd",
+        "name": "4比3双人通用屏幕",
+        "keys": [
+          "from",
+          "to"
+        ]
+      },
+      {
+        "uuid": "66c3c919-0f76-4472-aa1c-cb18d73f2060",
+        "name": "灯箱实体",
+        "keys": [
+          "from",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "15735e84-8b23-46a5-9843-3524148df373",
+        "name": "32单位整高顶盖",
+        "keys": [
+          "from",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "31229e4b-3235-40da-aef6-482901631909",
+        "name": "灯箱下框",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "96b3b442-9d33-48fb-93d4-9039cc210b87",
+        "name": "灯箱上框",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "6b374089-cf93-400e-9bb6-eb79c2790696",
+        "name": "灯箱左框",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "8ddc9df4-bd0d-46d6-a6ee-6e59b040e8d2",
+        "name": "灯箱右框",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "faces"
+        ]
+      },
+      {
+        "uuid": "bb94e755-93e3-4572-9078-99aeba3ce10f",
+        "name": "独立空白灯箱面",
+        "keys": [
+          "from",
+          "to",
+          "origin",
+          "faces"
+        ]
+      }
+    ],
+    "added": [
+      {
+        "uuid": "51c9ddf3-d671-4058-addc-af7e7bef6697",
+        "name": "灯箱下檐_完整实体"
+      },
+      {
+        "uuid": "06a564c2-2fc7-41d7-ae90-e8f75862bf53",
+        "name": "屏幕顶部隐藏连接梁"
+      },
+      {
+        "uuid": "68223b2f-47ee-4f8f-a0a0-03101f7f7941",
+        "name": "灯箱下口细收边"
+      }
+    ]
+  },
+  "geometryComponents": [
+    {
+      "count": 239
+    }
+  ],
+  "lowerSideCoverage": [
+    {
+      "side": "left",
+      "x": 23.555,
+      "sampledOriginal": 20345,
+      "missing": 0,
+      "examples": []
+    },
+    {
+      "side": "right",
+      "x": 0.445,
+      "sampledOriginal": 20345,
+      "missing": 0,
+      "examples": []
+    }
+  ],
+  "upperSideGaps": [
+    {
+      "side": "left",
+      "x": 23.555,
+      "gapSamples": 0,
+      "examples": []
+    },
+    {
+      "side": "right",
+      "x": 0.445,
+      "gapSamples": 0,
+      "examples": []
+    }
+  ],
+  "screen": {
+    "width": 18,
+    "height": 13.5,
+    "previousWidth": 16,
+    "previousHeight": 12,
+    "areaIncreasePercent": 26.5625
+  },
+  "bezelMetrics": {
+    "outerWidth": 20.759999999999998,
+    "outerHeight": 14.559999999999999,
+    "left": 1.3399999999999999,
+    "right": 1.3399999999999999,
+    "bottom": 0.3999999999999986,
+    "top": 0.6099999999999994
+  },
+  "frameUV": {
+    "x": {
+      "scale": -43.15992292835826,
+      "offset": 2053.9190751366577,
+      "consistent": true
+    },
+    "y": {
+      "scale": -43.159922928708795,
+      "offset": 1430.6897880539425,
+      "consistent": true
+    }
+  },
+  "surfaceChecks": [
+    {
+      "name": "4比3双人通用屏幕",
+      "face": "north",
+      "samples": 625,
+      "blockedSamples": 2,
+      "structuralBlockedSamples": 0,
+      "foregroundControlSamples": 2,
+      "blockers": [
+        {
+          "name": "2P/摇杆握球顶面·横芯",
+          "count": 1
+        },
+        {
+          "name": "2P/摇杆握球顶面·竖芯",
+          "count": 1
+        },
+        {
+          "name": "2P/摇杆握球顶面·倒角",
+          "count": 1
+        },
+        {
+          "name": "1P/摇杆握球顶面·横芯",
+          "count": 1
+        },
+        {
+          "name": "1P/摇杆握球顶面·竖芯",
+          "count": 1
+        },
+        {
+          "name": "1P/摇杆握球顶面·倒角",
+          "count": 1
+        }
+      ],
+      "examples": [
+        {
+          "i": 8,
+          "j": 0,
+          "local": [
+            9.000333333333334,
+            14.551,
+            4.6
+          ],
+          "blockers": [
+            "2P/摇杆握球顶面·横芯",
+            "2P/摇杆握球顶面·竖芯",
+            "2P/摇杆握球顶面·倒角"
+          ]
+        },
+        {
+          "i": 24,
+          "j": 0,
+          "local": [
+            20.999000000000002,
+            14.551,
+            4.6
+          ],
+          "blockers": [
+            "1P/摇杆握球顶面·横芯",
+            "1P/摇杆握球顶面·竖芯",
+            "1P/摇杆握球顶面·倒角"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "可贴图边框_左",
+      "face": "north",
+      "samples": 625,
+      "blockedSamples": 7,
+      "structuralBlockedSamples": 0,
+      "foregroundControlSamples": 7,
+      "blockers": [
+        {
+          "name": "1P/摇杆握球中段·横芯",
+          "count": 7
+        },
+        {
+          "name": "1P/摇杆握球中段·竖芯",
+          "count": 3
+        },
+        {
+          "name": "1P/摇杆握球中段·倒角",
+          "count": 14
+        }
+      ],
+      "examples": [
+        {
+          "i": 0,
+          "j": 0,
+          "local": [
+            21.041,
+            14.141,
+            4.45
+          ],
+          "blockers": [
+            "1P/摇杆握球中段·横芯",
+            "1P/摇杆握球中段·竖芯",
+            "1P/摇杆握球中段·倒角",
+            "1P/摇杆握球中段·倒角"
+          ]
+        },
+        {
+          "i": 1,
+          "j": 0,
+          "local": [
+            21.09675,
+            14.141,
+            4.45
+          ],
+          "blockers": [
+            "1P/摇杆握球中段·横芯",
+            "1P/摇杆握球中段·竖芯",
+            "1P/摇杆握球中段·倒角",
+            "1P/摇杆握球中段·倒角"
+          ]
+        },
+        {
+          "i": 2,
+          "j": 0,
+          "local": [
+            21.1525,
+            14.141,
+            4.45
+          ],
+          "blockers": [
+            "1P/摇杆握球中段·横芯",
+            "1P/摇杆握球中段·竖芯",
+            "1P/摇杆握球中段·倒角",
+            "1P/摇杆握球中段·倒角"
+          ]
+        },
+        {
+          "i": 3,
+          "j": 0,
+          "local": [
+            21.20825,
+            14.141,
+            4.45
+          ],
+          "blockers": [
+            "1P/摇杆握球中段·横芯",
+            "1P/摇杆握球中段·倒角",
+            "1P/摇杆握球中段·倒角"
+          ]
+        },
+        {
+          "i": 4,
+          "j": 0,
+          "local": [
+            21.264,
+            14.141,
+            4.45
+          ],
+          "blockers": [
+            "1P/摇杆握球中段·横芯",
+            "1P/摇杆握球中段·倒角",
+            "1P/摇杆握球中段·倒角"
+          ]
+        },
+        {
+          "i": 5,
+          "j": 0,
+          "local": [
+            21.31975,
+            14.141,
+            4.45
+          ],
+          "blockers": [
+            "1P/摇杆握球中段·横芯",
+            "1P/摇杆握球中段·倒角",
+            "1P/摇杆握球中段·倒角"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "可贴图边框_右",
+      "face": "north",
+      "samples": 625,
+      "blockedSamples": 0,
+      "structuralBlockedSamples": 0,
+      "foregroundControlSamples": 0,
+      "blockers": [],
+      "examples": []
+    },
+    {
+      "name": "可贴图边框_上",
+      "face": "north",
+      "samples": 625,
+      "blockedSamples": 0,
+      "structuralBlockedSamples": 0,
+      "foregroundControlSamples": 0,
+      "blockers": [],
+      "examples": []
+    },
+    {
+      "name": "可贴图边框_下",
+      "face": "north",
+      "samples": 625,
+      "blockedSamples": 50,
+      "structuralBlockedSamples": 0,
+      "foregroundControlSamples": 50,
+      "blockers": [
+        {
+          "name": "2P/摇杆握球中段·横芯",
+          "count": 20
+        },
+        {
+          "name": "2P/摇杆握球中段·竖芯",
+          "count": 25
+        },
+        {
+          "name": "2P/摇杆握球中段·倒角",
+          "count": 25
+        },
+        {
+          "name": "1P/摇杆握球中段·横芯",
+          "count": 20
+        },
+        {
+          "name": "1P/摇杆握球中段·竖芯",
+          "count": 25
+        },
+        {
+          "name": "1P/摇杆握球中段·倒角",
+          "count": 28
+        },
+        {
+          "name": "2P/摇杆握球顶面·竖芯",
+          "count": 24
+        },
+        {
+          "name": "1P/摇杆握球顶面·竖芯",
+          "count": 24
+        },
+        {
+          "name": "1P/摇杆握球顶面·倒角",
+          "count": 32
+        },
+        {
+          "name": "2P/摇杆握球顶面·倒角",
+          "count": 28
+        },
+        {
+          "name": "2P/摇杆握球顶面·横芯",
+          "count": 21
+        },
+        {
+          "name": "1P/摇杆握球顶面·横芯",
+          "count": 21
+        }
+      ],
+      "examples": [
+        {
+          "i": 8,
+          "j": 0,
+          "local": [
+            8.987,
+            14.141,
+            4.45
+          ],
+          "blockers": [
+            "2P/摇杆握球中段·横芯",
+            "2P/摇杆握球中段·竖芯",
+            "2P/摇杆握球中段·倒角",
+            "2P/摇杆握球中段·倒角"
+          ]
+        },
+        {
+          "i": 24,
+          "j": 0,
+          "local": [
+            21.039,
+            14.141,
+            4.45
+          ],
+          "blockers": [
+            "1P/摇杆握球中段·横芯",
+            "1P/摇杆握球中段·竖芯",
+            "1P/摇杆握球中段·倒角",
+            "1P/摇杆握球中段·倒角"
+          ]
+        },
+        {
+          "i": 8,
+          "j": 1,
+          "local": [
+            8.987,
+            14.157583333333333,
+            4.45
+          ],
+          "blockers": [
+            "2P/摇杆握球中段·横芯",
+            "2P/摇杆握球中段·竖芯",
+            "2P/摇杆握球中段·倒角",
+            "2P/摇杆握球中段·倒角",
+            "2P/摇杆握球顶面·竖芯"
+          ]
+        },
+        {
+          "i": 24,
+          "j": 1,
+          "local": [
+            21.039,
+            14.157583333333333,
+            4.45
+          ],
+          "blockers": [
+            "1P/摇杆握球中段·横芯",
+            "1P/摇杆握球中段·竖芯",
+            "1P/摇杆握球中段·倒角",
+            "1P/摇杆握球中段·倒角",
+            "1P/摇杆握球顶面·竖芯"
+          ]
+        },
+        {
+          "i": 8,
+          "j": 2,
+          "local": [
+            8.987,
+            14.174166666666666,
+            4.45
+          ],
+          "blockers": [
+            "2P/摇杆握球中段·横芯",
+            "2P/摇杆握球中段·竖芯",
+            "2P/摇杆握球中段·倒角",
+            "2P/摇杆握球中段·倒角",
+            "2P/摇杆握球顶面·竖芯"
+          ]
+        },
+        {
+          "i": 24,
+          "j": 2,
+          "local": [
+            21.039,
+            14.174166666666666,
+            4.45
+          ],
+          "blockers": [
+            "1P/摇杆握球中段·横芯",
+            "1P/摇杆握球中段·竖芯",
+            "1P/摇杆握球中段·倒角",
+            "1P/摇杆握球中段·倒角",
+            "1P/摇杆握球顶面·竖芯",
+            "1P/摇杆握球顶面·倒角"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "独立空白灯箱面",
+      "face": "north",
+      "samples": 625,
+      "blockedSamples": 0,
+      "structuralBlockedSamples": 0,
+      "foregroundControlSamples": 0,
+      "blockers": [],
+      "examples": []
+    }
+  ],
+  "atlas": {
+    "width": 2048,
+    "height": 2048,
+    "visibleFaces": 1424,
+    "unexpectedOverlaps": [],
+    "allowedProjectionOverlaps": 24,
+    "controlTexels": 50800,
+    "changedControlTexels": 0,
+    "sha256": "3e6081a5f18cbfd9277b229718996e3d9583c8a072c0119e9ed8380484de5265"
+  },
+  "limitations": [
+    "SAT checks connected physical cuboids, not rendered per-face watertight topology.",
+    "Normal-direction surface rays are geometric checks; screenshots still require aesthetic inspection. Foreground controls may normally cover a small part of the lower frame.",
+    "Bounds are visual dimensions, not Minecraft collision configuration.",
+    "Java block JSON is static; retained groups do not implement mod input or runtime animations."
+  ]
+}

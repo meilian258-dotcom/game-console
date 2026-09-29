@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "mode": "source-against-real-api",
+  "production_compiled": true,
+  "jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.32.jar",
+  "sha256": "F26A4F96DC8A9C6919B0681BE8F2BC3C5B97AF483D3DA7AEFC6B3222C00776E6",
+  "unit": {
+    "ok": true,
+    "tests": 25,
+    "passed": 25,
+    "skipped": 0,
+    "actual_junit_lifecycle": true
+  },
+  "transport": {
+    "ok": true,
+    "assertions": 446,
+    "actual_connection_and_embedded_channel": true,
+    "shared_media_window": true,
+    "minecraft_world_started": false,
+    "socket_opened": false,
+    "native_core_started": false
+  },
+  "sources": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetGameManifest.java": "F517D1ADB666FE07B15796F019E9FF5284E20F2E0B50D33546710C8A66F9B6CC",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetGameStore.java": "A8760AA0C3C15173E97421FBF58CE45847AA5145E40B1F2E166912D7EEC69E28",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetGameBudget.java": "A6788B7C67553FB292D639668A601039C034DDDC5D67ED45911B3B9D81933A35",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetGameTransfer.java": "CA107F485A1D6F02628DC496E9543B2C41BD1284EEA35CB961ABA9613B10265F",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetGameNetwork.java": "7702C3044C1465B3A9698EA54AAC347DA68D547A19896D552802852025FADC2B",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetMediaSender.java": "EDFB278C6EF4FFD651A676F19A5AF36822318B81AE2C29EA0492102DB7379D1C",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetGameBudgetTest.java": "AC19238EB5B8AB33C6C869B92EB8F7B7B874CBDC805215463BDE432CD55CD0C4",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetGameTransferTest.java": "CEA8ECD86F496E76388372FFAB8AE60708E852D7DFCE219F14E8E17F0299FCBD",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetGameStoreSafetyTest.java": "ED119A6BF3403C7AE93EDC4A9968C8F180931311F02A5BD7663EBB7899E5F240",
+    "tools\\qa\\CabinetGameTestRunner.java": "65E7E768156264AD199F0665E25F4A6EA54C5C326E76B017466D836BE428FD3E",
+    "tools\\qa\\CabinetGameTransportProbe.java": "2C5A990A381B7100917D2A2AE535742C07E87AB327715747581D76FBD7EFD2FC"
+  },
+  "gradle_started": false,
+  "installed": false,
+  "limits": [
+    "No real server/player transfer playtest; actual JUnit filesystem and embedded Netty write-completion checks."
+  ]
+}

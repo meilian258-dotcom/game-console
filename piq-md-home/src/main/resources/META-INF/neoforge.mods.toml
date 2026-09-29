@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="GPL-3.0-or-later (code); supplied model redistribution permission pending"
+[[mods]]
+modId="piq_md_home"
+version="0.1.0-alpha.1"
+displayName="方块电玩 · MD2"
+description='''MD2 私人家用机试验：实体主机/卡带/手柄/电视，独立进程默认，可显式启用共用JNI。初版仅私人单人，不支持公开多人/Netplay/CD/32X。'''
+[[dependencies.piq_md_home]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.236,22)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.piq_md_home]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.21.2)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.piq_md_home]]
+modId="piq_fc_arcade"
+type="required"
+versionRange="[0.31.0-alpha.76.24,0.31.0-alpha.77)"
+ordering="AFTER"
+side="BOTH"

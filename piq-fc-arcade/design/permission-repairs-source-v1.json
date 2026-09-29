@@ -1,0 +1,46 @@
+{
+  "ok": true,
+  "mode": "source-preflight-real-api",
+  "production_compiled": true,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-sync33-v1\\piq_fc_arcade-0.31.0-alpha.33.jar",
+      "sha256": "F36169E46B13CF46868851447B8518BC38C10967A03994AF26E89CE7B1E4FE00"
+    }
+  },
+  "behavior": {
+    "ok": true,
+    "tests": 27,
+    "passed": 27,
+    "actual_junit_lifecycle": true
+  },
+  "wiring": {
+    "ok": true,
+    "assertions": 47,
+    "actual_compiled_mc_wiring": true,
+    "minecraft_started": false,
+    "event_runtime_executed": false
+  },
+  "sources": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\server\\ServerArcadeSessions.java": "8810A0A3F1BCF3270B970610C750FD8180D698275FF6584E9AE089E895ADF18B",
+    "src\\main\\java\\cn\\piq\\fcarcade\\server\\PlayerSaveSlots.java": "D0671062F557EE713653B90AACCF11C569DE51793822C53B2E4BDF27617AD532",
+    "src\\main\\java\\cn\\piq\\fcarcade\\server\\InteractionTransaction.java": "6C5B5A1303D0D8C4667DB11CFFD34AB637D75EBAA47B6DD3094DEDAF5DE26584",
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\HomeHardware.java": "86CD079ECB45C4CF0FBDDD87B10B9ACFF23644398C26FFBA6DB186C449996CDC",
+    "src\\test\\java\\cn\\piq\\fcarcade\\server\\InteractionTransactionTest.java": "FF805968A59619E9D834D35E4AB6B4B06B4D074E9BD34D5B02547DA1C2BBBF50",
+    "src\\test\\java\\cn\\piq\\fcarcade\\server\\PlayerSaveMigrationSafetyTest.java": "55E6560EC5D7BAF3C7CBE0B5D2AFB43572196863666F7A7D7EE51C43658C6194",
+    "src\\test\\java\\cn\\piq\\fcarcade\\server\\PlayerSaveSlotsTest.java": "52557A38552D4F2A533B5D04602B7C94F67D77980B9EBDC29302BD99FCFE3FC8",
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\HomeLinkLedgerTest.java": "82A5BF768D959F4B08E5034197868006A7F902D82E5C4B44A7AF58279AF69ED6",
+    "tools\\qa\\FcPermissionRepairRunner.java": "0D5BC17286A6C0B60D64C0365A88E38B8023FEED12814553431DC0017B0F5A61",
+    "tools\\qa\\FcPermissionRepairWiringProbe.java": "618806590CB481200B8488EFEC52D5E1165FFB418EFD0CEDF25A7808A8490F83"
+  },
+  "logs": {
+    "compile": "",
+    "behavior": "{\"ok\":true,\"tests\":27,\"passed\":27,\"actual_junit_lifecycle\":true}\n",
+    "wiring": "{\"ok\":true,\"assertions\":47,\"actual_compiled_mc_wiring\":true,\"minecraft_started\":false,\"event_runtime_executed\":false}\n"
+  },
+  "limits": [
+    "Pure permission transaction callbacks and actual synthetic save files are exercised; no real Minecraft world or claim plugin is started.",
+    "ASM verifies real compiled MC entry wiring, not event dispatch in an actual world.",
+    "No user ROM/save, server, installation or network operations."
+  ]
+}

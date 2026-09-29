@@ -1,0 +1,94 @@
+plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
+group = 'cn.piq.nativearcade'
+version = mod_version
+base { archivesName = 'piq_native_arcade' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+neoForge { version = '21.1.236'; mods { piq_native_arcade { sourceSet(sourceSets.main) } } }
+repositories { mavenCentral() }
+def localModJars = files('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.22.jar')
+dependencies {
+    implementation localModJars
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+def metadata = tasks.register('generateModMetadata', ProcessResources) {
+    inputs.property 'version', project.version; expand(version: project.version)
+    from 'src/main/templates'; into 'build/generated/modMetadata'
+}
+sourceSets.main.resources.srcDir metadata
+neoForge.ideSyncTask metadata
+def asciiRoot = new File(System.getProperty('java.io.tmpdir'), 'piq-native-arcade-tests')
+def asciiTests = new File(asciiRoot, 'tests'), asciiMain = new File(asciiRoot, 'main'), asciiDependencies = new File(asciiRoot, 'dependencies')
+def copyDependencies = tasks.register('prepareAsciiModDependencies', Sync) { from localModJars; into asciiDependencies }
+def copyTests = tasks.register('prepareAsciiTestOutput', Sync) { dependsOn tasks.named('testClasses'); from sourceSets.test.output; into asciiTests }
+def copyMain = tasks.register('prepareAsciiMainOutput', Sync) { dependsOn tasks.named('classes'); from sourceSets.main.output; into asciiMain }
+tasks.named('test', Test) {
+    dependsOn copyTests, copyMain, copyDependencies; useJUnitPlatform()
+    classpath = files(asciiTests, asciiMain) + fileTree(asciiDependencies) + configurations.testRuntimeClasspath.filter { !localModJars.files.contains(it) }
+}
+// Keep the large, opaque child-process runtime out of test/dev resource copies.
+// This is an ordinary JAR resource tree, not a JarJar or mod classpath dependency.
+def embeddedRuntimeOutput = layout.buildDirectory.dir('generated/embeddedRuntime17')
+def embeddedRuntimeArchive = providers.gradleProperty('embeddedRuntimeArchive')
+        .map { file(it) }.getOrElse(file('../piq-fc-arcade/build/runtime-pack37-v1/piq-runtime-pack-v1.zip'))
+def prepareEmbeddedRuntime = tasks.register('prepareEmbeddedRuntime17', Exec) {
+    inputs.file('tools/prepare_embedded_runtime17.py')
+    inputs.file(embeddedRuntimeArchive)
+    inputs.files('docs/licenses/MAME-COPYING.txt', 'docs/licenses/MAME-GPL-2.0.txt',
+            'docs/licenses/JNA-LICENSE.txt', 'docs/licenses/JNA-Apache-2.0.txt')
+    inputs.property('embeddedRuntimeProfile', 'native17-runtime37-six-files-v1')
+    outputs.dir(embeddedRuntimeOutput)
+    workingDir projectDir
+    commandLine providers.gradleProperty('embeddedRuntimePython').getOrElse('python'),
+            file('tools/prepare_embedded_runtime17.py').absolutePath,
+            '--prepare', '--archive', embeddedRuntimeArchive.absolutePath,
+            '--output', embeddedRuntimeOutput.get().asFile.absolutePath
+}
+// New versioned helper only. Preserve the old six payloads/provenance tree unchanged.
+def helper011 = layout.buildDirectory.file('helper48/piq-native-helper-v4.jar')
+def buildHelper011 = tasks.register('buildNativeHelper011', Exec) {
+    inputs.file('tools/build_native_helper48.py')
+    inputs.files('src/main/java/cn/piq/nativearcade/bridge/BridgeProtocol.java',
+            'src/main/java/cn/piq/nativearcade/bridge/NativeInputPorts.java',
+            'src/main/java/cn/piq/nativearcade/bridge/NativeArcadeButtons.java',
+            'helper/src/main/java/cn/piq/nativearcade/bridge/NativeCoreWorker.java')
+    outputs.file(helper011)
+    workingDir projectDir
+    commandLine providers.gradleProperty('embeddedRuntimePython').getOrElse('python'),
+            file('tools/build_native_helper48.py').absolutePath, '--output', helper011.get().asFile.absolutePath
+}
+def embeddedRuntime011 = layout.buildDirectory.dir('generated/embeddedRuntime011')
+def prepareRuntime011 = tasks.register('prepareEmbeddedRuntime011', Exec) {
+    dependsOn buildHelper011
+    inputs.files('tools/prepare_embedded_runtime011.py', 'tools/prepare_embedded_runtime17.py')
+    inputs.file(helper011)
+    inputs.file(embeddedRuntimeArchive)
+    inputs.files('docs/licenses/MAME-COPYING.txt', 'docs/licenses/MAME-GPL-2.0.txt',
+            'docs/licenses/JNA-LICENSE.txt', 'docs/licenses/JNA-Apache-2.0.txt')
+    outputs.dir(embeddedRuntime011)
+    workingDir projectDir
+    commandLine providers.gradleProperty('embeddedRuntimePython').getOrElse('python'),
+            file('tools/prepare_embedded_runtime011.py').absolutePath, '--prepare',
+            '--archive', embeddedRuntimeArchive.absolutePath, '--helper', helper011.get().asFile.absolutePath,
+            '--output', embeddedRuntime011.get().asFile.absolutePath
+}
+def fbneoRuntime = layout.buildDirectory.dir('generated/fbneoNetplay014')
+def prepareFbneo = tasks.register('prepareFbneoNetplay013', Exec) {
+    inputs.files('tools/prepare_fbneo_netplay014.py', 'design/fbneo-study/pgm-cycle75/fbneo_libretro.dll', 'design/fbneo-study/pgm-cycle75/pgm-cycle-carry.patch', 'design/fbneo-study/pgm-cycle75/build.json', 'design/fbneo-study/vendor/license.txt')
+    outputs.dir(fbneoRuntime)
+    workingDir projectDir
+    commandLine providers.gradleProperty('embeddedRuntimePython').getOrElse('python'),
+            file('tools/prepare_fbneo_netplay014.py').absolutePath, '--output', fbneoRuntime.get().asFile.absolutePath
+}
+jar {
+    dependsOn prepareFbneo
+    from(fbneoRuntime)
+    dependsOn prepareEmbeddedRuntime, prepareRuntime011
+    from(embeddedRuntimeOutput)
+    from(embeddedRuntime011)
+    from('LICENSE') { into 'META-INF' }
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    manifest { attributes 'Implementation-Title': 'Game Console: Arcade', 'Implementation-Version': project.version }
+}

@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "production_compiled": true,
+  "helper_parser": {
+    "ok": true,
+    "assertions": 4183,
+    "actual_helper_parser_and_callbacks": true,
+    "mame_dll_loaded": false,
+    "minecraft_started": false
+  },
+  "minecraft_started": false,
+  "user_files_changed": false,
+  "limits": [
+    "Four helper input callbacks tested directly; original invaders diagnostic hardware exercises only its supported lines.",
+    "Not four-player commercial gameplay, Minecraft networking or user-instance testing."
+  ]
+}

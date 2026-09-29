@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "tests": 14,
+  "output": "\nTest run finished after 124 ms\n[         4 containers found      ]\n[         0 containers skipped    ]\n[         4 containers started    ]\n[         0 containers aborted    ]\n[         4 containers successful ]\n[         0 containers failed     ]\n[        14 tests found           ]\n[         0 tests skipped         ]\n[        14 tests started         ]\n[         0 tests aborted         ]\n[        14 tests successful      ]\n[         0 tests failed          ]\n\n",
+  "source_sha256": {
+    "G:\\服务器\\服务器Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\server\\SfcJoinGate.java": "cd917a2e6cd10b84297d242cbb3b54c8c1742fd47593970c1352d4a6b594d26f",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceLayout.java": "1c63d1b5300c6e255846f7a30b39ddff59592fbebec940f168209ee90ae3c032"
+  },
+  "limits": [
+    "No Minecraft/world or real GUI launched.",
+    "Four source wiring contracts are not runtime server permission tests; eight tests execute real gate and two execute shared real layout."
+  ]
+}

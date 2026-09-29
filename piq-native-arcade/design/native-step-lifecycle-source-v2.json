@@ -1,0 +1,119 @@
+{
+  "ok": true,
+  "mode": "production-source",
+  "production_compiled": true,
+  "assertions": 308,
+  "elapsed_seconds": 21.625,
+  "cases": [
+    {
+      "ok": true,
+      "case": "badframe",
+      "assertions": 22,
+      "elapsed_ms": 769,
+      "actual_parent": true,
+      "fake_child": true,
+      "native_core_loaded": false,
+      "minecraft_started": false
+    },
+    {
+      "ok": true,
+      "case": "badhash",
+      "assertions": 25,
+      "elapsed_ms": 1642,
+      "actual_parent": true,
+      "fake_child": true,
+      "native_core_loaded": false,
+      "minecraft_started": false
+    },
+    {
+      "ok": true,
+      "case": "badid",
+      "assertions": 22,
+      "elapsed_ms": 785,
+      "actual_parent": true,
+      "fake_child": true,
+      "native_core_loaded": false,
+      "minecraft_started": false
+    },
+    {
+      "ok": true,
+      "case": "cancel",
+      "assertions": 23,
+      "elapsed_ms": 1930,
+      "actual_parent": true,
+      "fake_child": true,
+      "native_core_loaded": false,
+      "minecraft_started": false
+    },
+    {
+      "ok": true,
+      "case": "deadline",
+      "assertions": 24,
+      "elapsed_ms": 17393,
+      "actual_parent": true,
+      "fake_child": true,
+      "native_core_loaded": false,
+      "minecraft_started": false
+    },
+    {
+      "ok": true,
+      "case": "eof",
+      "assertions": 22,
+      "elapsed_ms": 778,
+      "actual_parent": true,
+      "fake_child": true,
+      "native_core_loaded": false,
+      "minecraft_started": false
+    },
+    {
+      "ok": true,
+      "case": "idle",
+      "assertions": 22,
+      "elapsed_ms": 19836,
+      "actual_parent": true,
+      "fake_child": true,
+      "native_core_loaded": false,
+      "minecraft_started": false
+    },
+    {
+      "ok": true,
+      "case": "nohello",
+      "assertions": 21,
+      "elapsed_ms": 16560,
+      "actual_parent": true,
+      "fake_child": true,
+      "native_core_loaded": false,
+      "minecraft_started": false
+    },
+    {
+      "ok": true,
+      "case": "normal",
+      "assertions": 127,
+      "elapsed_ms": 793,
+      "actual_parent": true,
+      "fake_child": true,
+      "native_core_loaded": false,
+      "minecraft_started": false
+    }
+  ],
+  "fake_helper_sha256": "8A3E20A187204B090882D74C56C54DF84B568FC4D300A78E3CD408C9B05EE6E2",
+  "input_sha256": {
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\tools\\qa\\NativeStepLifecycleProbe.java": "2FA9C155A14D9768AB65A873016D2A9F953D5EFB10E7E6F9679ED8D3165F3747",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\tools\\qa\\fake-step\\cn\\piq\\nativearcade\\bridge\\NativeStepWorker.java": "A80E4694A069E8302C4308FD02EAAE7DCE1BE79FF8B5A4D224022B9617FCD282",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\tools\\check_native_step_lifecycle.py": "02C5DABC0F16B28A393478BAE179228640F82B6546E32A61978AF736C726B9E2",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade-poc\\vendor\\mame_libretro.dll": "6172A988AB67FE68F4177A6FC8FBB82619EB2044C330930F0F572F7B1EDC2301",
+    "C:\\Users\\13498\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna\\5.14.0\\67bf3eaea4f0718cb376a181a629e5f88fa1c9dd\\jna-5.14.0.jar": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeStepSession.java": "78D9B50456B38766877FD4D3607FA00348BB5F8325A4EADCE9F9DD28D6B43DEC",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeProcessSession.java": "6750146B6708657ADB689C01A64F4B631504B91EFC810A59E14451985CD3B87D",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeStepProtocol.java": "34D2D485F83AA6FFB83CCF960B484A2C5D6526AF5D20B8DFB852A6052415AF45",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeRomStaging.java": "315D30C565408FEA123837D2C6C32F9D8680BB004BDC3F3A173B8DDA01AA63F6",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\BridgeProtocol.java": "0C82F4250AD8734C8490EB63EBD5D6949B963DD137C53BF0E7A7F9865F062385",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeInputPorts.java": "82FBE336DDA3A894931194B35E6B94E7E0689DA2A02657C3C3DEC5E2C0A8CA14",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeArcadeButtons.java": "A250D0D0728E7871217F01C5BDC018E0D63D9542B184F6EA4DAC52DF04FC7FB2"
+  },
+  "limitations": [
+    "Actual NativeStepSession and shared NativeProcessSession lease; fake child only, no native DLL loaded or game started.",
+    "This does not prove MAME determinism or unload/deinit behavior. Normal parent close currently uses exact-child termination.",
+    "Real DLL/JNA files are only read for identity checks; generated test ZIPs contain no ROM."
+  ]
+}

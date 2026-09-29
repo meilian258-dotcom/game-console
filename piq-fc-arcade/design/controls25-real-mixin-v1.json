@@ -1,0 +1,67 @@
+{
+  "ok": true,
+  "schema": "piq-real-keyboard-mixin-1",
+  "mode": "existing-compiled-production-class",
+  "production_compiled": false,
+  "compiled_only_probe": true,
+  "minecraft_started": false,
+  "game_or_global_config_modified": false,
+  "input": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\classes\\java\\main\\cn\\piq\\fcarcade\\mixin\\KeyboardHandlerMixin.class",
+    "sha256": "E73ED989506FD84AB750D0ECF5ED1639D1D9C413E233385C9AA51A0D13727E24",
+    "mixin_class_sha256": "E73ED989506FD84AB750D0ECF5ED1639D1D9C413E233385C9AA51A0D13727E24",
+    "mixin_config_sha256": "41B67B70300AA0760599DEAE2F5F1FCFE7243AAAEF9881E673F92F539209035F"
+  },
+  "runtime": {
+    "mixin": "C:\\Users\\13498\\.gradle\\caches\\modules-2\\files-2.1\\net.fabricmc\\sponge-mixin\\0.15.2+mixin.0.8.7\\2af2f021d8e02a0220dc27a7a72b4666d66d44ca\\sponge-mixin-0.15.2+mixin.0.8.7.jar",
+    "sha256": "1D45CFE3AE4A2EAB38DC74276803748CF799088986260D6D912E50DDB35D15C5",
+    "declared_by": "NeoForge 21.1.236 moddev-config"
+  },
+  "actual_target": {
+    "jar": "C:\\Users\\13498\\.gradle\\caches\\neoformruntime\\intermediate_results\\sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar",
+    "class": "net/minecraft/client/KeyboardHandler.class",
+    "sha256": "08EFB37D5916C857C38A047BE0C731E1A42C00370D39AE341C0C1EC316F400FC"
+  },
+  "downstream_gui": {
+    "jar": "C:\\Users\\13498\\.gradle\\caches\\neoformruntime\\intermediate_results\\sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar",
+    "class": "net/minecraft/client/Minecraft.class",
+    "sha256": "495F5DC97D07476E23835FCDD034019A020A58B980F7C764D4953CE4ED16D283",
+    "method": "handleKeybinds()V",
+    "keys": [
+      "keyInventory",
+      "keyChat",
+      "keyCommand"
+    ]
+  },
+  "probe": {
+    "ok": true,
+    "assertions": 40,
+    "actual_mixin_transformer": true,
+    "minecraft_started": false,
+    "minecraft_classes_defined": 0,
+    "target_sha256": "08EFB37D5916C857C38A047BE0C731E1A42C00370D39AE341C0C1EC316F400FC",
+    "downstream_minecraft_sha256": "495F5DC97D07476E23835FCDD034019A020A58B980F7C764D4953CE4ED16D283",
+    "mixin_sha256": "E73ED989506FD84AB750D0ECF5ED1639D1D9C413E233385C9AA51A0D13727E24",
+    "transformed_sha256": "D1FCB306F6DC521805767E616B11C5BD83044E282A8F71F0A200D9AB1FFBB0AC",
+    "prefix_instructions": 18,
+    "original_instructions_preserved": 382,
+    "router_before_keymapping_click": true,
+    "vanilla_gui_uses_consumed_clicks": true,
+    "gui_key_gates": 3,
+    "cancel_return_before_vanilla": true,
+    "host": "read-only-classpath-service",
+    "transformer_origin": "file:/C:/Users/13498/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar"
+  },
+  "transformed_artifact": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\controls25-real-mixin-v1.transformed.class",
+    "sha256": "D1FCB306F6DC521805767E616B11C5BD83044E282A8F71F0A200D9AB1FFBB0AC"
+  },
+  "probe_source_sha256": "B589ECB2EE032E5B77A2E52303517E67AE17DA94E362BC168844B705C7190DE3",
+  "compiler_output": "",
+  "transformer_output": "{\"ok\":true,\"assertions\":40,\"actual_mixin_transformer\":true,\"minecraft_started\":false,\"minecraft_classes_defined\":0,\"target_sha256\":\"08EFB37D5916C857C38A047BE0C731E1A42C00370D39AE341C0C1EC316F400FC\",\"downstream_minecraft_sha256\":\"495F5DC97D07476E23835FCDD034019A020A58B980F7C764D4953CE4ED16D283\",\"mixin_sha256\":\"E73ED989506FD84AB750D0ECF5ED1639D1D9C413E233385C9AA51A0D13727E24\",\"transformed_sha256\":\"D1FCB306F6DC521805767E616B11C5BD83044E282A8F71F0A200D9AB1FFBB0AC\",\"prefix_instructions\":18,\"original_instructions_preserved\":382,\"router_before_keymapping_click\":true,\"vanilla_gui_uses_consumed_clicks\":true,\"gui_key_gates\":3,\"cancel_return_before_vanilla\":true,\"host\":\"read-only-classpath-service\",\"transformer_origin\":\"file:/C:/Users/13498/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar\"}\n",
+  "limits": [
+    "Actual Sponge transformer with classpath-only IMixinService/blackboard audit scaffolding, not a ModLauncher game boot.",
+    "No Minecraft class was defined/initialized; router and native GLFW input were not executed.",
+    "Does not prove compatibility/order with other mods' mixins or actual in-game keyboard/GUI behavior."
+  ]
+}

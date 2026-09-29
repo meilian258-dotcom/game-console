@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "mode": "production-source",
+  "production_compiled": true,
+  "actual": {
+    "ok": true,
+    "assertions": 149,
+    "real_step_worker_and_protocol": true,
+    "core": "callback-producing-test-core",
+    "mame_started": false,
+    "minecraft_started": false
+  },
+  "protocol_tests": {
+    "passed_tests": 12,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "source_sha256": {
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeStepProtocol.java": "34D2D485F83AA6FFB83CCF960B484A2C5D6526AF5D20B8DFB852A6052415AF45",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\helper\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeStepWorker.java": "3338E7CC62A6E876CDEC4A068BFFB9F789006496F8A3175A692DC075642E5A6A",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\test\\java\\cn\\piq\\nativearcade\\bridge\\NativeStepProtocolTest.java": "539FEE5E8783A7DBEFDC0618F584AD3C77A856D8C8A167B8443941AA3594DE9A",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\tools\\qa\\NativeStepWorkerProbe.java": "377A0CA9CAA1DF7108A3D0F9C783C08605C815209F5FBE0594B63571003682B3",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\tools\\qa\\CabinetRoomTestRunner.java": "76F1E13154E9C577B7E0632F97A031DE709F4F62669B03992387286881A150B3",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\tools\\check_native_step_worker.py": "DEFDC82FDA06CE5E6B95489B01D89212893AB2BC1E95C9285FB8F178784CCAC8",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq-native-arcade\\runtime\\piq-native-helper.jar": "20F6F3028D76DAEB01212D1808BE90E35BFB5429D1E06153B7D8B32DD73E943C",
+    "C:\\Users\\13498\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna\\5.14.0\\67bf3eaea4f0718cb376a181a629e5f88fa1c9dd\\jna-5.14.0.jar": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6"
+  },
+  "compile_log": "",
+  "limitations": [
+    "Step session and real old Engine callbacks tested with a callback-producing fake core, not MAME determinism.",
+    "No DLL, commercial ROM, game instance, Minecraft, runtime installation or old artifact modification."
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "ok": true,
+  "actual_adapter_and_cleanup_tests": 13,
+  "old_addon_binary_probe": {
+    "old_binary_compatibility": true,
+    "zero_copy": true,
+    "minecraft_started": false,
+    "core_started": false
+  },
+  "host_methods_unchanged_except_api_owner_types": [
+    "private cn.piq.fcarcade.client.cabinet.CabinetClientBackends();",
+    "static synchronized cn.piq.fcarcade.client.cabinet.CabinetBackend find(net.minecraft.resources.ResourceLocation);",
+    "public void openMenu(cn.piq.fcarcade.cabinet.CabinetNetwork$Menu);",
+    "public void openBackend(cn.piq.fcarcade.cabinet.CabinetNetwork$Launch);",
+    "public void closed(cn.piq.fcarcade.cabinet.CabinetNetwork$Closed);",
+    "private static boolean localWorld();",
+    "static boolean current();",
+    "static boolean running();",
+    "static void input(int, int);",
+    "static void clearInput();",
+    "private static void syncInput();",
+    "public static void key(net.neoforged.neoforge.client.event.InputEvent$Key);",
+    "public static void screenOpening(net.neoforged.neoforge.client.event.ScreenEvent$Opening);",
+    "static void stop(java.lang.String, boolean);",
+    "private static void release(java.util.UUID);",
+    "static void notice(java.lang.String);",
+    "static java.lang.String shortText(java.lang.String, int);",
+    "private static void dropTexture();",
+    "public static void shutdown(net.neoforged.neoforge.event.GameShuttingDownEvent);",
+    "public static void tick(net.neoforged.neoforge.client.event.ClientTickEvent$Post);",
+    "public static void render(net.neoforged.neoforge.client.event.RenderLevelStageEvent);",
+    "private static void lambda$start$N(cn.piq.fcarcade.client.cabinet.CabinetBackend, java.nio.file.Path, int, net.minecraft.client.Minecraft);",
+    "private static void lambda$start$N(int, java.lang.Throwable);",
+    "private static void lambda$start$N(cn.piq.fcarcade.cabinet.CabinetEmulator, int);",
+    "private static java.lang.Thread lambda$static$N(java.lang.Runnable);"
+  ],
+  "legacy_cleanup_bytecode_unchanged": true,
+  "host_algorithm_comparison_exclusions": [
+    "register: shared factory registration",
+    "start: shared factory lookup plus missing-factory fail-closed",
+    "static initializer: instantiate shared factory registry"
+  ],
+  "source_sha256": {
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetBackends.java": "B340D59DDDEFDB9AB54CB08DA8E6593A913451731278D2D35B830F29BBE406E8",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetEmulator.java": "E8C04E6D05A5674EBF93D762B72721DF74666C1F4BD3724213BF929349090E18",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetClientBackends.java": "1CA8703538DFDB504D59976B310C19FDB7DAA8B9FA8C5572E1B50C4F9AACDBAF",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetCleanup.java": "2A0DB8FC6B691523FB13E9DF5887D6F2DEC862EB6C230D1959C64F98E59FE0A5",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroBackendRegistry.java": "2B04C33C8877989E8F1ADC071672B4EA1E8BC05C2FAEBE44F5BE97D0705FA50A",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroEmulator.java": "A507D392066E2DE3EC4CC3F5E8F9FB8B35112D36A69BBD221330B6C158B5BB18",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroEmulatorFactory.java": "83AE3289370CD738CDAB281E2A82C1610C88B06FBEE0B3203A006E72720C38EF",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroFactoryRegistry.java": "15E2803BA3F6A96A2F351C95AD9A88BA3792D8F9CE55F62E5A095A2376F698CB",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroFrame.java": "E7563211DA48E98E045DD9DCA84704DCB55990229F458B7E488A98F9875F7F2F",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRetroAdapterTest.java": "593D9B0BCEBDF2435C950BA0BF9467A6D207236D6E0D10A5F922C448C0DD4E80",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRetroRegistryTest.java": "E32B59C847A567EEFAF25F4364EA4AFF29576DAC29F8BD8AB677361288F2F28D",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetRetroCleanupTest.java": "59AE5AAF0D5C2D630060B6BAA89789274218B4693B28727915C8CECE6391CC62",
+    "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetCleanupTest.java": "2619CBD61BCFF2C37B82D8E5EF629E1E7FFFFE599C8EB9832D8F4FC53BFE75C4"
+  },
+  "minecraft_started": false,
+  "core_started": false,
+  "gradle_started": false,
+  "scope": "Real MC API compile; real production adapter/registry/cleanup tests, old frozen-ABI fixture, actual generated host bytecode. No game/network session/ROM launched."
+}

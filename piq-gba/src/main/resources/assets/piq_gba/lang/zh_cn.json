@@ -1,0 +1,5 @@
+{
+  "item.piq_gba.handheld": "GBA",
+  "tooltip.piq_gba.handheld.use": "右键开关机 · Shift＋右键选择游戏",
+  "tooltip.piq_gba.handheld.local": "本机游戏与电池存档 · 不支持掌机通讯线"
+}

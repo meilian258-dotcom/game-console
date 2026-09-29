@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "notice": "Original 26-byte 8080 diagnostic plus zero padding; no commercial program code. Chip names only match the invaders hardware driver.",
+  "source": "piq-native-arcade-poc/probe.py:diagnostic_rom",
+  "original_probe_sha256": "39E15245A50DD2679B5F5832DE745ED15DA1BFCDC1C71DEB77647B39A8A56EC8",
+  "original_firmware_sha256": "554C673E65D5957DA0BC1DF0CEB986CBAC5500D407AE2D780FEAB4F8D2EED810",
+  "chips": [
+    {"name": "9316b-0869_m739h.h1", "bytes": 2048, "sha256": "F90A6BCD8C4935E4B8571E0C9A490F8483FFF26E4A8E975840F3021289739D70"},
+    {"name": "9316b-0856_m739g.g1", "bytes": 2048, "sha256": "E5A00AA9991AC8A5EE3109844D84A55583BD20572AD3FFCD42792F3C36B183AD"},
+    {"name": "9316b-0855_m739f.f1", "bytes": 2048, "sha256": "E5A00AA9991AC8A5EE3109844D84A55583BD20572AD3FFCD42792F3C36B183AD"},
+    {"name": "9316b-0854_m739e.e1", "bytes": 2048, "sha256": "E5A00AA9991AC8A5EE3109844D84A55583BD20572AD3FFCD42792F3C36B183AD"}
+  ]
+}

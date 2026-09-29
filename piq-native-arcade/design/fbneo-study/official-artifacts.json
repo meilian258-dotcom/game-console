@@ -1,0 +1,29 @@
+{
+  "schema": "piq-fbneo-official-study-1",
+  "official_binary": {
+    "url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/fbneo_libretro.dll.zip",
+    "resolved_url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/fbneo_libretro.dll.zip",
+    "last_modified": "Fri, 11 Sep 2026 23:02:07 GMT",
+    "bytes": 17334074,
+    "sha256": "934FF65DC9A3229E62F39A8F26630B54473995BE631FCF9D277996765B2643AB"
+  },
+  "dll": {
+    "path": "G:\\服务器\\服务器Codex\\piq-native-arcade\\design\\fbneo-study\\vendor\\fbneo_libretro.dll",
+    "bytes": 61913629,
+    "sha256": "52343F65453C0E1FC06B3AA818B48CA4FED18361F7F336A684E9E3CFFA5F5F3C"
+  },
+  "fixed_source": {
+    "url": "https://codeload.github.com/libretro/FBNeo/zip/a251c76229f1637e433b93e29845039752771b6d",
+    "resolved_url": "https://codeload.github.com/libretro/FBNeo/zip/a251c76229f1637e433b93e29845039752771b6d",
+    "last_modified": null,
+    "bytes": 29731166,
+    "sha256": "55CC0F5BF305D8953FA0A20C3598164D39EFC03EF3740C7B01E7EBF143CD4D7A"
+  },
+  "source_commit": "a251c76229f1637e433b93e29845039752771b6d",
+  "commit_time": "2026-09-04T07:53:13Z",
+  "license_sha256": "BB2369F1B75F42242968A78191B47EE90F85682224D3AD1EF63044E244B3E202",
+  "binary_to_source_exact_mapping_verified": false,
+  "production_modified": false,
+  "installed": false,
+  "purpose": "Local isolated determinism research only; non-commercial licensing requires separate distribution review."
+}

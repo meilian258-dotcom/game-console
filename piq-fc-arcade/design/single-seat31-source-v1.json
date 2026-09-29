@@ -1,0 +1,37 @@
+{
+  "ok": true,
+  "mode": "source-pure-and-source-contract",
+  "production_compiled": true,
+  "actual": {
+    "passed_tests": 48,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "classes": [
+    "CabinetSeats",
+    "CabinetRoomLedger",
+    "CabinetLinkLedger",
+    "CabinetJoinGate"
+  ],
+  "tests": [
+    "CabinetSingleSeatTest",
+    "CabinetSingleSeatSourceTest",
+    "CabinetRoomLedgerTest",
+    "CabinetSeatsTest",
+    "CabinetJoinSourceContractTest"
+  ],
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSeats.java": "2B32C1F222CE1FA14EC0242831940A079FB078C6A2C7DF30D485CCE70F364CF0",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomLedger.java": "1C85AE39C13DD025230C0AF76953644296C8E4B15C0396479A8575B8C20C09F3",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetLinkLedger.java": "91B09623FB992C2A6EAB479C4A3AA54F45879A891FC1E783EA70DB1EDB440CE1",
+    "src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetJoinGate.java": "38104E6A70BBC6880DEB6339D2AEB311543788B50BC44E5A66345A6783B58F2C",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSingleSeatTest.java": "F3DDDE4163D266D3EDA69E418E436D79E1F678FFE80AAF184366B141F8E076FC",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSingleSeatSourceTest.java": "7276E84DC8B9C8A7299493C1CA80E9BAE654A9FF58C2862A69F7E5A14197227A",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomLedgerTest.java": "64D25B5BEDA2B9661B6F2E60A54F6A37A4D7C40830485FE85EEC4EDFE529D91C",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSeatsTest.java": "019D6C0147FB618D0824C41F914607BB514FCEFDE8B856AA18B6FB9EEF96F135",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetJoinSourceContractTest.java": "488524B472E8690C8971F16AFAB4189CDD03211C1F5AD70DC30C7F8688319F58"
+  },
+  "limits": [
+    "Pure production seats/ledger/gate/link states and source contracts. No actual server/world/network or final-JAR proof."
+  ]
+}

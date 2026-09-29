@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "piq_j2me_arcade:block/j2me_arcade" },
+    "facing=east": { "model": "piq_j2me_arcade:block/j2me_arcade", "y": 90 },
+    "facing=south": { "model": "piq_j2me_arcade:block/j2me_arcade", "y": 180 },
+    "facing=west": { "model": "piq_j2me_arcade:block/j2me_arcade", "y": 270 }
+  }
+}

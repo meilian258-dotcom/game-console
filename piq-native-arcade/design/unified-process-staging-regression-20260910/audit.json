@@ -1,0 +1,37 @@
+{
+  "actual_bridge": true,
+  "parent_jar": null,
+  "parent_jar_sha256": null,
+  "unicode_runtime_classpath": true,
+  "helper": {
+    "file": "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ原生街机\\0.1.0-alpha.1\\piq-native-arcade\\runtime\\piq-native-helper.jar",
+    "sha256": "D1A360A8C300FDBC402A1CEFCF63314A045E0C1D9183E7BABA6E40EF9B33F75D",
+    "bytes": 18724
+  },
+  "firmware": {
+    "path": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-bridge-check-2h3pk4i1\\中文 测试 runtime\\invaders.zip",
+    "zip_sha256": "10E62BBACBF6E79EFB6DB6F7A65EA1EDFB65653EAB60B41E80DBCB4673A5276C",
+    "original_firmware_sha256": "554C673E65D5957DA0BC1DF0CEB986CBAC5500D407AE2D780FEAB4F8D2EED810",
+    "notice": "Original diagnostics, not Space Invaders game code. Expected checksum warnings are intentional."
+  },
+  "functional_24_checks": {
+    "stdout": "FRAME=260x224 DAR=1.3333334 ROTATION=1\r\nMERGED_PCM_SHORTS=11292 CHECKS=23\r\nPASS=24 ELAPSED_MS=7341\r\nEXPECTED_ORIGINAL_FIRMWARE_CHECKSUM_WARNINGS=true\r\n",
+    "stderr": ""
+  },
+  "actual_parent_jvm_shutdown": {
+    "stdout": "CHILD_PID=37692\r\n",
+    "stderr": "",
+    "exact_child_exited": true
+  },
+  "15_second_stall_reap": {
+    "stdout": "TIMEOUT_REAP_PASS elapsed_ms=15470\r\n",
+    "stderr": ""
+  },
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\nativearcade\\bridge\\BridgeProtocol.java": "F59113F4F6D2C72EEEBECD778B5ACCDC82A2EF564A792C5B9795EE8C55628250",
+    "src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeProcessSession.java": "F03828A8767B1A1CBB9F92D7AB0C01BA73CB166C3FD516B84E53FA4F3723D6EE",
+    "src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeRomStaging.java": "315D30C565408FEA123837D2C6C32F9D8680BB004BDC3F3A173B8DDA01AA63F6",
+    "helper\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeCoreWorker.java": "904BC021AC52922C0ED3E9C4EF8CA9D39BD27F5A0E9AC02B3DB202949247E8F7"
+  },
+  "boundary": "Original test firmware only. No commercial game compatibility assertion. Process boundary is not an OS security sandbox. A forced OS kill/crash of the parent JVM is not covered by the orderly-shutdown hook."
+}

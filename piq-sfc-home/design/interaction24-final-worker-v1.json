@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "mode": "final-jar-only",
+  "production_compiled": false,
+  "actual": {
+    "ok": true,
+    "assertions": 38,
+    "production_origin": "final-jar-only",
+    "production_compiled": false,
+    "actual_playback_core_started": true,
+    "minecraft_started": false,
+    "network_socket_opened": false,
+    "audio_device_opened": false,
+    "commercial_rom_used": false,
+    "host_final_next_frame": 12,
+    "callback_failure_frame": 6,
+    "host_frames_run_after_callback_failure": 6,
+    "p2_media_calls": 0,
+    "suspend_resume_media_sequence_monotonic": true
+  },
+  "elapsed_seconds": 5.547,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-interaction24-v1\\piq_fc_arcade-0.31.0-alpha.24.jar",
+      "sha256": "AE3185660442BA3BB38344165F3D60F736DB5DA3E63F2E4FE9D7DCC79C1F170B"
+    },
+    "sfc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-interaction24-v1\\piq_sfc-0.1.0-alpha.13.jar",
+      "sha256": "2DED10D744F22F7C32A988669C6E67E3A4744ECD6DB5799541EE3D6FDAD1FB15"
+    }
+  },
+  "source_sha256": {
+    "piq-sfc-home\\tools\\qa\\SfcWatchPlaybackProbe.java": "145072549714299B58CAFE276D37520C59999ABB2480EA2841C258F50CF3F1AA",
+    "piq-fc-arcade\\tools\\qa\\SfcTwoPortInputProbe.java": "E69C500BFC00303A3F2B65507AD29207EF5B30AA839D04AC8E146CBEF207C839",
+    "piq-sfc-arcade\\src\\test\\java\\cn\\piq\\sfcarcade\\core\\SfcLegalTestRom.java": "EF75502FB38B15197C2221D3937B00A9AD13A2762C1E0E2DF46BBB1767EE58B3",
+    "piq-sfc-home\\tools\\check_sfc_watch_playback.py": "C4FADC13E7595165144485C2D5462211B4DE17E8BDAE8A9EBEFA40858BA0DF2E"
+  },
+  "limitations": [
+    "Real worker/core/media queue; test Host replaces scheduling/audio/backup.",
+    "No Minecraft world/server, socket, actual spectator dispatch or commercial ROM."
+  ]
+}

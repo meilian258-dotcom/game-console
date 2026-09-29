@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "mode": "final-jar",
+  "final_jars": {
+    "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-SFC家用\\piq_sfc_home-0.1.0-alpha.2.jar": "CD6A117779470DFEBBF1E9A594C9A687A6BDEA36AE46A62EE54E51B01D9FBA78",
+    "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-FC街机\\piq_fc_arcade-0.31.0-alpha.15.jar": "34A1E0D87715E646C653BBE6555B8BBEC395AD1483172025B456B49BB1698BC5"
+  },
+  "unit_test_output": "\nTest run finished after 292 ms\n[         7 containers found      ]\n[         0 containers skipped    ]\n[         7 containers started    ]\n[         0 containers aborted    ]\n[         7 containers successful ]\n[         0 containers failed     ]\n[        24 tests found           ]\n[         0 tests skipped         ]\n[        24 tests started         ]\n[         0 tests aborted         ]\n[        24 tests successful      ]\n[         0 tests failed          ]\n\n",
+  "actual_core": {
+    "passed": true,
+    "assertions": 3154065,
+    "two_port_key_cases": 24,
+    "ntsc_fps": 60.0988,
+    "pal_fps": 50.007,
+    "merged_pcm_shorts": 14376,
+    "fast_edge_sequence": true,
+    "commercial_roms": false,
+    "minecraft_gameplay": false
+  },
+  "old_sfc_jar_sha256": "38FA46C5D283EAD9E1F6666D01398F495E2E1A3260A1517BE8EE959710963363",
+  "production_source_sha256": {
+    "G:\\服务器\\服务器Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcCoreLease.java": "5801FF96414544B84C409FAE09A186E0169D620334851B76E047EA382AB3F0B8",
+    "G:\\服务器\\服务器Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetInputs.java": "53B9903DD517596C44B63AF4F1D52C114AE542A94AC9A5227C60FA9C4EDB7193",
+    "G:\\服务器\\服务器Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetFrames.java": "A13F9827DFB8CB03398C8C6474595D670D54E576E88B078CB7DC83A1BA0B2EB4",
+    "G:\\服务器\\服务器Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetRom.java": "2755B1C8AF2105B51623AE5A796640D6485798A40C5BB51C53CB35A4046FFCF2",
+    "G:\\服务器\\服务器Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetSession.java": "A358B143DE36568958078F198B9641C68FFACA9CDD9C0995F1F52A7775918B51",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetFrame.java": "8FA1B7829E562FB74C0DF2A9C25012256681F79D52F6BA1FCB5FF833A2BF6B64",
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetEmulator.java": "EC2584D477113A9DC4707A83533C6CB84B4EF323576B363373CEFDF2DBEE77FB"
+  },
+  "limits": [
+    "No commercial ROM or Minecraft scene tested.",
+    "Original fixture produces silent clock PCM, not audible game music.",
+    "Native Wasmtime calls have no fuel timeout; a stuck worker remains occupied until client restart.",
+    "This provider uses local-only cabinet authority; home SFC multiplayer is unchanged."
+  ]
+}

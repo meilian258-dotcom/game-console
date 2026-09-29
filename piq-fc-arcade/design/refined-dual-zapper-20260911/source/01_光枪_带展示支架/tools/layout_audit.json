@@ -1,0 +1,92 @@
+{
+  "checks": [
+    {
+      "name": "All 286 elements physically connected",
+      "ok": true,
+      "detail": [
+        286
+      ]
+    },
+    {
+      "name": "Support contact 前管接触软垫",
+      "ok": true,
+      "detail": [
+        {
+          "name": "橙色前管_竖芯",
+          "gap": -0.008091419999999516
+        }
+      ]
+    },
+    {
+      "name": "Support contact 握把托背软垫",
+      "ok": true,
+      "detail": [
+        {
+          "name": "握把底部压边_竖芯",
+          "gap": -0.011958655924799
+        },
+        {
+          "name": "握把底部压边_切角2",
+          "gap": -0.011958662192241648
+        },
+        {
+          "name": "握把底部压边_切角3",
+          "gap": -0.011958657174597459
+        }
+      ]
+    },
+    {
+      "name": "Support contact 握把托前软垫",
+      "ok": true,
+      "detail": [
+        {
+          "name": "握把底部压边_竖芯",
+          "gap": -0.011958655924799
+        },
+        {
+          "name": "握把底部压边_切角2",
+          "gap": -0.011958662192241648
+        },
+        {
+          "name": "握把底部压边_切角3",
+          "gap": -0.011958657174597459
+        }
+      ]
+    },
+    {
+      "name": "Body is rigidly turned without scaling",
+      "ok": true,
+      "detail": {
+        "elements": 132,
+        "maxError": 8.881784197001252e-16
+      }
+    },
+    {
+      "name": "Trigger 8-degree sweep clears guard and stand",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "上侧ZAPPER字标 visible at 25 rays",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "下侧型号铭牌 visible at 25 rays",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "光学窗口玻璃 visible at 25 rays",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "支架铭牌 visible at 25 rays",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

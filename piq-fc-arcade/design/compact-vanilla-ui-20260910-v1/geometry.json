@@ -1,0 +1,2998 @@
+{
+  "ok": true,
+  "boundary": "Offline actual Java DeviceLayout + all 14 CartridgeWorkbenchLayout rectangles. No Minecraft/core started. Font metrics approximate; samples invented. Original Minecraft sprite bytes read only. No old preview edited.",
+  "source_sha256": {
+    "layout": "9394939AAAE0225E2DDF6E17AB2C5EFFF88C8530793CC907A355B3BA153C816D",
+    "workbench": "6B661824ACF150715C934D6CBD9D0A6535B982890E3D8F052B3E485E2F6DB02A",
+    "paint": "657A886505E588C8484CFC6586BABB54797AB786FF85264B868B62B808905C00",
+    "fc": "3C7915FF15B37B7F9D01CE9A064BECA936FC5A9468EFA7913C4E73FCAAA0445F",
+    "sfc": "A7179F7A353465CBF76328B01F33773C81190537133638C531C0C386899889F2",
+    "sfc_labels": "EB35623D407224F5CE9694970A03BE3404B271CBDCFE3570FF3C37341E1A62E2"
+  },
+  "sprite_sources": {
+    "assets/minecraft/textures/gui/sprites/widget/button.png": {
+      "sha256": "0A2E159360200A39E0C7E9C0DB0E6AA034BA4E1F8D99698C004084B5BA6E94CB",
+      "metadata_sha256": "C8F6FE62C01C357A814223D4AB6A368E5122C195FA2671E585FA24988557A505",
+      "scaling": {
+        "type": "nine_slice",
+        "width": 200,
+        "height": 20,
+        "border": 3
+      }
+    },
+    "assets/minecraft/textures/gui/sprites/widget/button_disabled.png": {
+      "sha256": "4895ACD147454771FD6A61AD294DFC12E13FF15D6018DA26C9FA0E884FD9C14E",
+      "metadata_sha256": "D7DD31A632FE41BE64E07EF0676B726E50F0AF053E638742EC1F6F9550A1B7E5",
+      "scaling": {
+        "type": "nine_slice",
+        "width": 200,
+        "height": 20,
+        "border": 1
+      }
+    },
+    "assets/minecraft/textures/gui/sprites/widget/button_highlighted.png": {
+      "sha256": "1FCD15AD8971B1E846F848B2211D631F51B9B6533D99CA392A5799AF7E9854F9",
+      "metadata_sha256": "C8F6FE62C01C357A814223D4AB6A368E5122C195FA2671E585FA24988557A505",
+      "scaling": {
+        "type": "nine_slice",
+        "width": 200,
+        "height": 20,
+        "border": 3
+      }
+    }
+  },
+  "actual_java_geometry": [
+    {
+      "width": 320,
+      "height": 240,
+      "supported": true,
+      "split": true,
+      "panel": [
+        20,
+        16,
+        280,
+        208
+      ],
+      "toolbar": [
+        30,
+        56,
+        260,
+        44
+      ],
+      "list": [
+        30,
+        104,
+        140,
+        64
+      ],
+      "details": [
+        178,
+        104,
+        112,
+        64
+      ],
+      "navigation": [
+        30,
+        176,
+        260,
+        20
+      ],
+      "status": [
+        30,
+        201,
+        260,
+        18
+      ],
+      "primary": [
+        184,
+        142,
+        100,
+        20
+      ],
+      "rows": [
+        [
+          34,
+          108,
+          132,
+          20
+        ],
+        [
+          34,
+          130,
+          132,
+          20
+        ]
+      ],
+      "workbench": {
+        "name": [
+          30,
+          56,
+          112,
+          20
+        ],
+        "saveName": [
+          146,
+          56,
+          66,
+          20
+        ],
+        "players": [
+          216,
+          56,
+          74,
+          20
+        ],
+        "gamesTab": [
+          30,
+          80,
+          56,
+          20
+        ],
+        "coversTab": [
+          90,
+          80,
+          42,
+          20
+        ],
+        "search": [
+          136,
+          80,
+          112,
+          20
+        ],
+        "refresh": [
+          252,
+          80,
+          38,
+          20
+        ],
+        "romFolder": [
+          30,
+          176,
+          48,
+          20
+        ],
+        "coverFolder": [
+          82,
+          176,
+          49,
+          20
+        ],
+        "previous": [
+          135,
+          176,
+          49,
+          20
+        ],
+        "next": [
+          188,
+          176,
+          49,
+          20
+        ],
+        "close": [
+          241,
+          176,
+          49,
+          20
+        ],
+        "clearCover": [
+          184,
+          118,
+          48,
+          20
+        ],
+        "restoreCover": [
+          236,
+          118,
+          48,
+          20
+        ]
+      }
+    },
+    {
+      "width": 512,
+      "height": 278,
+      "supported": true,
+      "split": true,
+      "panel": [
+        51,
+        26,
+        410,
+        225
+      ],
+      "toolbar": [
+        61,
+        66,
+        390,
+        44
+      ],
+      "list": [
+        61,
+        114,
+        238,
+        81
+      ],
+      "details": [
+        307,
+        114,
+        144,
+        81
+      ],
+      "navigation": [
+        61,
+        203,
+        390,
+        20
+      ],
+      "status": [
+        61,
+        228,
+        390,
+        18
+      ],
+      "primary": [
+        313,
+        169,
+        132,
+        20
+      ],
+      "rows": [
+        [
+          65,
+          118,
+          230,
+          20
+        ],
+        [
+          65,
+          140,
+          230,
+          20
+        ],
+        [
+          65,
+          162,
+          230,
+          20
+        ]
+      ],
+      "workbench": {
+        "name": [
+          61,
+          66,
+          242,
+          20
+        ],
+        "saveName": [
+          307,
+          66,
+          66,
+          20
+        ],
+        "players": [
+          377,
+          66,
+          74,
+          20
+        ],
+        "gamesTab": [
+          61,
+          90,
+          56,
+          20
+        ],
+        "coversTab": [
+          121,
+          90,
+          42,
+          20
+        ],
+        "search": [
+          167,
+          90,
+          242,
+          20
+        ],
+        "refresh": [
+          413,
+          90,
+          38,
+          20
+        ],
+        "romFolder": [
+          61,
+          203,
+          74,
+          20
+        ],
+        "coverFolder": [
+          139,
+          203,
+          75,
+          20
+        ],
+        "previous": [
+          218,
+          203,
+          75,
+          20
+        ],
+        "next": [
+          297,
+          203,
+          75,
+          20
+        ],
+        "close": [
+          376,
+          203,
+          75,
+          20
+        ],
+        "clearCover": [
+          313,
+          145,
+          64,
+          20
+        ],
+        "restoreCover": [
+          381,
+          145,
+          64,
+          20
+        ]
+      }
+    },
+    {
+      "width": 1024,
+      "height": 556,
+      "supported": true,
+      "split": true,
+      "panel": [
+        302,
+        148,
+        420,
+        260
+      ],
+      "toolbar": [
+        312,
+        188,
+        400,
+        44
+      ],
+      "list": [
+        312,
+        236,
+        244,
+        116
+      ],
+      "details": [
+        564,
+        236,
+        148,
+        116
+      ],
+      "navigation": [
+        312,
+        360,
+        400,
+        20
+      ],
+      "status": [
+        312,
+        385,
+        400,
+        18
+      ],
+      "primary": [
+        570,
+        326,
+        136,
+        20
+      ],
+      "rows": [
+        [
+          316,
+          240,
+          236,
+          20
+        ],
+        [
+          316,
+          262,
+          236,
+          20
+        ],
+        [
+          316,
+          284,
+          236,
+          20
+        ],
+        [
+          316,
+          306,
+          236,
+          20
+        ],
+        [
+          316,
+          328,
+          236,
+          20
+        ]
+      ],
+      "workbench": {
+        "name": [
+          312,
+          188,
+          252,
+          20
+        ],
+        "saveName": [
+          568,
+          188,
+          66,
+          20
+        ],
+        "players": [
+          638,
+          188,
+          74,
+          20
+        ],
+        "gamesTab": [
+          312,
+          212,
+          56,
+          20
+        ],
+        "coversTab": [
+          372,
+          212,
+          42,
+          20
+        ],
+        "search": [
+          418,
+          212,
+          252,
+          20
+        ],
+        "refresh": [
+          674,
+          212,
+          38,
+          20
+        ],
+        "romFolder": [
+          312,
+          360,
+          76,
+          20
+        ],
+        "coverFolder": [
+          392,
+          360,
+          77,
+          20
+        ],
+        "previous": [
+          473,
+          360,
+          77,
+          20
+        ],
+        "next": [
+          554,
+          360,
+          77,
+          20
+        ],
+        "close": [
+          635,
+          360,
+          77,
+          20
+        ],
+        "clearCover": [
+          570,
+          302,
+          66,
+          20
+        ],
+        "restoreCover": [
+          640,
+          302,
+          66,
+          20
+        ]
+      }
+    }
+  ],
+  "cases": [
+    {
+      "system": "FC",
+      "covers": false,
+      "width": 320,
+      "height": 240,
+      "detail_lines": [
+        "待写入游戏",
+        "名称：原创示例游戏.nes",
+        "来源：本地 ROM"
+      ],
+      "visible_row_count": 2,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            30,
+            56,
+            112,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            146,
+            56,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            216,
+            56,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 游戏库",
+          "rect": [
+            30,
+            80,
+            56,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "封面",
+          "rect": [
+            90,
+            80,
+            42,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            136,
+            80,
+            112,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            252,
+            80,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "原创示例游戏.nes",
+          "rect": [
+            34,
+            108,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一款示例.nes",
+          "rect": [
+            34,
+            130,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "上传并写入卡带",
+          "rect": [
+            184,
+            142,
+            100,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            30,
+            176,
+            48,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            82,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            135,
+            176,
+            49,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            188,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            241,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": [
+        {
+          "full": "名称：原创示例游戏.nes",
+          "shown": "名称：原创示例游戏.n…",
+          "width": 96
+        },
+        {
+          "full": "ROM 目录",
+          "shown": "ROM …",
+          "width": 34,
+          "button": true
+        },
+        {
+          "full": "封面目录",
+          "shown": "封面目…",
+          "width": 35,
+          "button": true
+        }
+      ]
+    },
+    {
+      "system": "SFC",
+      "covers": false,
+      "width": 320,
+      "height": 240,
+      "detail_lines": [
+        "待写入游戏",
+        "名称：原创示例游戏.sfc",
+        "来源：本地文件"
+      ],
+      "visible_row_count": 2,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            30,
+            56,
+            112,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            146,
+            56,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            216,
+            56,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 游戏库",
+          "rect": [
+            30,
+            80,
+            56,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "封面",
+          "rect": [
+            90,
+            80,
+            42,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            136,
+            80,
+            112,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            252,
+            80,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "原创示例游戏.sfc",
+          "rect": [
+            34,
+            108,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一款示例.sfc",
+          "rect": [
+            34,
+            130,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "写入所选游戏",
+          "rect": [
+            184,
+            142,
+            100,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            30,
+            176,
+            48,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            82,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            135,
+            176,
+            49,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            188,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            241,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": [
+        {
+          "full": "ROM 目录",
+          "shown": "ROM …",
+          "width": 34,
+          "button": true
+        },
+        {
+          "full": "封面目录",
+          "shown": "封面目…",
+          "width": 35,
+          "button": true
+        }
+      ]
+    },
+    {
+      "system": "FC",
+      "covers": true,
+      "width": 320,
+      "height": 240,
+      "detail_lines": [
+        "待应用封面 · 示例封面.png"
+      ],
+      "visible_row_count": 2,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            30,
+            56,
+            112,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            146,
+            56,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            216,
+            56,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "游戏库",
+          "rect": [
+            30,
+            80,
+            56,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 封面",
+          "rect": [
+            90,
+            80,
+            42,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            136,
+            80,
+            112,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            252,
+            80,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "示例封面.png",
+          "rect": [
+            34,
+            108,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一张封面.png",
+          "rect": [
+            34,
+            130,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "清空",
+          "rect": [
+            184,
+            118,
+            48,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "恢复",
+          "rect": [
+            236,
+            118,
+            48,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上传并应用封面",
+          "rect": [
+            184,
+            142,
+            100,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            30,
+            176,
+            48,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            82,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            135,
+            176,
+            49,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            188,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            241,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": [
+        {
+          "full": "待应用封面 · 示例封面.png",
+          "shown": "待应用封面 · 示例封面…",
+          "width": 96
+        },
+        {
+          "full": "ROM 目录",
+          "shown": "ROM …",
+          "width": 34,
+          "button": true
+        },
+        {
+          "full": "封面目录",
+          "shown": "封面目…",
+          "width": 35,
+          "button": true
+        }
+      ]
+    },
+    {
+      "system": "SFC",
+      "covers": true,
+      "width": 320,
+      "height": 240,
+      "detail_lines": [
+        "待应用封面 · 示例封面.png"
+      ],
+      "visible_row_count": 2,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            30,
+            56,
+            112,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            146,
+            56,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            216,
+            56,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "游戏库",
+          "rect": [
+            30,
+            80,
+            56,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 封面",
+          "rect": [
+            90,
+            80,
+            42,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            136,
+            80,
+            112,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            252,
+            80,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "示例封面.png",
+          "rect": [
+            34,
+            108,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一张封面.png",
+          "rect": [
+            34,
+            130,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "清空",
+          "rect": [
+            184,
+            118,
+            48,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "恢复",
+          "rect": [
+            236,
+            118,
+            48,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "应用所选封面",
+          "rect": [
+            184,
+            142,
+            100,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            30,
+            176,
+            48,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            82,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            135,
+            176,
+            49,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            188,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            241,
+            176,
+            49,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": [
+        {
+          "full": "待应用封面 · 示例封面.png",
+          "shown": "待应用封面 · 示例封面.…",
+          "width": 100
+        },
+        {
+          "full": "ROM 目录",
+          "shown": "ROM …",
+          "width": 34,
+          "button": true
+        },
+        {
+          "full": "封面目录",
+          "shown": "封面目…",
+          "width": 35,
+          "button": true
+        }
+      ]
+    },
+    {
+      "system": "FC",
+      "covers": false,
+      "width": 512,
+      "height": 278,
+      "detail_lines": [
+        "待写入游戏",
+        "名称：原创示例游戏.nes",
+        "来源：本地 ROM"
+      ],
+      "visible_row_count": 3,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            61,
+            66,
+            242,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            307,
+            66,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            377,
+            66,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 游戏库",
+          "rect": [
+            61,
+            90,
+            56,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "封面",
+          "rect": [
+            121,
+            90,
+            42,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            167,
+            90,
+            242,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            413,
+            90,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "原创示例游戏.nes",
+          "rect": [
+            65,
+            118,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一款示例.nes",
+          "rect": [
+            65,
+            140,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "示例双人冒险.nes",
+          "rect": [
+            65,
+            162,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "上传并写入卡带",
+          "rect": [
+            313,
+            169,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            61,
+            203,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            139,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            218,
+            203,
+            75,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            297,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            376,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": []
+    },
+    {
+      "system": "SFC",
+      "covers": false,
+      "width": 512,
+      "height": 278,
+      "detail_lines": [
+        "待写入游戏",
+        "名称：原创示例游戏.sfc",
+        "来源：本地文件"
+      ],
+      "visible_row_count": 3,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            61,
+            66,
+            242,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            307,
+            66,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            377,
+            66,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 游戏库",
+          "rect": [
+            61,
+            90,
+            56,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "封面",
+          "rect": [
+            121,
+            90,
+            42,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            167,
+            90,
+            242,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            413,
+            90,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "原创示例游戏.sfc",
+          "rect": [
+            65,
+            118,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一款示例.sfc",
+          "rect": [
+            65,
+            140,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "示例双人冒险.sfc",
+          "rect": [
+            65,
+            162,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "写入所选游戏",
+          "rect": [
+            313,
+            169,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            61,
+            203,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            139,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            218,
+            203,
+            75,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            297,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            376,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": []
+    },
+    {
+      "system": "FC",
+      "covers": true,
+      "width": 512,
+      "height": 278,
+      "detail_lines": [
+        "待应用封面 · 示例封面.png",
+        "来源：本地 PNG"
+      ],
+      "visible_row_count": 3,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            61,
+            66,
+            242,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            307,
+            66,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            377,
+            66,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "游戏库",
+          "rect": [
+            61,
+            90,
+            56,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 封面",
+          "rect": [
+            121,
+            90,
+            42,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            167,
+            90,
+            242,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            413,
+            90,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "示例封面.png",
+          "rect": [
+            65,
+            118,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一张封面.png",
+          "rect": [
+            65,
+            140,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "含较长自定义名称的封面.png",
+          "rect": [
+            65,
+            162,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "清空",
+          "rect": [
+            313,
+            145,
+            64,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "恢复",
+          "rect": [
+            381,
+            145,
+            64,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上传并应用封面",
+          "rect": [
+            313,
+            169,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            61,
+            203,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            139,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            218,
+            203,
+            75,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            297,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            376,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": []
+    },
+    {
+      "system": "SFC",
+      "covers": true,
+      "width": 512,
+      "height": 278,
+      "detail_lines": [
+        "待应用封面 · 示例封面.png",
+        "来源：本地 PNG"
+      ],
+      "visible_row_count": 3,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            61,
+            66,
+            242,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            307,
+            66,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            377,
+            66,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "游戏库",
+          "rect": [
+            61,
+            90,
+            56,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 封面",
+          "rect": [
+            121,
+            90,
+            42,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            167,
+            90,
+            242,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            413,
+            90,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "示例封面.png",
+          "rect": [
+            65,
+            118,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一张封面.png",
+          "rect": [
+            65,
+            140,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "含较长自定义名称的封面.png",
+          "rect": [
+            65,
+            162,
+            230,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "清空",
+          "rect": [
+            313,
+            145,
+            64,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "恢复",
+          "rect": [
+            381,
+            145,
+            64,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "应用所选封面",
+          "rect": [
+            313,
+            169,
+            132,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            61,
+            203,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            139,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            218,
+            203,
+            75,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            297,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            376,
+            203,
+            75,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": []
+    },
+    {
+      "system": "FC",
+      "covers": false,
+      "width": 1024,
+      "height": 556,
+      "detail_lines": [
+        "待写入游戏",
+        "名称：原创示例游戏.nes",
+        "来源：本地 ROM"
+      ],
+      "visible_row_count": 5,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            312,
+            188,
+            252,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            568,
+            188,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            638,
+            188,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 游戏库",
+          "rect": [
+            312,
+            212,
+            56,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "封面",
+          "rect": [
+            372,
+            212,
+            42,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            418,
+            212,
+            252,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            674,
+            212,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "原创示例游戏.nes",
+          "rect": [
+            316,
+            240,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一款示例.nes",
+          "rect": [
+            316,
+            262,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "示例双人冒险.nes",
+          "rect": [
+            316,
+            284,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "带有较长名称的诊断游戏.nes",
+          "rect": [
+            316,
+            306,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "示例动作.nes",
+          "rect": [
+            316,
+            328,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "上传并写入卡带",
+          "rect": [
+            570,
+            326,
+            136,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            312,
+            360,
+            76,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            392,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            473,
+            360,
+            77,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            554,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            635,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": []
+    },
+    {
+      "system": "SFC",
+      "covers": false,
+      "width": 1024,
+      "height": 556,
+      "detail_lines": [
+        "待写入游戏",
+        "名称：原创示例游戏.sfc",
+        "来源：本地文件"
+      ],
+      "visible_row_count": 5,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            312,
+            188,
+            252,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            568,
+            188,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            638,
+            188,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 游戏库",
+          "rect": [
+            312,
+            212,
+            56,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "封面",
+          "rect": [
+            372,
+            212,
+            42,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            418,
+            212,
+            252,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            674,
+            212,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "原创示例游戏.sfc",
+          "rect": [
+            316,
+            240,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一款示例.sfc",
+          "rect": [
+            316,
+            262,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "示例双人冒险.sfc",
+          "rect": [
+            316,
+            284,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "带有较长名称的诊断游戏.sfc",
+          "rect": [
+            316,
+            306,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "示例动作.sfc",
+          "rect": [
+            316,
+            328,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "写入所选游戏",
+          "rect": [
+            570,
+            326,
+            136,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            312,
+            360,
+            76,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            392,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            473,
+            360,
+            77,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            554,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            635,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": []
+    },
+    {
+      "system": "FC",
+      "covers": true,
+      "width": 1024,
+      "height": 556,
+      "detail_lines": [
+        "待应用封面",
+        "名称：示例封面.png",
+        "来源：本地 PNG"
+      ],
+      "visible_row_count": 5,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            312,
+            188,
+            252,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            568,
+            188,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            638,
+            188,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "游戏库",
+          "rect": [
+            312,
+            212,
+            56,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 封面",
+          "rect": [
+            372,
+            212,
+            42,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            418,
+            212,
+            252,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            674,
+            212,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "示例封面.png",
+          "rect": [
+            316,
+            240,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一张封面.png",
+          "rect": [
+            316,
+            262,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "含较长自定义名称的封面.png",
+          "rect": [
+            316,
+            284,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "像素封面.png",
+          "rect": [
+            316,
+            306,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "横向封面.png",
+          "rect": [
+            316,
+            328,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "清空",
+          "rect": [
+            570,
+            302,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "恢复",
+          "rect": [
+            640,
+            302,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上传并应用封面",
+          "rect": [
+            570,
+            326,
+            136,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            312,
+            360,
+            76,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            392,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            473,
+            360,
+            77,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            554,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            635,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": []
+    },
+    {
+      "system": "SFC",
+      "covers": true,
+      "width": 1024,
+      "height": 556,
+      "detail_lines": [
+        "待应用封面",
+        "名称：示例封面.png",
+        "来源：本地 PNG"
+      ],
+      "visible_row_count": 5,
+      "controls": [
+        {
+          "field": "示例卡带",
+          "rect": [
+            312,
+            188,
+            252,
+            20
+          ]
+        },
+        {
+          "label": "保存名称",
+          "rect": [
+            568,
+            188,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "人数：单人",
+          "rect": [
+            638,
+            188,
+            74,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "游戏库",
+          "rect": [
+            312,
+            212,
+            56,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "> 封面",
+          "rect": [
+            372,
+            212,
+            42,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "field": "搜索名称…",
+          "rect": [
+            418,
+            212,
+            252,
+            20
+          ]
+        },
+        {
+          "label": "刷新",
+          "rect": [
+            674,
+            212,
+            38,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "示例封面.png",
+          "rect": [
+            316,
+            240,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "另一张封面.png",
+          "rect": [
+            316,
+            262,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "含较长自定义名称的封面.png",
+          "rect": [
+            316,
+            284,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "像素封面.png",
+          "rect": [
+            316,
+            306,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "横向封面.png",
+          "rect": [
+            316,
+            328,
+            236,
+            20
+          ],
+          "enabled": true,
+          "row": true
+        },
+        {
+          "label": "清空",
+          "rect": [
+            570,
+            302,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "恢复",
+          "rect": [
+            640,
+            302,
+            66,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "应用所选封面",
+          "rect": [
+            570,
+            326,
+            136,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "ROM 目录",
+          "rect": [
+            312,
+            360,
+            76,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "封面目录",
+          "rect": [
+            392,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "上一页",
+          "rect": [
+            473,
+            360,
+            77,
+            20
+          ],
+          "enabled": false,
+          "row": false
+        },
+        {
+          "label": "下一页",
+          "rect": [
+            554,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        },
+        {
+          "label": "关闭",
+          "rect": [
+            635,
+            360,
+            77,
+            20
+          ],
+          "enabled": true,
+          "row": false
+        }
+      ],
+      "bounded_ellipsis": []
+    }
+  ],
+  "production_or_png_assets_changed": false
+}

@@ -1,0 +1,21 @@
+{
+  "command": [
+    "mingw32-make",
+    "-j4",
+    "platform=win",
+    "CC=x86_64-w64-mingw32-clang",
+    "CXX=x86_64-w64-mingw32-clang++",
+    "EXE_EXT=.exe",
+    "GIT_VERSION=unknown",
+    "SHARED=-shared -Wl,--no-undefined",
+    "LDFLAGS=-static-libgcc -static-libstdc++ -static"
+  ],
+  "experimentalOnly": true,
+  "sha256": "73579c4c50d1f16f5d52a1e5bf4d81106c40962bc284e83e4a96dc7bb68fd424",
+  "workingDirectory": "FBNeo source/src/burner/libretro",
+  "toolchain": "llvm-mingw-20250910-ucrt-x86_64 (clang 21)",
+  "sourceArchiveSha256": "55cc0f5bf305d8953fa0a20c3598164d39efc03ef3740c7b01e7ebf143cd4d7a",
+  "patchSha256": "48c81f66296d7c6aa2b786316940c693ce4e7df4e77ff1c1f257827990e4d57f",
+  "sourceBundleSha256": "a7bab8bb67f45e3b3664f12bf72930a958b7adce3aad2bc2af691b9fc425b01a",
+  "reproducibleBuildVerified": false
+}

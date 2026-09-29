@@ -1,0 +1,4 @@
+{
+  "parent": "piq_fc_arcade:block/legacy_animated/body",
+  "render_type": "minecraft:cutout"
+}

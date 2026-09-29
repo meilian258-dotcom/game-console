@@ -1,0 +1,10 @@
+{
+  "itemGroup.piq_native_arcade":"Game Console: Arcade",
+  "block.piq_native_arcade.cabinet":"Two-Player Arcade Cabinet",
+  "block.piq_native_arcade.cabinet_part":"Two-Player Arcade Cabinet Part",
+  "message.piq_native_arcade.cabinet_incomplete":"Cabinet incomplete or partially unloaded.",
+  "message.piq_native_arcade.cabinet_denied":"You cannot modify every cabinet cell.",
+  "message.piq_native_arcade.cabinet_clean_item":"Use a cabinet item without custom block data.",
+  "message.piq_native_arcade.cabinet_space":"Requires two cells wide, three high and one deep.",
+  "message.piq_native_arcade.preview_unavailable":"Preview not running. Windows single-player only; visuals require the local diagnostic core."
+}

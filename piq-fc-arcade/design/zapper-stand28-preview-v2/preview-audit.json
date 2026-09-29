@@ -1,0 +1,62 @@
+{
+  "ok": true,
+  "minecraft_screenshot": false,
+  "new_png_in_resources": 0,
+  "elements": {
+    "stand": 85,
+    "cable": 51,
+    "connector": 18,
+    "body": 130,
+    "trigger": 2
+  },
+  "gui": {
+    "stand": {
+      "bounds": {
+        "min": [
+          -5.506593927636417,
+          -4.100954586818648,
+          -5.085411572797777
+        ],
+        "max": [
+          5.506594189394824,
+          4.100954885807804,
+          5.08541189655997
+        ]
+      },
+      "inside_16px_slot": true,
+      "center_error_units": 1.6188109652759408e-07
+    },
+    "cable": {
+      "bounds": {
+        "min": [
+          -5.10257821193108,
+          -6.072986306735361,
+          -2.7176482729319105
+        ],
+        "max": [
+          5.102578713436118,
+          6.072986100132043,
+          2.7176474022770094
+        ]
+      },
+      "inside_16px_slot": true,
+      "center_error_units": 4.3532745053198596e-07
+    }
+  },
+  "resources": {
+    "assets/piq_fc_arcade/models/block/zapper_stand/stand.json": "B230833E8B2A7423FB61B8CAEB9FDF80FBC5718C07BE49A25F6706CC279CED8E",
+    "assets/piq_fc_arcade/models/block/zapper_stand/cable.json": "EE3BC01026113DDB507909A703C2A291936D35C12DB1D01543806B82EF2228AF",
+    "assets/piq_fc_arcade/models/block/zapper_stand/connector.json": "5A92B1E62E2852F1ABC88AEADE009E3BB2ABE0B5D00464788D3440A0814231E4",
+    "assets/piq_fc_arcade/models/item/zapper_stand.json": "1654F6EE8638424397A0F0C8B9871BAF102E1D0A3083C1EC356FE963ACA688BC",
+    "assets/piq_fc_arcade/models/item/zapper_stand_cable.json": "3F76659EC7EFDBDC3BDA6F861CA3E465E7EE83C35A762951E2AA78586B7C512B",
+    "assets/piq_fc_arcade/blockstates/zapper_stand.json": "E59C837E7E30E3C455005616AE2E0DCF086ABB4375456A791F51B75B72261C95",
+    "data/piq_fc_arcade/loot_table/blocks/zapper_stand.json": "0343F2ED72A2789DF1533DA87F98882CACA519E71B7158504AA1322C8B8D5210"
+  },
+  "preview": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\zapper-stand28-preview-v2\\stand-preview.png",
+    "sha256": "ED316D570CD065661607118251D5B87D60C0FD6101B12A825A1B130CCF86186E"
+  },
+  "limits": [
+    "No live game, permissions or inventory simulation. GUI projection is independently checked against slot bounds; panel images are fitted for readability."
+  ]
+}

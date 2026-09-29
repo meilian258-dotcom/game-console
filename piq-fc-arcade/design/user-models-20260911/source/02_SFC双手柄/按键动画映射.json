@@ -1,0 +1,471 @@
+{
+  "model": "SFC_日版双手柄_线材肩键修正版.bbmodel",
+  "runtimeBindingConfigured": false,
+  "groups": [
+    {
+      "groupName": "console_power",
+      "groupUuid": "139cf24a-2945-4053-a8e4-09b0a951bac9",
+      "pivot": [
+        10.01,
+        2.35,
+        8.6225
+      ],
+      "elementUuids": [
+        "36c6c30c-8777-4f3d-a3ad-98abbdfcf85a",
+        "fdaaca3c-83e7-44af-aa73-804934b4597b",
+        "47b85049-5ed0-4cbd-a291-6f0b593c2b56",
+        "88aec3f1-008d-493b-acc0-cad4d7116608",
+        "9d6b35a6-11a5-4776-aa05-9eb9de6c8474",
+        "1e30abae-c70e-4395-acc1-e697bfa04f95",
+        "199f77d4-49e7-46b3-a295-2e601bd0f62f",
+        "f32528c5-f854-4b2a-a614-d9b374da163c",
+        "26a9f371-a1e8-4d37-aa0b-17ae337b65cc",
+        "3e57e01b-5d1f-4e1b-a7d2-a38ba4d6ae40"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "console_reset",
+      "groupUuid": "5e285a25-4f2c-4239-a4e6-e7223ee2104c",
+      "pivot": [
+        5.99,
+        2.35,
+        8.6225
+      ],
+      "elementUuids": [
+        "77488a2a-46ca-4f9c-a041-ead451ae13ca",
+        "9adc36bb-c437-434f-a70a-1068da97cc0d",
+        "9a0d1feb-f236-4521-a5c5-855eb080dc07",
+        "d8f7c801-3381-44a1-a6cb-12e2061360c3",
+        "5a4404b8-8e73-415a-ab97-4d4c06982daf",
+        "0f8f4cfa-290a-443f-acd2-13fa71382089",
+        "f2151fe7-a680-4a59-a3b6-eacbceb3ab44"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "console_eject",
+      "groupUuid": "afdcf979-8d25-497e-a793-421948cd1ec7",
+      "pivot": [
+        8,
+        2.35,
+        8.6225
+      ],
+      "elementUuids": [
+        "bdea0021-877c-4a56-a064-c2badfbe9e61",
+        "4e786f67-8c1b-4011-aa40-352ea7ad941e",
+        "9155b6b8-4ee1-4d22-ab76-1f297d1927a5",
+        "99e053ee-84b3-4a8b-a0a9-107d89fe391a",
+        "e18acf5a-617d-429d-aada-b1a1f10129bf",
+        "454b5a33-b88b-4418-aa90-a7e3b38b5c6b",
+        "0b3a190e-2bee-41d6-a6e1-bb1ec2da45dc"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p1_button_a",
+      "groupUuid": "abff7fb1-5322-4eff-a28a-9b6365308ca8",
+      "pivot": [
+        9.4,
+        0.6255,
+        1.7375
+      ],
+      "elementUuids": [
+        "f228e6ee-b518-43d0-a5b1-3154ddbf919a",
+        "36afed4e-5a1c-4fc1-a054-c0edd3530c97",
+        "4df08af6-0b63-46b6-a305-723e8233691f",
+        "61c4709b-e6d0-431f-a54b-29de859647d5",
+        "83797dd1-ea37-4cb5-a58d-3f88e4506356",
+        "eafb00db-2640-4535-a6b9-1f802d27691a",
+        "88a994eb-051d-4d59-ab2c-ce22c67c6165",
+        "70a0ead2-c596-45c8-a3ed-de9165857253"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p1_button_b",
+      "groupUuid": "170899b7-d766-4b19-a1d5-490aa3ed6318",
+      "pivot": [
+        9.88,
+        0.6255,
+        1.2575
+      ],
+      "elementUuids": [
+        "b7a0ace7-000b-45ab-a0b8-4e1f38650bd3",
+        "1cfed54b-fd5e-47a4-aae5-f7d9c54238b4",
+        "3b14f8d2-5a32-4310-a648-89e4235bdc62",
+        "0b1fb84b-3cfe-4cc6-a4bb-e7218e65a3d7",
+        "7dba5b41-0a0a-4ea1-a6f9-60dd4d2bf95b",
+        "a86d8c2f-ca6a-417c-a9c2-2de93a56591c",
+        "aa8b9b91-eb5e-4284-afc8-a4f8969385cf",
+        "b84af208-f98c-4ce7-a79a-ad8969460cd2"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p1_button_x",
+      "groupUuid": "1b82e3c8-e871-4500-a853-6abe01f31c68",
+      "pivot": [
+        9.88,
+        0.6255,
+        2.2175
+      ],
+      "elementUuids": [
+        "2a339d93-f7c7-4a1b-a10f-8d6923a56d6f",
+        "2dabdc6e-6a2f-4983-a297-6e2587b8e049",
+        "c55e873c-130b-4e95-a968-d58e2a73242a",
+        "5e7d33e7-0297-4c1a-a935-c10159cc23e0",
+        "7d63e84d-fb9d-498c-ab73-6e422ef24c6c",
+        "30859164-fab2-46b6-a04a-452bdd92d2ab",
+        "4829a109-e112-4f5c-a95c-f0750fff45b6",
+        "da584799-28c3-4a4d-a0b7-69f675fefe08"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p1_button_y",
+      "groupUuid": "7eed2528-e109-49f2-abf0-59885f57fe24",
+      "pivot": [
+        10.36,
+        0.6255,
+        1.7375
+      ],
+      "elementUuids": [
+        "89da3a96-91ee-49b8-a0e2-503a8239cef9",
+        "b4b850af-9822-47ad-a281-e2b1e9b4f446",
+        "340ede0e-e6dd-4539-aaa3-10c930da3d5e",
+        "c9473c32-bfaf-40b2-a200-96451f1ec675",
+        "1d272619-c50e-4b5d-a3f5-d8b0e1accd1d",
+        "c1730730-cd5b-4a4c-ac64-ed39a20fc384",
+        "da7875f8-e2d3-4828-a2e0-5fe340b72282",
+        "eaa95368-b4e8-42c0-a4f1-41a913e09595"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p1_dpad",
+      "groupUuid": "7a72770e-2df0-42e6-a703-ee760324225b",
+      "pivot": [
+        13.12,
+        0.6075,
+        1.7375
+      ],
+      "elementUuids": [
+        "034697e4-5e4b-4783-a93c-5264c9342a8d",
+        "e466466b-eebd-4cd7-a51f-b8403ca87c08",
+        "3c9ce1b9-094d-4221-a5b6-fdc4790b8f86",
+        "d96e680d-43b9-485b-a026-a8431de03a24",
+        "0f5bf180-4a1d-4505-ac51-e9e2af51f325",
+        "8a04c779-561e-4bb1-a93e-16e63af40bf3",
+        "36c025cd-e3e2-4158-a236-545dc745a546",
+        "3ac311ad-1323-4a23-a360-da67522e0e55",
+        "8cd37f49-2634-411d-a42f-ab36840a9bae",
+        "e40075b8-6152-4b78-a090-b099232364d2",
+        "a5852b4e-6115-4eb9-aab1-d5535ee78f88",
+        "e97ea437-4aa7-498c-a3c3-9d5a9d291e8a",
+        "1354625e-d265-419a-a651-0ef06d488b8c",
+        "40247c26-4c50-40fc-aec0-2537a5553ba8",
+        "c92ba778-3b17-4d93-a310-761f014feb29",
+        "f3596fd1-627e-4693-a76e-56938b8941a1",
+        "690d2dbf-e247-4946-a6df-9f370edfd210",
+        "8a77d312-7b02-44ae-a020-7a0d0ab1d141",
+        "bbef1e56-0d5e-4eb1-acf5-b27878cdb03d",
+        "890254a7-cd58-4a4f-ac88-59707da57252"
+      ],
+      "action": "tilt_xz",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p1_select",
+      "groupUuid": "25d8c6f0-990e-454e-a5d8-46093791abee",
+      "pivot": [
+        11.84,
+        0.5905,
+        1.4975
+      ],
+      "elementUuids": [
+        "a4150b5e-3fd3-4dec-ae4b-293aac0b685f",
+        "9a36ca5b-41d5-476d-a104-f7b1624cb39a",
+        "034290d9-f7c9-4562-a7fc-b9e9882c6ab5",
+        "eb42c30e-d86d-4f06-a483-271110c2acf9",
+        "148cdb26-a090-42ce-a9c5-48a6261ce05c",
+        "a20cfc24-4251-4d63-a737-d2d5f2d8fc6a",
+        "38ea7f7c-cccc-427d-a57b-3c1d36e7f815",
+        "ae426abf-ee96-40f8-a4e0-13b3de60e792",
+        "d46cbff7-92a7-4d33-a14a-0b71fe2c9210"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p1_start",
+      "groupUuid": "1ff80ee2-9879-4914-a285-8cb7b58acbc7",
+      "pivot": [
+        11.165,
+        0.5905,
+        1.4975
+      ],
+      "elementUuids": [
+        "adb3be44-0a62-426d-a242-69f62c775c04",
+        "24be9ca2-bd02-4bb3-a690-9792b9ff4aa3",
+        "79bbd674-a20d-4265-af9e-74bf29a807f6",
+        "c0d3e824-2b62-419f-a35e-e5d8e778c8a1",
+        "45941edc-0233-4c62-ac8e-011c1428230c",
+        "e556e8f4-7c03-46c9-acd1-a5023b199148",
+        "c31dd0ae-b323-4913-a8e0-3acd2754dc62",
+        "6645bb93-6f6b-4b5a-a630-009e90529d2c",
+        "e0f63300-4ac2-47ac-a5b4-19befa533de7"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p1_shoulder_l",
+      "groupUuid": "cfe3323b-0c18-4786-ac3c-2bfbfd9d0591",
+      "pivot": [
+        13.11,
+        0.595,
+        2.8975
+      ],
+      "elementUuids": [
+        "a482aee9-2d29-4a6e-a286-5028c7a64ae2",
+        "bd8b1002-2918-4688-af74-d5873eb193b8",
+        "ad3f88fb-85fc-4bd9-a5d6-ac7ab53e2a61",
+        "12e0c622-9ed6-40ee-ae3b-3e521eebd3f2",
+        "5add8671-c367-4e41-affd-58c11d743b8e",
+        "46029b4c-b96c-4ee7-a972-c08c67c8f2b4",
+        "9d298ae0-bdf9-4b0c-adbc-b74dd3dd8283"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p1_shoulder_r",
+      "groupUuid": "905f2808-9585-469c-a96e-222b5703e17e",
+      "pivot": [
+        9.89,
+        0.595,
+        2.8975
+      ],
+      "elementUuids": [
+        "52cfe033-8d4f-4bdb-a994-a5ac1ef8948f",
+        "a3537c13-84e4-4018-a117-813843eb9cb7",
+        "24ed9102-d235-4ec8-a4b9-677663c07df4",
+        "6ef729de-ab91-4482-a5d7-92ed031006d9",
+        "5808c8e5-e9d9-410c-a95a-223ffcdf925e",
+        "e36763c2-54a2-49e1-a8b8-a577059b7912",
+        "a71e9e96-0086-40af-a7e2-96547e770d5b"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p2_button_a",
+      "groupUuid": "8210a40e-89ec-446e-a37b-547bd0f0ad90",
+      "pivot": [
+        2.4,
+        0.6255,
+        1.7375
+      ],
+      "elementUuids": [
+        "41173ddf-a35b-46f8-a6fa-da65e915b1cc",
+        "986cb4b9-ce58-4735-ab16-210f94550402",
+        "a883d95b-b501-4a65-a72d-d26b41ceb33d",
+        "2982398f-bf9d-4690-a562-f1b3ba7cb2f2",
+        "e19ead6c-50ed-4180-a95f-6a1b69818700",
+        "f7375ddc-60b7-42bb-a2fa-596370e440fa",
+        "b9d3194f-c4bd-460d-a28c-fe92946b8dc4",
+        "b7157a89-7ba0-4ea2-a209-06b9dd1e94c8"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p2_button_b",
+      "groupUuid": "184098fe-01b6-4189-aedb-d64c16edca49",
+      "pivot": [
+        2.88,
+        0.6255,
+        1.2575
+      ],
+      "elementUuids": [
+        "205358ee-e225-43c5-a81d-4c117065bbc2",
+        "79005f10-bd05-4c80-a1f9-6dcbc9d0cbbc",
+        "3c52a07a-63cf-4aca-ae11-3da027dad4b5",
+        "c9ff60d5-41f9-4a4a-af60-357d04276014",
+        "40c04e54-0686-44b0-ae65-e1196065f809",
+        "ef98c66f-fea9-41c9-a09e-c8990a19cc3e",
+        "61803c03-ba00-45c0-a5e6-1147e33e847e",
+        "9708ce37-c221-43a3-a7a1-84cbacd3ec02"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p2_button_x",
+      "groupUuid": "c7c81a14-3702-4c84-ac5c-1f0591b1cc84",
+      "pivot": [
+        2.88,
+        0.6255,
+        2.2175
+      ],
+      "elementUuids": [
+        "17ba1006-ab2a-4c1d-ab3d-ca38f5fc3990",
+        "9d619a88-0a11-4a02-ab13-6aa0de44171d",
+        "c6a3d498-05f9-4b95-a00f-8fd2138e6118",
+        "018bdabb-d435-47cb-a363-c06b96019961",
+        "b3106ed8-4007-464a-a2c0-1d517bf64d5f",
+        "273b2c11-013b-4d41-a756-e8475198a891",
+        "0c9b8d3b-34bd-43de-ae00-1bcc1cb6ce68",
+        "d58271a8-0972-431f-a61a-bda3155f422b"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p2_button_y",
+      "groupUuid": "737f9fe9-ef18-4e4a-ad45-5262901f32d8",
+      "pivot": [
+        3.36,
+        0.6255,
+        1.7375
+      ],
+      "elementUuids": [
+        "32ebd2b0-077d-4171-a88a-80b72672cbe3",
+        "c0aabdd9-2b06-430c-a3ae-00f715fbc028",
+        "a4a9d924-253d-4e23-a838-4648ec875fb5",
+        "02786314-12b0-487b-aa58-1933930e219e",
+        "2401dd54-d0ac-4bcd-a0cf-cf56d73449f1",
+        "a84cfb4b-c27e-41ee-a9e0-e8d3199d787f",
+        "0e52565d-09ca-4025-aedf-61dc33d9e40e",
+        "2e6819ec-0e39-44ac-a268-c6f251fa5747"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p2_dpad",
+      "groupUuid": "c1740883-f657-4516-a3c9-1dfafecea6dc",
+      "pivot": [
+        6.12,
+        0.6075,
+        1.7375
+      ],
+      "elementUuids": [
+        "cc44736b-0e75-445e-a126-ce71b48077b7",
+        "51e2c0b9-7dca-4c42-a190-f465280d4366",
+        "04a21729-d3df-41e3-a54f-5a21e00f6c97",
+        "03652504-878b-41b4-a30b-ce38f7b5ec56",
+        "d591e3d4-4866-4919-ae78-34bbd8e72e76",
+        "08ae6d81-d917-4c6d-ac82-f993ea9749f4",
+        "1526d75d-1a06-4c97-adb0-21b3e5510478",
+        "bb9eafac-a74c-4ac9-ada2-45f5706ed173",
+        "d695e7ce-576e-433f-a64c-f10b83026a1a",
+        "f80130c5-d391-4914-a152-5caa46300235",
+        "9a5f331f-b5a3-4c0e-a164-ef88913b4499",
+        "324d2665-0fdb-453b-a3ba-a9045929b89b",
+        "7a00be9d-3092-4587-ab70-a973b3f3c410",
+        "e7c0fb42-862d-49c0-aff7-1c88a9e62562",
+        "03722c83-1fc1-4ed5-afd2-5d5ba0b7e495",
+        "71ab75a8-f211-4dc5-a16a-f37bc275f465",
+        "0d99aaf5-557e-4a68-a0c0-679d0280dc11",
+        "48a32f7e-b828-4795-ae9b-874a9254f246",
+        "9bef2ae5-1373-4267-a954-fa3304166ab3",
+        "51fde7a4-ea05-4e4b-ac11-01ea56192c7b"
+      ],
+      "action": "tilt_xz",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p2_select",
+      "groupUuid": "1db6c194-f291-4e48-a8d8-bd46174ecb43",
+      "pivot": [
+        4.84,
+        0.5905,
+        1.4975
+      ],
+      "elementUuids": [
+        "d104ae75-04a2-4c3b-ac25-e8aedda26a94",
+        "ecb3092d-378d-4ea5-a3fc-4e516141872c",
+        "de358e3c-3e52-48b3-a51c-a24a99660715",
+        "701bbf37-bc6a-44a2-a77c-f289acd5b51f",
+        "ab6f6161-5d42-4969-ab08-419e69d08647",
+        "b4fcdc2f-a2b2-4654-a751-8c94bfaa3ac3",
+        "21361d61-0238-483d-a6db-7b4492c52d78",
+        "1fefa4f8-12e0-47b6-a546-767fcbaa9b87",
+        "0a96f5f6-1db6-4406-a446-336c519495e9"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p2_start",
+      "groupUuid": "a933d1b3-d36a-4bfd-a724-1cd0a9f1f1a0",
+      "pivot": [
+        4.165,
+        0.5905,
+        1.4975
+      ],
+      "elementUuids": [
+        "4bc47656-3381-4e35-ad57-a09102727a9d",
+        "24fb9fb7-aacf-4ef9-a883-f40b2cb4fd7c",
+        "ef87fbed-b524-45f1-a6ee-50b93a2f0c68",
+        "6b5858d4-3990-43d9-a0cb-c09962fb0b68",
+        "d7e63a6f-85b5-4dbd-a3a3-b2728b3e5c39",
+        "ca1efcd4-d16f-4302-a7e3-4f603fd05163",
+        "68b10e0d-d205-4b2d-a737-448bb048a306",
+        "06ebaf28-06ed-40e2-a85b-33ea90eab81c",
+        "587c0b89-3701-41c8-a5f9-6a3312764d07"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p2_shoulder_l",
+      "groupUuid": "0dd15aba-940d-48b1-ace2-d5ccbc426c2e",
+      "pivot": [
+        6.11,
+        0.595,
+        2.8975
+      ],
+      "elementUuids": [
+        "7823414e-0cfa-42b2-a34a-d70fa1fa42b1",
+        "49256699-ffe6-43b3-aff1-3665b5e76c28",
+        "dad06edf-5bb4-40c6-acd8-f252096224e8",
+        "f54afc30-342b-4a24-aa31-edd772229ebe",
+        "f85da7e9-d600-4fb1-a20f-8037652a2719",
+        "de3e1cfb-723f-4256-ae0a-713c0758735c",
+        "0c218500-5975-4437-ace8-b38f61aaf3ed"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    },
+    {
+      "groupName": "p2_shoulder_r",
+      "groupUuid": "e174493a-f93e-4be0-a5be-5124a29995eb",
+      "pivot": [
+        2.89,
+        0.595,
+        2.8975
+      ],
+      "elementUuids": [
+        "b748e942-2264-4f17-a275-21562f1517b4",
+        "f6f0487d-6c41-442a-a729-7ecc3d1c9417",
+        "1229d51b-7448-4621-a5f3-f4fe09c98383",
+        "5f62ffcd-7912-40d3-a9c7-4ca3e3802c14",
+        "78a6b317-f916-4057-a14a-67243dda8511",
+        "1eda2ffd-a509-4fc5-a96d-8f416067df0b",
+        "5a1726fc-28ad-41ee-a2f8-81911a178fb3"
+      ],
+      "action": "translate_y",
+      "suggestedPressY": -0.035
+    }
+  ]
+}

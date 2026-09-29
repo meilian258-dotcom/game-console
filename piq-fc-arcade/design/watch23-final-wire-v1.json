@@ -1,0 +1,38 @@
+{
+  "ok": true,
+  "schema": "piq-watch23-independent-1",
+  "production_origin": "final-jar-only",
+  "production_path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
+  "production_sha256": {
+    "piq_fc_arcade-0.31.0-alpha.23.jar": "B7BF04BEEA5F58E8E9C0DFA23E1BD8F2CAF6B11455085D843F568B42D9021686"
+  },
+  "production_class_hashes": null,
+  "production_compiled": false,
+  "pure_behavior": {
+    "passed_tests": 34,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "real_codec_and_shared_window": {
+    "ok": true,
+    "assertions": 1362,
+    "max_serverbound_outer_bytes": 24661,
+    "actual_production_registration": true,
+    "actual_neoforge_outer_codec": true,
+    "actual_connection_write_completion": true,
+    "production_origin": "final-jar-only",
+    "minecraft_or_native_core_started": false,
+    "network_socket_opened": false,
+    "server_world_authority_simulated": false
+  },
+  "staged_copy_verified_before_and_after": true,
+  "minecraft_or_native_core_started": false,
+  "network_socket_opened": false,
+  "installed": false,
+  "limits": [
+    "No live Minecraft world/server/players, render or audio-device acceptance test.",
+    "Pure lease/budget tests and actual codec/window tests do not replace in-world provider/permission tests.",
+    "Queued ingress uses the production dispatcher with a test ClientSink implementing the live-connection contract.",
+    "Late-worker exposure is tested with a deterministic injected completion fixture, not a scheduler-race claim."
+  ]
+}

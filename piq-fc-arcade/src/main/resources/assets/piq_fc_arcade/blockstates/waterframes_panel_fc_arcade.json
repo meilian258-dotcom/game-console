@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": {"model": "piq_fc_arcade:block/waterframes_panel_fc_arcade"},
+    "facing=east": {"model": "piq_fc_arcade:block/waterframes_panel_fc_arcade", "y": 90},
+    "facing=south": {"model": "piq_fc_arcade:block/waterframes_panel_fc_arcade", "y": 180},
+    "facing=west": {"model": "piq_fc_arcade:block/waterframes_panel_fc_arcade", "y": 270}
+  }
+}

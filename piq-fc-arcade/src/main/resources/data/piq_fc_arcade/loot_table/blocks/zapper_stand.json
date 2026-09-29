@@ -1,0 +1,1 @@
+{"type":"minecraft:block","pools":[{"rolls":1,"entries":[{"type":"minecraft:item","name":"piq_fc_arcade:zapper_stand"}],"conditions":[{"condition":"minecraft:survives_explosion"}]}]}

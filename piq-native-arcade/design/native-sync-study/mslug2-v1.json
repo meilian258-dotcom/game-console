@@ -1,0 +1,248 @@
+{
+  "schema": "piq-native-determinism-study-1",
+  "ok": true,
+  "sync_qualified": false,
+  "game": "mslug2",
+  "inputs": {
+    "F:\\Minecraft\\HMCL\\versions\\1.21.1-NeoForge\\piq-native-arcade\\roms\\mslug2.zip": {
+      "sha256": "1A82D65E88050FDC75DBCEA180E48802D54C67A4748558FC4BD51C0103D56E4A",
+      "bytes": 17473893,
+      "mtime_ns": 1777530796963932400
+    },
+    "E:\\Dow\\rom\\WinKawaks1.65模拟器\\WinKawaks1.65\\roms\\neogeo\\neogeo.zip": {
+      "sha256": "E1FFD4AB180E2F6AA4A3AA4D2C6F991E19D8EF762BEC8B5A6283704A2EDC3BBC",
+      "bytes": 953500,
+      "mtime_ns": 1158274344000000000
+    }
+  },
+  "runtime": {
+    "G:\\服务器\\服务器Codex\\piq-native-arcade-poc\\vendor\\mame_libretro.dll": {
+      "sha256": "6172A988AB67FE68F4177A6FC8FBB82619EB2044C330930F0F572F7B1EDC2301",
+      "bytes": 372431360,
+      "mtime_ns": 1788825946000000000
+    },
+    "C:\\Users\\13498\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna\\5.14.0\\67bf3eaea4f0718cb376a181a629e5f88fa1c9dd\\jna-5.14.0.jar": {
+      "sha256": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6",
+      "bytes": 1878533,
+      "mtime_ns": 1781245930305499200
+    },
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq-native-arcade\\runtime\\piq-native-helper.jar": {
+      "sha256": "20F6F3028D76DAEB01212D1808BE90E35BFB5429D1E06153B7D8B32DD73E943C",
+      "bytes": 18571,
+      "mtime_ns": 1789117844694258000
+    }
+  },
+  "production_modified": false,
+  "production_compiled": false,
+  "minecraft_started": false,
+  "commercial_rom_loaded": true,
+  "source_roms_read_only": true,
+  "core_profile": "Existing production Engine callbacks/options; no thread/throttle/config/autosave changes",
+  "limitations": [
+    "Authorized user ROM used only in owned temporary copies; no ROM or snapshot contents in this report.",
+    "One passed finite trace is not all-game compatibility or proof of every future execution.",
+    "Dedicated QA JVM halts only after native unload/deinit; natural upstream thread exit is not this test."
+  ],
+  "children": {
+    "a": {
+      "exit_code": 0,
+      "stderr_tail": "me path = \"C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\"\nPath extraction result: Parent path = \"C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\"\nStarting game: \"C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip\"\nSearching for driver: mslug2\nSystem type: ARCADE\nGame name: mslug2\nGame description: Metal Slug 2 - Super Vehicle-001/II (NGM-2410 ~ NGH-2410)\nSystem not found: a\nSearching for driver: a\nCreating frontend for game: mslug2\nSoftlists: 1\nParameters:\n  mame\n  -joystick\n  -joystick_deadzone\n  0.15\n  -joystick_saturation\n  0.85\n  -joystick_threshold\n  0.30\n  -mouse\n  -multimouse\n  -nolightgun\n  -nothrottle\n  -nocheat\n  -noreadconfig\n  -statename\n  %g/mslug2\n  -update_in_pause\n  -norotate\n  -cfg_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\cfg\n  -diff_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\diff\n  -nvram_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\nvram\n  -input_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\input\n  -state_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\states\n  -snapshot_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\snaps\n  -artpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\artwork\n  -cheatpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\cheat\n  -hashpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\hash\n  -inipath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\ini\n  -pluginspath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\plugins\n  -samplepath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\samples\n  -crosshairpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\crosshair\n  -homepath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\\n  -rompath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a;C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\bios;C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mame\\roms\n  mslug2\n===> registered module none uifontprovider\n===> registered module soft video\n===> registered module retro sound\n===> registered module retro monitorprovider\n===> registered module none debugger\n===> registered module none networkprovider\n===> registered module none midiprovider\n===> registered module retro keyboardprovider\n===> registered module none keyboardprovider\n===> registered module retro mouseprovider\n===> registered module none mouseprovider\n===> registered module retro lightgunprovider\n===> registered module none lightgunprovider\n===> registered module retro joystickprovider\n===> registered module none joystickprovider\n===> registered module none output\n===> registered module console output\n===> registered module network output\nInput: Adding keyboard #1: RetroKeyboard0 (device id: RetroKeyboard0)\nInput: Adding mouse #1: RetroMouse0 (device id: RetroMouse0)\nInput: Adding mouse #2: RetroMouse1 (device id: RetroMouse1)\nInput: Adding mouse #3: RetroMouse2 (device id: RetroMouse2)\nInput: Adding mouse #4: RetroMouse3 (device id: RetroMouse3)\nInput: Adding mouse #5: RetroMouse4 (device id: RetroMouse4)\nInput: Adding mouse #6: RetroMouse5 (device id: RetroMouse5)\nInput: Adding mouse #7: RetroMouse6 (device id: RetroMouse6)\nInput: Adding mouse #8: RetroMouse7 (device id: RetroMouse7)\nInput: Adding joystick #1: RetroPad0 (device id: RetroPad0)\nInput: Adding joystick #2: RetroPad1 (device id: RetroPad1)\nInput: Adding joystick #3: RetroPad2 (device id: RetroPad2)\nInput: Adding joystick #4: RetroPad3 (device id: RetroPad3)\nInput: Adding joystick #5: RetroPad4 (device id: RetroPad4)\nInput: Adding joystick #6: RetroPad5 (device id: RetroPad5)\nInput: Adding joystick #7: RetroPad6 (device id: RetroPad6)\nInput: Adding joystick #8: RetroPad7 (device id: RetroPad7)\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip ECD at 980\nunzip: C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip has no ZIP64 ECD locator\nunzip: read C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip central directory\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip ECD at 991\nunzip: C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip has no ZIP64 ECD locator\nunzip: read C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip central directory\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\neogeo.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\a\\mslug2.zip and sending to cache\nOptional device ':cslot6' not found\nOptional device ':cslot5' not found\nOptional device ':cslot4' not found\nOptional device ':cslot3' not found\nOptional device ':cslot2' not found\nOptional memory region ':audiocpu' not found\nOptional memory region ':fixed' not found\nOptional memory region ':sprites' not found\nOptional shared pointer ':maincpu' not found\nOptional memory region ':maincpu' not found\nOptional memory region ':screen' not found\nOptional memory region ':ymsnd:adpcmb' not found\nOptional memory region ':ymsnd:adpcma' not found\nOptional memory region ':saveram' not found\nOptional memory region ':cslot1:ymsnd:adpcmb' not found\nOptional memory region ':cslot1:audiocrypt' not found\nStarting Metal Slug 2 - Super Vehicle-001/II (NGM-2410 ~ NGH-2410) ':'\n  (missing dependencies; rescheduling)\nStarting Motorola MC68000 ':maincpu'\nStarting Zilog Z80 ':audiocpu'\nStarting 74HC259 Addressable Latch ':systemlatch'\nStarting Video Screen ':screen'\nStarting palette ':palette'\nStarting Neo-Geo Sprites (optimized) ':spritegen'\nStarting Input Merger (all high) ':audionmi'\nStarting Generic 8-bit latch ':soundlatch'\nStarting Generic 8-bit latch ':soundlatch2'\nStarting YM2610 OPNB ':ymsnd'\nStarting Watchdog Timer ':watchdog'\nStarting uPD4990A RTC ':upd4990a'\nStarting NVRAM ':saveram'\nStarting Speaker ':speaker'\nStarting NeoGeo Memory Card ':memcard'\nStarting SNK Neo Geo Edge Connector (Controller) ':edge'\nStarting SNK Neo Geo Arcade Joystick ':edge:joy'\nStarting SNK Neo Geo controller port ':ctrl1'\nStarting SNK Neo Geo controller port ':ctrl2'\nStarting Neo Geo Cartridge Slot ':cslot1'\nStarting Neo Geo Standard Carts ':cslot1:rom'\nStarting Metal Slug 2 - Super Vehicle-001/II (NGM-2410 ~ NGH-2410) ':'\nConfiguration file default.cfg not found\nConfiguration file mslug2.cfg not found\nFRAME 0\nOutput audio buffer capacity set to 3114\nOutput audio buffer capacity set to 4710\nFRAME 600\nFRAME 1200\nFRAME 1800\nNATIVE_TEARDOWN_COMPLETED\n",
+      "native_teardown_completed": true,
+      "result": {
+        "ok": true,
+        "actual_core": true,
+        "helper_origin_verified": true,
+        "snapshot_bytes": 1029356,
+        "snapshot_sha256": "0E31A723D75CD4792AEC87A68A3020B9481F6D2D357F387FEB20416FEB5C3595",
+        "immediate_repeat_save_sha256": "0E31A723D75CD4792AEC87A68A3020B9481F6D2D357F387FEB20416FEB5C3595",
+        "restored_before_step_sha256": "9334D3340D741857A498F81716EB3E3EC0892E6D24BA2AD81CBFD216D069DAD0",
+        "ending_state_sha256": "C86FBB384D735B8A940E8EB2B19DF5FA3A0F203D27D84A15BA156086A680778D",
+        "restored_ending_state_sha256": "8A512DFF83B7B66A867A9D7EEF72096EBB04E05D63271496140424C77D87E4D3",
+        "cross_ending_state_sha256": "null",
+        "local_restore_mismatching_frames": 86,
+        "first_local_mismatch": "frame 2200",
+        "snapshot_frame": 2200,
+        "replay_frames": 600,
+        "fps": 59.18560791015625,
+        "minecraft_started": false
+      }
+    },
+    "b": {
+      "exit_code": 0,
+      "stderr_tail": "me path = \"C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\"\nPath extraction result: Parent path = \"C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\"\nStarting game: \"C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip\"\nSearching for driver: mslug2\nSystem type: ARCADE\nGame name: mslug2\nGame description: Metal Slug 2 - Super Vehicle-001/II (NGM-2410 ~ NGH-2410)\nSystem not found: b\nSearching for driver: b\nCreating frontend for game: mslug2\nSoftlists: 1\nParameters:\n  mame\n  -joystick\n  -joystick_deadzone\n  0.15\n  -joystick_saturation\n  0.85\n  -joystick_threshold\n  0.30\n  -mouse\n  -multimouse\n  -nolightgun\n  -nothrottle\n  -nocheat\n  -noreadconfig\n  -statename\n  %g/mslug2\n  -update_in_pause\n  -norotate\n  -cfg_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\cfg\n  -diff_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\diff\n  -nvram_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\nvram\n  -input_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\input\n  -state_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\states\n  -snapshot_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\snaps\n  -artpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\artwork\n  -cheatpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\cheat\n  -hashpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\hash\n  -inipath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\ini\n  -pluginspath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\plugins\n  -samplepath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\samples\n  -crosshairpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\crosshair\n  -homepath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\\n  -rompath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b;C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\bios;C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mame\\roms\n  mslug2\n===> registered module none uifontprovider\n===> registered module soft video\n===> registered module retro sound\n===> registered module retro monitorprovider\n===> registered module none debugger\n===> registered module none networkprovider\n===> registered module none midiprovider\n===> registered module retro keyboardprovider\n===> registered module none keyboardprovider\n===> registered module retro mouseprovider\n===> registered module none mouseprovider\n===> registered module retro lightgunprovider\n===> registered module none lightgunprovider\n===> registered module retro joystickprovider\n===> registered module none joystickprovider\n===> registered module none output\n===> registered module console output\n===> registered module network output\nInput: Adding keyboard #1: RetroKeyboard0 (device id: RetroKeyboard0)\nInput: Adding mouse #1: RetroMouse0 (device id: RetroMouse0)\nInput: Adding mouse #2: RetroMouse1 (device id: RetroMouse1)\nInput: Adding mouse #3: RetroMouse2 (device id: RetroMouse2)\nInput: Adding mouse #4: RetroMouse3 (device id: RetroMouse3)\nInput: Adding mouse #5: RetroMouse4 (device id: RetroMouse4)\nInput: Adding mouse #6: RetroMouse5 (device id: RetroMouse5)\nInput: Adding mouse #7: RetroMouse6 (device id: RetroMouse6)\nInput: Adding mouse #8: RetroMouse7 (device id: RetroMouse7)\nInput: Adding joystick #1: RetroPad0 (device id: RetroPad0)\nInput: Adding joystick #2: RetroPad1 (device id: RetroPad1)\nInput: Adding joystick #3: RetroPad2 (device id: RetroPad2)\nInput: Adding joystick #4: RetroPad3 (device id: RetroPad3)\nInput: Adding joystick #5: RetroPad4 (device id: RetroPad4)\nInput: Adding joystick #6: RetroPad5 (device id: RetroPad5)\nInput: Adding joystick #7: RetroPad6 (device id: RetroPad6)\nInput: Adding joystick #8: RetroPad7 (device id: RetroPad7)\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip ECD at 980\nunzip: C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip has no ZIP64 ECD locator\nunzip: read C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip central directory\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip ECD at 991\nunzip: C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip has no ZIP64 ECD locator\nunzip: read C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip central directory\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\neogeo.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-mame-determinism-8gq7_vpf\\b\\mslug2.zip and sending to cache\nOptional device ':cslot6' not found\nOptional device ':cslot5' not found\nOptional device ':cslot4' not found\nOptional device ':cslot3' not found\nOptional device ':cslot2' not found\nOptional memory region ':audiocpu' not found\nOptional memory region ':fixed' not found\nOptional memory region ':sprites' not found\nOptional shared pointer ':maincpu' not found\nOptional memory region ':maincpu' not found\nOptional memory region ':screen' not found\nOptional memory region ':ymsnd:adpcmb' not found\nOptional memory region ':ymsnd:adpcma' not found\nOptional memory region ':saveram' not found\nOptional memory region ':cslot1:ymsnd:adpcmb' not found\nOptional memory region ':cslot1:audiocrypt' not found\nStarting Metal Slug 2 - Super Vehicle-001/II (NGM-2410 ~ NGH-2410) ':'\n  (missing dependencies; rescheduling)\nStarting Motorola MC68000 ':maincpu'\nStarting Zilog Z80 ':audiocpu'\nStarting 74HC259 Addressable Latch ':systemlatch'\nStarting Video Screen ':screen'\nStarting palette ':palette'\nStarting Neo-Geo Sprites (optimized) ':spritegen'\nStarting Input Merger (all high) ':audionmi'\nStarting Generic 8-bit latch ':soundlatch'\nStarting Generic 8-bit latch ':soundlatch2'\nStarting YM2610 OPNB ':ymsnd'\nStarting Watchdog Timer ':watchdog'\nStarting uPD4990A RTC ':upd4990a'\nStarting NVRAM ':saveram'\nStarting Speaker ':speaker'\nStarting NeoGeo Memory Card ':memcard'\nStarting SNK Neo Geo Edge Connector (Controller) ':edge'\nStarting SNK Neo Geo Arcade Joystick ':edge:joy'\nStarting SNK Neo Geo controller port ':ctrl1'\nStarting SNK Neo Geo controller port ':ctrl2'\nStarting Neo Geo Cartridge Slot ':cslot1'\nStarting Neo Geo Standard Carts ':cslot1:rom'\nStarting Metal Slug 2 - Super Vehicle-001/II (NGM-2410 ~ NGH-2410) ':'\nConfiguration file default.cfg not found\nConfiguration file mslug2.cfg not found\nFRAME 0\nOutput audio buffer capacity set to 3114\nOutput audio buffer capacity set to 4710\nFRAME 600\nFRAME 1200\nFRAME 1800\nNATIVE_TEARDOWN_COMPLETED\n",
+      "native_teardown_completed": true,
+      "result": {
+        "ok": true,
+        "actual_core": true,
+        "helper_origin_verified": true,
+        "snapshot_bytes": 1029356,
+        "snapshot_sha256": "8BEA26933F3D7D6EB39CFB46B2885F61BB94429DE0FC5E7EEEF0347A841D5465",
+        "immediate_repeat_save_sha256": "8BEA26933F3D7D6EB39CFB46B2885F61BB94429DE0FC5E7EEEF0347A841D5465",
+        "restored_before_step_sha256": "C8977947DAC168CBA372217E942AFBF472A7356DD24BB5DCBDBC3C09A83FD7EF",
+        "ending_state_sha256": "2EF61AE999D45146A8FFE42537816A96AFFE7E6C2FE63C102B1594F82532ECBF",
+        "restored_ending_state_sha256": "F1B3B9C017E8831EA612A1A900E336DCD73F5F144BFA1DCBDCDB1767F8B41EED",
+        "cross_ending_state_sha256": "753FC16D61C4948236B3EECFE71F26CF3989F530883ED904D0F9194D6C413125",
+        "local_restore_mismatching_frames": 86,
+        "first_local_mismatch": "frame 2200",
+        "snapshot_frame": 2200,
+        "replay_frames": 600,
+        "fps": 59.18560791015625,
+        "minecraft_started": false
+      }
+    }
+  },
+  "comparisons": {
+    "independent_start": {
+      "equal": true,
+      "different_frames": 0,
+      "first_difference": null,
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        }
+      }
+    },
+    "a_local_restore": {
+      "equal": false,
+      "different_frames": 86,
+      "first_difference": {
+        "frame": 2200,
+        "header_equal": true,
+        "video_equal": true,
+        "audio_equal": false
+      },
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 86,
+          "first_index": 0,
+          "last_index": 85,
+          "last_60_mismatches": 0
+        }
+      }
+    },
+    "b_local_restore": {
+      "equal": false,
+      "different_frames": 86,
+      "first_difference": {
+        "frame": 2200,
+        "header_equal": true,
+        "video_equal": true,
+        "audio_equal": false
+      },
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 86,
+          "first_index": 0,
+          "last_index": 85,
+          "last_60_mismatches": 0
+        }
+      }
+    },
+    "a_snapshot_on_b": {
+      "equal": false,
+      "different_frames": 86,
+      "first_difference": {
+        "frame": 2200,
+        "header_equal": true,
+        "video_equal": true,
+        "audio_equal": false
+      },
+      "fields": {
+        "header": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "video": {
+          "mismatches": 0,
+          "first_index": null,
+          "last_index": null,
+          "last_60_mismatches": 0
+        },
+        "audio": {
+          "mismatches": 86,
+          "first_index": 0,
+          "last_index": 85,
+          "last_60_mismatches": 0
+        }
+      }
+    }
+  },
+  "state_hashes": {
+    "independent_snapshot_equal": false,
+    "a_immediate_repeat_equal": true,
+    "b_immediate_repeat_equal": true,
+    "a_load_immediate_save_equal": false,
+    "b_load_immediate_save_equal": false,
+    "a_restored_end_equal": false,
+    "b_restored_end_equal": false,
+    "cross_end_equal": false
+  },
+  "independent_snapshot_difference": {
+    "bytes_a": 1029356,
+    "bytes_b": 1029356,
+    "different_bytes": 16,
+    "first_offsets_only": [
+      1022332,
+      1022377,
+      1022467,
+      1022917,
+      1025437,
+      1026967,
+      1028092,
+      1028093,
+      1028094,
+      1028095,
+      1028362,
+      1028363,
+      1028364,
+      1028365,
+      1028767,
+      1028769
+    ]
+  },
+  "options_equal": true,
+  "options_sha256": "F4E2716E5C4E0E5A0CE0F558DC2C6CE6C690ED9FDD50E4F6F26C5472B4E7BED4",
+  "source_roms_unchanged": true,
+  "seconds": 9.417
+}

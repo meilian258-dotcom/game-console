@@ -1,0 +1,19 @@
+{
+  "itemGroup.piq_sfc_home": "方块电玩：SFC",
+  "block.piq_sfc_home.console": "SFC",
+  "item.piq_sfc_home.cartridge": "SFC 游戏卡带",
+  "item.piq_sfc_home.controller": "SFC 游戏手柄",
+  "key.categories.piq_sfc_home": "方块电玩：SFC",
+  "key.piq_sfc_home.b": "B 键",
+  "key.piq_sfc_home.y": "Y 键",
+  "key.piq_sfc_home.select": "选择 SELECT",
+  "key.piq_sfc_home.start": "开始 START",
+  "key.piq_sfc_home.up": "上",
+  "key.piq_sfc_home.down": "下",
+  "key.piq_sfc_home.left": "左",
+  "key.piq_sfc_home.right": "右",
+  "key.piq_sfc_home.a": "A 键",
+  "key.piq_sfc_home.x": "X 键",
+  "key.piq_sfc_home.l": "L 肩键",
+  "key.piq_sfc_home.r": "R 肩键"
+}

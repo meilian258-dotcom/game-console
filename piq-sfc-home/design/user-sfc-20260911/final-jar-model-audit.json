@@ -1,0 +1,729 @@
+{
+  "ok": true,
+  "junit_tests": 30,
+  "junit_output": "\nTest run finished after 1831 ms\n[         5 containers found      ]\n[         0 containers skipped    ]\n[         5 containers started    ]\n[         0 containers aborted    ]\n[         5 containers successful ]\n[         0 containers failed     ]\n[        30 tests found           ]\n[         0 tests skipped         ]\n[        30 tests started         ]\n[         0 tests aborted         ]\n[        30 tests successful      ]\n[         0 tests failed          ]\n\n",
+  "production_source_compiled": false,
+  "production_origin": "final-jar-only",
+  "origin_probe": {
+    "production_origin": "final-jar-only",
+    "ok": true,
+    "minecraft_or_core_started": false,
+    "production_classes": {
+      "SfcHardwareMeshData": "G:\\������\\������Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+      "SfcControllerPoseLayout": "G:\\������\\������Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+      "SfcButtonAnimation": "G:\\������\\������Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+      "SfcCoverGeometry": "G:\\������\\������Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+      "SfcAvCableGeometry": "G:\\������\\������Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar"
+    }
+  },
+  "final_jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+  "final_jar_sha256": "A5892700D043D51A890E59D5EC57F3E34F9F828A49EED92BE1DA759C5782F882",
+  "mesh_from_jar_sha256": "4B944A5A98CF926A38092BCDF3B8FA5E8D1B07631B116E554E7DD551B4D80E64",
+  "compiled_test_probe_classes": [
+    "SfcUserModelTestRunner.class",
+    "cn/piq/sfchome/client/SfcAvCableGeometryTest.class",
+    "cn/piq/sfchome/client/SfcButtonAnimationTest.class",
+    "cn/piq/sfchome/client/SfcCoverGeometryTest.class",
+    "cn/piq/sfchome/client/SfcHardwareMeshDataTest.class",
+    "cn/piq/sfchome/client/SfcHardwareMeshProbe.class",
+    "cn/piq/sfchome/client/SfcUserModelOriginProbe.class",
+    "cn/piq/sfchome/client/SfcUserModelProbe.class"
+  ],
+  "actual_pose": {
+    "groups": {
+      "slot_cover": [
+        0,
+        0
+      ],
+      "controller": [
+        10,
+        3364
+      ],
+      "p1_docked": [
+        12,
+        3628
+      ],
+      "body": [
+        8,
+        2402
+      ],
+      "p2_docked": [
+        12,
+        3628
+      ],
+      "cartridge": [
+        5,
+        1012
+      ],
+      "inserted": [
+        5,
+        1012
+      ]
+    },
+    "rigs": {
+      "0.0": [
+        -0.62,
+        -1.46,
+        -60.0
+      ],
+      "0.05": [
+        -0.6083699545312092,
+        -1.4793834091146514,
+        -57.41554545137983
+      ],
+      "0.125": [
+        -0.6038716591533175,
+        -1.486880568077804,
+        -56.415924256292776
+      ],
+      "0.25": [
+        -0.602,
+        -1.49,
+        -56.0
+      ],
+      "0.5": [
+        -0.6056775223717853,
+        -1.4838707960470243,
+        -56.817227193730076
+      ],
+      "0.75": [
+        -0.6126456278054214,
+        -1.4722572869909643,
+        -58.36569506787143
+      ],
+      "1.0": [
+        -0.62,
+        -1.46,
+        -60.0
+      ]
+    },
+    "controller_scale": 0.9,
+    "arms": {
+      "left": [
+        -1.0187394033599464,
+        -0.053050669994557265,
+        -0.29969165671483977,
+        30.0,
+        -60.0,
+        0.9675999999999999
+      ],
+      "right": [
+        1.0187394033599464,
+        -0.053050669994557265,
+        -0.29969165671483977,
+        30.0,
+        60.0,
+        0.9675999999999999
+      ]
+    },
+    "minecraft_started": false
+  },
+  "actual_animation_controls": {
+    "p1_button_a": {
+      "binding": {
+        "key": "button_a",
+        "x": 0.2375,
+        "y": 0.5313125,
+        "z": 0.501875,
+        "press": 0.004375
+      },
+      "states": {
+        "0": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "16": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "32": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "64": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "128": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "256": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "512": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1024": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "2048": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1296": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "4095": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        }
+      }
+    },
+    "p1_button_b": {
+      "binding": {
+        "key": "button_b",
+        "x": 0.2975,
+        "y": 0.5313125,
+        "z": 0.441875,
+        "press": 0.004375
+      },
+      "states": {
+        "0": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "16": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "32": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "64": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "128": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "256": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "512": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1024": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "2048": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1296": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "4095": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        }
+      }
+    },
+    "p1_button_x": {
+      "binding": {
+        "key": "button_x",
+        "x": 0.2975,
+        "y": 0.5313125,
+        "z": 0.561875,
+        "press": 0.004375
+      },
+      "states": {
+        "0": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "16": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "32": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "64": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "128": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "256": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "512": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1024": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "2048": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1296": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "4095": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        }
+      }
+    },
+    "p1_button_y": {
+      "binding": {
+        "key": "button_y",
+        "x": 0.3575,
+        "y": 0.5313125,
+        "z": 0.501875,
+        "press": 0.004375
+      },
+      "states": {
+        "0": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "16": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "32": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "64": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "128": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "256": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "512": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1024": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "2048": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1296": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "4095": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        }
+      }
+    },
+    "p1_dpad": {
+      "binding": {
+        "key": "dpad",
+        "x": 0.7025,
+        "y": 0.5290625,
+        "z": 0.501875,
+        "press": 0.004375
+      },
+      "states": {
+        "0": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "16": {
+          "y": -0.00153125,
+          "pitch": 5.0,
+          "roll": 0.0
+        },
+        "32": {
+          "y": -0.00153125,
+          "pitch": -5.0,
+          "roll": 0.0
+        },
+        "64": {
+          "y": -0.00153125,
+          "pitch": 0.0,
+          "roll": -5.0
+        },
+        "128": {
+          "y": -0.00153125,
+          "pitch": 0.0,
+          "roll": 5.0
+        },
+        "256": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "512": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1024": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "2048": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1296": {
+          "y": -0.00153125,
+          "pitch": 5.0,
+          "roll": 0.0
+        },
+        "4095": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        }
+      }
+    },
+    "p1_select": {
+      "binding": {
+        "key": "select",
+        "x": 0.5425,
+        "y": 0.5269375,
+        "z": 0.471875,
+        "press": 0.004375
+      },
+      "states": {
+        "0": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "16": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "32": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "64": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "128": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "256": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "512": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1024": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "2048": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1296": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "4095": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        }
+      }
+    },
+    "p1_start": {
+      "binding": {
+        "key": "start",
+        "x": 0.458125,
+        "y": 0.5269375,
+        "z": 0.471875,
+        "press": 0.004375
+      },
+      "states": {
+        "0": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "16": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "32": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "64": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "128": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "256": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "512": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1024": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "2048": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1296": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "4095": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        }
+      }
+    },
+    "p1_shoulder_l": {
+      "binding": {
+        "key": "shoulder_l",
+        "x": 0.70125,
+        "y": 0.5275,
+        "z": 0.646875,
+        "press": 0.004375
+      },
+      "states": {
+        "0": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "16": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "32": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "64": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "128": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "256": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "512": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1024": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "2048": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1296": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "4095": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        }
+      }
+    },
+    "p1_shoulder_r": {
+      "binding": {
+        "key": "shoulder_r",
+        "x": 0.29875,
+        "y": 0.5275,
+        "z": 0.646875,
+        "press": 0.004375
+      },
+      "states": {
+        "0": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "16": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "32": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "64": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "128": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "256": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "512": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1024": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "2048": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "1296": {
+          "y": 0.0,
+          "pitch": 0.0,
+          "roll": 0.0
+        },
+        "4095": {
+          "y": -0.004375,
+          "pitch": 0.0,
+          "roll": 0.0
+        }
+      }
+    }
+  },
+  "actual_av_quads": 893,
+  "sources": {
+    "src\\test\\java\\cn\\piq\\sfchome\\client\\SfcHardwareMeshDataTest.java": "48ACEF98FC83E6967C421E84072FAA56026DCF934C03F3B4616C9B318C39E589",
+    "src\\test\\java\\cn\\piq\\sfchome\\client\\SfcButtonAnimationTest.java": "B2E3BB7A52E20D34AADCA79312DEECCA852A834494A0CCDDD4C7350D0FAB59C5",
+    "src\\test\\java\\cn\\piq\\sfchome\\client\\SfcCoverGeometryTest.java": "64CD0387387D0173A154EFCDDD9C07DE99F92F8ABCADC7549F9C5DE0C24CADE9",
+    "src\\test\\java\\cn\\piq\\sfchome\\client\\SfcAvCableGeometryTest.java": "5ABB2FDAB7E298789A4E4D6E19D7C603C7745097236640F328262DFFFB2F02FD",
+    "tools\\qa\\SfcHardwareMeshProbe.java": "204978920C4BFCD4CC23BEEFA2221461B80E0F93BB6C6AAABDE9F96D0B90DE6A",
+    "tools\\qa\\SfcUserModelProbe.java": "DEF6A86778DE737E60C34215C98FA7C2264159D1E6B69A2A3B6D450447C0A4A0",
+    "tools\\qa\\SfcUserModelTestRunner.java": "FA4ABF3BD656CF02E3FD2268DA3100D90A5CCA3B5572EA7928FD5B7DB567AD2C",
+    "tools\\qa\\SfcUserModelOriginProbe.java": "44B68F33ADF49D8263A1BCDA8947023C3FAB1AFBF66FC0599D7300DEA4640F09"
+  },
+  "minecraft_or_core_started": false
+}

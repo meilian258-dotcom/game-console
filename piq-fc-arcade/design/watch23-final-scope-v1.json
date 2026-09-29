@@ -1,0 +1,1018 @@
+{
+  "ok": true,
+  "schema": "piq-watch23-final-scope-1",
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
+      "sha256": "B7BF04BEEA5F58E8E9C0DFA23E1BD8F2CAF6B11455085D843F568B42D9021686"
+    },
+    "sfc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-v1\\piq_sfc-0.1.0-alpha.11.jar",
+      "sha256": "ADF7172C0997983A61C0566AAEE4AE6F19C7D574D6D5B1971490EB69F4B92393"
+    },
+    "native": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+      "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A"
+    }
+  },
+  "strict_scope": {
+    "fc": {
+      "added_classes": [
+        "cn/piq/fcarcade/cabinet/CabinetRooms$1.class",
+        "cn/piq/fcarcade/cabinet/WatchAnchor.class",
+        "cn/piq/fcarcade/cabinet/WatchBudget$Window.class",
+        "cn/piq/fcarcade/cabinet/WatchBudget.class",
+        "cn/piq/fcarcade/cabinet/WatchDescriptor.class",
+        "cn/piq/fcarcade/cabinet/WatchLedger$Candidate.class",
+        "cn/piq/fcarcade/cabinet/WatchLedger$Lease.class",
+        "cn/piq/fcarcade/cabinet/WatchLedger$Source.class",
+        "cn/piq/fcarcade/cabinet/WatchLedger.class",
+        "cn/piq/fcarcade/cabinet/WatchNetwork$Available.class",
+        "cn/piq/fcarcade/cabinet/WatchNetwork$ClientSink.class",
+        "cn/piq/fcarcade/cabinet/WatchNetwork$Heartbeat.class",
+        "cn/piq/fcarcade/cabinet/WatchNetwork$HostDemand.class",
+        "cn/piq/fcarcade/cabinet/WatchNetwork$Media.class",
+        "cn/piq/fcarcade/cabinet/WatchNetwork$Release.class",
+        "cn/piq/fcarcade/cabinet/WatchNetwork$Start.class",
+        "cn/piq/fcarcade/cabinet/WatchNetwork$Stop.class",
+        "cn/piq/fcarcade/cabinet/WatchNetwork$Stream.class",
+        "cn/piq/fcarcade/cabinet/WatchNetwork.class",
+        "cn/piq/fcarcade/cabinet/WatchProvider.class",
+        "cn/piq/fcarcade/cabinet/WatchProviders.class",
+        "cn/piq/fcarcade/cabinet/WatchService$Control.class",
+        "cn/piq/fcarcade/cabinet/WatchService$Live.class",
+        "cn/piq/fcarcade/cabinet/WatchService$State.class",
+        "cn/piq/fcarcade/cabinet/WatchService.class",
+        "cn/piq/fcarcade/cabinet/WatchSource.class",
+        "cn/piq/fcarcade/client/cabinet/WatchAudio.class",
+        "cn/piq/fcarcade/client/cabinet/WatchMediaStream.class",
+        "cn/piq/fcarcade/client/watch/CabinetWatchDisplay.class",
+        "cn/piq/fcarcade/client/watch/WatchClient$Demand.class",
+        "cn/piq/fcarcade/client/watch/WatchClient$DisplayAdapter.class",
+        "cn/piq/fcarcade/client/watch/WatchClient$Setup.class",
+        "cn/piq/fcarcade/client/watch/WatchClient.class",
+        "cn/piq/fcarcade/client/watch/WatchLeaseState.class"
+      ],
+      "changed_classes": [
+        "cn/piq/fcarcade/cabinet/CabinetMediaSender$1.class",
+        "cn/piq/fcarcade/cabinet/CabinetMediaSender.class",
+        "cn/piq/fcarcade/cabinet/CabinetNetwork$Choose.class",
+        "cn/piq/fcarcade/cabinet/CabinetNetwork$Closed.class",
+        "cn/piq/fcarcade/cabinet/CabinetNetwork$Heartbeat.class",
+        "cn/piq/fcarcade/cabinet/CabinetNetwork$Launch.class",
+        "cn/piq/fcarcade/cabinet/CabinetNetwork$Menu.class",
+        "cn/piq/fcarcade/cabinet/CabinetNetwork$Release.class",
+        "cn/piq/fcarcade/cabinet/CabinetNetwork.class",
+        "cn/piq/fcarcade/cabinet/CabinetRooms$State.class",
+        "cn/piq/fcarcade/cabinet/CabinetRooms.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetClientBackends$Setup.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetClientBackends.class",
+        "cn/piq/retro/input/InputOwnership.class"
+      ],
+      "unchanged_entries": 1411,
+      "unchanged_classes": 1243,
+      "all_old_assets_and_data_byte_identical": 153,
+      "deleted_entries": 0
+    },
+    "sfc": {
+      "added_classes": [
+        "cn/piq/sfchome/client/SfcWatchClient$Setup.class",
+        "cn/piq/sfchome/client/SfcWatchClient.class",
+        "cn/piq/sfchome/client/SfcWatchDemand.class",
+        "cn/piq/sfchome/client/SfcWatchFrames.class",
+        "cn/piq/sfchome/client/SfcWatchPublisher$Publication.class",
+        "cn/piq/sfchome/client/SfcWatchPublisher.class",
+        "cn/piq/sfchome/server/SfcWatchProvider.class"
+      ],
+      "changed_classes": [
+        "cn/piq/sfchome/SfcHomeMod.class",
+        "cn/piq/sfchome/client/SfcPlayback$Host.class",
+        "cn/piq/sfchome/client/SfcPlayback$MinecraftHost$1.class",
+        "cn/piq/sfchome/client/SfcPlayback$MinecraftHost.class",
+        "cn/piq/sfchome/client/SfcPlayback$Picture.class",
+        "cn/piq/sfchome/client/SfcPlayback$Restore.class",
+        "cn/piq/sfchome/client/SfcPlayback.class",
+        "cn/piq/sfchome/server/SfcHomeServer$1.class",
+        "cn/piq/sfchome/server/SfcHomeServer$Joining.class",
+        "cn/piq/sfchome/server/SfcHomeServer$Lease.class",
+        "cn/piq/sfchome/server/SfcHomeServer$Session.class",
+        "cn/piq/sfchome/server/SfcHomeServer$State.class",
+        "cn/piq/sfchome/server/SfcHomeServer.class"
+      ],
+      "unchanged_entries": 199,
+      "unchanged_classes": 173,
+      "all_old_assets_and_data_byte_identical": 22,
+      "deleted_entries": 0
+    },
+    "native": {
+      "added_classes": [],
+      "changed_classes": [],
+      "unchanged_entries": 51,
+      "unchanged_classes": 42,
+      "all_old_assets_and_data_byte_identical": 5,
+      "deleted_entries": 0
+    }
+  },
+  "ownership": {
+    "classes": 1526,
+    "duplicate_classes": 0,
+    "platform_owner": "fc",
+    "runtime_owners": {
+      "core/nes_rust_wasm_bg.wasm": "fc",
+      "natives/linux-x86_64/libwasmtime4j.so": "fc",
+      "natives/windows-x86_64/wasmtime4j.dll": "fc",
+      "assets/piq_sfc_arcade/core/piq_sfc_wasm.wasm": "sfc"
+    }
+  },
+  "old_method_protection": {
+    "old_identical_methods": 277,
+    "reviewed_changed_old_methods": 19,
+    "classes": {
+      "cn/piq/fcarcade/cabinet/CabinetMediaSender$1.class": {
+        "old_methods_identical": [
+          "<init>(Lcn/piq/fcarcade/cabinet/CabinetSendWindow$Ticket;I)V",
+          "onFailure()Lnet/minecraft/network/protocol/Packet;",
+          "onSuccess()V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/fcarcade/cabinet/CabinetMediaSender.class": {
+        "old_methods_identical": [
+          "<clinit>()V",
+          "<init>()V",
+          "completion(Lcn/piq/fcarcade/cabinet/CabinetSendWindow$Ticket;I)Lnet/minecraft/network/PacketSendListener;",
+          "inFlight(Lnet/minecraft/network/Connection;)I",
+          "lambda$send$0(Lnet/minecraft/network/Connection;)Lcn/piq/fcarcade/cabinet/CabinetSendWindow;",
+          "release(Lnet/minecraft/network/Connection;)V",
+          "weights(Ljava/util/List;)[I"
+        ],
+        "reviewed_old_hook_methods": [
+          "clientbound(Lnet/minecraft/network/Connection;Ljava/util/UUID;Ljava/util/List;)Z",
+          "send(Lnet/minecraft/network/Connection;Ljava/util/UUID;Ljava/util/List;)Z",
+          "serverbound(Lnet/minecraft/network/Connection;Ljava/util/List;)Z"
+        ],
+        "reviewed_new_hook_methods": [
+          "clientbound(Lnet/minecraft/network/Connection;Ljava/util/UUID;Ljava/util/List;)Z",
+          "send(Lnet/minecraft/network/Connection;Ljava/util/UUID;Ljava/util/List;Z)Z",
+          "serverbound(Lnet/minecraft/network/Connection;Ljava/util/List;)Z",
+          "watchClientbound(Lnet/minecraft/network/Connection;Ljava/util/UUID;Ljava/util/List;)Z",
+          "watchServerbound(Lnet/minecraft/network/Connection;Ljava/util/List;)Z"
+        ],
+        "added_fields": [],
+        "review": "Only payload routing/boolean private dispatcher; window admission, completion and release retained.",
+        "hook_sha256": {
+          "clientbound(Lnet/minecraft/network/Connection;Ljava/util/UUID;Ljava/util/List;)Z": "14D1540A781EF3AB301F46654E82B9459CF4E2980B5945B0E482CC1A2F122E97",
+          "send(Lnet/minecraft/network/Connection;Ljava/util/UUID;Ljava/util/List;Z)Z": "B4CEF70700A6B9D667A6119C3E103348005BFCB22FC0D382B19CC8D0BEEE6D3E",
+          "serverbound(Lnet/minecraft/network/Connection;Ljava/util/List;)Z": "2D7F6B549CBF2A3F2E2A181EDAAB9E981BFF7B4811A6CF035BE6168EE5BD1DCF",
+          "watchClientbound(Lnet/minecraft/network/Connection;Ljava/util/UUID;Ljava/util/List;)Z": "3BA24171762323B87FFFD2ECF10968C2B2E53BFC2E4453E30FA688D53B22E37F",
+          "watchServerbound(Lnet/minecraft/network/Connection;Ljava/util/List;)Z": "90C6604E9F5B3DFBDBA7BB61BC3619E92E95EBB7E4521BE3D78E612866FDA9D0"
+        }
+      },
+      "cn/piq/fcarcade/cabinet/CabinetNetwork$Choose.class": {
+        "old_methods_identical": [
+          "<clinit>()V",
+          "<init>(Ljava/util/UUID;Lnet/minecraft/resources/ResourceLocation;)V",
+          "backend()Lnet/minecraft/resources/ResourceLocation;",
+          "equals(Ljava/lang/Object;)Z",
+          "hashCode()I",
+          "lambda$static$0(Lnet/minecraft/network/RegistryFriendlyByteBuf;Lcn/piq/fcarcade/cabinet/CabinetNetwork$Choose;)V",
+          "lambda$static$1(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lcn/piq/fcarcade/cabinet/CabinetNetwork$Choose;",
+          "toString()Ljava/lang/String;",
+          "token()Ljava/util/UUID;",
+          "type()Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$Type;"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/fcarcade/cabinet/CabinetNetwork$Closed.class": {
+        "old_methods_identical": [
+          "<clinit>()V",
+          "<init>(Ljava/util/UUID;Ljava/lang/String;)V",
+          "equals(Ljava/lang/Object;)Z",
+          "hashCode()I",
+          "lambda$static$0(Lnet/minecraft/network/RegistryFriendlyByteBuf;Lcn/piq/fcarcade/cabinet/CabinetNetwork$Closed;)V",
+          "lambda$static$1(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lcn/piq/fcarcade/cabinet/CabinetNetwork$Closed;",
+          "lease()Ljava/util/UUID;",
+          "reason()Ljava/lang/String;",
+          "toString()Ljava/lang/String;",
+          "type()Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$Type;"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/fcarcade/cabinet/CabinetNetwork$Heartbeat.class": {
+        "old_methods_identical": [
+          "<clinit>()V",
+          "<init>(Ljava/util/UUID;)V",
+          "equals(Ljava/lang/Object;)Z",
+          "hashCode()I",
+          "lambda$static$0(Lnet/minecraft/network/RegistryFriendlyByteBuf;Lcn/piq/fcarcade/cabinet/CabinetNetwork$Heartbeat;)V",
+          "lambda$static$1(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lcn/piq/fcarcade/cabinet/CabinetNetwork$Heartbeat;",
+          "lease()Ljava/util/UUID;",
+          "toString()Ljava/lang/String;",
+          "type()Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$Type;"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/fcarcade/cabinet/CabinetNetwork$Launch.class": {
+        "old_methods_identical": [
+          "<clinit>()V",
+          "<init>(Lcn/piq/fcarcade/cabinet/CabinetTarget;Lnet/minecraft/resources/ResourceLocation;Ljava/util/UUID;)V",
+          "backend()Lnet/minecraft/resources/ResourceLocation;",
+          "equals(Ljava/lang/Object;)Z",
+          "hashCode()I",
+          "lambda$static$0(Lnet/minecraft/network/RegistryFriendlyByteBuf;Lcn/piq/fcarcade/cabinet/CabinetNetwork$Launch;)V",
+          "lambda$static$1(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lcn/piq/fcarcade/cabinet/CabinetNetwork$Launch;",
+          "lease()Ljava/util/UUID;",
+          "target()Lcn/piq/fcarcade/cabinet/CabinetTarget;",
+          "toString()Ljava/lang/String;",
+          "type()Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$Type;"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/fcarcade/cabinet/CabinetNetwork$Menu.class": {
+        "old_methods_identical": [
+          "<clinit>()V",
+          "<init>(Lcn/piq/fcarcade/cabinet/CabinetTarget;Ljava/util/UUID;Ljava/util/List;Lnet/minecraft/resources/ResourceLocation;)V",
+          "entries()Ljava/util/List;",
+          "equals(Ljava/lang/Object;)Z",
+          "hashCode()I",
+          "lambda$static$0(Lnet/minecraft/network/RegistryFriendlyByteBuf;Lcn/piq/fcarcade/cabinet/CabinetNetwork$Menu;)V",
+          "lambda$static$1(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lcn/piq/fcarcade/cabinet/CabinetNetwork$Menu;",
+          "selected()Lnet/minecraft/resources/ResourceLocation;",
+          "target()Lcn/piq/fcarcade/cabinet/CabinetTarget;",
+          "toString()Ljava/lang/String;",
+          "token()Ljava/util/UUID;",
+          "type()Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$Type;"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/fcarcade/cabinet/CabinetNetwork$Release.class": {
+        "old_methods_identical": [
+          "<clinit>()V",
+          "<init>(Ljava/util/UUID;)V",
+          "equals(Ljava/lang/Object;)Z",
+          "hashCode()I",
+          "lambda$static$0(Lnet/minecraft/network/RegistryFriendlyByteBuf;Lcn/piq/fcarcade/cabinet/CabinetNetwork$Release;)V",
+          "lambda$static$1(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lcn/piq/fcarcade/cabinet/CabinetNetwork$Release;",
+          "lease()Ljava/util/UUID;",
+          "toString()Ljava/lang/String;",
+          "type()Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$Type;"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/fcarcade/cabinet/CabinetNetwork.class": {
+        "old_methods_identical": [
+          "<init>()V",
+          "checkedId(Lnet/minecraft/resources/ResourceLocation;)V",
+          "dispatch(Lnet/neoforged/neoforge/network/handling/IPayloadContext;Ljava/util/function/Consumer;)V",
+          "id(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;",
+          "lambda$dispatch$12(Lnet/minecraft/network/Connection;Ljava/util/function/Consumer;)V",
+          "lambda$register$0(Lnet/neoforged/neoforge/network/handling/IPayloadContext;Lcn/piq/fcarcade/cabinet/CabinetNetwork$Choose;)V",
+          "lambda$register$1(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Choose;Lnet/neoforged/neoforge/network/handling/IPayloadContext;)V",
+          "lambda$register$10(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Closed;Lcn/piq/fcarcade/cabinet/CabinetNetwork$ClientSink;)V",
+          "lambda$register$11(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Closed;Lnet/neoforged/neoforge/network/handling/IPayloadContext;)V",
+          "lambda$register$2(Lnet/neoforged/neoforge/network/handling/IPayloadContext;Lcn/piq/fcarcade/cabinet/CabinetNetwork$Heartbeat;)V",
+          "lambda$register$3(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Heartbeat;Lnet/neoforged/neoforge/network/handling/IPayloadContext;)V",
+          "lambda$register$4(Lnet/neoforged/neoforge/network/handling/IPayloadContext;Lcn/piq/fcarcade/cabinet/CabinetNetwork$Release;)V",
+          "lambda$register$5(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Release;Lnet/neoforged/neoforge/network/handling/IPayloadContext;)V",
+          "lambda$register$6(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Menu;Lcn/piq/fcarcade/cabinet/CabinetNetwork$ClientSink;)V",
+          "lambda$register$7(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Menu;Lnet/neoforged/neoforge/network/handling/IPayloadContext;)V",
+          "lambda$register$8(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Launch;Lcn/piq/fcarcade/cabinet/CabinetNetwork$ClientSink;)V",
+          "lambda$register$9(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Launch;Lnet/neoforged/neoforge/network/handling/IPayloadContext;)V",
+          "readId(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lnet/minecraft/resources/ResourceLocation;",
+          "readTarget(Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lcn/piq/fcarcade/cabinet/CabinetTarget;",
+          "send(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload;)V",
+          "setClientSink(Lcn/piq/fcarcade/cabinet/CabinetNetwork$ClientSink;)V",
+          "writeId(Lnet/minecraft/network/RegistryFriendlyByteBuf;Lnet/minecraft/resources/ResourceLocation;)V",
+          "writeTarget(Lnet/minecraft/network/RegistryFriendlyByteBuf;Lcn/piq/fcarcade/cabinet/CabinetTarget;)V"
+        ],
+        "reviewed_old_hook_methods": [
+          "register(Lnet/neoforged/neoforge/network/event/RegisterPayloadHandlersEvent;)V"
+        ],
+        "reviewed_new_hook_methods": [
+          "register(Lnet/neoforged/neoforge/network/event/RegisterPayloadHandlersEvent;)V"
+        ],
+        "added_fields": [],
+        "review": "One additive WatchNetwork.register call after original registrations.",
+        "hook_sha256": {
+          "register(Lnet/neoforged/neoforge/network/event/RegisterPayloadHandlersEvent;)V": "EB94EEAE0201D93691FEDFBC59B7C8A80849566CC74524FDEB2B436B2C5C947B"
+        }
+      },
+      "cn/piq/fcarcade/cabinet/CabinetRooms$State.class": {
+        "old_methods_identical": [
+          "<init>()V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/fcarcade/cabinet/CabinetRooms.class": {
+        "old_methods_identical": [
+          "<init>()V",
+          "authorized(Lnet/minecraft/server/level/ServerPlayer;Ljava/util/UUID;Ljava/util/UUID;)Lcn/piq/fcarcade/cabinet/CabinetRoomLedger$Member;",
+          "contains(Lnet/minecraft/server/MinecraftServer;Ljava/util/UUID;)Z",
+          "current(Lnet/minecraft/server/level/ServerPlayer;)Z",
+          "forward(Lnet/minecraft/server/MinecraftServer;Lcn/piq/fcarcade/cabinet/CabinetRooms$State;Lcn/piq/fcarcade/cabinet/CabinetRoomLedger$Change;)V",
+          "hasPlayer(Lnet/minecraft/server/level/ServerPlayer;)Z",
+          "hasTarget(Lnet/minecraft/server/MinecraftServer;Lcn/piq/fcarcade/cabinet/CabinetTarget;)Z",
+          "heartbeat(Lnet/minecraft/server/level/ServerPlayer;Ljava/util/UUID;)Z",
+          "input(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Input;)V",
+          "interact(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/fcarcade/cabinet/ServerCabinets$Binding;Lnet/minecraft/resources/ResourceLocation;)V",
+          "lambda$interact$0(Lnet/minecraft/server/MinecraftServer;)Lcn/piq/fcarcade/cabinet/CabinetRooms$State;",
+          "lambda$media$1(Lcn/piq/fcarcade/cabinet/CabinetRoomLedger$Room;Lcn/piq/fcarcade/cabinet/CabinetRoomMedia$Part;)Lcn/piq/fcarcade/cabinet/CabinetMediaPacket;",
+          "matches(Lcn/piq/fcarcade/cabinet/CabinetTarget;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Ljava/util/UUID;)Z",
+          "notice(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)V",
+          "now(Lnet/minecraft/server/MinecraftServer;)J",
+          "ready(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Ready;)V",
+          "release(Lnet/minecraft/server/level/ServerPlayer;Ljava/util/UUID;)Z",
+          "removed(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Ljava/util/UUID;)V",
+          "reset(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Reset;)V",
+          "roomAt(Lcn/piq/fcarcade/cabinet/CabinetRooms$State;Lcn/piq/fcarcade/cabinet/CabinetTarget;)Lcn/piq/fcarcade/cabinet/CabinetRoomLedger$Room;",
+          "send(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload;)V",
+          "topology(Lnet/minecraft/server/MinecraftServer;Lcn/piq/fcarcade/cabinet/CabinetRooms$State;Lcn/piq/fcarcade/cabinet/CabinetRoomLedger$Room;Lnet/minecraft/server/level/ServerLevel;)Z",
+          "validateLease(Lnet/minecraft/server/level/ServerPlayer;Ljava/util/UUID;Lnet/minecraft/resources/ResourceLocation;)Lcn/piq/fcarcade/cabinet/CabinetTarget;"
+        ],
+        "reviewed_old_hook_methods": [
+          "<clinit>()V",
+          "close(Lnet/minecraft/server/MinecraftServer;Lcn/piq/fcarcade/cabinet/CabinetRooms$State;Lcn/piq/fcarcade/cabinet/CabinetRoomLedger$Member;Ljava/lang/String;)V",
+          "logout(Lnet/minecraft/server/level/ServerPlayer;)V",
+          "media(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Media;)V",
+          "stopped(Lnet/minecraft/server/MinecraftServer;)V",
+          "tick(Lnet/minecraft/server/MinecraftServer;)V"
+        ],
+        "reviewed_new_hook_methods": [
+          "<clinit>()V",
+          "close(Lnet/minecraft/server/MinecraftServer;Lcn/piq/fcarcade/cabinet/CabinetRooms$State;Lcn/piq/fcarcade/cabinet/CabinetRoomLedger$Member;Ljava/lang/String;)V",
+          "logout(Lnet/minecraft/server/level/ServerPlayer;)V",
+          "media(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Media;)V",
+          "registerWatchProvider()V",
+          "stopped(Lnet/minecraft/server/MinecraftServer;)V",
+          "tick(Lnet/minecraft/server/MinecraftServer;)V",
+          "watchSource(Lcn/piq/fcarcade/cabinet/CabinetRooms$State;Lcn/piq/fcarcade/cabinet/CabinetRoomLedger$Room;)Lcn/piq/fcarcade/cabinet/WatchSource;"
+        ],
+        "added_fields": [
+          "WATCH_PROVIDER Lnet/minecraft/resources/ResourceLocation;",
+          "watchRegistered Z"
+        ],
+        "review": "Add read-only provider; append spectator relay after player delivery and exact-source shutdown/tick hooks.",
+        "hook_sha256": {
+          "<clinit>()V": "763769F745DBC7044178FC57ABF1EA49D061F1CDBF08A4BD148F9261E5965287",
+          "close(Lnet/minecraft/server/MinecraftServer;Lcn/piq/fcarcade/cabinet/CabinetRooms$State;Lcn/piq/fcarcade/cabinet/CabinetRoomLedger$Member;Ljava/lang/String;)V": "4131DDA8DD2FDD957D8920867A662DDCB8FDAC841140C41A2B7E4F863B2A4EC2",
+          "logout(Lnet/minecraft/server/level/ServerPlayer;)V": "22481A7FA3B43386EBD45F05A7A23441DB5F425272C0091BD64D95B23F343C36",
+          "media(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Media;)V": "7D6146D31142A368851B1ADB254ED3C454CA3BF0C19DD03639CF660AF56F23D5",
+          "registerWatchProvider()V": "F68FCD676C9076FFC160C0249C0EA23768B2E6CE529B2A1E74A8F11D5B082DD9",
+          "stopped(Lnet/minecraft/server/MinecraftServer;)V": "9B3EB2936B066368CB7BD3DD229668DD8D57D2B6BC1DC6834F2AACE28DBCC1B3",
+          "tick(Lnet/minecraft/server/MinecraftServer;)V": "8994B6E055EC3318924C68A93DB5E92082966D8E4AF36A87C6FDDBFC0A8B8B8E",
+          "watchSource(Lcn/piq/fcarcade/cabinet/CabinetRooms$State;Lcn/piq/fcarcade/cabinet/CabinetRoomLedger$Room;)Lcn/piq/fcarcade/cabinet/WatchSource;": "AFFD635A5667232D0F35398D0CFC2B15BF2E8E3C21C9907AEBC097191A3DA55D"
+        }
+      },
+      "cn/piq/fcarcade/client/cabinet/CabinetClientBackends$Setup.class": {
+        "old_methods_identical": [
+          "<init>()V",
+          "lambda$setup$0()V",
+          "setup(Lnet/neoforged/fml/event/lifecycle/FMLClientSetupEvent;)V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/fcarcade/client/cabinet/CabinetClientBackends.class": {
+        "old_methods_identical": [
+          "<clinit>()V",
+          "<init>()V",
+          "acceptsConnection(Lnet/minecraft/network/Connection;)Z",
+          "assignment(Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Assignment;)V",
+          "buttons(Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Buttons;)V",
+          "cancelConfigure()V",
+          "clearInput()V",
+          "closed(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Closed;)V",
+          "configure(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Menu;Lnet/minecraft/resources/ResourceLocation;)Z",
+          "current()Z",
+          "dropTexture()V",
+          "find(Lnet/minecraft/resources/ResourceLocation;)Lcn/piq/fcarcade/client/cabinet/CabinetBackend;",
+          "guest()Z",
+          "input(II)V",
+          "key(Lnet/neoforged/neoforge/client/event/InputEvent$Key;)V",
+          "lambda$configure$2(Lnet/minecraft/resources/ResourceLocation;Lcn/piq/fcarcade/cabinet/CabinetBackends$Entry;)Z",
+          "lambda$register$1(Lcn/piq/fcarcade/client/cabinet/CabinetBackend;Ljava/nio/file/Path;)Lcn/piq/retro/api/RetroEmulator;",
+          "lambda$startGame$3()Ljava/io/IOException;",
+          "lambda$startGame$5(ILjava/lang/Throwable;)V",
+          "lambda$startGame$6(IZLjava/nio/file/Path;Lcn/piq/fcarcade/cabinet/CabinetRomBindings$Key;Lcn/piq/fcarcade/client/cabinet/CabinetBackend;Lcn/piq/retro/api/RetroEmulatorFactory;Lnet/minecraft/client/Minecraft;)V",
+          "lambda$static$0(Ljava/lang/Runnable;)Ljava/lang/Thread;",
+          "localWorld()Z",
+          "media(Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Stream;)V",
+          "notice(Ljava/lang/String;)V",
+          "openBackend(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Launch;)V",
+          "openMenu(Lcn/piq/fcarcade/cabinet/CabinetNetwork$Menu;)V",
+          "register(Lnet/minecraft/resources/ResourceLocation;Lcn/piq/fcarcade/client/cabinet/CabinetBackend;)V",
+          "release(Ljava/util/UUID;)V",
+          "roomMessage(Ljava/util/UUID;Ljava/util/UUID;)Z",
+          "running()Z",
+          "screenOpening(Lnet/neoforged/neoforge/client/event/ScreenEvent$Opening;)V",
+          "shortText(Ljava/lang/String;I)Ljava/lang/String;",
+          "shutdown(Lnet/neoforged/neoforge/event/GameShuttingDownEvent;)V",
+          "start(Ljava/nio/file/Path;)V",
+          "startGame(Ljava/nio/file/Path;Z)V",
+          "syncInput()V",
+          "tick(Lnet/neoforged/neoforge/client/event/ClientTickEvent$Post;)V",
+          "visualInputs(Lcn/piq/fcarcade/cabinet/CabinetTarget;)[I"
+        ],
+        "reviewed_old_hook_methods": [
+          "drainMedia()V",
+          "lambda$startGame$4(Lcn/piq/retro/api/RetroEmulator;I)V",
+          "render(Lnet/neoforged/neoforge/client/event/RenderLevelStageEvent;)V",
+          "seat(Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Seat;)V",
+          "stop(Ljava/lang/String;Z)V"
+        ],
+        "reviewed_new_hook_methods": [
+          "drainMedia()V",
+          "hasLocalSession()Z",
+          "lambda$startGame$4(Lcn/piq/retro/api/RetroEmulator;I)V",
+          "needsMedia()Z",
+          "render(Lnet/neoforged/neoforge/client/event/RenderLevelStageEvent;)V",
+          "seat(Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Seat;)V",
+          "stop(Ljava/lang/String;Z)V",
+          "updateMediaDemand()V",
+          "watchDemand(Lcn/piq/fcarcade/cabinet/WatchNetwork$HostDemand;)V"
+        ],
+        "added_fields": [
+          "watchExpires J",
+          "watchers I"
+        ],
+        "review": "Only media demand OR spectators, drop stale outbound when not demanded, and spectator state reset; old keyboard, lease, input and permission methods retained.",
+        "hook_sha256": {
+          "drainMedia()V": "DEA05E13C17E68342E29BBBAF2D51D15B52828AE3782982B048BD2FFC08C9E6E",
+          "hasLocalSession()Z": "ED8C0FE110EB59C20AD44FC54E926AEF126B183B9D82FE7DC28FABCE4306B87F",
+          "lambda$startGame$4(Lcn/piq/retro/api/RetroEmulator;I)V": "BB337AAF4B42C81A2599745C380D03021E205C6CC3F9B9544BBC19B3CDFD3977",
+          "needsMedia()Z": "1DC31D31283B1F149B3BC343F599D6AF84A232674B16D6B6061897AEAD5D9801",
+          "render(Lnet/neoforged/neoforge/client/event/RenderLevelStageEvent;)V": "C9347850D8F73CC2D6A8A0042BBC92ADC652375C8291E7188EAB77436B67F45A",
+          "seat(Lcn/piq/fcarcade/cabinet/CabinetRoomNetwork$Seat;)V": "62F15395D9982CB2E5A326B35341270A0EB3197D65552C995E8AD6C220A2B54A",
+          "stop(Ljava/lang/String;Z)V": "B92F60842FA831FDF64FDD39DEBD03D86AADA229901979D6BAC00474A594CC15",
+          "updateMediaDemand()V": "07829C4E1297D6CA45E3DBB0C17D04AE87A5DE520E1E4956F06A0A2E2027514D",
+          "watchDemand(Lcn/piq/fcarcade/cabinet/WatchNetwork$HostDemand;)V": "87214FC692AD5320155E9D9072C556D5C1FB7DDCD9649944B67AD5FC3C35AB18"
+        }
+      },
+      "cn/piq/retro/input/InputOwnership.class": {
+        "old_methods_identical": [
+          "<init>()V",
+          "acquire(Ljava/lang/Object;)Z",
+          "owns(Ljava/lang/Object;)Z",
+          "release(Ljava/lang/Object;)V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [
+          "occupied()Z"
+        ],
+        "added_fields": [],
+        "review": "Add synchronized read-only occupied query; ownership mutations retained.",
+        "hook_sha256": {
+          "occupied()Z": "4E1DB88F434D9963A81C54DD724462D6242382F77311B36ED81FA94B09015331"
+        }
+      },
+      "cn/piq/sfchome/SfcHomeMod.class": {
+        "old_methods_identical": [
+          "<clinit>()V",
+          "creativeContents(Lnet/neoforged/neoforge/event/BuildCreativeModeTabContentsEvent;)V"
+        ],
+        "reviewed_old_hook_methods": [
+          "<init>(Lnet/neoforged/bus/api/IEventBus;)V"
+        ],
+        "reviewed_new_hook_methods": [
+          "<init>(Lnet/neoforged/bus/api/IEventBus;)V"
+        ],
+        "added_fields": [],
+        "review": "One additive provider registration.",
+        "hook_sha256": {
+          "<init>(Lnet/neoforged/bus/api/IEventBus;)V": "7E275586A3738AE671BB119A6D842E62C94C61D39C32E98586A749219A01D6E5"
+        }
+      },
+      "cn/piq/sfchome/client/SfcPlayback$Host.class": {
+        "old_methods_identical": [
+          "applied(Lcn/piq/sfchome/client/SfcPlayback;Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;Ljava/lang/String;Z)V",
+          "backup(Lcn/piq/sfchome/client/SfcPlayback;Lcn/piq/sfcarcade/core/wasm/WasmSfcCore;I)V",
+          "captured(Lcn/piq/sfchome/client/SfcPlayback;Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;[BLjava/lang/String;)V",
+          "execute(Ljava/lang/Runnable;)V",
+          "isCurrent(Lcn/piq/sfchome/client/SfcPlayback;)Z",
+          "observedFrame(III[B[SI)V",
+          "openAudio()Lcn/piq/sfchome/client/SfcPlayback$Audio;",
+          "ready(Lcn/piq/sfchome/client/SfcPlayback;Lcn/piq/sfchome/net/SfcHomeNetwork$Ready;)V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [
+          "mediaClosed(Lcn/piq/sfchome/client/SfcPlayback;)V",
+          "mediaFrame(Lcn/piq/sfchome/client/SfcPlayback;IIIF[B[SI)V"
+        ],
+        "added_fields": [],
+        "review": "Two default no-op media-only methods.",
+        "hook_sha256": {
+          "mediaClosed(Lcn/piq/sfchome/client/SfcPlayback;)V": "497AC2EED6410E6B6A5CD1C7FFCF2C96A50E7428116CABC2608A447EBB123A3E",
+          "mediaFrame(Lcn/piq/sfchome/client/SfcPlayback;IIIF[B[SI)V": "219817926EE807418352C75B06F56C67865A515BF44DC8658D43D19CDFBD3188"
+        }
+      },
+      "cn/piq/sfchome/client/SfcPlayback$MinecraftHost$1.class": {
+        "old_methods_identical": [
+          "<init>(Lcn/piq/sfchome/client/SfcPlayback$MinecraftHost;Lcn/piq/sfcarcade/audio/SfcAudioPlayer;)V",
+          "close()V",
+          "submit([SIF)V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/sfchome/client/SfcPlayback$MinecraftHost.class": {
+        "old_methods_identical": [
+          "<init>()V",
+          "applied(Lcn/piq/sfchome/client/SfcPlayback;Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;Ljava/lang/String;Z)V",
+          "backup(Lcn/piq/sfchome/client/SfcPlayback;Lcn/piq/sfcarcade/core/wasm/WasmSfcCore;I)V",
+          "captured(Lcn/piq/sfchome/client/SfcPlayback;Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;[BLjava/lang/String;)V",
+          "execute(Ljava/lang/Runnable;)V",
+          "isCurrent(Lcn/piq/sfchome/client/SfcPlayback;)Z",
+          "openAudio()Lcn/piq/sfchome/client/SfcPlayback$Audio;",
+          "ready(Lcn/piq/sfchome/client/SfcPlayback;Lcn/piq/sfchome/net/SfcHomeNetwork$Ready;)V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [
+          "mediaClosed(Lcn/piq/sfchome/client/SfcPlayback;)V",
+          "mediaFrame(Lcn/piq/sfchome/client/SfcPlayback;IIIF[B[SI)V"
+        ],
+        "added_fields": [],
+        "review": "Forward the two optional hooks to SfcWatchPublisher only.",
+        "hook_sha256": {
+          "mediaClosed(Lcn/piq/sfchome/client/SfcPlayback;)V": "3C7CD03DE2FD0A61B2DBCE86492E67B7C41FFA590BF226DDAEDF0D5568B4CB03",
+          "mediaFrame(Lcn/piq/sfchome/client/SfcPlayback;IIIF[B[SI)V": "3150DFA6E9F38A51A4AF1B6D75762F5D4B0D0CF3F01DB920266336784E4604EB"
+        }
+      },
+      "cn/piq/sfchome/client/SfcPlayback$Picture.class": {
+        "old_methods_identical": [
+          "<init>(IIID[B)V",
+          "aspect()D",
+          "equals(Ljava/lang/Object;)Z",
+          "hashCode()I",
+          "height()I",
+          "rgba()[B",
+          "stride()I",
+          "toString()Ljava/lang/String;",
+          "width()I"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/sfchome/client/SfcPlayback$Restore.class": {
+        "old_methods_identical": [
+          "<init>(Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;[BLjava/lang/String;)V",
+          "bytes()[B",
+          "equals(Ljava/lang/Object;)Z",
+          "hashCode()I",
+          "request()Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;",
+          "sha()Ljava/lang/String;",
+          "toString()Ljava/lang/String;"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/sfchome/client/SfcPlayback.class": {
+        "old_methods_identical": [
+          "<init>(Lcn/piq/sfchome/net/SfcHomeNetwork$Session;[BLcn/piq/sfchome/client/SfcStartupProgress;)V",
+          "<init>(Lcn/piq/sfchome/net/SfcHomeNetwork$Session;[BLcn/piq/sfchome/client/SfcStartupProgress;Lcn/piq/sfchome/client/SfcPlayback$Host;)V",
+          "aspect()D",
+          "backup(Lcn/piq/sfcarcade/core/wasm/WasmSfcCore;I)V",
+          "cancelJoin(Ljava/util/UUID;)V",
+          "capture(Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;)V",
+          "error()Ljava/lang/String;",
+          "gain(F)V",
+          "lambda$run$0(DLjava/lang/String;)V",
+          "lambda$run$1(Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;Ljava/lang/String;)V",
+          "lambda$run$2(Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;)V",
+          "lambda$run$3(Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;[BLjava/lang/String;)V",
+          "lambda$run$4(Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;)V",
+          "matches(JI)Z",
+          "offer(Lcn/piq/sfchome/net/SfcHomeNetwork$Frames;)Z",
+          "release()V",
+          "restore(Lcn/piq/sfchome/net/SfcJoinNetwork$Capture;[BLjava/lang/String;)V",
+          "started()Z",
+          "textureId()Lnet/minecraft/resources/ResourceLocation;",
+          "upload()V"
+        ],
+        "reviewed_old_hook_methods": [
+          "close()V",
+          "run()V"
+        ],
+        "reviewed_new_hook_methods": [
+          "close()V",
+          "run()V",
+          "watchFrame()Lcn/piq/retro/api/RetroFrame;"
+        ],
+        "added_fields": [
+          "mediaFailed Z",
+          "watchPicture Lcn/piq/sfchome/client/SfcPlayback$Picture;"
+        ],
+        "review": "Retain last immutable Picture and optional P1-only media callback; callback Runtime/Linkage failure isolated, original pacing/capture/restore/input/core/backup control flow retained.",
+        "hook_sha256": {
+          "close()V": "D4191B68A632FBB1B55B620BD4D6D370B7331D7021026E45113A61B76BDF52BD",
+          "run()V": "7FCA921D4CBFB5F071810BE9451BD0DB9B4303FE31FE370CB822366644DEFAC6",
+          "watchFrame()Lcn/piq/retro/api/RetroFrame;": "CD9FF06BB4FF7D4BC53BD605AB661D1F6D2FBA99242EFE04966F5DAEEE112027"
+        }
+      },
+      "cn/piq/sfchome/server/SfcHomeServer$1.class": {
+        "old_methods_identical": [
+          "<init>()V",
+          "onInteract(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/InteractionHand;Lcn/piq/fcarcade/home/HomeSystems$Connection;Lnet/minecraft/world/phys/BlockHitResult;)V",
+          "onPlaybackStopped(Lnet/minecraft/server/level/ServerLevel;Lcn/piq/fcarcade/home/ExternalHomeConsoleBlockEntity;Lcn/piq/fcarcade/home/HomeSystems$StopReason;)V",
+          "onRemoved(Lnet/minecraft/server/level/ServerLevel;Lcn/piq/fcarcade/home/ExternalHomeConsoleBlockEntity;)V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/sfchome/server/SfcHomeServer$Joining.class": {
+        "old_methods_identical": [
+          "<init>(Lcn/piq/sfchome/server/SfcJoinGate;Lnet/minecraft/world/item/ItemStack;)V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/sfchome/server/SfcHomeServer$Lease.class": {
+        "old_methods_identical": [
+          "<init>(Ljava/util/UUID;Ljava/util/UUID;Lcn/piq/sfchome/world/SfcHomeConsoleBlockEntity;ILnet/minecraft/world/item/ItemStack;)V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/sfchome/server/SfcHomeServer$Session.class": {
+        "old_methods_identical": [],
+        "reviewed_old_hook_methods": [
+          "<init>(JILcn/piq/fcarcade/home/HomeSystems$Connection;Ljava/lang/String;[Lcn/piq/sfchome/server/SfcHomeServer$Lease;J)V"
+        ],
+        "reviewed_new_hook_methods": [
+          "<init>(JILcn/piq/fcarcade/home/HomeSystems$Connection;Ljava/lang/String;[Lcn/piq/sfchome/server/SfcHomeServer$Lease;J)V"
+        ],
+        "added_fields": [
+          "watchSource Ljava/util/UUID;"
+        ],
+        "review": "Initialize one random visual source UUID; all original constructor assignments retained.",
+        "hook_sha256": {
+          "<init>(JILcn/piq/fcarcade/home/HomeSystems$Connection;Ljava/lang/String;[Lcn/piq/sfchome/server/SfcHomeServer$Lease;J)V": "42543E8260FD0661D723B003914A9C9C46818E00A7451411EF0036D803F94E99"
+        }
+      },
+      "cn/piq/sfchome/server/SfcHomeServer$State.class": {
+        "old_methods_identical": [
+          "<init>()V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [],
+        "added_fields": [],
+        "review": "All old fields, signatures and instructions unchanged.",
+        "hook_sha256": {}
+      },
+      "cn/piq/sfchome/server/SfcHomeServer.class": {
+        "old_methods_identical": [
+          "<clinit>()V",
+          "<init>()V",
+          "abortJoin(Lcn/piq/sfchome/server/SfcHomeServer$State;Lcn/piq/sfchome/server/SfcHomeServer$Session;Ljava/lang/String;)V",
+          "acceptInput(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Session;Lcn/piq/sfchome/net/SfcHomeNetwork$Input;I)V",
+          "allowJoin(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/net/SfcJoinNetwork$Allow;)V",
+          "authorizedRom(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)Z",
+          "authorizedStart(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Lease;Lcn/piq/fcarcade/home/HomeSystems$Connection;)Z",
+          "basic(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/world/SfcHomeConsoleBlockEntity;)Z",
+          "candidate(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Session;Z)Z",
+          "controlLease(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Session;Ljava/util/UUID;)Z",
+          "controllerLeave(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/net/SfcJoinNetwork$ControllerLeave;)V",
+          "controllerReady(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/net/SfcJoinNetwork$ControllerReady;)V",
+          "decideJoin(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/net/SfcJoinNetwork$Decision;)V",
+          "detachSecond(Lcn/piq/sfchome/server/SfcHomeServer$State;Lcn/piq/sfchome/server/SfcHomeServer$Session;Lcn/piq/sfchome/server/SfcHomeServer$Lease;Ljava/lang/String;)V",
+          "endpointFacts(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Lease;Lcn/piq/fcarcade/home/HomeSystems$Connection;)Z",
+          "feedback(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)V",
+          "input(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/net/SfcHomeNetwork$Input;)V",
+          "interact(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/InteractionHand;Lcn/piq/sfchome/world/SfcHomeConsoleBlockEntity;)V",
+          "interactDirect(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/BlockHitResult;)V",
+          "joinApplied(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/net/SfcJoinNetwork$Applied;)V",
+          "joinInput(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/net/SfcJoinNetwork$ControllerInput;)V",
+          "joinReady(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Session;Lcn/piq/sfchome/net/SfcHomeNetwork$Ready;)V",
+          "joinUpload(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/net/SfcJoinNetwork$State;)V",
+          "joinValid(Lnet/minecraft/server/MinecraftServer;Lcn/piq/sfchome/server/SfcHomeServer$Session;Z)Z",
+          "lambda$candidate$5(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Lease;)Z",
+          "lambda$candidate$6(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Lease;)Z",
+          "lambda$interact$4(Lcn/piq/sfchome/world/SfcHomeConsoleBlockEntity;Lcn/piq/sfchome/server/SfcHomeServer$Lease;)Z",
+          "lambda$register$2(Lnet/neoforged/neoforge/event/tick/ServerTickEvent$Post;)V",
+          "lambda$register$3(Lnet/neoforged/neoforge/event/server/ServerStoppedEvent;)V",
+          "lambda$requestJoin$7(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Session;)Z",
+          "lambda$state$1(Lnet/minecraft/server/MinecraftServer;)Lcn/piq/sfchome/server/SfcHomeServer$State;",
+          "lambda$static$0()Ljava/lang/Boolean;",
+          "leave(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/net/SfcHomeNetwork$Leave;)V",
+          "member(Lnet/minecraft/server/level/ServerPlayer;JI)Lcn/piq/sfchome/server/SfcHomeServer$Session;",
+          "paused(Lcn/piq/sfchome/server/SfcHomeServer$Session;)Z",
+          "port(Lcn/piq/sfchome/server/SfcHomeServer$Session;Ljava/util/UUID;)I",
+          "protectedEndpoints(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Lease;Lcn/piq/fcarcade/home/HomeSystems$Connection;)Z",
+          "ready(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/net/SfcHomeNetwork$Ready;)V",
+          "register()V",
+          "release(Lnet/minecraft/server/MinecraftServer;Lcn/piq/sfchome/server/SfcHomeServer$Lease;Ljava/lang/String;)V",
+          "releaseConsole(Lnet/minecraft/server/MinecraftServer;Lcn/piq/sfchome/world/SfcHomeConsoleBlockEntity;Ljava/lang/String;)V",
+          "requestJoin(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Session;)V",
+          "returnMessage(Lcn/piq/sfchome/server/SfcHomeServer$Lease;)Ljava/lang/String;",
+          "start(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Lease;Z)V",
+          "state(Lnet/minecraft/server/MinecraftServer;)Lcn/piq/sfchome/server/SfcHomeServer$State;",
+          "stop(Lcn/piq/sfchome/server/SfcHomeServer$State;Ljava/util/UUID;Ljava/lang/String;)V",
+          "tick(Lnet/minecraft/server/MinecraftServer;)V",
+          "useController(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/InteractionHand;)V",
+          "validLease(Lnet/minecraft/server/level/ServerPlayer;Lcn/piq/sfchome/server/SfcHomeServer$Lease;Z)Z",
+          "validateControllerItem(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/item/ItemStack;)V"
+        ],
+        "reviewed_old_hook_methods": [],
+        "reviewed_new_hook_methods": [
+          "watchParticipant(Lnet/minecraft/server/MinecraftServer;Ljava/util/UUID;)Z",
+          "watchSources(Lnet/minecraft/server/MinecraftServer;)Ljava/util/List;"
+        ],
+        "added_fields": [],
+        "review": "Add two read-only snapshots; every old server control/invitation method unchanged.",
+        "hook_sha256": {
+          "watchParticipant(Lnet/minecraft/server/MinecraftServer;Ljava/util/UUID;)Z": "8D59C0F51D8DF377D5DCF636DC735D4D02751C5A4A5D7ED3E7A3D52439CF846F",
+          "watchSources(Lnet/minecraft/server/MinecraftServer;)Ljava/util/List;": "9603AC0A72FC13DD9B98F5FDF99A81064DE3688E8882ECD9B30A3AC0218B2BA6"
+        }
+      }
+    },
+    "normalization": "ASM SKIP_DEBUG/SKIP_FRAMES, full instructions, try/catch, field/method operands, invokedynamic bootstrap handles; no production class loaded."
+  },
+  "old_network_classes_whole_byte_identical": {
+    "fc": 59,
+    "sfc": 29
+  },
+  "old_room_protocol_classes_byte_identical": 10,
+  "old_cabinet_six_records_fields_codecs_and_instructions_identical": true,
+  "frozen_sfc6_core_entries_byte_identical": 60,
+  "native_and_helper_whole_jar_identical": true,
+  "stage_preparer_review": {
+    "reproduces_exact_frozen_bytes": true,
+    "source_and_baseline_hashes_match_record": true,
+    "only_two_explicit_controller_textures_restored": true,
+    "no_class_core_runtime_injected_by_fc_staging": true,
+    "zip_path_crc_duplicate_and_size_guards_reused": true,
+    "note": "Stage uses prefix/stem bounds; this independent audit tightens them to exact class lists, exact metadata deltas and reviewed ASM methods."
+  },
+  "negative_controls_rejected": [
+    "old_model",
+    "core",
+    "watch_prefix_injection",
+    "deleted_entry",
+    "old_controller_method_instruction_change"
+  ],
+  "probes": {
+    "fml_discovery": {
+      "discovery": [
+        {
+          "module_name": "piq_fc_arcade",
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-54av_q_a\\fc.jar",
+          "scanned_classes": 1291,
+          "entry_points": [
+            "piq_fc_arcade"
+          ],
+          "access_transformers": 1,
+          "mods": [
+            {
+              "id": "piq_fc_arcade",
+              "version": "0.31.0-alpha.23",
+              "dependencies": [
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "neoforge",
+                  "range": "[21.1.236,22)",
+                  "ordering": "NONE"
+                },
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.21.2)",
+                  "ordering": "NONE"
+                },
+                {
+                  "type": "OPTIONAL",
+                  "side": "BOTH",
+                  "id": "waterframes",
+                  "range": "[2.1.23,3)",
+                  "ordering": "AFTER"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "module_name": "piq_sfc_arcade",
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-54av_q_a\\sfc.jar",
+          "scanned_classes": 193,
+          "entry_points": [
+            "piq_sfc_arcade",
+            "piq_sfc_home"
+          ],
+          "access_transformers": 1,
+          "mods": [
+            {
+              "id": "piq_sfc_arcade",
+              "version": "0.2.0-alpha.6",
+              "dependencies": [
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "neoforge",
+                  "range": "[21.1.236,)",
+                  "ordering": "NONE"
+                },
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.22)",
+                  "ordering": "NONE"
+                },
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "piq_fc_arcade",
+                  "range": "[0.26.0,)",
+                  "ordering": "AFTER"
+                }
+              ]
+            },
+            {
+              "id": "piq_sfc_home",
+              "version": "0.1.0-alpha.11",
+              "dependencies": [
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "neoforge",
+                  "range": "[21.1.236,22)",
+                  "ordering": "NONE"
+                },
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.21.2)",
+                  "ordering": "NONE"
+                },
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "piq_fc_arcade",
+                  "range": "[0.31.0-alpha.23,0.32.0)",
+                  "ordering": "AFTER"
+                },
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "piq_sfc_arcade",
+                  "range": "[0.2.0-alpha.6,0.3.0)",
+                  "ordering": "AFTER"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "module_name": "piq_native_arcade",
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-54av_q_a\\native.jar",
+          "scanned_classes": 42,
+          "entry_points": [
+            "piq_native_arcade"
+          ],
+          "access_transformers": 0,
+          "mods": [
+            {
+              "id": "piq_native_arcade",
+              "version": "0.1.0-alpha.7",
+              "dependencies": [
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "neoforge",
+                  "range": "[21.1.236,22)",
+                  "ordering": "NONE"
+                },
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "minecraft",
+                  "range": "[1.21.1,1.21.2)",
+                  "ordering": "NONE"
+                },
+                {
+                  "type": "REQUIRED",
+                  "side": "BOTH",
+                  "id": "piq_fc_arcade",
+                  "range": "[0.31.0-alpha.21,0.32.0)",
+                  "ordering": "AFTER"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "ok": true,
+      "mod_entry_points_executed": false,
+      "dependency_check": "Actual FML ModInfo + Maven VersionRange; not full FML ModSorter/bootstrap",
+      "level": "actual JarModsDotTomlModFileReader + ModFile.identifyMods + ASM compileContent",
+      "assertions": 28,
+      "loader": "FancyModLoader 4.0.43",
+      "production_origin": "final-jar-only",
+      "minecraft_or_native_core_started": false
+    },
+    "sfc_real_neoforge_outer_packet_codec": {
+      "passed": true,
+      "assertions": 37,
+      "max_upload_outer_packet_bytes": 30856,
+      "outer_codec": "NeoForge21.1.236 ServerboundCustomPayloadPacket.STREAM_CODEC",
+      "minecraft_started": false
+    },
+    "hash_checked_temporary_copies": {
+      "fc": {
+        "original": "piq-fc-arcade\\build\\review-watch23-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
+        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-54av_q_a\\fc.jar",
+        "sha256": "B7BF04BEEA5F58E8E9C0DFA23E1BD8F2CAF6B11455085D843F568B42D9021686",
+        "byte_identical_before": true,
+        "byte_identical_after": true
+      },
+      "sfc": {
+        "original": "piq-fc-arcade\\build\\review-watch23-v1\\piq_sfc-0.1.0-alpha.11.jar",
+        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-54av_q_a\\sfc.jar",
+        "sha256": "ADF7172C0997983A61C0566AAEE4AE6F19C7D574D6D5B1971490EB69F4B92393",
+        "byte_identical_before": true,
+        "byte_identical_after": true
+      },
+      "native": {
+        "original": "piq-fc-arcade\\build\\review-watch23-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-54av_q_a\\native.jar",
+        "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A",
+        "byte_identical_before": true,
+        "byte_identical_after": true
+      }
+    },
+    "production_compiled": false,
+    "old_separate_core_on_classpath": false
+  },
+  "reviewed_asm_artifact": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\watch23-asm-inspection-v1.json",
+    "sha256": "AFE9552A37DAC20B81AE467B3092E583A124A8A54736C13E6984B048887C3B97"
+  },
+  "tools_sha256": {
+    "piq-fc-arcade\\tools\\verify_watch23_scope.py": "A34D86608DE706CAFAC2F65D547AE7830AAB94091FFF37E477C75DBD5897BDFF",
+    "piq-fc-arcade\\tools\\qa\\Watch23BytecodeProbe.java": "0C80130E72BBE2F9F5C7F87A16CBDAE107514D0D751542D051D44480F46A1CF8",
+    "piq-fc-arcade\\tools\\prepare_watch23.py": "7E886BBC9DBA1312DFE07087BA00E23FBD106EE0BA682369662DBEE876E62E0D"
+  },
+  "production_compiled": false,
+  "minecraft_or_native_core_started": false,
+  "network_socket_opened": false,
+  "installed": false,
+  "limits": [
+    "No actual Minecraft multiplayer/physical-controller/protection-plugin playtest.",
+    "FML discovery and old outer codecs do not equal full game bootstrap.",
+    "Spectator wire/window and SFC real worker tests are separate teammate final-JAR reports and were not rerun here."
+  ]
+}

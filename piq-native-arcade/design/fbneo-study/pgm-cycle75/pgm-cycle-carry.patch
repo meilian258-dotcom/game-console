@@ -1,0 +1,11 @@
+--- a/src/burn/drv/pgm/pgm_run.cpp
++++ b/src/burn/drv/pgm/pgm_run.cpp
+@@ -1302,6 +1302,8 @@
+ 
+ 	if (nAction & ACB_DRIVER_DATA) {
+ 	
++		// Cycle overrun is carried into the next frame and must rewind with CPUs.
++		SCAN_VAR(nCyclesDone);
+ 		SekScan(nAction);
+ 		ZetScan(nAction);
+ 

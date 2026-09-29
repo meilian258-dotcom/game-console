@@ -1,0 +1,37 @@
+display_name = "Plants vs. Zombies"
+display_version = "1.0.0"
+authors = "PvZ-Portable contributors; libretro port"
+corename = "PvZ"
+manufacturer = "PopCap Games"
+categories = "Game"
+systemname = "Plants vs. Zombies"
+systemid = "pvz"
+features = "libretro"
+license = "LGPL-3.0-or-later"
+permissions = ""
+supported_extensions = "pak"
+
+# The core runs with or without content:
+#   - no content  -> main.pak + properties/ are read from <system>/pvz/
+#   - main.pak as content -> that directory is used instead, and the BIOS below
+#     is not consulted at all
+# So the firmware entries are optional; RetroArch only uses them to report
+# whether the BIOS is present.
+supports_no_game = "true"
+
+database = ""
+
+firmware_count = 3
+firmware0_desc = "pvz/main.pak (game data; BIOS mode, or load it directly as content)"
+firmware0_path = "pvz/main.pak"
+firmware0_opt = "true"
+
+firmware1_desc = "pvz/properties/default.xml (string table overrides; optional)"
+firmware1_path = "pvz/properties/default.xml"
+firmware1_opt = "true"
+
+firmware2_desc = "pvz/properties/Layout.xml (layout overrides; optional)"
+firmware2_path = "pvz/properties/Layout.xml"
+firmware2_opt = "true"
+
+notes = "Place main.pak and the properties/ folder in the system directory under 'pvz/' (BIOS mode), or load a main.pak directly as content -- in that case properties/ is looked up next to it and the BIOS is ignored. Requires a hardware-rendering video driver (gl or glcore). Save data goes to <save>/PvZ-Portable/. Background music needs a core built with libopenmpt (-DLIBRETRO_OPENMPT=ON); see README-libretro.md."

@@ -1,0 +1,35 @@
+{
+  "ok": true,
+  "jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-interaction24-v1\\piq_fc_arcade-0.31.0-alpha.24.jar",
+  "sha256": "AE3185660442BA3BB38344165F3D60F736DB5DA3E63F2E4FE9D7DCC79C1F170B",
+  "probe": {
+    "ok": true,
+    "assertions": 1916,
+    "pure_tests": 37,
+    "max_outer_bytes": 548,
+    "actual_production_registration": true,
+    "actual_neoforge_outer_codec": true,
+    "actual_client_dispatch_with_contract_sink": true,
+    "production_origin": "final-jar-only",
+    "production_compiled": false,
+    "minecraft_or_core_started": false,
+    "network_socket_opened": false,
+    "real_server_world_authority_executed": false
+  },
+  "compiled_only_probes_and_tests": true,
+  "vanilla_resources": {
+    "path": "C:\\Users\\13498\\.gradle\\caches\\neoformruntime\\intermediate_results\\stripClient_1c8e7d85886c0a45d98a9d38d082e6a9f34fe0f3_resourcesOutput.jar",
+    "sha256": "8E9CF6F4B6EAFB1C6BF745A67A61DD1736F31865CAD409E5B2BEC918667DAB5E"
+  },
+  "source_sha256": {
+    "tools\\qa\\CabinetJoin24FinalProbe.java": "91CD4E2B0BAB31910B04542B9EA1840574BA0E5E34478BB767370A7ABD9FAC4F",
+    "src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetJoinGateTest.java": "7D0DCF7066011AC9A7E7F6C105885D013DB5448C505F239024B27A1F0826CD5C",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetPromptGuardTest.java": "03D05838127CC923BBFDA9086331127076D41FFF11ED3E0E75769FD0D8ECF11C",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetImmersiveInputTest.java": "2A310AB78F7D96D035ED2F0D9162DB5B1F0BFFEB322D32C5B85F42B50BFAF8AE",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\cabinet\\CabinetInputLifecycleTest.java": "0E100ED737EE47917D762A870B66451456DC7819AF4FCB0AF47565E02605817E"
+  },
+  "limits": [
+    "No real Minecraft GUI/window, socket, server world/permissions or emulator launched.",
+    "Pure gate tests execute final classes; server event-reentrancy integration was reviewed separately, not simulated as a live world."
+  ]
+}

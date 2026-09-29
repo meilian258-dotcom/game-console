@@ -1,0 +1,512 @@
+{
+  "ok": true,
+  "schema": "piq-final-linked21-independent-1",
+  "production_compiled": false,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_fc_arcade-0.31.0-alpha.21.jar",
+      "sha256": "0147D49C542E82DDF2DD37CDAFFBDB135CDA20E11907B4060B471A2FBC0D3F93"
+    },
+    "sfc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_sfc-0.1.0-alpha.9.jar",
+      "sha256": "F951146515D7F35257585A9DA7536453F1DFFA70285F51EDD612D65C771DF951"
+    },
+    "native": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+      "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A"
+    }
+  },
+  "strict_scope": {
+    "fc": {
+      "added": [
+        "assets/piq_fc_arcade/models/item/cabinet_link_cable.json",
+        "cn/piq/fcarcade/cabinet/CabinetLinkCableItem.class",
+        "cn/piq/fcarcade/cabinet/CabinetLinkLedger$End.class",
+        "cn/piq/fcarcade/cabinet/CabinetLinkLedger$Pair.class",
+        "cn/piq/fcarcade/cabinet/CabinetLinkLedger.class",
+        "cn/piq/fcarcade/cabinet/CabinetLinks$Data.class",
+        "cn/piq/fcarcade/cabinet/CabinetLinks$Pending.class",
+        "cn/piq/fcarcade/cabinet/CabinetLinks.class",
+        "cn/piq/fcarcade/cabinet/CabinetMediaCodec$Encoded.class",
+        "cn/piq/fcarcade/cabinet/CabinetMediaCodec.class",
+        "cn/piq/fcarcade/cabinet/CabinetMediaPacket.class",
+        "cn/piq/fcarcade/cabinet/CabinetMediaSender$1.class",
+        "cn/piq/fcarcade/cabinet/CabinetMediaSender.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomLedger$Change.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomLedger$Member.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomLedger$Room.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomLedger$Window.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomLedger.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomMedia$Part.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomMedia$Pending.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomMedia.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomNetwork$Assignment.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomNetwork$Buttons.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomNetwork$ClientSink.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomNetwork$Input.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomNetwork$Media.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomNetwork$Ready.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomNetwork$Reset.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomNetwork$Seat.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomNetwork$Stream.class",
+        "cn/piq/fcarcade/cabinet/CabinetRoomNetwork.class",
+        "cn/piq/fcarcade/cabinet/CabinetRooms$State.class",
+        "cn/piq/fcarcade/cabinet/CabinetRooms.class",
+        "cn/piq/fcarcade/cabinet/CabinetSendWindow$Ticket.class",
+        "cn/piq/fcarcade/cabinet/CabinetSendWindow.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetAssignmentHistory.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetMediaAssembler$Complete.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetMediaAssembler.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetMediaStream.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetPcmBuffer$Chunk.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetPcmBuffer.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetPeerInputs.class"
+      ],
+      "changed": {
+        "META-INF/MANIFEST.MF": {
+          "before": "23E3E65B2E3FFDB9E6620B15FF0025C0E501778EB748DD699E05FC49286A9A85",
+          "after": "C44E2D6DEE41CEB1228F2A884F8346E48CD403180B8A723457093A5A851BB6E1"
+        },
+        "META-INF/neoforge.mods.toml": {
+          "before": "65F2EFEE5D018AFCC9A18B99FE87BE1BD09C2E0C17A337B700D11F53F791EA9E",
+          "after": "6351E910B85EB71BD26FD953A5EBB152DDFA0A33216475C6438E6E29A943ABB6"
+        },
+        "assets/piq_fc_arcade/lang/en_us.json": {
+          "before": "8AB8A99CC595E79FDF22019F5274F85B6F01C20BD076D698397B1613C11B8BAE",
+          "after": "F9E223E581061ABF96793FCF9947476C4574B78CF7B7EFCB528E28E06A0B865F"
+        },
+        "assets/piq_fc_arcade/lang/zh_cn.json": {
+          "before": "59799709A8F7B88B22A12E4EDCFD0A611658ECDF0DF39AE553BB70CF95F47983",
+          "after": "E4E3246B5A5E754FF0A364F49877D54C157C8A8138C7F48FC8D2F28DFFF3AD18"
+        },
+        "cn/piq/fcarcade/FcArcadeMod.class": {
+          "before": "8845A01F1C1C169E4C073D187E70CF89AC2193C8A79627F5B466991AE9457DDF",
+          "after": "23289CBD9D2D3592A2B2E6267805A9D84AACCFBDD4A6AC6953EC7B4077459C90"
+        },
+        "cn/piq/fcarcade/cabinet/CabinetBackends$Entry.class": {
+          "before": "20456D8C2EE67E13C3E9F50E10082663AE33D8B4502C8A8E8E1E43AB2B65C4DF",
+          "after": "A5B9D816D275F5EFDB11912416A61E3991BB448095F06C331E0DEFB08DA40231"
+        },
+        "cn/piq/fcarcade/cabinet/CabinetBackends.class": {
+          "before": "918D76DD1456FD177578DC28A31008461EE85D52D1E3CAB32195E9A3467C59AB",
+          "after": "69992C8CE0C98A3D63AC0C4C18F23ABAEDA8B9E2D7B7CBBC4FAAF7E604E7001D"
+        },
+        "cn/piq/fcarcade/cabinet/CabinetEmulator$1.class": {
+          "before": "465CCCB82DB73613235BB63E3D1CD8FC8F5D618BEE6AD3880CAE6468A48CEE2E",
+          "after": "E5B27F2EE47C714AB8ED27962F59854120317E435D9EC11B5DB952D7B5BEECD1"
+        },
+        "cn/piq/fcarcade/cabinet/CabinetEmulator.class": {
+          "before": "15D0363ABDCEA24E9A3A98772EF1702347FC69E1D74BFB9D328777146024D8F7",
+          "after": "C4B38A62C9FAE921008A5B34188FAF23F9B10A9DA6C894D3F13EE55CC8AA2F1E"
+        },
+        "cn/piq/fcarcade/cabinet/CabinetNetwork$ClientSink.class": {
+          "before": "24979B12584EAE3C656E44F76094693891CF3D3FD5B9F0ADDE2A6FEDCEF10108",
+          "after": "FCF926C1D2D9FC5A25B2EBC18AB4D6BA955C4E50FC3A9D9F2C9FDE7F8DBA8D44"
+        },
+        "cn/piq/fcarcade/cabinet/CabinetNetwork.class": {
+          "before": "FC2EB5F64783AB2201120F9C81C80529397F27F0246A4E3D533B0BB6995D7CCC",
+          "after": "1A91592874ECDEF69B4CCD4561BDAABD1BC36E3D303916271041BB8D3D34B8AF"
+        },
+        "cn/piq/fcarcade/cabinet/ServerCabinets$Binding.class": {
+          "before": "DC6D073D198741659D4BFB8A7D08A56BCFDCE60FB004E08E1C098DE23159E1C3",
+          "after": "49374BEEE6B648538D96CE8B597E66AD43D545F545ED9A2D4FAD23BB5933B71A"
+        },
+        "cn/piq/fcarcade/cabinet/ServerCabinets$MenuBinding.class": {
+          "before": "C76F77B1EA7B25F3A6D5B2C8CBBCF20CBB1F3B983EE2D59960478DD97535EF0B",
+          "after": "14234B356B7093F676ACDA29500A77B747B5B35AE9C900100313501E2E4F8AE9"
+        },
+        "cn/piq/fcarcade/cabinet/ServerCabinets$State.class": {
+          "before": "C0C594908D77751BF05763CB746ECA7B8956FE5A31F738A8E97CC886567DA987",
+          "after": "898CEECDA2B09C9CF6FD926993C0A879C25CA533E9A83CE5538A34F163B1CFE4"
+        },
+        "cn/piq/fcarcade/cabinet/ServerCabinets.class": {
+          "before": "4F914B67472B5108BB4EC874C6087BED39B9614EB646F51F2E82DEAEAAF11268",
+          "after": "CFFC05BA888933760D81F011C766B4CF430F1CC12C4E70DB28952236C12A1629"
+        },
+        "cn/piq/fcarcade/client/cabinet/CabinetClientBackends$Setup.class": {
+          "before": "9E72D410A96B2200CF9DF9BA31C6AF3F650C54EB4384131228C9560D4E7BA339",
+          "after": "8C9E3477B76FD11A19CE9D2914F0051349688E7DBE5868906891DAD28AE2EDAA"
+        },
+        "cn/piq/fcarcade/client/cabinet/CabinetClientBackends.class": {
+          "before": "EDE4B8B1EB129B1E437538BAF1D0952EDE23D2FFC4F8D69AC50A109A30789582",
+          "after": "371141884BC801947EF6FB4D63CE0DECBF96071C9F40FC6B3DC0C87B5BAE1E01"
+        },
+        "cn/piq/fcarcade/registry/CreativeTabCatalog.class": {
+          "before": "78726FB6D4CA575B02092A9E19CDFEC6A25A4E8D630698363743C186C35F6976",
+          "after": "933EFF46CA45A46204BB92AE6379949A4B20984CC3CF0719171FDA8B2E0FA046"
+        },
+        "cn/piq/fcarcade/registry/ModItems.class": {
+          "before": "1AB1A860A7AF036B73074F79E1797EB4C69F37ACAF0888514B802BC4F27D138F",
+          "after": "CA03DCB8D644BB4FFA90935A9C4296FF21DE57CF6A90EF9DD7E119AA10A732C8"
+        },
+        "cn/piq/fcarcade/world/DualCabinetBlock.class": {
+          "before": "CA0E09FEC8A98B61A97251BAA391311C70F2B6DE635EB926E0CB81FAAEF09AFC",
+          "after": "B777E0B0E20D3D2F8BEA8660B7E656F66926191ED1DBCA8BB05B8AC9930C3E9A"
+        },
+        "cn/piq/fcarcade/world/DualCabinetPartBlock.class": {
+          "before": "C35C62131A23A3F7619D748521F006EF7DFED95B5E345AC9261B1148540D1C76",
+          "after": "2667A57C8C4C612CB901B729F69CD9DAC736BC52813FC8BC6F2362BDFAD8E0D8"
+        },
+        "cn/piq/fcarcade/world/FcArcadeBlock.class": {
+          "before": "D2A08EE6A46779F4D6703D46B263E7DDE0D2D87F033A4F88497B5A2017A9E881",
+          "after": "F60345AA1E751C507F95315B9E90166D984B0BB7B80410025B0DC8F02560382E"
+        },
+        "cn/piq/fcarcade/world/LegacyFcArcadeBlock.class": {
+          "before": "CF48009774DF8B7EC86F4C9685BC0D150F658153B10852B40D4FD4A6DD2044D5",
+          "after": "888775F133DA23F7D3983CD20B821C2F32B5FF5F8D9FAC93FBCAB013DDC36EF4"
+        },
+        "cn/piq/retro/api/RetroEmulator.class": {
+          "before": "0753D67C59ACE4AEDF68B2BB4D08A63CF3117342048D96918E9C0130186FA0CE",
+          "after": "4745F0C2FC4534664384A86DF6237CFAFDBE89211DE302513911E3F8153CB2A2"
+        }
+      },
+      "removed": [],
+      "unchanged_entries": 1340,
+      "existing_non_language_assets_unchanged": 111,
+      "explicit_allowlist_enforced": true
+    },
+    "sfc": {
+      "added": [],
+      "changed": {
+        "META-INF/MANIFEST.MF": {
+          "before": "2D5CB458AE8202E12ECBA4E4E7F7ED5A2B2BFA7DC97B34117E252041E7F99083",
+          "after": "F009DC441F253711A1DA72F098A90F43A90ED11CEBF5746F66DD9D7503479248"
+        },
+        "META-INF/neoforge.mods.toml": {
+          "before": "893EB358CFE29C3F7A462A46968B5847892CDC915100315B614238509361FCD2",
+          "after": "C20CADF26F5ADD06DB5D0AE015F59440C27C9E4BCECAC671E875421E719865F4"
+        },
+        "cn/piq/sfchome/SfcHomeMod.class": {
+          "before": "09DFE268E12E302D8F7861C3A0E035F457F7B58700AF12C38A5CD20E1F7422A8",
+          "after": "F831731AF079190B82233594DECC2CED0711DBFD651BF2F9EFD75E15140D7D35"
+        },
+        "cn/piq/sfchome/client/cabinet/SfcCabinetInputs.class": {
+          "before": "BEFFAB6B4894D7A848A5E34EDF256F551B20056A9DC07577A088B4300A9519AA",
+          "after": "0936145031BE747F23B1709ED3EAA4C6D15B78E81DA7B137860FD26D202D5849"
+        },
+        "cn/piq/sfchome/client/cabinet/SfcCabinetProvider.class": {
+          "before": "DEFA169FA2B57DB837F52BF7A17EBE634AADA58060F75A0C2B6D06CFFF3A4526",
+          "after": "434FA7F8391467ED7BCE3BD55FB2DEE979D0373F5E88675115741D0CAAAC6846"
+        },
+        "cn/piq/sfchome/client/cabinet/SfcCabinetSession.class": {
+          "before": "40569506599434B279C7B3899669194C7CC0486B5520CCD4C29DB8544D4D79CE",
+          "after": "F4E96BEE77B95D37499515AA95AE2FE04C8021CBD4DB61306CB8332512EDC4EF"
+        }
+      },
+      "removed": [],
+      "unchanged_entries": 203,
+      "existing_non_language_assets_unchanged": 15,
+      "explicit_allowlist_enforced": true
+    },
+    "native": {
+      "added": [
+        "cn/piq/nativearcade/bridge/NativeInputPorts.class"
+      ],
+      "changed": {
+        "META-INF/MANIFEST.MF": {
+          "before": "AAA5FF95BDC140D52574C2B1F0F36F4B198B6B521E15BBFE2463141330A54B32",
+          "after": "39DBB7A539F04D355C76F65E1EE0FED7D49EEBAB05EF4D3449BB6B027722EAF3"
+        },
+        "META-INF/neoforge.mods.toml": {
+          "before": "A90675461B661FD606AC5FE08FF5FF6A2652F1ABC9A89709BFE37175125E6BC4",
+          "after": "B474F8F72057407B68DC87A5E0914F4B3600252963578D9984C948E2D0AC4D63"
+        },
+        "cn/piq/nativearcade/NativeArcadeMod.class": {
+          "before": "695B86D53CE669CD9D0B64161EBC77CA186AF8F5E4DF6AF4F81E5437D1A4826B",
+          "after": "FAF2DAAD7B6C6DE7D6AED4064390A2BE9989FC04230D01A2E5C80D5B874AC317"
+        },
+        "cn/piq/nativearcade/bridge/BridgeProtocol.class": {
+          "before": "74B09A500272A752EC05E11AB41E26B8E9ECAC838F45032102A2AE2EA8E8DE52",
+          "after": "5495AFBA8FAD232CB12748BBE2412185D16FD856551F393311906F01A1AD702C"
+        },
+        "cn/piq/nativearcade/bridge/NativeProcessSession$Input.class": {
+          "before": "4714F5C54F6A39226934FAACB78AFA91884470410EF884EA14F975C016083E77",
+          "after": "B22F7988789CEE14CAF17923B681190B0B40C72E75C0B8C7ECAC91ADCA1ECBF1"
+        },
+        "cn/piq/nativearcade/bridge/NativeProcessSession.class": {
+          "before": "C38064A90FF307F80AD3469FF007A5C93D00684A265A9208E16E064D58727D36",
+          "after": "577FD70BDAC3ED8CED256DE706F14DAA0885FADF57359A462B1CF34855DF4FAA"
+        },
+        "cn/piq/nativearcade/client/NativeCabinetBackend$1.class": {
+          "before": "5C1762ADAE3C9C1C81A3E1688366BC09D88951B2BA15338A9574418C72057297",
+          "after": "2A7D0D4F60DE5B94FF8330DE9844FD3C6B06CED6BBE1C92F7378447306773FC5"
+        }
+      },
+      "removed": [],
+      "unchanged_entries": 43,
+      "existing_non_language_assets_unchanged": 3,
+      "explicit_allowlist_enforced": true
+    }
+  },
+  "ownership": {
+    "classes": 1479,
+    "duplicate_classes": 0,
+    "platform_owner": "fc",
+    "runtime_owners": {
+      "core/nes_rust_wasm_bg.wasm": "fc",
+      "natives/linux-x86_64/libwasmtime4j.so": "fc",
+      "natives/windows-x86_64/wasmtime4j.dll": "fc",
+      "assets/piq_sfc_arcade/core/piq_sfc_wasm.wasm": "sfc"
+    }
+  },
+  "frozen_sfc6_entries_preserved": 60,
+  "native_helper_sha256": "229268989AD4E263277FDF0BD5D49E59F69EEB3E980B948DD1D3628182437120",
+  "negative_controls": [
+    "old_texture",
+    "unexpected_test_class",
+    "unexpected_rom",
+    "removed_old_class"
+  ],
+  "room_final_jar_probes": {
+    "production_compiled": false,
+    "production_origin": {
+      "ok": true,
+      "checked_production_types": 57,
+      "production_origin": "final-jar-only",
+      "production_compiled": false
+    },
+    "pure": {
+      "passed_tests": 42,
+      "minecraft_started": false,
+      "mode": "actual-production-pure-state-machines"
+    },
+    "ingress": {
+      "ok": true,
+      "assertions": 52,
+      "real_connection_and_context_api": true,
+      "minecraft_started": false,
+      "network_socket_opened": false,
+      "native_core_started": false
+    },
+    "backpressure": {
+      "ok": true,
+      "assertions": 1018,
+      "actual_connection_and_embedded_channel": true,
+      "minecraft_started": false,
+      "network_socket_opened": false,
+      "native_core_started": false
+    },
+    "saved_data": {
+      "ok": true,
+      "assertions": 920,
+      "actual_minecraft_nbt_saved_data": true,
+      "holder_lookup": "RegistryAccess.EMPTY",
+      "world_or_chunk_started": false,
+      "network_or_core_started": false,
+      "scope": "production SavedData serialization; no live chunk-unload or protection-event simulation"
+    },
+    "compiled_probe_files": [
+      "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomLedgerTest.java",
+      "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetRoomMediaTest.java",
+      "piq-fc-arcade\\src\\test\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetSendWindowTest.java",
+      "piq-fc-arcade\\tools\\qa\\CabinetRoomTestRunner.java",
+      "piq-fc-arcade\\tools\\qa\\CabinetRoomIngressProbe.java",
+      "piq-fc-arcade\\tools\\qa\\CabinetSendBackpressureProbe.java",
+      "piq-fc-arcade\\tools\\qa\\CabinetLinksDataProbe.java",
+      "piq-fc-arcade\\tools\\qa\\CabinetFinalOriginProbe.java"
+    ],
+    "byte_identical_temporary_jar": true
+  },
+  "compatibility_final_jar_probes": {
+    "fml_discovery": {
+      "loader": "FancyModLoader 4.0.43",
+      "assertions": 28,
+      "level": "actual JarModsDotTomlModFileReader + ModFile.identifyMods + ASM compileContent",
+      "dependency_check": "Actual FML ModInfo + Maven VersionRange; not full FML ModSorter/bootstrap",
+      "mod_entry_points_executed": false,
+      "ok": true,
+      "discovery": [
+        {
+          "access_transformers": 1,
+          "entry_points": [
+            "piq_fc_arcade"
+          ],
+          "scanned_classes": 1254,
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\fc.jar",
+          "module_name": "piq_fc_arcade",
+          "mods": [
+            {
+              "version": "0.31.0-alpha.21",
+              "id": "piq_fc_arcade",
+              "dependencies": [
+                {
+                  "id": "neoforge",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "NONE",
+                  "range": "[21.1.236,22)"
+                },
+                {
+                  "id": "minecraft",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "NONE",
+                  "range": "[1.21.1,1.21.2)"
+                },
+                {
+                  "id": "waterframes",
+                  "side": "BOTH",
+                  "type": "OPTIONAL",
+                  "ordering": "AFTER",
+                  "range": "[2.1.23,3)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "access_transformers": 1,
+          "entry_points": [
+            "piq_sfc_arcade",
+            "piq_sfc_home"
+          ],
+          "scanned_classes": 183,
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\sfc.jar",
+          "module_name": "piq_sfc_arcade",
+          "mods": [
+            {
+              "version": "0.2.0-alpha.6",
+              "id": "piq_sfc_arcade",
+              "dependencies": [
+                {
+                  "id": "neoforge",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "NONE",
+                  "range": "[21.1.236,)"
+                },
+                {
+                  "id": "minecraft",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "NONE",
+                  "range": "[1.21.1,1.22)"
+                },
+                {
+                  "id": "piq_fc_arcade",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "AFTER",
+                  "range": "[0.26.0,)"
+                }
+              ]
+            },
+            {
+              "version": "0.1.0-alpha.9",
+              "id": "piq_sfc_home",
+              "dependencies": [
+                {
+                  "id": "neoforge",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "NONE",
+                  "range": "[21.1.236,22)"
+                },
+                {
+                  "id": "minecraft",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "NONE",
+                  "range": "[1.21.1,1.21.2)"
+                },
+                {
+                  "id": "piq_fc_arcade",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "AFTER",
+                  "range": "[0.31.0-alpha.21,0.32.0)"
+                },
+                {
+                  "id": "piq_sfc_arcade",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "AFTER",
+                  "range": "[0.2.0-alpha.6,0.3.0)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "access_transformers": 0,
+          "entry_points": [
+            "piq_native_arcade"
+          ],
+          "scanned_classes": 42,
+          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\native.jar",
+          "module_name": "piq_native_arcade",
+          "mods": [
+            {
+              "version": "0.1.0-alpha.7",
+              "id": "piq_native_arcade",
+              "dependencies": [
+                {
+                  "id": "neoforge",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "NONE",
+                  "range": "[21.1.236,22)"
+                },
+                {
+                  "id": "minecraft",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "NONE",
+                  "range": "[1.21.1,1.21.2)"
+                },
+                {
+                  "id": "piq_fc_arcade",
+                  "side": "BOTH",
+                  "type": "REQUIRED",
+                  "ordering": "AFTER",
+                  "range": "[0.31.0-alpha.21,0.32.0)"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "minecraft_or_native_core_started": false,
+      "production_origin": "final-jar-only"
+    },
+    "sfc_real_neoforge_outer_packet_codec": {
+      "passed": true,
+      "assertions": 37,
+      "max_upload_outer_packet_bytes": 30856,
+      "outer_codec": "NeoForge21.1.236 ServerboundCustomPayloadPacket.STREAM_CODEC",
+      "minecraft_started": false
+    },
+    "hash_checked_temporary_copies": {
+      "fc": {
+        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_fc_arcade-0.31.0-alpha.21.jar",
+        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\fc.jar",
+        "sha256": "0147D49C542E82DDF2DD37CDAFFBDB135CDA20E11907B4060B471A2FBC0D3F93",
+        "byte_identical_before": true,
+        "byte_identical_after": true
+      },
+      "sfc": {
+        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_sfc-0.1.0-alpha.9.jar",
+        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\sfc.jar",
+        "sha256": "F951146515D7F35257585A9DA7536453F1DFFA70285F51EDD612D65C771DF951",
+        "byte_identical_before": true,
+        "byte_identical_after": true
+      },
+      "native": {
+        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\native.jar",
+        "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A",
+        "byte_identical_before": true,
+        "byte_identical_after": true
+      }
+    },
+    "production_compiled": false,
+    "old_separate_core_on_classpath": false
+  },
+  "installed": false,
+  "minecraft_or_native_core_started": false,
+  "network_socket_opened": false,
+  "limits": [
+    "Actual codecs, Connection/EmbeddedChannel completion backpressure, NBT/SavedData and FML metadata discovery, not a live four-player gameplay test.",
+    "No mod entry point, user client/server, ROM or native emulator was launched."
+  ]
+}

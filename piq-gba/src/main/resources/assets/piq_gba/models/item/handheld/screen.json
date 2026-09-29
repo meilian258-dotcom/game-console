@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"0":"piq_gba:item/handheld","particle":"#0"},"elements":[{"name":"可替换游戏画面","from":[6.2,1.294,6.61],"to":[9.8,1.301,9.01],"faces":{"up":{"uv":[6.875,0.25,12.5,4],"texture":"#0"}}}]}

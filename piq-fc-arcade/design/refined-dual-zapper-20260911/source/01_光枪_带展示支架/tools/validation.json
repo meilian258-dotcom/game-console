@@ -1,0 +1,1202 @@
+{
+  "generatedAt": "2026-09-11T03:37:13.688Z",
+  "checks": [
+    {
+      "name": "Source BBModel and PNG remain byte-identical",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Body rotation is +90 degrees around X with finite translation and no scale",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Every original body UUID is retained exactly once",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Every original body corner is a rigidly transformed original; no reshaping or resizing",
+      "ok": true,
+      "detail": {
+        "cubes": 132,
+        "corners": 1056,
+        "errors": []
+      }
+    },
+    {
+      "name": "Retained body, cable boot, and connector retain every original UV rectangle",
+      "ok": true,
+      "detail": {
+        "retainedCubes": 151,
+        "errors": []
+      }
+    },
+    {
+      "name": "Positive finite cuboids and unique IDs without inflation/rescale",
+      "ok": true,
+      "detail": {
+        "elements": 286
+      }
+    },
+    {
+      "name": "All cube rotations are legal single-axis Java angles",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "All local coordinates and pivots are inside Java -16..32 limits",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Manifest whole and body bounds match independently calculated OBB envelopes",
+      "ok": true,
+      "detail": {
+        "bounds": {
+          "min": [
+            3.4999999999712847,
+            0,
+            6.199999999971284
+          ],
+          "max": [
+            12.500000000028715,
+            5.2739085800000005,
+            10.300000000028716
+          ],
+          "size": [
+            9.00000000005743,
+            5.2739085800000005,
+            4.100000000057432
+          ]
+        },
+        "bodyBounds": {
+          "min": [
+            4.11827672,
+            1.149999996106727,
+            7.618
+          ],
+          "max": [
+            11.881723283893272,
+            5.2739085800000005,
+            8.782
+          ],
+          "size": [
+            7.763446563893273,
+            4.123908583893273,
+            1.1639999999999997
+          ]
+        }
+      }
+    },
+    {
+      "name": "Full stand rests on Y=0 and fits a one-block footprint",
+      "ok": true,
+      "detail": {
+        "min": [
+          3.4999999999712847,
+          0,
+          6.199999999971284
+        ],
+        "max": [
+          12.500000000028715,
+          5.2739085800000005,
+          10.300000000028716
+        ],
+        "size": [
+          9.00000000005743,
+          5.2739085800000005,
+          4.100000000057432
+        ]
+      }
+    },
+    {
+      "name": "Every cube appears once beneath a known outliner group",
+      "ok": true,
+      "detail": {
+        "unknown": []
+      }
+    },
+    {
+      "name": "Unique groups each appear once with finite pivots and zero rest rotations",
+      "ok": true,
+      "detail": {
+        "groups": 15
+      }
+    },
+    {
+      "name": "Manifest parts cover every cube and match its actual group",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Entire assembly is physically connected at 1e-6 SAT tolerance",
+      "ok": true,
+      "detail": {
+        "contacts": 1355,
+        "components": [
+          286
+        ]
+      }
+    },
+    {
+      "name": "Stand shell, feet, cradle posts and nameplate form one standalone connected support",
+      "ok": true,
+      "detail": {
+        "components": [
+          {
+            "count": 85,
+            "names": [
+              "底座下壳_横芯",
+              "底座下壳_竖芯",
+              "底座下壳_斜角0",
+              "底座下壳_斜角1",
+              "底座下壳_斜角2",
+              "底座下壳_斜角3",
+              "橙色细腰线_横芯",
+              "橙色细腰线_竖芯",
+              "橙色细腰线_斜角0",
+              "橙色细腰线_斜角1",
+              "橙色细腰线_斜角2",
+              "橙色细腰线_斜角3",
+              "底座面板_横芯",
+              "底座面板_竖芯",
+              "底座面板_斜角0",
+              "底座面板_斜角1",
+              "底座面板_斜角2",
+              "底座面板_斜角3",
+              "防滑脚4.15_6.8_横芯",
+              "防滑脚4.15_6.8_竖芯",
+              "防滑脚4.15_6.8_斜角0",
+              "防滑脚4.15_6.8_斜角1",
+              "防滑脚4.15_6.8_斜角2",
+              "防滑脚4.15_6.8_斜角3",
+              "防滑脚4.15_9.7_横芯",
+              "防滑脚4.15_9.7_竖芯",
+              "防滑脚4.15_9.7_斜角0",
+              "防滑脚4.15_9.7_斜角1",
+              "防滑脚4.15_9.7_斜角2",
+              "防滑脚4.15_9.7_斜角3",
+              "防滑脚11.85_6.8_横芯",
+              "防滑脚11.85_6.8_竖芯",
+              "防滑脚11.85_6.8_斜角0",
+              "防滑脚11.85_6.8_斜角1",
+              "防滑脚11.85_6.8_斜角2",
+              "防滑脚11.85_6.8_斜角3",
+              "防滑脚11.85_9.7_横芯",
+              "防滑脚11.85_9.7_竖芯",
+              "防滑脚11.85_9.7_斜角0",
+              "防滑脚11.85_9.7_斜角1",
+              "防滑脚11.85_9.7_斜角2",
+              "防滑脚11.85_9.7_斜角3",
+              "前托立柱脚座_横芯",
+              "前托立柱脚座_竖芯",
+              "前托立柱脚座_斜角0",
+              "前托立柱脚座_斜角1",
+              "前托立柱脚座_斜角2",
+              "前托立柱脚座_斜角3",
+              "前托后立柱",
+              "前托立柱橙嵌条",
+              "前托承重横槽_横芯",
+              "前托承重横槽_竖芯",
+              "前托承重横槽_斜角0",
+              "前托承重横槽_斜角1",
+              "前托承重横槽_斜角2",
+              "前托承重横槽_斜角3",
+              "前管接触软垫",
+              "前托后限位",
+              "前托前限位",
+              "前托加强斜撑",
+              "握把托背脚座_横芯",
+              "握把托背脚座_竖芯",
+              "握把托背脚座_斜角0",
+              "握把托背脚座_斜角1",
+              "握把托背脚座_斜角2",
+              "握把托背脚座_斜角3",
+              "握把托背矮柱",
+              "握把托背斜座",
+              "握把托背软垫",
+              "握把托前脚座_横芯",
+              "握把托前脚座_竖芯",
+              "握把托前脚座_斜角0",
+              "握把托前脚座_斜角1",
+              "握把托前脚座_斜角2",
+              "握把托前脚座_斜角3",
+              "握把托前矮柱",
+              "握把托前斜座",
+              "握把托前软垫",
+              "铭牌嵌座_横芯",
+              "铭牌嵌座_竖芯",
+              "铭牌嵌座_斜角0",
+              "铭牌嵌座_斜角1",
+              "铭牌嵌座_斜角2",
+              "铭牌嵌座_斜角3",
+              "支架铭牌"
+            ],
+            "groups": [
+              "stand_base",
+              "stand_feet",
+              "stand_front_cradle",
+              "stand_grip_cradle",
+              "stand_badge"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "stand_front_cradle: every specified soft pad touches the intended original shell",
+      "ok": true,
+      "detail": [
+        {
+          "pad": "前管接触软垫",
+          "contacts": [
+            {
+              "target": "橙色前管_竖芯",
+              "separation": -0.008091419999999516
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stand_grip_cradle: every specified soft pad touches the intended original shell",
+      "ok": true,
+      "detail": [
+        {
+          "pad": "握把托背软垫",
+          "contacts": [
+            {
+              "target": "握把底部压边_竖芯",
+              "separation": -0.011958655924799
+            },
+            {
+              "target": "握把底部压边_切角2",
+              "separation": -0.011958662192241648
+            },
+            {
+              "target": "握把底部压边_切角3",
+              "separation": -0.011958657174597459
+            }
+          ]
+        },
+        {
+          "pad": "握把托前软垫",
+          "contacts": [
+            {
+              "target": "握把底部压边_竖芯",
+              "separation": -0.011958655924799
+            },
+            {
+              "target": "握把底部压边_切角2",
+              "separation": -0.011958662192241648
+            },
+            {
+              "target": "握把底部压边_切角3",
+              "separation": -0.011958657174597459
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cable and plug are one continuous component",
+      "ok": true,
+      "detail": {
+        "components": [
+          {
+            "count": 69,
+            "names": [
+              "握把线材护套",
+              "线材出线垂段",
+              "底座盘线圆接0_0",
+              "底座盘线圆接0_1",
+              "底座盘线圆接0_2",
+              "底座盘线圆接0_3",
+              "底座盘线圆接1_0",
+              "底座盘线圆接1_1",
+              "底座盘线圆接1_2",
+              "底座盘线圆接1_3",
+              "底座盘线1",
+              "底座盘线圆接2_0",
+              "底座盘线圆接2_1",
+              "底座盘线圆接2_2",
+              "底座盘线圆接2_3",
+              "底座盘线2",
+              "底座盘线圆接3_0",
+              "底座盘线圆接3_1",
+              "底座盘线圆接3_2",
+              "底座盘线圆接3_3",
+              "底座盘线3",
+              "底座盘线圆接4_0",
+              "底座盘线圆接4_1",
+              "底座盘线圆接4_2",
+              "底座盘线圆接4_3",
+              "底座盘线4",
+              "底座盘线圆接5_0",
+              "底座盘线圆接5_1",
+              "底座盘线圆接5_2",
+              "底座盘线圆接5_3",
+              "底座盘线5",
+              "底座盘线圆接6_0",
+              "底座盘线圆接6_1",
+              "底座盘线圆接6_2",
+              "底座盘线圆接6_3",
+              "底座盘线6",
+              "底座盘线圆接7_0",
+              "底座盘线圆接7_1",
+              "底座盘线圆接7_2",
+              "底座盘线圆接7_3",
+              "底座盘线7",
+              "底座盘线圆接8_0",
+              "底座盘线圆接8_1",
+              "底座盘线圆接8_2",
+              "底座盘线圆接8_3",
+              "底座盘线8",
+              "底座盘线圆接9_0",
+              "底座盘线圆接9_1",
+              "底座盘线圆接9_2",
+              "底座盘线圆接9_3",
+              "底座盘线9",
+              "插头软护套",
+              "NES插头外壳_横芯",
+              "NES插头外壳_竖芯",
+              "NES插头外壳_切角0",
+              "NES插头外壳_切角1",
+              "NES插头外壳_切角2",
+              "NES插头外壳_切角3",
+              "插头端面",
+              "插头防滑肋0",
+              "插头防滑肋1",
+              "插头防滑肋2",
+              "插头接孔0",
+              "插头接孔1",
+              "插头接孔2",
+              "插头接孔3",
+              "插头接孔4",
+              "插头接孔5",
+              "插头接孔6"
+            ],
+            "groups": [
+              "cable",
+              "connector"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Cable joins the grip boot and the connector without gaps",
+      "ok": true,
+      "detail": {
+        "grip": [
+          [
+            "握把线材护套",
+            "握把底部压边_竖芯"
+          ]
+        ],
+        "plug": [
+          [
+            "底座盘线圆接9_0",
+            "插头软护套"
+          ],
+          [
+            "底座盘线圆接9_1",
+            "插头软护套"
+          ],
+          [
+            "底座盘线圆接9_2",
+            "插头软护套"
+          ],
+          [
+            "底座盘线圆接9_3",
+            "插头软护套"
+          ],
+          [
+            "底座盘线9",
+            "插头软护套"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Trigger keeps an independent group and correct UUID/pivot mapping",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Suggested trigger motion is Z+8 degrees; no runtime binding or animation claimed",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Trigger clears guard and stand through 17 samples of the full suggested motion",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "Trigger remains attached throughout suggested press motion",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "Guard retains its open finger cavity after standing upright",
+      "ok": true,
+      "detail": [
+        {
+          "point": [
+            8.61352672,
+            3.7541585800000004,
+            8.229000000000001
+          ],
+          "hits": []
+        },
+        {
+          "point": [
+            8.61352672,
+            3.4751585800000004,
+            8.229000000000001
+          ],
+          "hits": []
+        },
+        {
+          "point": [
+            8.61352672,
+            3.1961585800000005,
+            8.229000000000001
+          ],
+          "hits": []
+        },
+        {
+          "point": [
+            8.88452672,
+            3.7541585800000004,
+            8.229000000000001
+          ],
+          "hits": []
+        },
+        {
+          "point": [
+            8.88452672,
+            3.4751585800000004,
+            8.229000000000001
+          ],
+          "hits": []
+        },
+        {
+          "point": [
+            8.88452672,
+            3.1961585800000005,
+            8.229000000000001
+          ],
+          "hits": []
+        },
+        {
+          "point": [
+            9.15552672,
+            3.7541585800000004,
+            8.229000000000001
+          ],
+          "hits": []
+        },
+        {
+          "point": [
+            9.15552672,
+            3.4751585800000004,
+            8.229000000000001
+          ],
+          "hits": []
+        },
+        {
+          "point": [
+            9.15552672,
+            3.1961585800000005,
+            8.229000000000001
+          ],
+          "hits": []
+        }
+      ]
+    },
+    {
+      "name": "Optical window remains visible from the muzzle side at 25 samples",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "上侧ZAPPER字标: printed side is unobstructed in display orientation",
+      "ok": true,
+      "detail": {
+        "samples": 25,
+        "blocked": []
+      }
+    },
+    {
+      "name": "下侧型号铭牌: printed side is unobstructed in display orientation",
+      "ok": true,
+      "detail": {
+        "samples": 25,
+        "blocked": []
+      }
+    },
+    {
+      "name": "Single PNG is embedded byte-identically at the advertised size",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Manifest texture hash matches current PNG",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Original texture upper rows remain pixel-identical",
+      "ok": true,
+      "detail": {
+        "rows": [
+          0,
+          1040
+        ],
+        "pixels": 2129920
+      }
+    },
+    {
+      "name": "Every original used UV face retains exactly the original skin pixels",
+      "ok": true,
+      "detail": {
+        "sourceFaces": 1322,
+        "changed": []
+      }
+    },
+    {
+      "name": "Visible UVs are valid nondegenerate rectangles with legal quarter-turn orientations",
+      "ok": true,
+      "detail": {
+        "visible": 1701,
+        "errors": []
+      }
+    },
+    {
+      "name": "Manifest face index exactly covers visible faces including UV orientation",
+      "ok": true,
+      "detail": {
+        "records": 1701,
+        "errors": []
+      }
+    },
+    {
+      "name": "Editable face UV islands do not overlap",
+      "ok": true,
+      "detail": {
+        "count": 0,
+        "examples": []
+      }
+    },
+    {
+      "name": "New stand/cable UVs only occupy the unused lower atlas region",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Java JSON exactly reproduces BBModel geometry, rotations, UVs and face orientation",
+      "ok": true,
+      "detail": {
+        "elements": 286,
+        "mismatches": []
+      }
+    },
+    {
+      "name": "Resource copies are byte-identical to the delivered JSON and PNG",
+      "ok": true,
+      "detail": {
+        "jsonCopies": [
+          "C:\\codex\\我的世界服务端\\新蒸程服务端\\nes_zapper\\stand\\minecraft_assets\\assets\\zapper_stand\\models\\block\\zapper_stand.json"
+        ],
+        "pngCopies": [
+          "C:\\codex\\我的世界服务端\\新蒸程服务端\\nes_zapper\\stand\\minecraft_assets\\assets\\zapper_stand\\textures\\block\\skin.png"
+        ]
+      }
+    },
+    {
+      "name": "Source and derivative inputs remained unchanged during audit",
+      "ok": true,
+      "detail": null
+    }
+  ],
+  "errors": [],
+  "warnings": [],
+  "inputHashes": {
+    "Zapper_橙灰光枪_展示支架版.bbmodel": "a55a6550e4bde2eba0b0b8d2eb64fb1a2a840014713debcdad74b2408e79f57b",
+    "zapper_stand.json": "89cdfad0a6c02f628ab4d50f7dd5fc66e3b0052ff66a1a18250eafb4755ca9e1",
+    "stand_manifest.json": "928aadb846a0c88b7893f95fc743f1b2f1c18ed3352fc8d4d26008d4c6fbb678",
+    "扳机分组映射.json": "4b43c6187409f0c9af14e5933192219735461088277e3e7609c3cc349055318b",
+    "Zapper_支架版完整UV.png": "ab5c925b7bd21ad2cbbfcc96a0f38cc4fe6c4e9013bce57df8f866e9ea16167f"
+  },
+  "bounds": {
+    "min": [
+      3.4999999999712847,
+      0,
+      6.199999999971284
+    ],
+    "max": [
+      12.500000000028715,
+      5.2739085800000005,
+      10.300000000028716
+    ],
+    "size": [
+      9.00000000005743,
+      5.2739085800000005,
+      4.100000000057432
+    ]
+  },
+  "bodyBounds": {
+    "min": [
+      4.11827672,
+      1.149999996106727,
+      7.618
+    ],
+    "max": [
+      11.881723283893272,
+      5.2739085800000005,
+      8.782
+    ],
+    "size": [
+      7.763446563893273,
+      4.123908583893273,
+      1.1639999999999997
+    ]
+  },
+  "connectivity": {
+    "contacts": 1355,
+    "components": [
+      {
+        "count": 286,
+        "names": [
+          "橙色前管_横芯",
+          "橙色前管_竖芯",
+          "橙色前管_切角0",
+          "橙色前管_切角1",
+          "橙色前管_切角2",
+          "橙色前管_切角3",
+          "前管侧面微收边_横芯",
+          "前管侧面微收边_竖芯",
+          "前管侧面微收边_切角0",
+          "前管侧面微收边_切角1",
+          "前管侧面微收边_切角2",
+          "前管侧面微收边_切角3",
+          "前管分模线",
+          "灰色上护套_填芯0",
+          "灰色上护套_填芯1",
+          "灰色上护套_填芯2",
+          "灰色上护套_填芯3",
+          "灰色上护套_填芯4",
+          "灰色上护套_填芯5",
+          "灰色上护套_填芯6",
+          "灰色上护套_填芯7",
+          "灰色上护套_填芯8",
+          "灰色上护套_填芯9",
+          "灰色上护套_填芯10",
+          "灰色上护套_填芯11",
+          "灰色上护套_填芯12",
+          "灰色上护套_填芯13",
+          "灰色上护套_填芯14",
+          "灰色上护套_填芯15",
+          "灰色上护套_填芯16",
+          "灰色上护套_填芯17",
+          "灰色上护套_填芯18",
+          "灰色上护套_填芯19",
+          "灰色上护套_填芯20",
+          "灰色上护套_填芯21",
+          "灰色上护套_填芯22",
+          "灰色上护套_填芯23",
+          "灰色上护套_填芯24",
+          "灰色上护套_填芯25",
+          "灰色上护套_填芯26",
+          "灰色上护套_填芯27",
+          "灰色上护套_填芯28",
+          "灰色上护套_填芯29",
+          "灰色上护套_连续边0",
+          "灰色上护套_连续边1",
+          "灰色上护套_连续边2",
+          "灰色上护套_连续边3",
+          "灰色上护套_连续边4",
+          "灰色上护套_连续边5",
+          "灰色侧盖收边_填芯0",
+          "灰色侧盖收边_填芯1",
+          "灰色侧盖收边_填芯2",
+          "灰色侧盖收边_填芯3",
+          "灰色侧盖收边_填芯4",
+          "灰色侧盖收边_填芯5",
+          "灰色侧盖收边_填芯6",
+          "灰色侧盖收边_填芯7",
+          "灰色侧盖收边_填芯8",
+          "灰色侧盖收边_填芯9",
+          "灰色侧盖收边_填芯10",
+          "灰色侧盖收边_填芯11",
+          "灰色侧盖收边_填芯12",
+          "灰色侧盖收边_填芯13",
+          "灰色侧盖收边_填芯14",
+          "灰色侧盖收边_填芯15",
+          "灰色侧盖收边_填芯16",
+          "灰色侧盖收边_填芯17",
+          "灰色侧盖收边_填芯18",
+          "灰色侧盖收边_填芯19",
+          "灰色侧盖收边_填芯20",
+          "灰色侧盖收边_填芯21",
+          "灰色侧盖收边_填芯22",
+          "灰色侧盖收边_填芯23",
+          "灰色侧盖收边_填芯24",
+          "灰色侧盖收边_填芯25",
+          "灰色侧盖收边_填芯26",
+          "灰色侧盖收边_连续边0",
+          "灰色侧盖收边_连续边1",
+          "灰色侧盖收边_连续边2",
+          "灰色侧盖收边_连续边3",
+          "灰色侧盖收边_连续边4",
+          "灰色侧盖收边_连续边5",
+          "握把主壳_横芯",
+          "握把主壳_竖芯",
+          "握把主壳_切角0",
+          "握把主壳_切角1",
+          "握把主壳_切角2",
+          "握把主壳_切角3",
+          "握把侧面收边_横芯",
+          "握把侧面收边_竖芯",
+          "握把侧面收边_切角0",
+          "握把侧面收边_切角1",
+          "握把侧面收边_切角2",
+          "握把侧面收边_切角3",
+          "握把底部压边_横芯",
+          "握把底部压边_竖芯",
+          "握把底部压边_切角0",
+          "握把底部压边_切角1",
+          "握把底部压边_切角2",
+          "握把底部压边_切角3",
+          "握把合模缝",
+          "握把细防滑纹1",
+          "握把细防滑纹2",
+          "握把细防滑纹3",
+          "握把细防滑纹4",
+          "握把细防滑纹5",
+          "握把细防滑纹6",
+          "握把细防滑纹7",
+          "护圈前支撑",
+          "护圈下斜角",
+          "护圈底边",
+          "扳机根部",
+          "扳机弧形指托",
+          "光学窗口暗腔",
+          "光学窗口玻璃",
+          "镜片高光",
+          "橙色镜口压边0.22_0.34_5.34_6.2",
+          "橙色镜口压边0.85_0.99_5.34_6.2",
+          "橙色镜口压边0.32_0.87_5.33_5.49",
+          "橙色镜口压边0.32_0.87_6.065_6.22",
+          "上侧ZAPPER字标",
+          "下侧型号铭牌",
+          "侧盖紧固孔8.52_1",
+          "侧盖紧固孔8.52_2",
+          "侧盖紧固孔8.52_3",
+          "侧盖紧固孔8.52_4",
+          "紧固孔槽8.52",
+          "侧盖紧固孔11.1_1",
+          "侧盖紧固孔11.1_2",
+          "侧盖紧固孔11.1_3",
+          "侧盖紧固孔11.1_4",
+          "紧固孔槽11.1",
+          "握把线材护套",
+          "底座下壳_横芯",
+          "底座下壳_竖芯",
+          "底座下壳_斜角0",
+          "底座下壳_斜角1",
+          "底座下壳_斜角2",
+          "底座下壳_斜角3",
+          "橙色细腰线_横芯",
+          "橙色细腰线_竖芯",
+          "橙色细腰线_斜角0",
+          "橙色细腰线_斜角1",
+          "橙色细腰线_斜角2",
+          "橙色细腰线_斜角3",
+          "底座面板_横芯",
+          "底座面板_竖芯",
+          "底座面板_斜角0",
+          "底座面板_斜角1",
+          "底座面板_斜角2",
+          "底座面板_斜角3",
+          "防滑脚4.15_6.8_横芯",
+          "防滑脚4.15_6.8_竖芯",
+          "防滑脚4.15_6.8_斜角0",
+          "防滑脚4.15_6.8_斜角1",
+          "防滑脚4.15_6.8_斜角2",
+          "防滑脚4.15_6.8_斜角3",
+          "防滑脚4.15_9.7_横芯",
+          "防滑脚4.15_9.7_竖芯",
+          "防滑脚4.15_9.7_斜角0",
+          "防滑脚4.15_9.7_斜角1",
+          "防滑脚4.15_9.7_斜角2",
+          "防滑脚4.15_9.7_斜角3",
+          "防滑脚11.85_6.8_横芯",
+          "防滑脚11.85_6.8_竖芯",
+          "防滑脚11.85_6.8_斜角0",
+          "防滑脚11.85_6.8_斜角1",
+          "防滑脚11.85_6.8_斜角2",
+          "防滑脚11.85_6.8_斜角3",
+          "防滑脚11.85_9.7_横芯",
+          "防滑脚11.85_9.7_竖芯",
+          "防滑脚11.85_9.7_斜角0",
+          "防滑脚11.85_9.7_斜角1",
+          "防滑脚11.85_9.7_斜角2",
+          "防滑脚11.85_9.7_斜角3",
+          "前托立柱脚座_横芯",
+          "前托立柱脚座_竖芯",
+          "前托立柱脚座_斜角0",
+          "前托立柱脚座_斜角1",
+          "前托立柱脚座_斜角2",
+          "前托立柱脚座_斜角3",
+          "前托后立柱",
+          "前托立柱橙嵌条",
+          "前托承重横槽_横芯",
+          "前托承重横槽_竖芯",
+          "前托承重横槽_斜角0",
+          "前托承重横槽_斜角1",
+          "前托承重横槽_斜角2",
+          "前托承重横槽_斜角3",
+          "前管接触软垫",
+          "前托后限位",
+          "前托前限位",
+          "前托加强斜撑",
+          "握把托背脚座_横芯",
+          "握把托背脚座_竖芯",
+          "握把托背脚座_斜角0",
+          "握把托背脚座_斜角1",
+          "握把托背脚座_斜角2",
+          "握把托背脚座_斜角3",
+          "握把托背矮柱",
+          "握把托背斜座",
+          "握把托背软垫",
+          "握把托前脚座_横芯",
+          "握把托前脚座_竖芯",
+          "握把托前脚座_斜角0",
+          "握把托前脚座_斜角1",
+          "握把托前脚座_斜角2",
+          "握把托前脚座_斜角3",
+          "握把托前矮柱",
+          "握把托前斜座",
+          "握把托前软垫",
+          "铭牌嵌座_横芯",
+          "铭牌嵌座_竖芯",
+          "铭牌嵌座_斜角0",
+          "铭牌嵌座_斜角1",
+          "铭牌嵌座_斜角2",
+          "铭牌嵌座_斜角3",
+          "支架铭牌",
+          "线材出线垂段",
+          "底座盘线圆接0_0",
+          "底座盘线圆接0_1",
+          "底座盘线圆接0_2",
+          "底座盘线圆接0_3",
+          "底座盘线圆接1_0",
+          "底座盘线圆接1_1",
+          "底座盘线圆接1_2",
+          "底座盘线圆接1_3",
+          "底座盘线1",
+          "底座盘线圆接2_0",
+          "底座盘线圆接2_1",
+          "底座盘线圆接2_2",
+          "底座盘线圆接2_3",
+          "底座盘线2",
+          "底座盘线圆接3_0",
+          "底座盘线圆接3_1",
+          "底座盘线圆接3_2",
+          "底座盘线圆接3_3",
+          "底座盘线3",
+          "底座盘线圆接4_0",
+          "底座盘线圆接4_1",
+          "底座盘线圆接4_2",
+          "底座盘线圆接4_3",
+          "底座盘线4",
+          "底座盘线圆接5_0",
+          "底座盘线圆接5_1",
+          "底座盘线圆接5_2",
+          "底座盘线圆接5_3",
+          "底座盘线5",
+          "底座盘线圆接6_0",
+          "底座盘线圆接6_1",
+          "底座盘线圆接6_2",
+          "底座盘线圆接6_3",
+          "底座盘线6",
+          "底座盘线圆接7_0",
+          "底座盘线圆接7_1",
+          "底座盘线圆接7_2",
+          "底座盘线圆接7_3",
+          "底座盘线7",
+          "底座盘线圆接8_0",
+          "底座盘线圆接8_1",
+          "底座盘线圆接8_2",
+          "底座盘线圆接8_3",
+          "底座盘线8",
+          "底座盘线圆接9_0",
+          "底座盘线圆接9_1",
+          "底座盘线圆接9_2",
+          "底座盘线圆接9_3",
+          "底座盘线9",
+          "插头软护套",
+          "NES插头外壳_横芯",
+          "NES插头外壳_竖芯",
+          "NES插头外壳_切角0",
+          "NES插头外壳_切角1",
+          "NES插头外壳_切角2",
+          "NES插头外壳_切角3",
+          "插头端面",
+          "插头防滑肋0",
+          "插头防滑肋1",
+          "插头防滑肋2",
+          "插头接孔0",
+          "插头接孔1",
+          "插头接孔2",
+          "插头接孔3",
+          "插头接孔4",
+          "插头接孔5",
+          "插头接孔6"
+        ],
+        "groups": [
+          "orange_barrel",
+          "gray_housing",
+          "grip",
+          "trigger_guard",
+          "trigger",
+          "optical_window",
+          "details",
+          "cable",
+          "stand_base",
+          "stand_feet",
+          "stand_front_cradle",
+          "stand_grip_cradle",
+          "stand_badge",
+          "connector"
+        ]
+      }
+    ]
+  },
+  "supports": [
+    {
+      "group": "stand_front_cradle",
+      "contacts": [
+        {
+          "pad": "前管接触软垫",
+          "contacts": [
+            {
+              "target": "橙色前管_竖芯",
+              "separation": -0.008091419999999516
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "stand_grip_cradle",
+      "contacts": [
+        {
+          "pad": "握把托背软垫",
+          "contacts": [
+            {
+              "target": "握把底部压边_竖芯",
+              "separation": -0.011958655924799
+            },
+            {
+              "target": "握把底部压边_切角2",
+              "separation": -0.011958662192241648
+            },
+            {
+              "target": "握把底部压边_切角3",
+              "separation": -0.011958657174597459
+            }
+          ]
+        },
+        {
+          "pad": "握把托前软垫",
+          "contacts": [
+            {
+              "target": "握把底部压边_竖芯",
+              "separation": -0.011958655924799
+            },
+            {
+              "target": "握把底部压边_切角2",
+              "separation": -0.011958662192241648
+            },
+            {
+              "target": "握把底部压边_切角3",
+              "separation": -0.011958657174597459
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "triggerSweep": [
+    {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        0.5
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        1
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        1.5
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        2
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        2.5
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        3
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        3.5
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        4
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        4.5
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        5
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        5.5
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        6
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        6.5
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        7
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        7.5
+      ],
+      "collisions": [],
+      "connected": true
+    },
+    {
+      "rotation": [
+        0,
+        0,
+        8
+      ],
+      "collisions": [],
+      "connected": true
+    }
+  ],
+  "labelVisibility": [
+    {
+      "name": "上侧ZAPPER字标",
+      "blocked": []
+    },
+    {
+      "name": "下侧型号铭牌",
+      "blocked": []
+    }
+  ],
+  "passed": true
+}

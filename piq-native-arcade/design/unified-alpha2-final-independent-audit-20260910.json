@@ -1,0 +1,138 @@
+{
+  "status": "passed",
+  "jar_sha256": "B3DC23F4DFAE53CD87730FEBB7668D470D111ADDCEE577803B09351CE34EFA56",
+  "metadata": {
+    "piq_fc_arcade": "[0.31.0-alpha.15,0.32.0)",
+    "minecraft": "[1.21.1,1.21.2)",
+    "neoforge": "[21.1.236,22)"
+  },
+  "source_sha256": {
+    "src/main/java/cn/piq/nativearcade/NativeArcadeMod.java": "DAA002A4746A53B6E37009517A8762D0952DFEC498EB8D84D8E0B7C9A35834C2",
+    "src/main/java/cn/piq/nativearcade/client/NativeCabinetBackend.java": "6482FFC691924B87859B403F5FF0659025C21EF01CCE27729D8EBE9A7F81CF2F",
+    "src/main/java/cn/piq/nativearcade/client/NativeArcadeClient.java": "93AB5F601865F38FC02695EF6EEEE0DBCDE042CC6755FCF3A9BD8DE37A4FA3EB",
+    "src/main/java/cn/piq/nativearcade/bridge/NativeRomStaging.java": "315D30C565408FEA123837D2C6C32F9D8680BB004BDC3F3A173B8DDA01AA63F6",
+    "src/main/java/cn/piq/nativearcade/bridge/NativeProcessSession.java": "F03828A8767B1A1CBB9F92D7AB0C01BA73CB166C3FD516B84E53FA4F3723D6EE",
+    "src/main/java/cn/piq/nativearcade/bridge/BridgeProtocol.java": "F59113F4F6D2C72EEEBECD778B5ACCDC82A2EF564A792C5B9795EE8C55628250",
+    "helper/src/main/java/cn/piq/nativearcade/bridge/NativeCoreWorker.java": "904BC021AC52922C0ED3E9C4EF8CA9D39BD27F5A0E9AC02B3DB202949247E8F7",
+    "src/main/templates/META-INF/neoforge.mods.toml": "43298B65B19388BE8E165255913B135712C8504A52735AC3A4D77F555B5570BF"
+  },
+  "main": {
+    "own_java21_classes": 41,
+    "common_classes_checked": 28,
+    "class_sha256": {
+      "cn/piq/nativearcade/NativeArcadeMod.class": "695B86D53CE669CD9D0B64161EBC77CA186AF8F5E4DF6AF4F81E5437D1A4826B",
+      "cn/piq/nativearcade/bridge/BridgeProtocol.class": "74B09A500272A752EC05E11AB41E26B8E9ECAC838F45032102A2AE2EA8E8DE52",
+      "cn/piq/nativearcade/bridge/NativeProcessSession$Frame.class": "C4D3A03F24648492A766CD5EE32116968B818E677398890552AF81B76442BE32",
+      "cn/piq/nativearcade/bridge/NativeProcessSession$Input.class": "4714F5C54F6A39226934FAACB78AFA91884470410EF884EA14F975C016083E77",
+      "cn/piq/nativearcade/bridge/NativeProcessSession.class": "C38064A90FF307F80AD3469FF007A5C93D00684A265A9208E16E064D58727D36",
+      "cn/piq/nativearcade/bridge/NativeRomStaging.class": "0F8159EFC077F5F363A562F102FC3FCCCE84C166F916BD6AA19C592DA7AC22BC",
+      "cn/piq/nativearcade/client/NativeArcadeAudio.class": "607B9EF8F7368632632E56D1CA5D3EF08FBBC6B396A70C97033572C7204058DB",
+      "cn/piq/nativearcade/client/NativeArcadeClient$Setup.class": "871C22202853B1A2703C96DDB0D2391947B5D1E670542812E68452A2DE2E32B5",
+      "cn/piq/nativearcade/client/NativeArcadeClient.class": "D366B39BC2A6C5F40260A4DB861386F4735D359DF35840D0152D13743F367E60",
+      "cn/piq/nativearcade/client/NativeArcadePlayScreen.class": "5834C4B9E6127282D0534AEFD21465014D2C6696DAF8BC447314717FE34805C4",
+      "cn/piq/nativearcade/client/NativeArcadeSetupScreen.class": "3F9B409E08F04430AC4405DCF03365024659C3B4CFE5E9E44D59B7469369156A",
+      "cn/piq/nativearcade/client/NativeCabinetBackend$1.class": "589332639059A206F2AB0B12331A70B6AB6197882BA15F8E92F57CE829DFA106",
+      "cn/piq/nativearcade/client/NativeCabinetBackend.class": "52CA3AF2BE770B9EB7AE3EF35C27577A4E070D0D2E6DA4CA1828A1E6F600D1E0",
+      "cn/piq/nativearcade/client/NativeCabinetRenderer$1.class": "8E6B43DA1520D6CA7D8D5BEC4F93D6257B00D1516D6222AF63B1B7165FC66EAC",
+      "cn/piq/nativearcade/client/NativeCabinetRenderer$2.class": "B180B0708EF128FCBEBBBABAA4905F7CFF13001E9E036021BA6992E22A70EEE7",
+      "cn/piq/nativearcade/client/NativeCabinetRenderer$Cached.class": "D282E3B4C19AB2EF6A80139A78F48E9CDA77C36986A8DE3FD918CB46D53B6CE9",
+      "cn/piq/nativearcade/client/NativeCabinetRenderer$ItemRenderer.class": "9808A8D722D746D7464915DFDA9BA62A9527A5906A326710D75EF78BE251124C",
+      "cn/piq/nativearcade/client/NativeCabinetRenderer$VideoRenderer.class": "30CD8AA573C7416B7564B051BD3F5D4A7667B8E2B9746AB029D0950151282861",
+      "cn/piq/nativearcade/client/NativeCabinetRenderer.class": "6B348A9E6017ADC3AC750C0CC3314E6072D73A36F34D1E4F624589826F845974",
+      "cn/piq/nativearcade/events/NativeCabinetClosedEvent.class": "789C4CF90FC676AF90A544E5DC6860545D52C0E7F020677AB1678BC4588C11D0",
+      "cn/piq/nativearcade/events/NativeCabinetUseEvent.class": "4084C6C5C901A4206F31648FCEE75B56B6B2A47B1401D153B6926B5FA1ADD1DB",
+      "cn/piq/nativearcade/layout/NativeCabinetLayout.class": "A3CAB4C04E8C63E7B8E0FB46D27495FA724DF4DD5668A96BA0343BFBAAEB7A2E",
+      "cn/piq/nativearcade/layout/NativeVideoPresentation.class": "63C8138E3915F4AD4D00AF02D7884FC9F91CEC621F6CAED1348365E85979D7C0",
+      "cn/piq/nativearcade/registry/NativeArcadeRegistries.class": "3B188C2B00AFA8098D3A32052A768E6857534F21F509802FEE2AA9E19B9B4079",
+      "cn/piq/nativearcade/world/NativeCabinetAssemblyData.class": "7B9AE6DE07E3850C0170AB60EC3C0317D17BE9370AB4547DF9DC6DDF92DBBDF2",
+      "cn/piq/nativearcade/world/NativeCabinetAssemblyLedger$Assembly.class": "DE520468EFC1C8536AB3B9DCD56F9C5135A0EC286E46B9CAE9FABEA921E09FE3",
+      "cn/piq/nativearcade/world/NativeCabinetAssemblyLedger.class": "DA9E8F482A6FD6FDAD4B7DC6A6181FF7465640FE9CF3DAA2F572C6E7FCBEE0F8",
+      "cn/piq/nativearcade/world/NativeCabinetBlock.class": "F018232868FFDC80606C30A299512316C7BC17C95778FEE94CF5DDA2753A7E93",
+      "cn/piq/nativearcade/world/NativeCabinetBlockEntity.class": "B7A6528D8E80C6E32650B39782FD71E7BC0443B5C370FDEDA340EFC1C67C549B",
+      "cn/piq/nativearcade/world/NativeCabinetBlockItem.class": "A111E07355933ECD87648C8C6475D1A4E31E5EB72B2AA009D40AF5F30F2DFC7C",
+      "cn/piq/nativearcade/world/NativeCabinetFootprint$Bounds.class": "FBFBE5ECD72F7F970250584818D9B0712E4896F32AB45205348C3109B753F17E",
+      "cn/piq/nativearcade/world/NativeCabinetFootprint$Cell.class": "AAFE247FAC88B21093454223CBA1CB1D7BFB035C8AA38D6F53A47F310C5632C0",
+      "cn/piq/nativearcade/world/NativeCabinetFootprint$Facing.class": "61FCDF9CC43A350FCD53F539C9AA29F069859F6A3FD6BCAE9424D7D423894AF3",
+      "cn/piq/nativearcade/world/NativeCabinetFootprint.class": "E12F07195EB40CA8740C6D23E6DE2C801A9F9BEE7CE7E76CF39A85A4780DB4F1",
+      "cn/piq/nativearcade/world/NativeCabinetPartBlock.class": "7BB85BE7457FCA47A0ABDFAB3B20D53B28AB402D74F950373611E543BDBB025E",
+      "cn/piq/nativearcade/world/NativeCabinetPartBlockEntity.class": "BF4634641A5EDF09D1C3E391B0A1459142DCF98AF155A624C74A81C3444ABA4A",
+      "cn/piq/nativearcade/world/NativeCabinetRemovalGate$Result.class": "2297606C7CF6350B0370FE04EA2AB71ECDFE596D9EEF8C69A07514EB19BC7210",
+      "cn/piq/nativearcade/world/NativeCabinetRemovalGate.class": "99D7AE097A299D6B2525B22D3653AD88B89F755D55A6C32CDD4EA09780C63C07",
+      "cn/piq/nativearcade/world/NativeCabinetStructure$Owner.class": "3B116F60CF45AFED3CBCBDD06FDB0B819DBABB73A3A27B046DF7555A03071161",
+      "cn/piq/nativearcade/world/NativeCabinetStructure$Placed.class": "A82A662A507D38E3583DF2513B53204018B494C7F86E261EF787E776B6B20D49",
+      "cn/piq/nativearcade/world/NativeCabinetStructure.class": "F1669D46DE28F6A8E76FF92C1A3CD925F98C4D8969D1D96607AA5E352859DC86"
+    }
+  },
+  "spi": {
+    "local_only_true": true,
+    "client_factory_registered": true,
+    "frame_adapter": true,
+    "no_independent_tab": true,
+    "no_common_client_link": true,
+    "auxiliary_allowlist": [
+      "neogeo.zip",
+      "qsound_hle.zip"
+    ],
+    "per_file_mib": 64,
+    "total_mib": 128,
+    "javap_sha256": {
+      "common": "BC4498D18E0471869CFA107E592FF23CF851382A206A764AB5B5804D5434C828",
+      "client": "5B2C130F0E6464A7FC72EC1108039A501017E02D1BEFFAEE51466111A05B960E",
+      "staging": "A92DA8D8843C0A49C4BF38EA0895633A3B890F8671FDEFE26A9609D5523E019B"
+    }
+  },
+  "runtime": {
+    "mame_libretro.dll": {
+      "sha256": "6172A988AB67FE68F4177A6FC8FBB82619EB2044C330930F0F572F7B1EDC2301",
+      "bytes": 372431360
+    },
+    "jna-5.14.0.jar": {
+      "sha256": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6",
+      "bytes": 1878533
+    }
+  },
+  "helper_sha256": "D1A360A8C300FDBC402A1CEFCF63314A045E0C1D9183E7BABA6E40EF9B33F75D",
+  "helper": {
+    "java21_classes": 18,
+    "entry": "cn.piq.nativearcade.bridge.NativeCoreWorker",
+    "protocol_bytes_identical": false,
+    "protocol_main_sha256": "74B09A500272A752EC05E11AB41E26B8E9ECAC838F45032102A2AE2EA8E8DE52",
+    "protocol_helper_sha256": "DE3656E91749E9AE0F20FF76C80CA9BF3BFC34C234560AE26E9CED132B2A3268",
+    "protocol_semantics": {
+      "semantic_match": true,
+      "bytes_identical": false,
+      "main_sha256": "74B09A500272A752EC05E11AB41E26B8E9ECAC838F45032102A2AE2EA8E8DE52",
+      "helper_sha256": "DE3656E91749E9AE0F20FF76C80CA9BF3BFC34C234560AE26E9CED132B2A3268",
+      "canonical_full_class_sha256": "968346C356B8D4794F8BF59CA22AC172EC6D24F4ABEAD4926EC5D0AC07693198",
+      "difference": "debug-only: main includes LocalVariableTable; full non-debug class representation matches",
+      "comparison": "Complete javap verbose class equality with all constants, descriptors, instructions, resolved operands and non-debug attributes; excludes provenance, constant-pool indices/definitions and line/local-variable tables."
+    },
+    "class_sha256": {
+      "cn/piq/nativearcade/bridge/BridgeProtocol.class": "DE3656E91749E9AE0F20FF76C80CA9BF3BFC34C234560AE26E9CED132B2A3268",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$Audio.class": "E2118D0D7A3422570D9A52A1B320EAFAA609A56C8F1735A3A53F0270E32F8C95",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$AudioBatch.class": "8456E8807FEBA6805A0F1D12721EC8CDFC0A068433CA2EE80E32D6F1DC892C2C",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$AvInfo.class": "E5EAFC130DC087CEFEE7F349DA6EF28C32710ACE08848ECB6B818077A49EB822",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$BinaryPipe.class": "2AC18FABCB25914D67172F2C682E0A309C5E3DB0442A223928051EB7BA9DFECB",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$Buttons.class": "5B74F371C0AA3198E749A621A72316ADAFA8582FE906413C0B9C1E8DE8527B61",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$Crt.class": "527DF4EAA9A508555D48049A497CE4E9D210A5EAC5BE17D2EC81EB418FE78D6C",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$Engine.class": "FF5D6126661016F228AC1E965147598BD9D8E157E05482489F195AF9AF4167E2",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$Environment.class": "93E16A5DAE93E2551A019FCBBD9FE55B4A5815867EDEC46CD860AE628E9B9282",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$GameInfo.class": "472354296D2A770B9583D14CE6C27AB873EDA80BDEC8715FFED3765936AFE6A5",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$Geometry.class": "C85DE1CC4256B423F832463F407E34F76944AD83891F0F34FAE7EC66D512E5CE",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$InputPoll.class": "0738B3CEB3D1537FBF33B613A07C7EACA241775846C6F10C06BE0F97F95F3F63",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$InputState.class": "DEC755A36F9B410926B92D8520B0D462D3879E26CC7E60C637DCC437C2676A4C",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$Kernel.class": "F547DDA1116BDD8F23452AE0F54A40B80A949233DCAF5D2A4D741864CEAD6668",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$Retro.class": "6ADF115AA64D22B7FDDBEB5F00F4FA1B0886D595F50EE662652196E58C8C37F3",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$Timing.class": "DC571620019159EBE1F80C110E1E6F16EE02458034A397C5B074F2E639FC7F86",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker$Video.class": "B02903D35CF873BD24B0619108A327B454D94302A7280E04BEAD2239D90CA255",
+      "cn/piq/nativearcade/bridge/NativeCoreWorker.class": "E710C5F49D09BF76B67C63C409CA5D81D4B200E179A508581D0CAD144AB5B636"
+    }
+  },
+  "pure_final_jar_protocol_uv": {
+    "stdout": "NATIVE_DELIVERY_PROBE=118 PASS",
+    "probe_sha256": "090CF368E37E32F3B0F958546FE940047FEC9A9D4C8B46D0F76E059FD85A0A46",
+    "native_library_loaded": false,
+    "minecraft_started": false
+  },
+  "limits": "Read-only artifact/bytecode/source and pure protocol/uncropped-UV checks. No Minecraft world or ROM execution here; actual MAME/KOF97 evidence is separate. Private ROM fixtures are excluded from delivery."
+}

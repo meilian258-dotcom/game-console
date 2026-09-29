@@ -1,0 +1,59 @@
+{
+  "ok": true,
+  "assertions": 10,
+  "actual_wasm_core": true,
+  "minecraft_started": false,
+  "rom_copied": false,
+  "rom_sha256": "6412CFDEAF5618C8352E1F8FB7DC226D8C280D5ECFA1FD3250858F1EC48E5907",
+  "shot_frame": 661,
+  "aim": [
+    98,
+    138
+  ],
+  "runs": {
+    "hit": {
+      "ok": true,
+      "actual_wasm_core": true,
+      "frames": 720,
+      "rom_sha256": "6412cfdeaf5618c8352e1f8fb7dc226d8c280d5ecfa1fd3250858f1ec48e5907",
+      "shoot_frame": 661,
+      "aim_x": 98,
+      "aim_y": 138,
+      "offscreen": false,
+      "minecraft_started": false,
+      "rom_copied": false
+    },
+    "offscreen": {
+      "ok": true,
+      "actual_wasm_core": true,
+      "frames": 720,
+      "rom_sha256": "6412cfdeaf5618c8352e1f8fb7dc226d8c280d5ecfa1fd3250858f1ec48e5907",
+      "shoot_frame": 661,
+      "aim_x": 98,
+      "aim_y": 138,
+      "offscreen": true,
+      "minecraft_started": false,
+      "rom_copied": false
+    }
+  },
+  "same_pre_shot_frames": [
+    119,
+    150,
+    300,
+    600,
+    630,
+    660
+  ],
+  "aimed_shot_score_changed": true,
+  "offscreen_score_stayed_zero": true,
+  "visual_review": "Separate agent-visible private frame review identified aimed-shot score 001000 and offscreen score 000000.",
+  "private_frame_sha256": {
+    "hit_690": "70DEF6C88EE93BDA98A0F4E3B33248819F3F5C690048DF8A80CD54A7EA981274",
+    "offscreen_690": "CBD53594B9FC72A50BDDF4FE2C9F1B8E9CFFE2547C8C7777205164B6951061D0"
+  },
+  "limits": [
+    "Private output images are game-derived evidence and must not be bundled in the mod/release archive.",
+    "No ROM or memory-state bytes are written. No Minecraft item, aiming ray, network/permission or physical gun tested.",
+    "This one user-supplied ROM does not establish compatibility with every light-gun game."
+  ]
+}

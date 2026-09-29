@@ -1,0 +1,71 @@
+{
+  "scope": "Independent wire-only geometry and UV audit; no model modifications",
+  "model": "SFC_日版双手柄_线材肩键修正版.bbmodel",
+  "modelSha256": "35c487534089f8b24bd836076ef52883bfe43e90c823c0aeef6e58b44dfbf509",
+  "method": "Independently transform cube basis axes and endpoints, compare the centerline after removing 0.01-unit end extension to the prescribed raw path transformed by scale/offset; OBB separating-axis contact test; test attachment nodes inside actual cubes; compare UV rectangles and PNG bytes against corner_fix.",
+  "units": "Blockbench final units; 16 units per Minecraft block",
+  "checks": {
+    "eachCableHas15Segments": true,
+    "transformedCenterlineEndpointsMatchPathWithin1eMinus7": true,
+    "everyAdjacentPairActuallyOverlaps": true,
+    "everySharedPathNodeInsideBothAdjacentCubes": true,
+    "noVertexBelowYZero": true,
+    "wireGeometryInsideUnchangedAssemblyFootprint": true,
+    "plugAndSleeveEndpointNodesActuallyInsideAttachmentCubes": true,
+    "allDirectionChangesAtMost22Point5DegreesWithinRoundingTolerance": true,
+    "squareCrossSectionPoint07AndTotalEndExtensionPoint02": true,
+    "all180WireFaceUVsInsideOldWireOnlyRectangles": true,
+    "wireUVIslandsDoNotOverlap": true,
+    "allNonWireFaceUVTextureAndRotationDefinitionsUnchanged": true,
+    "pngBytesEqualOriginalEmbeddedAndResourcePack": true
+  },
+  "cables": [
+    {
+      "player": 1,
+      "segments": 15,
+      "bounds": {
+        "min": [9.988837383324762, 0.0038373790675013536, 3.0324999999999998],
+        "max": [11.536162616675236, 0.7586626171056641, 5.3225]
+      },
+      "maximumEndpointError": 7.85883281096552e-9,
+      "maximumAxisAlignmentError": 5.551115123125783e-16,
+      "maximumDirectionChangeDegrees": 22.50000173125158,
+      "maximumAdjacentSATSeparation": -0.03263270312574201,
+      "minimumJointInteriorMargin": 0.009999992981364225,
+      "plugSATSeparation": -0.08500000000000041,
+      "plugEndpointInteriorMargin": 0.07500000000000018,
+      "controllerSleeveSATSeparation": -0.02000000000000024,
+      "controllerEndpointInteriorMargin": 0.010000000000000231
+    },
+    {
+      "player": 2,
+      "segments": 15,
+      "bounds": {
+        "min": [4.463837383324763, 0.0038373790675013536, 3.0324999999999998],
+        "max": [6.011162616675237, 0.7586626171056641, 5.3225]
+      },
+      "maximumEndpointError": 7.85883281096552e-9,
+      "maximumAxisAlignmentError": 5.551115123125783e-16,
+      "maximumDirectionChangeDegrees": 22.500001731251302,
+      "maximumAdjacentSATSeparation": -0.03263270312574201,
+      "minimumJointInteriorMargin": 0.009999992981364225,
+      "plugSATSeparation": -0.08500000000000041,
+      "plugEndpointInteriorMargin": 0.07500000000000018,
+      "controllerSleeveSATSeparation": -0.02000000000000024,
+      "controllerEndpointInteriorMargin": 0.010000000000000231
+    }
+  ],
+  "uv": {
+    "newWireFaceCount": 180,
+    "outsideOriginalWireRectangles": 0,
+    "overlappingWireUVPairs": 0,
+    "changedNonWireFaceDefinitions": 0,
+    "pngSha256": "4bbba0f53697d69a919f5fc12750e608aa50a4d71d8281f23d6428a5d02bd920"
+  },
+  "visualReview": {
+    "screenshot": "截图_手柄修复后.png",
+    "observed": "Both cords read as continuous thinner leads with downward drape and gradual bends. No detached segments, right-angle folded controller tails or visible cord/shoulder intersections.",
+    "limitation": "Blockbench screenshot and static-file validation only; no Minecraft runtime test."
+  },
+  "passed": true
+}

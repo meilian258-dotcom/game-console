@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "checks": {
+    "cn.piq.fcarcade.client.ui.DeviceConfirmScreen": {
+      "foreground_after_background_and_widgets": true,
+      "vanilla_buttons": 2,
+      "old_bad_order_rejected": true,
+      "long_message_scroll": true,
+      "global_blur_configuration_untouched": true
+    },
+    "cn.piq.sfchome.client.SfcJoinScreen": {
+      "foreground_after_background_and_widgets": true,
+      "vanilla_buttons": 2,
+      "old_bad_order_rejected": true,
+      "long_message_scroll": true,
+      "global_blur_configuration_untouched": true
+    }
+  },
+  "exact_legacy_lifecycle_methods": {
+    "cn.piq.fcarcade.client.ui.DeviceConfirmScreen": [
+      " answer(",
+      " onClose(",
+      " isPauseScreen(",
+      " mouseScrolled(",
+      " keyPressed("
+    ],
+    "cn.piq.sfchome.client.SfcJoinScreen": [
+      " choose(",
+      " expire(",
+      " onClose(",
+      " removed(",
+      " isPauseScreen("
+    ]
+  },
+  "actual_mc_screen_order": "background -> widgets",
+  "vanilla_confirm_order": "super.render -> title/body",
+  "source_sha256": {
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\client\\ui\\DeviceConfirmScreen.java": "AAA8D0B53BA48A486805D453A145FDD21DBEECA2457777E8AAD67BB945355572",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcJoinScreen.java": "CBC519720EF4E8F8D91D6CA98C7447B9B46FCEA23BE9B93AC8B6B93BD0E577D6"
+  },
+  "minecraft_started": false,
+  "emulator_started": false,
+  "scope": "Actual current production sources compiled against cached real MC APIs; disassembled actual generated classes and frozen alpha18 negative fixtures. No rendered screenshot or in-game visual claim."
+}

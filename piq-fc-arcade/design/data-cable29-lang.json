@@ -1,0 +1,30 @@
+{
+  "zh_cn": {
+    "item.piq_fc_arcade.zapper_stand_cable": "数据线",
+    "item.piq_fc_arcade.cabinet_link_cable": "数据线",
+    "tooltip.piq_fc_arcade.data_cable.connect": "连接：先右键光枪支架，再右键FC主机；或依次右键两台双人街机",
+    "tooltip.piq_fc_arcade.data_cable.disconnect": "断开：持数据线 Shift＋右键已连接的设备",
+    "tooltip.piq_fc_arcade.data_cable.permissions": "街机通讯需管理员权限并先结束游戏；AV电视线单独使用",
+    "tooltip.piq_fc_arcade.av_cable.connect": "连接：持AV线依次右键主机和电视",
+    "tooltip.piq_fc_arcade.av_cable.disconnect": "断开：持AV线 Shift＋右键主机或电视",
+    "message.piq_fc_arcade.zapper_stand_not_connected": "这台FC主机没有连接光枪支架数据线。",
+    "message.piq_fc_arcade.zapper_stand_power_first": "请先用数据线连接支架与 FC；连接后无需开机即可取枪。",
+    "message.piq_fc_arcade.zapper_stand_take_no_input": "原光枪已取出，当前没有输入权限；开机后可持枪右键主机申请，不会自动开机。",
+    "message.piq_fc_arcade.zapper_stand_selected": "已选支架；60 秒内右键同维度 16 格内的 FC 连接。持数据线 Shift＋右键任一端断开。",
+    "message.piq_fc_arcade.zapper_stand_connected": "支架已连接 FC；放入已有光枪后可随时取出。取枪不会自动开机。"
+  },
+  "en_us": {
+    "item.piq_fc_arcade.zapper_stand_cable": "Data Cable",
+    "item.piq_fc_arcade.cabinet_link_cable": "Data Cable",
+    "tooltip.piq_fc_arcade.data_cable.connect": "Connect: right-click a gun stand then an FC console, or two dual cabinets in order",
+    "tooltip.piq_fc_arcade.data_cable.disconnect": "Disconnect: hold this cable and Shift-right-click a linked device",
+    "tooltip.piq_fc_arcade.data_cable.permissions": "Cabinet links require an administrator and idle games; TVs still use a separate AV cable",
+    "tooltip.piq_fc_arcade.av_cable.connect": "Connect: hold an AV cable and right-click the console and TV in order",
+    "tooltip.piq_fc_arcade.av_cable.disconnect": "Disconnect: hold an AV cable and Shift-right-click either console or TV",
+    "message.piq_fc_arcade.zapper_stand_not_connected": "This FC console has no gun-stand data cable attached.",
+    "message.piq_fc_arcade.zapper_stand_power_first": "Connect the stand to FC with a data cable first; the console may remain off when taking the gun.",
+    "message.piq_fc_arcade.zapper_stand_take_no_input": "Original gun taken without input authority. Once powered on, right-click the console with it to request control; taking it never powers on the console.",
+    "message.piq_fc_arcade.zapper_stand_selected": "Stand selected: click an FC within 16 blocks and 60 seconds. Hold a data cable and Shift-right-click either end to disconnect.",
+    "message.piq_fc_arcade.zapper_stand_connected": "Stand connected to FC. Dock an existing gun and take it at any time; taking it does not power on the console."
+  }
+}

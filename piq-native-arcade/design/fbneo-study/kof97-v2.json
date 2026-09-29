@@ -1,0 +1,80 @@
+{
+  "schema": "piq-fbneo-isolated-study-1",
+  "game": "kof97",
+  "ok": false,
+  "sync_qualified": false,
+  "official_artifacts": {
+    "schema": "piq-fbneo-official-study-1",
+    "official_binary": {
+      "url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/fbneo_libretro.dll.zip",
+      "resolved_url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/fbneo_libretro.dll.zip",
+      "last_modified": "Fri, 11 Sep 2026 23:02:07 GMT",
+      "bytes": 17334074,
+      "sha256": "934FF65DC9A3229E62F39A8F26630B54473995BE631FCF9D277996765B2643AB"
+    },
+    "dll": {
+      "path": "G:\\服务器\\服务器Codex\\piq-native-arcade\\design\\fbneo-study\\vendor\\fbneo_libretro.dll",
+      "bytes": 61913629,
+      "sha256": "52343F65453C0E1FC06B3AA818B48CA4FED18361F7F336A684E9E3CFFA5F5F3C"
+    },
+    "fixed_source": {
+      "url": "https://codeload.github.com/libretro/FBNeo/zip/a251c76229f1637e433b93e29845039752771b6d",
+      "resolved_url": "https://codeload.github.com/libretro/FBNeo/zip/a251c76229f1637e433b93e29845039752771b6d",
+      "last_modified": null,
+      "bytes": 29731166,
+      "sha256": "55CC0F5BF305D8953FA0A20C3598164D39EFC03EF3740C7B01E7EBF143CD4D7A"
+    },
+    "source_commit": "a251c76229f1637e433b93e29845039752771b6d",
+    "commit_time": "2026-09-04T07:53:13Z",
+    "license_sha256": "BB2369F1B75F42242968A78191B47EE90F85682224D3AD1EF63044E244B3E202",
+    "binary_to_source_exact_mapping_verified": false,
+    "production_modified": false,
+    "installed": false,
+    "purpose": "Local isolated determinism research only; non-commercial licensing requires separate distribution review."
+  },
+  "inputs": {
+    "F:\\Minecraft\\HMCL\\versions\\1.21.1-NeoForge\\piq-native-arcade\\roms\\kof97.zip": {
+      "sha256": "804F892924D4650545D3EA2D19FB85670094DC46DB882FECAF3E03009E2C4B9F",
+      "bytes": 28745740,
+      "mtime_ns": 1789019872695917100
+    },
+    "E:\\Dow\\rom\\WinKawaks1.65模拟器\\WinKawaks1.65\\roms\\neogeo\\neogeo.zip": {
+      "sha256": "E1FFD4AB180E2F6AA4A3AA4D2C6F991E19D8EF762BEC8B5A6283704A2EDC3BBC",
+      "bytes": 953500,
+      "mtime_ns": 1158274344000000000
+    }
+  },
+  "production_modified": false,
+  "production_compiled": false,
+  "minecraft_started": false,
+  "commercial_rom_loaded": true,
+  "source_roms_read_only": true,
+  "snapshot_frame": 2200,
+  "following_frames": 600,
+  "limitations": [
+    "Independent experimental core, not integrated into FC or Native production.",
+    "Finite traces for the provided existing ROM set only; not a universal FBNeo compatibility claim.",
+    "Entire canonical video and all signed stereo PCM samples are hashed per frame; no sound samples ignored.",
+    "Snapshot contents and ROM/BIOS copies exist only in owned temporary directories and are not report artifacts."
+  ],
+  "children": {
+    "a": {
+      "exit_code": 1,
+      "stderr_tail": "CORE FinalBurn Neo v1.0.0.03 260904 GITa251c76 fps=59.18 actual_sample_rate=47994.98\nNATIVE_TEARDOWN_COMPLETED\nException in thread \"main\" java.io.IOException: No real video\n\tat FbneoStudy.frame(FbneoStudy.java:57)\n\tat FbneoStudy.main(FbneoStudy.java:66)\n",
+      "stdout_tail": "",
+      "native_teardown_completed": true
+    },
+    "b": {
+      "exit_code": 1,
+      "stderr_tail": "CORE FinalBurn Neo v1.0.0.03 260904 GITa251c76 fps=59.18 actual_sample_rate=47994.98\nNATIVE_TEARDOWN_COMPLETED\nException in thread \"main\" java.io.IOException: No real video\n\tat FbneoStudy.frame(FbneoStudy.java:57)\n\tat FbneoStudy.main(FbneoStudy.java:66)\n",
+      "stdout_tail": "",
+      "native_teardown_completed": true
+    }
+  },
+  "source_roms_unchanged": true,
+  "seconds": 1.534,
+  "qa_source_sha256": {
+    "tools\\run_study.py": "100D76E606876EA4B5D100CDF9B9CDBE89C75DEBFDA15EB2D4160963F3EF22A4",
+    "tools\\FbneoStudy.java": "22D43B8F523F9DB2BAFF8B6EE0D9C19C66DD808A3A420EB4BF4FC6F0555DB0DE"
+  }
+}

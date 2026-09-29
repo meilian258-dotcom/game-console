@@ -1,0 +1,23 @@
+{
+  "parent": "minecraft:block/block",
+  "credit": "Game Console handheld admin terminal; vanilla block materials",
+  "ambientocclusion": false,
+  "gui_light": "front",
+  "textures": {"particle":"minecraft:block/gray_concrete","body":"minecraft:block/gray_concrete","screen":"minecraft:block/cyan_concrete","key":"minecraft:block/light_gray_concrete","light":"minecraft:block/lime_concrete"},
+  "display": {
+    "gui":{"rotation":[12,-22,0],"scale":[1,1,1]},
+    "ground":{"translation":[0,3,0],"scale":[0.5,0.5,0.5]},
+    "fixed":{"rotation":[0,180,0],"scale":[0.8,0.8,0.8]},
+    "firstperson_righthand":{"rotation":[0,-35,0],"translation":[1,2,0],"scale":[0.7,0.7,0.7]},
+    "firstperson_lefthand":{"rotation":[0,35,0],"translation":[1,2,0],"scale":[0.7,0.7,0.7]},
+    "thirdperson_righthand":{"rotation":[0,0,0],"translation":[0,2,0],"scale":[0.65,0.65,0.65]},
+    "thirdperson_lefthand":{"rotation":[0,0,0],"translation":[0,2,0],"scale":[0.65,0.65,0.65]}
+  },
+  "elements": [
+    {"from":[3,1,7],"to":[13,15,9],"faces":{"north":{"texture":"#body"},"south":{"texture":"#body"},"east":{"texture":"#body"},"west":{"texture":"#body"},"up":{"texture":"#body"},"down":{"texture":"#body"}}},
+    {"from":[4,6,6.9],"to":[12,14,7],"faces":{"north":{"texture":"#screen"}}},
+    {"from":[4,2.5,6.8],"to":[6,4.5,7],"faces":{"north":{"texture":"#key"},"up":{"texture":"#key"},"down":{"texture":"#key"},"east":{"texture":"#key"},"west":{"texture":"#key"}}},
+    {"from":[7,2.5,6.8],"to":[9,4.5,7],"faces":{"north":{"texture":"#key"},"up":{"texture":"#key"},"down":{"texture":"#key"},"east":{"texture":"#key"},"west":{"texture":"#key"}}},
+    {"from":[10,2.5,6.8],"to":[12,4.5,7],"faces":{"north":{"texture":"#light"},"up":{"texture":"#light"},"down":{"texture":"#light"},"east":{"texture":"#light"},"west":{"texture":"#light"}}}
+  ]
+}

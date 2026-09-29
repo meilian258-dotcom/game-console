@@ -1,0 +1,72 @@
+{
+  "ok": true,
+  "driver": "kof97",
+  "mode": "final-private-JAR-only",
+  "production_compiled": false,
+  "evidence": {
+    "ipc_ok": true,
+    "assertions": 5611,
+    "owned_pid": 4644,
+    "actual_fps": 59.18560791015625,
+    "pcm_rate": 48000,
+    "initial_empty_frames": 1,
+    "state_bytes": 1029356,
+    "state_sha256": "bfa18d67fb86792d1df4926d0cc6b2dec7396257328dd80d6a310682d2bc806a",
+    "idle_state_equal": true,
+    "load_resave_equal": false,
+    "restored_video_mismatches_of_600": 0,
+    "restored_pcm_mismatches_of_600": 600,
+    "restored_final_state_different_bytes": 10,
+    "elapsed_seconds": 13.6274347,
+    "native_sync_qualified": false
+  },
+  "sources_unchanged": true,
+  "source_fingerprints": {
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\tools\\qa\\NativeStepMameProbe.java": {
+      "sha256": "DCF1B78285E144290D3F35A085B8293492AE722A398DC0415152DFDE4E8327B0",
+      "bytes": 5296,
+      "mtime_ns": 1789180616164310500
+    },
+    "piq-native-arcade\\build\\native-step-prototype-v1\\piq-native-step-parent-prototype.jar": {
+      "sha256": "012F3B471CE3A8354FF86A5EE2A0D20BD13F7A7AB5D32DF1D39A85FCC2E6DCCF",
+      "bytes": 38316,
+      "mtime_ns": 1789180955041658400
+    },
+    "F:\\Minecraft\\HMCL\\versions\\1.21.1-NeoForge\\piq-native-arcade\\roms\\kof97.zip": {
+      "sha256": "804F892924D4650545D3EA2D19FB85670094DC46DB882FECAF3E03009E2C4B9F",
+      "bytes": 28745740,
+      "mtime_ns": 1789019872695917100
+    },
+    "E:\\Dow\\rom\\WinKawaks1.65模拟器\\WinKawaks1.65\\roms\\neogeo\\neogeo.zip": {
+      "sha256": "E1FFD4AB180E2F6AA4A3AA4D2C6F991E19D8EF762BEC8B5A6283704A2EDC3BBC",
+      "bytes": 953500,
+      "mtime_ns": 1158274344000000000
+    },
+    "piq-native-arcade\\build\\native-step-prototype-v1\\piq-native-step-helper.jar": {
+      "sha256": "AA515AB5E4981EFEA667FBDFFA839B13FE035A4C40F1A6B1F15B7E9711CF7E77",
+      "bytes": 39840,
+      "mtime_ns": 1789180481334585300
+    },
+    "G:\\服务器\\服务器Codex\\piq-native-arcade-poc\\vendor\\mame_libretro.dll": {
+      "sha256": "6172A988AB67FE68F4177A6FC8FBB82619EB2044C330930F0F572F7B1EDC2301",
+      "bytes": 372431360,
+      "mtime_ns": 1788825946000000000
+    },
+    "C:\\Users\\13498\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna\\5.14.0\\67bf3eaea4f0718cb376a181a629e5f88fa1c9dd\\jna-5.14.0.jar": {
+      "sha256": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6",
+      "bytes": 1878533,
+      "mtime_ns": 1781245930305499200
+    },
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\tools\\check_native_step_mame.py": {
+      "sha256": "ADC05DA188BF64BD7306A22C63E8DF18B94D53B44DDFBA304C108D2BDE42FEBF",
+      "bytes": 3871,
+      "mtime_ns": 1789180869868837600
+    }
+  },
+  "helper_sha256": "AA515AB5E4981EFEA667FBDFFA839B13FE035A4C40F1A6B1F15B7E9711CF7E77",
+  "limitations": [
+    "Real fixed MAME + actual parent IPC, not Minecraft/world/server/socket tests.",
+    "IPC correct does not mean emulator snapshot state or PCM restores deterministically.",
+    "No mod registration, runtime installation, user file edits or unrelated process termination."
+  ]
+}

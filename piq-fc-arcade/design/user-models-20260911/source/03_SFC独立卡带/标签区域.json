@@ -1,0 +1,20 @@
+{
+  "texture": "SFC卡带_完整UV.png",
+  "canvas": [
+    1024,
+    1024
+  ],
+  "front": {
+    "x": 32,
+    "y": 32,
+    "width": 616,
+    "height": 278
+  },
+  "back": {
+    "x": 704,
+    "y": 32,
+    "width": 260,
+    "height": 100
+  },
+  "sourceLabel": "游戏标签_616x278.png"
+}

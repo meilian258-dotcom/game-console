@@ -1,0 +1,81 @@
+{
+  "passed": true,
+  "mode": "final-jar-only",
+  "production_compiled": false,
+  "elapsed_seconds": 13.125,
+  "actual": {
+    "passed": true,
+    "coordinator_assertions": 782,
+    "worker_assertions": 796,
+    "actual_codec_roundtrips": 315,
+    "actual_playback_worker_jvms": 2,
+    "guest_worker_generations": 3,
+    "host_final_next_frame": 248,
+    "matched_video_and_pcm_frames": 184,
+    "actual_button_port_cases": 24,
+    "same_tick_edge_masks": [
+      1,
+      0,
+      256,
+      0,
+      2,
+      0,
+      512,
+      0
+    ],
+    "jitter_milliseconds": [
+      0,
+      3,
+      8,
+      15,
+      35
+    ],
+    "joins": [
+      {
+        "frame": 28,
+        "bytes": 1294513,
+        "chunks": 43,
+        "sha256": "4d3b943b9700728c4b9ba5c727e55739cf2152aa3afa1a39639251e9813d67c1"
+      },
+      {
+        "frame": 208,
+        "bytes": 1294513,
+        "chunks": 43,
+        "sha256": "62214ba7884591c7dbf90201a24ec6ebfb597f22e907c74a6a8d9cce959fc24f"
+      }
+    ],
+    "rejected_guest_gap_error": "SFC 输入帧缺失，已停止以免双人不同步",
+    "queued_ready_suppressed_after_close": true,
+    "host_worker_restart_count": 0
+  },
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
+      "sha256": "74E16FEF0F69C88191C0A64DA4FCCDEFD2F3B18B231FC56C97839E60B885FBE5"
+    },
+    "sfc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_sfc-0.1.0-alpha.15.jar",
+      "sha256": "EC4BAF1CE1819BAA85229B2873AA9B97A70B19340E6B7EA23CB43FD479BC63C6"
+    }
+  },
+  "source_sha256": {
+    "piq-sfc-home\\tools\\qa\\SfcPlaybackWorkerProbe.java": "5706279D688985FA67F712CCCAB3A30F243846CF053D387DA34D1B8E27336C54",
+    "piq-fc-arcade\\tools\\qa\\SfcTwoPortInputProbe.java": "E69C500BFC00303A3F2B65507AD29207EF5B30AA839D04AC8E146CBEF207C839",
+    "piq-sfc-arcade\\src\\test\\java\\cn\\piq\\sfcarcade\\core\\SfcLegalTestRom.java": "EF75502FB38B15197C2221D3937B00A9AD13A2762C1E0E2DF46BBB1767EE58B3",
+    "piq-sfc-home\\tools\\run_sfc_playback_multiplayer_probe.py": "31E03BBAE45EF07C2425EB64E98A35E581CD37BB27A8141061043C0687516BFA"
+  },
+  "compile_output": "",
+  "scope": "Two real production SfcPlayback workers, unmodified WASM cores, actual paced frame queues/core leases, real record codecs and SfcJoinGate consent/snapshot checks, original input-sensitive 65816 ROM.",
+  "limitations": [
+    "No Minecraft client/server, socket, real packet dispatch, protection plugin or real controller was started.",
+    "Python is the coordinator; server lease/permission/session transitions are not integration-tested by this fixture.",
+    "Host callback dispatch/audio/backup effects are test sinks; production SfcJoinClient upload/cancellation routing is not exercised.",
+    "Timeout gate uses an advanced logical tick, not a 30-second live network timeout.",
+    "Only an original diagnostic ROM was used; this does not assert commercial game compatibility."
+  ],
+  "commercial_roms": false,
+  "minecraft_started": false,
+  "network_socket_opened": false,
+  "audio_device_opened": false,
+  "installed": false
+}

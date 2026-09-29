@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:block",
+  "pools": [{
+    "rolls": 1,
+    "entries": [{
+      "type": "minecraft:item",
+      "name": "piq_j2me_arcade:j2me_arcade"
+    }],
+    "conditions": [{ "condition": "minecraft:survives_explosion" }]
+  }]
+}

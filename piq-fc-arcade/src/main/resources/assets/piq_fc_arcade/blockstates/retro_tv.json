@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": {"model": "piq_fc_arcade:block/home_retro_tv"},
+    "facing=east": {"model": "piq_fc_arcade:block/home_retro_tv", "y": 90},
+    "facing=south": {"model": "piq_fc_arcade:block/home_retro_tv", "y": 180},
+    "facing=west": {"model": "piq_fc_arcade:block/home_retro_tv", "y": 270}
+  }
+}

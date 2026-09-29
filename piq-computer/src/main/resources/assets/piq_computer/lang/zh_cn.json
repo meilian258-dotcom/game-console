@@ -1,0 +1,18 @@
+{
+  "block.piq_computer.computer_black": "黑色可组装电脑",
+  "block.piq_computer.computer_white": "白色可组装电脑",
+  "block.piq_computer.keyboard_black": "黑色键盘",
+  "block.piq_computer.keyboard_white": "白色键盘",
+  "block.piq_computer.mouse_black": "黑色鼠标",
+  "block.piq_computer.mouse_white": "白色鼠标",
+  "item.piq_computer.motherboard": "电脑主板",
+  "item.piq_computer.cpu": "处理器",
+  "item.piq_computer.cooler": "CPU 散热器",
+  "item.piq_computer.ram": "内存条",
+  "item.piq_computer.gpu": "显卡",
+  "item.piq_computer.hdd": "硬盘",
+  "item.piq_computer.psu": "电源",
+  "item.piq_computer.connector": "USB 无线接收器配对工具",
+  "block.piq_computer.keyboard_mouse_black": "黑色键鼠套装",
+  "block.piq_computer.keyboard_mouse_white": "白色键鼠套装"
+}

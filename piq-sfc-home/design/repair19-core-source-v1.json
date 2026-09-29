@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "mode": "production-source",
+  "production_compiled": true,
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-gba-server31-v2\\piq_fc_arcade-0.31.0-alpha.31.jar",
+      "sha256": "EB71CBF7F4FD3940C2B840F3E74629D0E925902EB4D4195C97973B5A8A874E58"
+    },
+    "sfc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls30-v1\\piq_sfc-0.1.0-alpha.18.jar",
+      "sha256": "7BDF3B5BAB4722B35D85303CD2F18C9A7BEA640B3DB7B00C3E9CAFF24E1B49DB"
+    }
+  },
+  "actual": {
+    "real_core_instances": 2,
+    "checkpoint_save_and_sha_millis": 2.7126,
+    "assertions": 2409,
+    "rgba_full_stereo_pcm_frames_compared": 767,
+    "state_bytes": 1294513,
+    "host_frames_advanced_during_repair": 120,
+    "commercial_rom_used": false,
+    "minecraft_or_socket_started": false,
+    "ok": true,
+    "fps": 60.0988
+  },
+  "source_sha256": {
+    "piq-sfc-home\\tools\\qa\\SfcRepairCoreProbe.java": "61E039FC5A49631E67B4057B89A4A94F8ACD7557B32BD7FAF37E90D9ED19A1E0",
+    "piq-fc-arcade\\tools\\qa\\SfcTwoPortInputProbe.java": "E69C500BFC00303A3F2B65507AD29207EF5B30AA839D04AC8E146CBEF207C839",
+    "piq-sfc-arcade\\src\\test\\java\\cn\\piq\\sfcarcade\\core\\SfcLegalTestRom.java": "EF75502FB38B15197C2221D3937B00A9AD13A2762C1E0E2DF46BBB1767EE58B3",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcExecutionCore.java": "E7E4F37344F921E8C9160E85EC34F4391F6C1800BCBD5032724C2FF7EB4DC338",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcCheckpoints.java": "0D6A290F1DE5E72BCBC9051770E7F1B8BC2AC31AFEDE598EE670037EBB779539",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\server\\SfcRepairLedger.java": "F30904B251D94C5D564AF91C04545ED38333453B4242F00942BA1533058CEEA9",
+    "piq-sfc-home\\tools\\check_sfc_repair_core.py": "6A38C10FBD78A76086D2AA2979A37CCC01C0359999942741441AB2EAAB29CD4B"
+  },
+  "compile_log": "",
+  "elapsed_seconds": 12.532,
+  "limitations": [
+    "Actual two WASM cores and canonical execution/state wrapper; not the SfcPlayback network coordinator.",
+    "Original 65816 ROM; no commercial ROM, Minecraft process, socket, sound device or user save accessed.",
+    "Permission and real Connection backpressure are validated separately."
+  ]
+}

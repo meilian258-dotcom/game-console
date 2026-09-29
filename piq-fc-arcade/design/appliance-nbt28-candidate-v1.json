@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.28.jar",
+  "sha256": "572E4FF3D750ED3C0E92E78C2DCBF137B5D5F4851059C8866CFA0E9212B50CF3",
+  "probe": {
+    "ok": true,
+    "assertions": 419,
+    "actual_neoforge_register_event": true,
+    "actual_production_constructors": true,
+    "actual_minecraft_nbt": true,
+    "unsafe_or_fake_holders": false,
+    "production_origin": "supplied-jar-only",
+    "production_compiled": false,
+    "minecraft_world_started": false,
+    "full_fml_discovery_test": false
+  },
+  "production_compiled": false,
+  "compiled_only_probe": true,
+  "probe_sha256": "FA2BBFA58086B44D2ABFF3F6A770B9B60B321E9118DD80C61FC2B0EB355AD5FB",
+  "limitations": [
+    "Actual registry events and production constructors/NBT in an isolated Java process. Not full FML discovery, a real server/world, packet/protection or live interaction test."
+  ]
+}

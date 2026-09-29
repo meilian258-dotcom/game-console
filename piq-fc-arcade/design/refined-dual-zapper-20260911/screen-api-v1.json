@@ -1,0 +1,38 @@
+{
+  "ok": true,
+  "actual_minecraft_api_compile": true,
+  "minecraft_started": false,
+  "gradle_started": false,
+  "compiled_production_sources": [
+    "layout/ScreenSurfaceGeometry.java",
+    "layout/ScreenRayMapping.java",
+    "layout/DualCabinetGeometry.java",
+    "client/ArcadeBlockScreenRenderer.java",
+    "client/HomeVideoDisplay.java"
+  ],
+  "compiled_classes": [
+    "cn/piq/fcarcade/client/ArcadeBlockScreenRenderer.class",
+    "cn/piq/fcarcade/client/HomeVideoDisplay.class",
+    "cn/piq/fcarcade/layout/DualCabinetGeometry.class",
+    "cn/piq/fcarcade/layout/ScreenRayMapping$Pixel.class",
+    "cn/piq/fcarcade/layout/ScreenRayMapping.class",
+    "cn/piq/fcarcade/layout/ScreenSurfaceGeometry$1.class",
+    "cn/piq/fcarcade/layout/ScreenSurfaceGeometry$Surface.class",
+    "cn/piq/fcarcade/layout/ScreenSurfaceGeometry.class"
+  ],
+  "compiler_output": "",
+  "baseline_fc": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-interaction24-v1\\piq_fc_arcade-0.31.0-alpha.24.jar",
+    "sha256": "AE3185660442BA3BB38344165F3D60F736DB5DA3E63F2E4FE9D7DCC79C1F170B"
+  },
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\ScreenSurfaceGeometry.java": "CB6E1C9E8879B40538C0CD18F777ED5125F5CEB312F9AA1C68CF5102837FB60F",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\ScreenRayMapping.java": "D2A98ACE32DC748008FFD836D7A2B4617E7B30E77C92B915120AAA8EDE4709BF",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\DualCabinetGeometry.java": "857CA7D16D6461FC1F40512EB1B1E57A2D295833044DB8AC75FE174EC0D4A10B",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ArcadeBlockScreenRenderer.java": "8703DB13B0A16B7FFAA3C1CAC9F0936A4EED269AF3B1E8B88FF5C67DEDB78AE6",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\HomeVideoDisplay.java": "4EAE7677524A98C01107F76974751099D91225876609E4D887EB0452DE65019F"
+  },
+  "limits": [
+    "API compilation only; not a real game/GL/render thread test."
+  ]
+}

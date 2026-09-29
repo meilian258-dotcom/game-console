@@ -1,0 +1,162 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+
+group = mod_group_id
+version = mod_version
+
+base {
+    archivesName = mod_id
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    withSourcesJar()
+}
+
+repositories {
+    mavenCentral()
+}
+
+neoForge {
+    version = neo_version
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        configureEach {
+            logLevel = org.slf4j.event.Level.INFO
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+configurations {
+    wasmtimeRuntime
+    implementation.extendsFrom(wasmtimeRuntime)
+}
+
+dependencies {
+    // PIQ FC Arcade already ships this runtime. Keep it on the compile/test
+    // classpath, but do not bundle a second copy into the SFC mod JAR.
+    wasmtimeRuntime "ai.tegmentum:wasmtime4j:${wasmtime4j_version}"
+    wasmtimeRuntime "ai.tegmentum:wasmtime4j-jni:${wasmtime4j_version}"
+    wasmtimeRuntime "ai.tegmentum:wasmtime4j-native-loader:${wasmtime4j_version}"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+tasks.register('coreSelfTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs the ROM/input/video ABI self-test without a copyrighted ROM.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'cn.piq.sfcarcade.core.SfcCoreSelfTest'
+}
+
+tasks.register('wasmRuntimeSmoke', JavaExec) {
+    group = 'verification'
+    description = 'Runs an original legal LoROM through the packaged jgenesis WASM core.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'cn.piq.sfcarcade.core.SfcWasmRuntimeSmoke'
+}
+
+tasks.register('romRepositorySelfTest', JavaExec) {
+    group = 'verification'
+    description = 'Verifies SFC ROM catalog, normalized hashing and downloaded-file storage.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'cn.piq.sfcarcade.core.SfcRomRepositorySelfTest'
+}
+
+tasks.named('test', Test) {
+    // The phase-1 verification is a dependency-free executable self-test,
+    // not a JUnit engine test. Gradle 9 otherwise treats this as an error.
+    failOnNoDiscoveredTests = false
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('coreSelfTest'), tasks.named('wasmRuntimeSmoke'),
+            tasks.named('romRepositorySelfTest')
+}
+
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    var replaceProperties = [
+            minecraft_version: minecraft_version,
+            neo_version      : neo_version,
+            mod_id           : mod_id,
+            mod_name         : mod_name,
+            mod_version      : mod_version
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude 'META-INF/MANIFEST.MF',
+            'META-INF/*.SF',
+            'META-INF/*.RSA',
+            'META-INF/*.DSA',
+            'module-info.class',
+            'natives/darwin-aarch64/**',
+            'natives/linux-aarch64/**'
+    from(rootProject.file('LICENSE')) {
+        into 'META-INF'
+        rename { 'LICENSE-piq-sfc-arcade.txt' }
+    }
+    manifest {
+        attributes(
+            'Implementation-Title': 'Game Console: SFC Core',
+            'Implementation-Version': project.version,
+            'Implementation-Vendor': 'PIQ'
+        )
+    }
+}
+
+tasks.register('packagedRuntimeSmoke', JavaExec) {
+    dependsOn tasks.named('jar'), tasks.named('testClasses')
+    classpath = files(sourceSets.test.output, tasks.named('jar').flatMap { it.archiveFile }) + configurations.wasmtimeRuntime
+    mainClass = 'cn.piq.sfcarcade.core.SfcWasmRuntimeSmoke'
+}
+
+tasks.register('verifyNoBundledWasmtime') {
+    group = 'verification'
+    description = 'Ensures SFC does not duplicate the Wasmtime module already supplied by PIQ FC Arcade.'
+    dependsOn tasks.named('jar')
+    doLast {
+        def archive = tasks.named('jar').get().archiveFile.get().asFile
+        def duplicate = zipTree(archive).matching {
+            include 'ai/tegmentum/wasmtime4j/**'
+        }.files
+        if (!duplicate.empty) {
+            throw new GradleException("SFC JAR still bundles Wasmtime classes: ${duplicate.take(5)}")
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('packagedRuntimeSmoke'), tasks.named('verifyNoBundledWasmtime')
+}

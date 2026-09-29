@@ -1,0 +1,106 @@
+*** Begin Patch
+*** Update File: G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/fcarcade/home/HomeHardware.java
+@@
+     public static void register() {
+         HomeControllerService.register();
++        HomeSystems.installLifecycle();
+@@
+     public static HomeConsoleBlockEntity connectedConsole(Level level, BlockPos tvPos) {
++        var endpoint = connectedEndpoint(level, tvPos);
++        return endpoint instanceof HomeConsoleBlockEntity console ? console : null;
++    }
++
++    /** Package-only generalization: old public FC queries retain their NES-only meaning. */
++    static HomeEndpointBlockEntity connectedEndpoint(Level level, BlockPos tvPos) {
+@@
+-        if (!(loadedEndpoint(level, tv.consolePos()) instanceof HomeConsoleBlockEntity console)
+-                || !mutual(console, tv) || !SuborStructure.complete(level, console.getBlockPos())) return null;
++        HomeEndpointBlockEntity console = loadedEndpoint(level, tv.consolePos());
++        if (console == null || console.getLevel() != level || !mutual(console, tv) || !consoleComplete(console)) return null;
+@@
+-    private static boolean mutual(HomeConsoleBlockEntity console, HomeTvBlockEntity tv) {
+-        return console.linkId() != null && console.linkId().equals(tv.linkId())
++    private static boolean mutual(HomeEndpointBlockEntity console, HomeTvBlockEntity tv) {
++        return console.kind() == HomeLinkLedger.Kind.CONSOLE && console.linkId() != null && console.linkId().equals(tv.linkId())
+                 && console.hardwareId().equals(tv.peerId()) && tv.hardwareId().equals(console.peerId())
+-                && console.getBlockPos().equals(tv.consolePos()) && tv.getBlockPos().equals(console.tvPos())
++                && console.getBlockPos().equals(tv.consolePos()) && tv.getBlockPos().equals(console.peerPos())
+                 && HomeLinkLedger.inRange(console.endpoint(), tv.endpoint());
+     }
++
++    private static boolean consoleComplete(HomeEndpointBlockEntity console) {
++        if (console instanceof HomeConsoleBlockEntity fc) return SuborStructure.complete(fc.getLevel(), fc.getBlockPos());
++        return console instanceof ExternalHomeConsoleBlockEntity external && HomeSystems.complete(external);
++    }
+@@
+         if (!HomeTvStructure.complete(level, pos)) return message(player, "tv_incomplete");
++        if (connectedEndpoint(level, pos) instanceof ExternalHomeConsoleBlockEntity) {
++            if (player.isShiftKeyDown()) return message(player, "use_console");
++            var external = HomeSystems.connectionForTv(player.serverLevel(), pos);
++            return external.isPresent() ? HomeSystems.interactAt(player, hit.getBlockPos(), InteractionHand.MAIN_HAND, hit, external.get())
++                    : message(player, "tv_requires_console");
++        }
+         HomeConsoleBlockEntity console = connectedConsole(player.serverLevel(), pos);
+@@
+-        if (endpoint instanceof HomeConsoleBlockEntity && !SuborStructure.complete(level, pos))
++        if (endpoint.kind() == HomeLinkLedger.Kind.CONSOLE && !consoleComplete(endpoint))
+             return message(player, "subor_incomplete");
+@@
+-        if (first instanceof HomeConsoleBlockEntity && !SuborStructure.complete(level, firstPos))
++        if (first.kind() == HomeLinkLedger.Kind.CONSOLE && !consoleComplete(first))
+             return message(player, "subor_incomplete");
+@@
+         if (console instanceof HomeConsoleBlockEntity machine && machine.hasCartridge()
+                 && machine.romSha().matches("[0-9a-f]{64}"))
+             ServerArcadeSessions.startHomeConsole(player, tv.getBlockPos(), machine.romSha());
++        else if (console instanceof ExternalHomeConsoleBlockEntity external) HomeSystems.linked(player, external);
+@@
+     private static void stopEndpoint(HomeEndpointBlockEntity endpoint) {
++        stopEndpoint(endpoint, HomeSystems.StopReason.INVALID_CONNECTION);
++    }
++
++    private static void stopEndpoint(HomeEndpointBlockEntity endpoint, HomeSystems.StopReason reason) {
+         if (!(endpoint.getLevel() instanceof ServerLevel level)) return;
++        if (endpoint instanceof ExternalHomeConsoleBlockEntity external) {
++            // The original BE is still available during unload even if its peer is not.
++            HomeSystems.stopped(external, reason);
++            return;
++        }
+         BlockPos tvPos;
+-        if (endpoint instanceof HomeTvBlockEntity) {
++        if (endpoint instanceof HomeTvBlockEntity television) {
+             tvPos = endpoint.getBlockPos();
+@@
+             if (level.hasChunkAt(tvPos) && level.getBlockEntity(tvPos) != endpoint) return;
++            if (loadedEndpoint(level, television.consolePos()) instanceof ExternalHomeConsoleBlockEntity external
++                    && mutual(external, television)) {
++                HomeSystems.stopped(external, reason);
++                return;
++            }
+@@
+-                    || !mutual((HomeConsoleBlockEntity) endpoint, tv)) return;
++                    || !mutual(endpoint, tv)) return;
+@@
+-        stopEndpoint(endpoint);
++        stopEndpoint(endpoint, HomeSystems.StopReason.DISCONNECTED);
+         UUID linkId = endpoint.linkId();
+@@
+     static void reconcile(HomeEndpointBlockEntity endpoint) {
++        if (endpoint instanceof ExternalHomeConsoleBlockEntity external) {
++            if (external.isRemoved()) return;
++            if (!HomeSystems.complete(external)) stopEndpoint(external);
++        }
+@@
+     static void unloaded(HomeEndpointBlockEntity endpoint) {
+         // Unloading is not dismantling: keep link, cartridge and refund state.
+-        stopEndpoint(endpoint);
++        stopEndpoint(endpoint, HomeSystems.StopReason.UNLOADED);
+@@
+-        stopEndpoint(endpoint);
++        stopEndpoint(endpoint, HomeSystems.StopReason.REMOVED);
+         try { disconnect(endpoint, null); }
+         finally {
+             if (endpoint instanceof HomeConsoleBlockEntity console)
+                 Block.popResource(level, pos, console.takeCartridge());
++            else if (endpoint instanceof ExternalHomeConsoleBlockEntity external) HomeSystems.removed(external);
+*** End Patch

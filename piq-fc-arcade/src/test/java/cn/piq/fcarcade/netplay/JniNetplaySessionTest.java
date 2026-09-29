@@ -1,0 +1,128 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+package cn.piq.fcarcade.netplay;
+
+import cn.piq.retro.libretro.*;
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/** Exercises real relay/codec/session/rollback/storage callbacks; fake core only, not a JNI claim. */
+class JniNetplaySessionTest {
+    static class Core implements LibretroRuntime {
+        final InfoHolder av=new InfoHolder();long state=7;Thread owner;boolean closed,pendingReset;
+        private void check(){assertSame(owner,Thread.currentThread());assertFalse(closed);}
+        public LibretroProcess.Info load(byte[] bytes){owner=Thread.currentThread();return info();}
+        public LibretroProcess.Info info(){return av.info;}
+        public String coreVersion(){return "test";}
+        public LibretroProcess.Output run(List<LibretroProcess.Controls> frames,int mask){
+            check();if(pendingReset){state=7;pendingReset=false;}for(var frame:frames){var p=frame.pads();state=state*31+p[0]*65537L+p[1];}
+            byte[] picture=(mask&1)==0?new byte[0]:new byte[256*240*4];
+            if(picture.length>0)ByteBuffer.wrap(picture).putLong(state);
+            return new LibretroProcess.Output(info(),false,picture,(mask&2)==0?new short[0]:new short[1470],new byte[0]);
+        }
+        public LibretroProcess.Output runWithMemory(List<LibretroProcess.Controls> frames,int mask,int id){return run(frames,mask);}
+        public LibretroProcess.Info reset(){check();pendingReset=true;return info();}
+        public byte[] serialize(){check();return ByteBuffer.allocate(8).putLong(state).array();}
+        public void restore(byte[] bytes){check();if(bytes.length!=8)throw new IllegalArgumentException();state=ByteBuffer.wrap(bytes).getLong();}
+        public byte[] memory(int id){check();return new byte[0];}
+        public LibretroSaveMemory saveMemory(){check();return new LibretroSaveMemory(new byte[0],new byte[0]);}
+        public void restoreSaveMemory(LibretroSaveMemory memory){check();}
+        public byte[] persistenceIdentity(){return new byte[32];}
+        public void close(){check();closed=true;}
+    }
+    static class InfoHolder {final LibretroProcess.Info info=new LibretroProcess.Info(256,240,256,240,4f/3,60,44100,1);}
+    static final byte[] ROM=new byte[16];
+    static class Room implements AutoCloseable {
+        final Object hostKey=new Object();
+        final Map<Object,JniNetplaySession> runs=new ConcurrentHashMap<>();
+        final ScheduledThreadPoolExecutor wire=new ScheduledThreadPoolExecutor(1);
+        final NetplayRelay<Object> relay;
+        final JniNetplaySession host;
+        final AtomicReference<byte[]> saved=new AtomicReference<>();
+        final AtomicInteger commits=new AtomicInteger();
+        volatile int delay=0;
+        Room(boolean persist){
+            relay=new NetplayRelay<>(700,hostKey,(target,message)->{
+                var run=runs.get(target);if(run!=null)wire.schedule(()->run.receive(message.chunk(),message.port()),delay,TimeUnit.MILLISECONDS);
+            });
+            var ticket=relay.grant(hostKey,0);
+            host=new JniNetplaySession(new NetplayProcess.Grant(700,ticket.id(),true,true,0),()->ROM,
+                    packet->relay.receive(hostKey,packet),Core::new);
+            if(persist)host.persistence(new NetplayProcess.Persistence(){
+                public byte[] load(NetplaySaveState.Identity identity){return saved.get();}
+                public CompletableFuture<Void> save(byte[] bytes){NetplaySaveState.decode(bytes,FcNetplaySaves.jniIdentity(NetplaySaveState.hash(ROM)));saved.set(bytes);commits.incrementAndGet();return CompletableFuture.completedFuture(null);}
+            });
+            runs.put(hostKey,host);
+            wire.scheduleAtFixedRate(()->relay.renew(Set.copyOf(runs.keySet())),0,100,TimeUnit.MILLISECONDS);
+            host.start();
+        }
+        JniNetplaySession join(int port){
+            Object key=new Object();var ticket=relay.grant(key,port);
+            var run=new JniNetplaySession(new NetplayProcess.Grant(700,ticket.id(),false,port>=0,port),()->ROM,
+                    packet->wire.schedule(()->relay.receive(key,packet),delay,TimeUnit.MILLISECONDS),Core::new);
+            runs.put(key,run);run.start();return run;
+        }
+        void disconnect(JniNetplaySession run){
+            Object key=runs.entrySet().stream().filter(e->e.getValue()==run).findFirst().orElseThrow().getKey();
+            relay.revoke(key);runs.remove(key);run.close();
+        }
+        void healthy(){for(var r:runs.values())assertNull(r.error(),r.diagnostic());}
+        public void close()throws Exception{
+            for(var r:runs.values())r.close();
+            for(var r:runs.values())r.terminated().get(10,TimeUnit.SECONDS);
+            relay.close();wire.shutdownNow();assertTrue(wire.awaitTermination(3,TimeUnit.SECONDS));
+        }
+    }
+    static void until(java.util.function.BooleanSupplier check,Room room)throws Exception{
+        long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(12);
+        while(!check.getAsBoolean()&&System.nanoTime()<end){room.healthy();Thread.sleep(5);}
+        room.healthy();assertTrue(check.getAsBoolean(),"timed out: "+room.host.diagnostic());
+    }
+    @Test void twoPlayersObserverDelayedInputDisconnectRejoinAndHostSave()throws Exception{
+        try(var room=new Room(true)){
+            until(room.host::ready,room);room.delay=35;
+            var peer=room.join(1);until(peer::ready,room);
+            peer.input(256);room.host.input(1);
+            until(()->room.host.framesReceived()>90&&peer.framesReceived()>80,room);
+            long before=room.host.framesReceived();peer.input(16);
+            until(()->room.host.framesReceived()>before+12,room);
+            assertTrue(room.host.replayedFrames()>0,"changed delayed 2P input must cause a real replay");
+            var observer=room.join(-1);until(observer::ready,room);
+            until(()->observer.framesReceived()>65,room); // Crosses a real confirmed-state digest exchange.
+            peer.input(0);room.host.input(0);
+            room.host.saveNow().get(10,TimeUnit.SECONDS);assertEquals(1,room.commits.get());
+            assertNotNull(room.saved.get());assertTrue(room.host.diagnostic().contains("重演帧"));
+            room.disconnect(peer);peer.terminated().get(3,TimeUnit.SECONDS);
+            var rejoin=room.join(1);until(rejoin::ready,room);rejoin.input(8);
+            until(()->rejoin.framesReceived()>65,room);
+            assertFalse(rejoin.canSave());assertFalse(observer.canSave());
+            assertThrows(ExecutionException.class,()->observer.saveNow().get());
+            assertThrows(ExecutionException.class,()->peer.checkpoint().get());
+            room.healthy();room.host.close();room.host.terminated().get(10,TimeUnit.SECONDS);
+            assertTrue(room.commits.get()>=2,"final save must have committed");
+        }
+    }
+    @Test void jniSaveIdentityCannotReadOrOverwriteRetroarchSave() {
+        String rom=NetplaySaveState.hash(ROM);
+        assertNotEquals(FcNetplaySaves.identity(false,rom),FcNetplaySaves.jniIdentity(rom));
+        var bytes=NetplaySaveState.encode(new NetplaySaveState.Parts(FcNetplaySaves.jniIdentity(rom),8,new byte[]{1},new byte[0],new byte[0]));
+        assertFalse(FcNetplaySaves.accepts(false,rom,bytes));assertTrue(FcNetplaySaves.accepts(false,true,rom,bytes));
+        assertNotEquals(FcNetplaySaves.key(false,"card|1"),FcNetplaySaves.key(false,true,"card|1"));
+        assertThrows(IllegalArgumentException.class,()->FcNetplaySaves.key(true,true,"card|1"));
+    }
+    @Test void invalidSpectatorCannotStopTheHost()throws Exception {
+        try(var room=new Room(false)) {
+            until(room.host::ready,room);
+            var ticket=UUID.randomUUID();
+            room.host.receive(new NetplayChunk(700,ticket,NetplayChunk.OPEN,0,new byte[0]),-1);
+            room.host.receive(new NetplayChunk(700,ticket,NetplayChunk.DATA,0,new byte[]{1,2,3}),-1);
+            long before=room.host.framesReceived();
+            until(()->room.host.framesReceived()>before+5,room);
+            assertTrue(room.host.diagnostic().contains("拒绝异常连接：1"));
+            assertTrue(room.host.ready());
+        }
+    }
+}

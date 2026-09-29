@@ -1,0 +1,82 @@
+{
+  "ok": true,
+  "driver": "mslug2",
+  "mode": "parent-production-source/helper-final-JAR",
+  "production_compiled": true,
+  "evidence": {
+    "ipc_ok": true,
+    "assertions": 5611,
+    "owned_pid": 33688,
+    "actual_fps": 59.18560791015625,
+    "pcm_rate": 48000,
+    "initial_empty_frames": 1,
+    "state_bytes": 1029356,
+    "state_sha256": "c4d4c5532a4673f94fa2dd6c2610d8d5bb44fdc9668e5a3b2e8dcfe2fe32b4a1",
+    "idle_state_equal": true,
+    "load_resave_equal": false,
+    "restored_video_mismatches_of_600": 0,
+    "restored_pcm_mismatches_of_600": 240,
+    "restored_final_state_different_bytes": 10,
+    "elapsed_seconds": 13.3408833,
+    "native_sync_qualified": false
+  },
+  "sources_unchanged": true,
+  "source_fingerprints": {
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeStepSession.java": {
+      "sha256": "78D9B50456B38766877FD4D3607FA00348BB5F8325A4EADCE9F9DD28D6B43DEC",
+      "bytes": 9979,
+      "mtime_ns": 1789180480307675200
+    },
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeProcessSession.java": {
+      "sha256": "6750146B6708657ADB689C01A64F4B631504B91EFC810A59E14451985CD3B87D",
+      "bytes": 13969,
+      "mtime_ns": 1789179623886933600
+    },
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\src\\main\\java\\cn\\piq\\nativearcade\\bridge\\NativeRomStaging.java": {
+      "sha256": "315D30C565408FEA123837D2C6C32F9D8680BB004BDC3F3A173B8DDA01AA63F6",
+      "bytes": 3802,
+      "mtime_ns": 1789014630286657400
+    },
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\tools\\qa\\NativeStepMameProbe.java": {
+      "sha256": "DCF1B78285E144290D3F35A085B8293492AE722A398DC0415152DFDE4E8327B0",
+      "bytes": 5296,
+      "mtime_ns": 1789180616164310500
+    },
+    "F:\\Minecraft\\HMCL\\versions\\1.21.1-NeoForge\\piq-native-arcade\\roms\\mslug2.zip": {
+      "sha256": "1A82D65E88050FDC75DBCEA180E48802D54C67A4748558FC4BD51C0103D56E4A",
+      "bytes": 17473893,
+      "mtime_ns": 1777530796963932400
+    },
+    "E:\\Dow\\rom\\WinKawaks1.65模拟器\\WinKawaks1.65\\roms\\neogeo\\neogeo.zip": {
+      "sha256": "E1FFD4AB180E2F6AA4A3AA4D2C6F991E19D8EF762BEC8B5A6283704A2EDC3BBC",
+      "bytes": 953500,
+      "mtime_ns": 1158274344000000000
+    },
+    "piq-native-arcade\\build\\native-step-prototype-v1\\piq-native-step-helper.jar": {
+      "sha256": "AA515AB5E4981EFEA667FBDFFA839B13FE035A4C40F1A6B1F15B7E9711CF7E77",
+      "bytes": 39840,
+      "mtime_ns": 1789180481334585300
+    },
+    "G:\\服务器\\服务器Codex\\piq-native-arcade-poc\\vendor\\mame_libretro.dll": {
+      "sha256": "6172A988AB67FE68F4177A6FC8FBB82619EB2044C330930F0F572F7B1EDC2301",
+      "bytes": 372431360,
+      "mtime_ns": 1788825946000000000
+    },
+    "C:\\Users\\13498\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna\\5.14.0\\67bf3eaea4f0718cb376a181a629e5f88fa1c9dd\\jna-5.14.0.jar": {
+      "sha256": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6",
+      "bytes": 1878533,
+      "mtime_ns": 1781245930305499200
+    },
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\tools\\check_native_step_mame.py": {
+      "sha256": "71599D17C0F1E2372ADA1DE24A32EB7981554B155D81CD706FAEDDD74B5E5B60",
+      "bytes": 3578,
+      "mtime_ns": 1789180616165596400
+    }
+  },
+  "helper_sha256": "AA515AB5E4981EFEA667FBDFFA839B13FE035A4C40F1A6B1F15B7E9711CF7E77",
+  "limitations": [
+    "Real fixed MAME + actual parent IPC, not Minecraft/world/server/socket tests.",
+    "IPC correct does not mean emulator snapshot state or PCM restores deterministically.",
+    "No mod registration, runtime installation, user file edits or unrelated process termination."
+  ]
+}

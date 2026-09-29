@@ -1,0 +1,246 @@
+{
+  "generatedAt": "2026-09-10T16:40:28.831Z",
+  "checks": [
+    {
+      "name": "Source SFC model is byte-identical",
+      "ok": true,
+      "detail": {
+        "expected": "35c487534089f8b24bd836076ef52883bfe43e90c823c0aeef6e58b44dfbf509",
+        "actual": "35c487534089f8b24bd836076ef52883bfe43e90c823c0aeef6e58b44dfbf509"
+      }
+    },
+    {
+      "name": "32 original visible shell/label/grip elements retain shape and scale",
+      "ok": true,
+      "detail": {
+        "retained": 32,
+        "translation": [
+          0,
+          -2.18,
+          -3.711
+        ],
+        "changed": []
+      }
+    },
+    {
+      "name": "Standalone envelope equals planned 5.12 × 2.9 × 0.803 units",
+      "ok": true,
+      "detail": {
+        "min": [
+          5.4399999999999995,
+          0,
+          7.5985
+        ],
+        "max": [
+          10.56,
+          2.9,
+          8.401499999999999
+        ],
+        "size": [
+          5.120000000000001,
+          2.9,
+          0.802999999999999
+        ]
+      }
+    },
+    {
+      "name": "Cartridge is centered and rests at Y=0 inside one block",
+      "ok": true,
+      "detail": {
+        "min": [
+          5.4399999999999995,
+          0,
+          7.5985
+        ],
+        "max": [
+          10.56,
+          2.9,
+          8.401499999999999
+        ],
+        "size": [
+          5.120000000000001,
+          2.9,
+          0.802999999999999
+        ]
+      }
+    },
+    {
+      "name": "Unique cube IDs and finite positive dimensions",
+      "ok": true,
+      "detail": {
+        "elements": 86,
+        "unique": 86
+      }
+    },
+    {
+      "name": "Minecraft rotations use only one legal axis",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "All cubes belong once to named groups, all groups resolve once",
+      "ok": true,
+      "detail": {
+        "unknown": [],
+        "groups": [
+          "shell",
+          "front_label",
+          "back_label",
+          "connector",
+          "contacts"
+        ],
+        "badElements": []
+      }
+    },
+    {
+      "name": "Group pivots are finite, rest rotation zero",
+      "ok": true,
+      "detail": {
+        "groups": 5
+      }
+    },
+    {
+      "name": "No detached volumetric or label components at 1e-6 tolerance",
+      "ok": true,
+      "detail": {
+        "contacts": 230,
+        "components": [
+          {
+            "count": 86
+          }
+        ]
+      }
+    },
+    {
+      "name": "Front label faces -Z and is unobstructed",
+      "ok": true,
+      "detail": {
+        "visibleFace": "north",
+        "obstructedSamples": 0,
+        "samples": 25
+      }
+    },
+    {
+      "name": "Two guide rails meet the ground",
+      "ok": true,
+      "detail": [
+        {
+          "name": "插入段左导轨",
+          "bottom": 0
+        },
+        {
+          "name": "插入段右导轨",
+          "bottom": 0
+        }
+      ]
+    },
+    {
+      "name": "Decorative gold contacts attach to PCB",
+      "ok": true,
+      "detail": {
+        "pins": 48,
+        "pcb": [
+          "连接器PCB"
+        ],
+        "detached": []
+      }
+    },
+    {
+      "name": "Single 1024 PNG is identical embedded and external",
+      "ok": true,
+      "detail": {
+        "textures": 1,
+        "size": [
+          1024,
+          1024
+        ],
+        "sha256": "7608f10ad4205635c321aa423f348ca68515b16fddc7bdf9f111811121d4892a"
+      }
+    },
+    {
+      "name": "Every visible face UV is finite, nonzero and in atlas",
+      "ok": true,
+      "detail": {
+        "faceCount": 506,
+        "badUvs": []
+      }
+    },
+    {
+      "name": "UV face islands do not overlap",
+      "ok": true,
+      "detail": {
+        "count": 0,
+        "examples": []
+      }
+    },
+    {
+      "name": "Replaceable front label pixels and 616×278 aspect preserved",
+      "ok": true,
+      "detail": {
+        "uv": [
+          32,
+          32,
+          648,
+          310
+        ],
+        "pixelBytes": 684992
+      }
+    },
+    {
+      "name": "Exactly one root Minecraft Java export exists",
+      "ok": true,
+      "detail": [
+        "sfc_cartridge.json"
+      ]
+    },
+    {
+      "name": "Java exported geometry, rotations and UV match BBModel",
+      "ok": true,
+      "detail": {
+        "elements": 86,
+        "mismatches": []
+      }
+    },
+    {
+      "name": "Minecraft asset copies are identical",
+      "ok": true,
+      "detail": {
+        "javaCopies": [
+          "C:\\codex\\我的世界服务端\\新蒸程服务端\\super_famicom\\cartridge\\minecraft_assets\\assets\\sfc_cartridge\\models\\block\\sfc_cartridge.json"
+        ],
+        "pngCopies": [
+          "C:\\codex\\我的世界服务端\\新蒸程服务端\\super_famicom\\cartridge\\minecraft_assets\\assets\\sfc_cartridge\\textures\\block\\skin.png"
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "warnings": [],
+  "model": "SFC卡带_独立版_单张UV.bbmodel",
+  "bounds": {
+    "min": [
+      5.4399999999999995,
+      0,
+      7.5985
+    ],
+    "max": [
+      10.56,
+      2.9,
+      8.401499999999999
+    ],
+    "size": [
+      5.120000000000001,
+      2.9,
+      0.802999999999999
+    ]
+  },
+  "connectivity": {
+    "contacts": 230,
+    "components": [
+      {
+        "count": 86
+      }
+    ]
+  },
+  "passed": true
+}

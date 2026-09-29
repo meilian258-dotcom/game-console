@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "piq_sfc_arcade:block/sfc_arcade" },
+    "facing=east":  { "model": "piq_sfc_arcade:block/sfc_arcade", "y": 90 },
+    "facing=south": { "model": "piq_sfc_arcade:block/sfc_arcade", "y": 180 },
+    "facing=west":  { "model": "piq_sfc_arcade:block/sfc_arcade", "y": 270 }
+  }
+}

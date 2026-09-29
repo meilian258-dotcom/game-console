@@ -1,0 +1,101 @@
+{
+  "ok": true,
+  "schema": "piq-native-buttons26-1",
+  "production_compiled": false,
+  "production_origin": "final-jar-only",
+  "helper": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq-native-arcade\\runtime\\piq-native-helper.jar",
+    "sha256": "20F6F3028D76DAEB01212D1808BE90E35BFB5429D1E06153B7D8B32DD73E943C"
+  },
+  "parent": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_native_arcade-0.1.0-alpha.10.jar",
+    "sha256": "F4011CBDE8DC3F3F3FA44FD03077638421C7D3334B33A55AFFB0E78C740C2453"
+  },
+  "runtime_dll_sha256": "6172A988AB67FE68F4177A6FC8FBB82619EB2044C330930F0F572F7B1EDC2301",
+  "private_pipe_version": 3,
+  "network_formats_changed": false,
+  "mame_dll_modified": false,
+  "minecraft_started": false,
+  "instance_modified": false,
+  "behavior": {
+    "passed_tests": 14,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "helper_parser_callback": {
+    "ok": true,
+    "assertions": 4185,
+    "actual_helper_parser_and_callbacks": true,
+    "mame_dll_loaded": false,
+    "minecraft_started": false
+  },
+  "actual_core_options": {
+    "ok": true,
+    "assertions": 251,
+    "actual_mame_core_started": true,
+    "actual_core_option_queries": 1,
+    "game_profiles_forced_disabled": true,
+    "pinned_default_was_already_disabled": true,
+    "original_frames": 120,
+    "commercial_rom_loaded": false,
+    "minecraft_started": false,
+    "natural_jvm_exit_tested": false,
+    "qa_halt_after_all_assertions_and_native_teardown": true
+  },
+  "actual_bridge": {
+    "ok": true,
+    "assertions": 15,
+    "actual_mame_bridge": true,
+    "original_diagnostic_only": true,
+    "minecraft_started": false,
+    "four_player_commercial_game_tested": false
+  },
+  "firmware": {
+    "path": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip",
+    "zip_sha256": "10E62BBACBF6E79EFB6DB6F7A65EA1EDFB65653EAB60B41E80DBCB4673A5276C",
+    "original_firmware_sha256": "554C673E65D5957DA0BC1DF0CEB986CBAC5500D407AE2D780FEAB4F8D2EED810",
+    "notice": "Original diagnostics, not Space Invaders game code. Expected checksum warnings are intentional."
+  },
+  "old_helper_rejection": {
+    "ok": true,
+    "assertions": 5,
+    "old_helper_rejected_before_process_launch": true,
+    "actionable_error": true,
+    "native_core_started": false,
+    "minecraft_started": false
+  },
+  "old_helper_sha256": "229268989AD4E263277FDF0BD5D49E59F69EEB3E980B948DD1D3628182437120",
+  "logs": {
+    "compile": {
+      "stdout": "",
+      "stderr": ""
+    },
+    "behavior": {
+      "stdout": "{\"passed_tests\":14,\"minecraft_started\":false,\"mode\":\"actual-production-pure-state-machines\"}\r\n",
+      "stderr": ""
+    },
+    "helper": {
+      "stdout": "{\"ok\":true,\"assertions\":4185,\"actual_helper_parser_and_callbacks\":true,\"mame_dll_loaded\":false,\"minecraft_started\":false}\r\n",
+      "stderr": ""
+    },
+    "core": {
+      "stdout": "{\"ok\":true,\"assertions\":251,\"actual_mame_core_started\":true,\"actual_core_option_queries\":1,\"game_profiles_forced_disabled\":true,\"pinned_default_was_already_disabled\":true,\"original_frames\":120,\"commercial_rom_loaded\":false,\"minecraft_started\":false,\"natural_jvm_exit_tested\":false,\"qa_halt_after_all_assertions_and_native_teardown\":true}\n",
+      "stderr": "QA_PHASE main\nQA_PHASE dll_load\nQA_PHASE dll_loaded\nQA_PHASE init\nQA_PHASE initialized\nQA_PHASE load_game\nOutput audio buffer capacity set to 2048\n------------------------\nMAME 0.289 (4fc9a931)\n------------------------\nPath extraction result: File name = \"C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip\"\nPath extraction result: Game name = \"invaders\"\nPath extraction result: System name = \"piq-native-buttons26-63uyv52c\"\nPath extraction result: Game path = \"C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\"\nPath extraction result: Parent path = \"C:\\Users\\13498\\AppData\\Local\\Temp\"\nStarting game: \"C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip\"\nSearching for driver: invaders\nSystem type: ARCADE\nScreen rotation: 270deg\nGame name: invaders\nGame description: Space Invaders / Space Invaders M\nSystem not found: piq-native-buttons26-63uyv52c\nSearching for driver: piq-native-buttons26-63uyv52c\nCreating frontend for game: invaders\nSoftlists: 1\nParameters:\n  mame\n  -joystick\n  -joystick_deadzone\n  0.15\n  -joystick_saturation\n  0.85\n  -joystick_threshold\n  0.30\n  -mouse\n  -multimouse\n  -nolightgun\n  -nothrottle\n  -nocheat\n  -noreadconfig\n  -statename\n  %g/invaders\n  -update_in_pause\n  -norotate\n  -cfg_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\cfg\n  -diff_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\diff\n  -nvram_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\nvram\n  -input_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\input\n  -state_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\states\n  -snapshot_directory\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\snaps\n  -artpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\artwork\n  -cheatpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\cheat\n  -hashpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\hash\n  -inipath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\ini\n  -pluginspath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\plugins\n  -samplepath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\samples\n  -crosshairpath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\crosshair\n  -homepath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\\n  -rompath\n  C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c;C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\bios;C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\mame\\roms\n  invaders\n===> registered module none uifontprovider\n===> registered module soft video\n===> registered module retro sound\n===> registered module retro monitorprovider\n===> registered module none debugger\n===> registered module none networkprovider\n===> registered module none midiprovider\n===> registered module retro keyboardprovider\n===> registered module none keyboardprovider\n===> registered module retro mouseprovider\n===> registered module none mouseprovider\n===> registered module retro lightgunprovider\n===> registered module none lightgunprovider\n===> registered module retro joystickprovider\n===> registered module none joystickprovider\n===> registered module none output\n===> registered module console output\n===> registered module network output\nInput: Adding keyboard #1: RetroKeyboard0 (device id: RetroKeyboard0)\nInput: Adding mouse #1: RetroMouse0 (device id: RetroMouse0)\nInput: Adding mouse #2: RetroMouse1 (device id: RetroMouse1)\nInput: Adding mouse #3: RetroMouse2 (device id: RetroMouse2)\nInput: Adding mouse #4: RetroMouse3 (device id: RetroMouse3)\nInput: Adding mouse #5: RetroMouse4 (device id: RetroMouse4)\nInput: Adding mouse #6: RetroMouse5 (device id: RetroMouse5)\nInput: Adding mouse #7: RetroMouse6 (device id: RetroMouse6)\nInput: Adding mouse #8: RetroMouse7 (device id: RetroMouse7)\nInput: Adding joystick #1: RetroPad0 (device id: RetroPad0)\nInput: Adding joystick #2: RetroPad1 (device id: RetroPad1)\nInput: Adding joystick #3: RetroPad2 (device id: RetroPad2)\nInput: Adding joystick #4: RetroPad3 (device id: RetroPad3)\nInput: Adding joystick #5: RetroPad4 (device id: RetroPad4)\nInput: Adding joystick #6: RetroPad5 (device id: RetroPad5)\nInput: Adding joystick #7: RetroPad6 (device id: RetroPad6)\nInput: Adding joystick #8: RetroPad7 (device id: RetroPad7)\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip ECD at 1002\nunzip: C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip has no ZIP64 ECD locator\nunzip: read C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip central directory\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip and sending to cache\nunzip: found C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip in cache\nunzip: opened archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip\nunzip: closing archive file C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c\\invaders.zip and sending to cache\n9316b-0869_m739h.h1 WRONG CHECKSUMS:\n    EXPECTED: CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f)\n       FOUND: CRC(9fc943dc) SHA1(f21f9e10c51ee445491aad83ede7b0410ddb3226)\n9316b-0856_m739g.g1 WRONG CHECKSUMS:\n    EXPECTED: CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350)\n       FOUND: CRC(f1e8ba9e) SHA1(605db3fdbaff4ba13729371ad0c4fbab3889378e)\n9316b-0855_m739f.f1 WRONG CHECKSUMS:\n    EXPECTED: CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743)\n       FOUND: CRC(f1e8ba9e) SHA1(605db3fdbaff4ba13729371ad0c4fbab3889378e)\n9316b-0854_m739e.e1 WRONG CHECKSUMS:\n    EXPECTED: CRC(14e538b0) SHA1(1d6ca0c99f9df71e2990b610deb9d7da0125e2d8)\n       FOUND: CRC(f1e8ba9e) SHA1(605db3fdbaff4ba13729371ad0c4fbab3889378e)\nWARNING: the machine might not run correctly.\nOptional device ':discrete' not found\nOptional memory region ':screen' not found\nStarting Space Invaders / Space Invaders M ':'\n  (missing dependencies; rescheduling)\nStarting Intel 8080 ':maincpu'\nStarting Video Screen ':screen'\nStarting Watchdog Timer ':watchdog'\nStarting MB14241 Data Shifter ':mb14241'\nStarting Taito Space Invaders Audio ':soundboard'\nStarting Speaker ':soundboard:mono'\nStarting TI SN76477 CSG ':soundboard:snsnd'\nStarting Discrete Sound ':soundboard:discrete'\nStarting Space Invaders / Space Invaders M ':'\nConfiguration file default.cfg not found\nConfiguration file invaders.cfg not found\nQA_PHASE game_loaded=true\nQA_PHASE frame=0\nOutput audio buffer capacity set to 3111\nOutput audio buffer capacity set to 4705\nQA_PHASE frame=30\nQA_PHASE frame=60\nQA_PHASE frame=90\nQA_PHASE unload\nQA_PHASE deinit\nQA_PHASE finished\n",
+      "isolated_working_directory": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-native-buttons26-63uyv52c"
+    },
+    "bridge": {
+      "stdout": "{\"ok\":true,\"assertions\":15,\"actual_mame_bridge\":true,\"original_diagnostic_only\":true,\"minecraft_started\":false,\"four_player_commercial_game_tested\":false}\r\n",
+      "stderr": ""
+    },
+    "rejection": {
+      "stdout": "{\"ok\":true,\"assertions\":5,\"old_helper_rejected_before_process_launch\":true,\"actionable_error\":true,\"native_core_started\":false,\"minecraft_started\":false}\r\n",
+      "stderr": ""
+    }
+  },
+  "limits": [
+    "Numbered host buttons convert at the helper callback for every port and input source. Game-specific profiles are explicitly disabled; the old pinned default was already disabled.",
+    "Direct-DLL probe natural JVM exit is not guaranteed: after all 251 assertions and successful unload/deinit/result flush, its dedicated QA JVM explicitly halts. Failure paths cannot report success or reach that halt. Production parent/child lifecycle is separately validated by the actual bridge test.",
+    "Actual original invaders diagnostic exercises its supported hardware inputs only, not KOF97/Dino gameplay or six-button game action effects.",
+    "No commercial ROM, Minecraft, network player, user save, user config or user runtime was loaded/modified."
+  ]
+}

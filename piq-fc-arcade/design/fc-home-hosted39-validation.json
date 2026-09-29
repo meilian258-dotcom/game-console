@@ -1,0 +1,25 @@
+{
+  "author": "Codex / server_core39",
+  "date": "2026-09-14",
+  "scope": "FC home SERVER_MEDIA source integration; LOCAL_SYNC original branch retained",
+  "command": "piq-fc-arcade/tools/qa/FcHomeHosted39Check.ps1",
+  "compiler": "Microsoft JDK 21.0.11, --release 21 -proc:none",
+  "dependencies": "Current FC build/classes/java/main and AT-transformed neoforge-21.1.236-merged.jar; cached MC 1.21.1 manifest libraries",
+  "productionUnitsCompiled": 11,
+  "testsFound": 11,
+  "testsSucceeded": 11,
+  "testsFailed": 0,
+  "testsSkipped": 0,
+  "testDurationMillis": 4493,
+  "classOutput": "C:/Users/13498/AppData/Local/Temp/piq-fc-home39-edf20dd816ef4fa2868bf3c944b54e02",
+  "sourceSha256": {
+    "server/FcHomeHostedNetwork.java": "17CBCC69343AF10CF067D5F9A0B7BB362ABFDFA40BE1512A4E71CF8D0C09F5FD",
+    "server/FcHomeHostedRun.java": "C0CEE5244FBBD78E92857ECAB9159588D85FBFFC93D8B93C18EC65A7F580241F",
+    "server/ServerArcadeSessions.java": "08C87FCBCD60FB012DBC550CF9C4DE4CAF261B50582492D62189FB2B46039D50",
+    "client/ClientArcadeSession.java": "9540729E0721E00E4EE025574016B997C1A3FD4863B853CD7BCEF80A7D2D5181",
+    "client/ClientArcadeEvents.java": "25BD8992656DE94C5932714A17678E2C4A19C0C0E84368F4F39BEF04E0601C90"
+  },
+  "runtimeAcceptance": "Not performed: no Minecraft server/client, user ROM, actual WASM/native core, installation or publishing was started by this agent",
+  "remainingChecks": ["Two-client TV/audio and invitation acceptance", "Physical gun aim/trigger and merged keyboard fallback", "Operator disconnect with continuing controller", "Normal close/reopen and shutdown save freshness"],
+  "unimplementedMode": "FC home MEDIA (player-hosted AV) remains unavailable, not silently mapped to another mode"
+}

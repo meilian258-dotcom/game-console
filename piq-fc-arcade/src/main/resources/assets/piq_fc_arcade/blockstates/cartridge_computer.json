@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"piq_fc_arcade:block/cartridge_computer"},"facing=east":{"model":"piq_fc_arcade:block/cartridge_computer","y":90},"facing=south":{"model":"piq_fc_arcade:block/cartridge_computer","y":180},"facing=west":{"model":"piq_fc_arcade:block/cartridge_computer","y":270}}}

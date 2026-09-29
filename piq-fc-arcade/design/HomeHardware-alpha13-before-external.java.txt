@@ -1,0 +1,422 @@
+package cn.piq.fcarcade.home;
+
+import cn.piq.fcarcade.FcArcadeMod;
+import cn.piq.fcarcade.registry.ModItems;
+import cn.piq.fcarcade.server.ServerArcadeSessions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.TriState;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+
+import java.util.UUID;
+
+/** Loaded-endpoint operations only. Every mutation runs on the server game thread. */
+public final class HomeHardware {
+    private static final String SELECTION = "PiqHomeAvSelection";
+    private static final ThreadLocal<Boolean> CHECKING_ANCHOR_INTERACTION = ThreadLocal.withInitial(() -> false);
+    private HomeHardware() {}
+
+    public static void register() {
+        HomeControllerService.register();
+        // Lifecycle is provided by the two block tickers, onRemove and BE
+        // onChunkUnloaded hooks. No world-wide scanner or extra clock is needed.
+    }
+
+    public static HomeConsoleBlockEntity connectedConsole(Level level, BlockPos tvPos) {
+        if (tvPos == null) return null;
+        BlockPos resolved = HomeTvStructure.resolveAnchor(level, tvPos);
+        if (resolved == null || !HomeTvStructure.complete(level, resolved)) return null;
+        tvPos = resolved;
+        if (!(loadedEndpoint(level, tvPos) instanceof HomeTvBlockEntity tv)
+                || tv.consolePos() == null || tv.linkId() == null) return null;
+        if (!(loadedEndpoint(level, tv.consolePos()) instanceof HomeConsoleBlockEntity console)
+                || !mutual(console, tv) || !SuborStructure.complete(level, console.getBlockPos())) return null;
+        if (level instanceof ServerLevel serverLevel) {
+            var link = HomeLinkData.get(serverLevel).ledger.get(tv.linkId());
+            if (link == null || link.closed() || !link.console().equals(console.endpoint())
+                    || !link.tv().equals(tv.endpoint())) return null;
+        }
+        return console;
+    }
+
+    public static String selectedRom(Level level, BlockPos tvPos) {
+        HomeConsoleBlockEntity console = connectedConsole(level, tvPos);
+        return console == null ? "" : console.romSha();
+    }
+
+    public static boolean validPlayback(Level level, BlockPos tvPos) {
+        return selectedRom(level, tvPos).matches("[0-9a-f]{64}");
+    }
+
+    private static boolean mutual(HomeConsoleBlockEntity console, HomeTvBlockEntity tv) {
+        return console.linkId() != null && console.linkId().equals(tv.linkId())
+                && console.hardwareId().equals(tv.peerId()) && tv.hardwareId().equals(console.peerId())
+                && console.getBlockPos().equals(tv.consolePos()) && tv.getBlockPos().equals(console.tvPos())
+                && HomeLinkLedger.inRange(console.endpoint(), tv.endpoint());
+    }
+
+    static HomeEndpointBlockEntity loadedEndpoint(Level level, BlockPos pos) {
+        if (pos == null || !level.hasChunkAt(pos)) return null;
+        if (level.getBlockEntity(pos) instanceof HomeTvPartBlockEntity
+                || level.getBlockEntity(pos) instanceof WideLcdTvPartBlockEntity
+                || level.getBlockEntity(pos) instanceof LargeLcdTvPartBlockEntity) {
+            pos = HomeTvStructure.resolveAnchor(level, pos);
+            if (pos == null) return null;
+        }
+        if (level.getBlockEntity(pos) instanceof SuborPartBlockEntity) {
+            pos = SuborStructure.resolveAnchor(level, pos);
+            if (pos == null) return null;
+        }
+        return level.getBlockEntity(pos) instanceof HomeEndpointBlockEntity endpoint && !endpoint.isRemoved()
+                ? endpoint : null;
+    }
+
+    static boolean mayUse(ServerPlayer player, BlockPos pos) {
+        return player.getServer().isSameThread() && player.serverLevel().hasChunkAt(pos)
+                && player.serverLevel().mayInteract(player, pos)
+                && player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) <= 64.0;
+    }
+
+    private static InteractionResult message(ServerPlayer player, String key) {
+        HomeFeedback.show(player, "home_" + key);
+        return InteractionResult.CONSUME;
+    }
+
+    public static InteractionResult insertCartridge(ServerPlayer player, BlockPos pos, InteractionHand hand) {
+        return insertCartridge(player, pos, hand, new BlockHitResult(Vec3.atCenterOf(pos), player.getDirection(), pos, false));
+    }
+
+    public static InteractionResult insertCartridge(ServerPlayer player, BlockPos pos, InteractionHand hand, BlockHitResult hit) {
+        if (!mayUse(player, pos)) return message(player, "denied");
+        if (!(loadedEndpoint(player.serverLevel(), pos) instanceof HomeConsoleBlockEntity console))
+            return player.serverLevel().getBlockState(pos).getBlock() instanceof SuborPartBlock
+                    ? message(player, "subor_incomplete") : InteractionResult.PASS;
+        if (!allowAnchorInteraction(player, pos, console, hand, hit)) return message(player, "denied");
+        if (!SuborStructure.complete(player.serverLevel(), console.getBlockPos())) return message(player, "subor_incomplete");
+        // Shift belongs to the cartridge editor, never to an insertion transaction.
+        if (player.isShiftKeyDown()) return InteractionResult.PASS;
+        ItemStack held = player.getItemInHand(hand);
+        if (!FcCartridgeData.isPlayable(held) || held.getCount() != 1) return InteractionResult.PASS;
+        if (console.hasCartridge()) return message(player, "card_present");
+        if (!FcCartridgeData.romSha(held).matches("[0-9a-f]{64}")) return message(player, "blank_card");
+        try {
+            FcCartridgeData.ensureIdentity(held);
+            if (FcCartridgeData.isBoard(held)) FcCartridgeData.board(held);
+        } catch (IllegalArgumentException invalid) { return message(player, "blank_card"); }
+        if (!console.insert(held)) return message(player, "card_present");
+        held.shrink(1);
+        // Commit the physical item transaction first. A ROM/start failure must
+        // never put a second copy back into the player's hand.
+        if (console.tvPos() == null || connectedConsole(player.serverLevel(), console.tvPos()) != console)
+            return message(player, "card_inserted_unlinked");
+        message(player, "card_inserted");
+        ServerArcadeSessions.startHomeConsole(player, console.tvPos(), console.romSha());
+        return InteractionResult.CONSUME;
+    }
+
+    public static InteractionResult interactConsole(ServerPlayer player, BlockPos pos) {
+        return interactConsole(player, pos, new BlockHitResult(Vec3.atCenterOf(pos), player.getDirection(), pos, false));
+    }
+
+    public static InteractionResult interactConsole(ServerPlayer player, BlockPos pos, BlockHitResult hit) {
+        if (!mayUse(player, pos)) return message(player, "denied");
+        if (!(loadedEndpoint(player.serverLevel(), pos) instanceof HomeConsoleBlockEntity console))
+            return player.serverLevel().getBlockState(pos).getBlock() instanceof SuborPartBlock
+                    ? message(player, "subor_incomplete") : InteractionResult.PASS;
+        if (!allowAnchorInteraction(player, pos, console, InteractionHand.MAIN_HAND, hit)) return message(player, "denied");
+        if (!SuborStructure.complete(player.serverLevel(), console.getBlockPos())) return message(player, "subor_incomplete");
+        if (player.isShiftKeyDown()) {
+            if (!console.hasCartridge()) return message(player, "no_card");
+            stopEndpoint(console);
+            giveOrDrop(player, console.takeCartridge());
+            // Stop requests a best-effort save; this message does not claim it has finished.
+            return message(player, "card_ejected");
+        }
+        if (!console.hasCartridge()) return message(player, "no_card");
+        BlockPos tvPos = console.tvPos();
+        if (loadedEndpoint(player.serverLevel(), tvPos) instanceof HomeTvBlockEntity tv
+                && !tv.structureInstalled()) return message(player, "tv_rebuild");
+        if (tvPos == null || connectedConsole(player.serverLevel(), tvPos) != console)
+            return message(player, "no_tv");
+        ServerArcadeSessions.startHomeConsole(player, tvPos, console.romSha());
+        return InteractionResult.CONSUME;
+    }
+
+    public static InteractionResult interactTv(ServerPlayer player, BlockPos pos) {
+        return interactTv(player, pos, new BlockHitResult(Vec3.atCenterOf(pos), player.getDirection(), pos, false));
+    }
+
+    public static InteractionResult interactTv(ServerPlayer player, BlockPos pos, BlockHitResult hit) {
+        if (!mayUse(player, pos)) return message(player, "denied");
+        HomeEndpointBlockEntity endpoint = loadedEndpoint(player.serverLevel(), pos);
+        if (!(endpoint instanceof HomeTvBlockEntity tv)) return message(player, "tv_incomplete");
+        if (!allowAnchorInteraction(player, pos, endpoint, InteractionHand.MAIN_HAND, hit)) return message(player, "denied");
+        pos = tv.getBlockPos();
+        if (!player.serverLevel().mayInteract(player, pos)) return message(player, "denied");
+        if (!tv.structureInstalled()) return message(player, "tv_rebuild");
+        if (!HomeTvStructure.complete(player.serverLevel(), pos)) return message(player, "tv_incomplete");
+        HomeConsoleBlockEntity console = connectedConsole(player.serverLevel(), pos);
+        if (console == null) return message(player, "tv_requires_console");
+        if (player.isShiftKeyDown()) return message(player, "use_console");
+        if (!console.hasCartridge()) return message(player, "no_card");
+        ServerArcadeSessions.startHomeConsole(player, pos, console.romSha());
+        return InteractionResult.CONSUME;
+    }
+
+    public static InteractionResult useCable(ServerPlayer player, BlockPos pos, InteractionHand hand) {
+        return useCable(player, pos, hand, new BlockHitResult(Vec3.atCenterOf(pos), player.getDirection(), pos, false));
+    }
+
+    public static InteractionResult useCable(ServerPlayer player, BlockPos pos, InteractionHand hand, BlockHitResult hit) {
+        if (!mayUse(player, pos)) return message(player, "denied");
+        ServerLevel level = player.serverLevel();
+        HomeEndpointBlockEntity endpoint = loadedEndpoint(level, pos);
+        if (endpoint == null) return (level.getBlockState(pos).getBlock() instanceof HomeTvPartBlock
+                || level.getBlockState(pos).getBlock() instanceof WideLcdTvPartBlock
+                || level.getBlockState(pos).getBlock() instanceof LargeLcdTvPartBlock)
+                ? message(player, "tv_incomplete") : level.getBlockState(pos).getBlock() instanceof SuborPartBlock
+                ? message(player, "subor_incomplete") : InteractionResult.PASS;
+        if (!allowAnchorInteraction(player, pos, endpoint, hand, hit)) return message(player, "denied");
+        pos = endpoint.getBlockPos();
+        if (!level.mayInteract(player, pos)) return message(player, "denied");
+        ItemStack wire = player.getItemInHand(hand);
+        if (!wire.is(ModItems.AV_CABLE.get()) || wire.isEmpty()) return InteractionResult.PASS;
+        if (player.isShiftKeyDown()) {
+            clearSelection(wire);
+            if (endpoint.linkId() == null) return message(player, "wire_selection_cleared");
+            disconnect(endpoint, player);
+            return message(player, "wire_disconnected");
+        }
+        if (endpoint instanceof HomeTvBlockEntity tv) {
+            if (!tv.structureInstalled()) return message(player, "tv_rebuild");
+            if (!HomeTvStructure.complete(level, pos)) return message(player, "tv_incomplete");
+        }
+        if (endpoint instanceof HomeConsoleBlockEntity && !SuborStructure.complete(level, pos))
+            return message(player, "subor_incomplete");
+        if (endpoint.linkId() != null) return message(player, "wire_occupied");
+        CompoundTag selection = wire.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
+                .copyTag().getCompound(SELECTION);
+        if (!selection.hasUUID("HardwareId") || !selection.contains("Pos")) {
+            CompoundTag selected = new CompoundTag();
+            selected.putUUID("HardwareId", endpoint.hardwareId());
+            selected.putString("Dimension", level.dimension().location().toString());
+            selected.putLong("Pos", pos.asLong());
+            CustomData.update(DataComponents.CUSTOM_DATA, wire, tag -> tag.put(SELECTION, selected));
+            return message(player, "wire_selected");
+        }
+        if (!selection.getString("Dimension").equals(level.dimension().location().toString()))
+            return message(player, "wire_dimension");
+        BlockPos firstPos = BlockPos.of(selection.getLong("Pos"));
+        // The first endpoint was selected by a normal block click. At the
+        // second click the player may be beyond its 8-block radius while the
+        // endpoints themselves are still <=8 blocks apart (e.g. standing outside TV).
+        if (!level.hasChunkAt(firstPos) || !level.mayInteract(player, firstPos)
+                || player.distanceToSqr(firstPos.getX() + 0.5, firstPos.getY() + 0.5,
+                firstPos.getZ() + 0.5) > 256.0) return message(player, "denied");
+        HomeEndpointBlockEntity first = loadedEndpoint(level, firstPos);
+        if (first == null || !first.hardwareId().equals(selection.getUUID("HardwareId"))) {
+            clearSelection(wire);
+            return message(player, "wire_first_missing");
+        }
+        if (first instanceof HomeTvBlockEntity tv) {
+            if (!tv.structureInstalled()) return message(player, "tv_rebuild");
+            if (!HomeTvStructure.complete(level, firstPos)) return message(player, "tv_incomplete");
+        }
+        if (first instanceof HomeConsoleBlockEntity && !SuborStructure.complete(level, firstPos))
+            return message(player, "subor_incomplete");
+        if (first.kind() == endpoint.kind()) return message(player, "wire_same_type");
+        if (first.linkId() != null) return message(player, "wire_occupied");
+        HomeEndpointBlockEntity console = first.kind() == HomeLinkLedger.Kind.CONSOLE ? first : endpoint;
+        HomeEndpointBlockEntity tv = first.kind() == HomeLinkLedger.Kind.TV ? first : endpoint;
+        if (!HomeLinkLedger.inRange(console.endpoint(), tv.endpoint())) return message(player, "wire_range");
+        HomeLinkData data = HomeLinkData.get(level);
+        var link = data.ledger.connect(console.endpoint(), tv.endpoint());
+        if (link == null) return message(player, "wire_occupied");
+        // No scheduling/await between validation, both endpoint writes and debit.
+        console.attach(link); tv.attach(link);
+        clearSelection(wire);
+        wire.shrink(1); // Paid links alone can later return one wire, including creative use.
+        data.setDirty();
+        message(player, "wire_connected");
+        if (console instanceof HomeConsoleBlockEntity machine && machine.hasCartridge()
+                && machine.romSha().matches("[0-9a-f]{64}"))
+            ServerArcadeSessions.startHomeConsole(player, tv.getBlockPos(), machine.romSha());
+        return InteractionResult.CONSUME;
+    }
+
+    static boolean allowAnchorInteraction(ServerPlayer player, BlockPos clicked,
+                                                   HomeEndpointBlockEntity endpoint, InteractionHand hand,
+                                                   BlockHitResult hit) {
+        var anchor = endpoint.getBlockPos();
+        if (clicked.equals(anchor)) return true; // Original vanilla event already covered this position.
+        var level = player.serverLevel();
+        if (!level.hasChunkAt(anchor) || !level.hasChunkAt(clicked)
+                || !level.mayInteract(player, anchor) || CHECKING_ANCHOR_INTERACTION.get()) return false;
+        var clickedEntity = level.getBlockEntity(clicked);
+        CHECKING_ANCHOR_INTERACTION.set(true);
+        try {
+            // Keep the true world hit point/face on the large model, but identify
+            // the anchor as the target whose public protection event is consulted.
+            var anchorHit = new BlockHitResult(hit.getLocation(), hit.getDirection(), anchor, hit.isInside());
+            var event = NeoForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickBlock(player, hand, anchor, anchorHit));
+            return !event.isCanceled() && event.getUseBlock() != TriState.FALSE && event.getUseItem() != TriState.FALSE
+                    && level.hasChunkAt(anchor) && level.hasChunkAt(clicked)
+                    && level.getBlockEntity(anchor) == endpoint && level.getBlockEntity(clicked) == clickedEntity;
+        } finally { CHECKING_ANCHOR_INTERACTION.remove(); }
+    }
+
+    private static void clearSelection(ItemStack wire) {
+        CustomData.update(DataComponents.CUSTOM_DATA, wire, tag -> tag.remove(SELECTION));
+    }
+
+    private static void giveOrDrop(ServerPlayer player, ItemStack stack) {
+        if (!stack.isEmpty() && !player.getInventory().add(stack)) player.drop(stack, false);
+    }
+
+    private static void stopEndpoint(HomeEndpointBlockEntity endpoint) {
+        if (!(endpoint.getLevel() instanceof ServerLevel level)) return;
+        BlockPos tvPos;
+        if (endpoint instanceof HomeTvBlockEntity) {
+            tvPos = endpoint.getBlockPos();
+            // Do not stop a replacement television at the same coordinates.
+            if (level.hasChunkAt(tvPos) && level.getBlockEntity(tvPos) != endpoint) return;
+        } else {
+            tvPos = endpoint.peerPos();
+            if (!(loadedEndpoint(level, tvPos) instanceof HomeTvBlockEntity tv)
+                    || !mutual((HomeConsoleBlockEntity) endpoint, tv)) return;
+        }
+        try {
+            ServerArcadeSessions.stopHomeConsole(level.getServer(), level.dimension(), tvPos);
+        } catch (RuntimeException error) {
+            FcArcadeMod.LOGGER.warn("[PIQ FC] Home hardware stop/save request failed at {}", tvPos, error);
+        }
+    }
+
+    private static void disconnect(HomeEndpointBlockEntity endpoint, ServerPlayer refundTo) {
+        if (!(endpoint.getLevel() instanceof ServerLevel level) || endpoint.linkId() == null) return;
+        stopEndpoint(endpoint);
+        UUID linkId = endpoint.linkId();
+        HomeLinkData data = HomeLinkData.get(level);
+        var result = data.ledger.close(linkId, endpoint.endpoint());
+        if (result == null) { endpoint.clearLink(); return; }
+        data.setDirty(); // Claim the one refund before any drop or inventory delivery.
+        clearLoadedEnd(level, data, result.link(), result.link().console());
+        clearLoadedEnd(level, data, result.link(), result.link().tv());
+        if (result.refundCable()) {
+            ItemStack returned = new ItemStack(ModItems.AV_CABLE.get());
+            if (refundTo != null) giveOrDrop(refundTo, returned);
+            else Block.popResource(level, endpoint.getBlockPos(), returned);
+        }
+    }
+
+    private static void clearLoadedEnd(ServerLevel level, HomeLinkData data,
+                                       HomeLinkLedger.Link link, HomeLinkLedger.Endpoint expected) {
+        BlockPos pos = new BlockPos(expected.x(), expected.y(), expected.z());
+        if (!level.hasChunkAt(pos)) return;
+        HomeEndpointBlockEntity actual = loadedEndpoint(level, pos);
+        if (actual != null && actual.endpoint().equals(expected) && link.id().equals(actual.linkId())) {
+            stopEndpoint(actual);
+            actual.clearLink();
+        }
+        // Loaded replacement/no block means the original endpoint is gone. Its
+        // old record may be acknowledged, but the new endpoint must not be edited.
+        if (data.ledger.acknowledgeCleared(link.id(), expected)) data.setDirty();
+    }
+
+    static void reconcile(HomeEndpointBlockEntity endpoint) {
+        if (endpoint instanceof HomeConsoleBlockEntity console) {
+            SuborStructure.reconcile(console);
+            if (console.isRemoved()) return;
+            if (console.getLevel() != null && !SuborStructure.complete(console.getLevel(), console.getBlockPos())) stopEndpoint(console);
+        }
+        if (endpoint instanceof HomeTvBlockEntity tv) {
+            HomeTvStructure.reconcile(tv);
+            if (tv.isRemoved()) return;
+            if (tv.getLevel() != null && !HomeTvStructure.complete(tv.getLevel(), tv.getBlockPos())) stopEndpoint(tv);
+        }
+        if (!(endpoint.getLevel() instanceof ServerLevel level) || endpoint.linkId() == null) return;
+        HomeLinkData data = HomeLinkData.get(level);
+        var link = data.ledger.get(endpoint.linkId());
+        if (link == null || !link.owns(endpoint.endpoint())) {
+            stopEndpoint(endpoint); endpoint.clearLink(); return;
+        }
+        if (link.closed()) {
+            stopEndpoint(endpoint);
+            clearLoadedEnd(level, data, link, link.console());
+            clearLoadedEnd(level, data, link, link.tv());
+            return;
+        }
+        var expected = link.other(endpoint.endpoint());
+        BlockPos peer = new BlockPos(expected.x(), expected.y(), expected.z());
+        if (!level.hasChunkAt(peer)) { stopEndpoint(endpoint); return; }
+        HomeEndpointBlockEntity actual = loadedEndpoint(level, peer);
+        if (actual == null || !actual.endpoint().equals(expected)
+                || !link.id().equals(actual.linkId()) || !endpoint.hardwareId().equals(actual.peerId())) {
+            disconnect(endpoint, null);
+        }
+    }
+
+    static void unloaded(HomeEndpointBlockEntity endpoint) {
+        // Unloading is not dismantling: keep link, cartridge and refund state.
+        stopEndpoint(endpoint);
+    }
+
+    /** A proxy can break while the TV chunk is unloaded. The existing link
+     * ledger alone authorizes the exact endpoint's one cable refund. */
+    static void removedTvIdentity(ServerLevel level, BlockPos anchor, UUID hardwareId, BlockPos dropPos) {
+        if (level.hasChunkAt(anchor) && level.getBlockEntity(anchor) instanceof HomeTvBlockEntity tv
+                && hardwareId.equals(tv.hardwareId())) removed(level, anchor);
+        var expected = new HomeLinkLedger.Endpoint(hardwareId, level.dimension().location().toString(),
+                anchor.getX(), anchor.getY(), anchor.getZ(), HomeLinkLedger.Kind.TV);
+        var data = HomeLinkData.get(level);
+        var active = data.ledger.activeFor(expected);
+        if (active == null) return;
+        var result = data.ledger.close(active.id(), expected);
+        if (result == null) return;
+        data.setDirty();
+        clearLoadedEnd(level, data, result.link(), result.link().console());
+        clearLoadedEnd(level, data, result.link(), result.link().tv());
+        if (result.refundCable()) Block.popResource(level, dropPos, new ItemStack(ModItems.AV_CABLE.get()));
+    }
+
+    /** A four-cell console proxy can disappear while its authoritative cartridge chunk is unloaded. */
+    static void removedConsoleIdentity(ServerLevel level, BlockPos anchor, UUID hardwareId, BlockPos dropPos) {
+        if (level.hasChunkAt(anchor) && level.getBlockEntity(anchor) instanceof HomeConsoleBlockEntity console
+                && hardwareId.equals(console.hardwareId())) removed(level, anchor);
+        var expected = new HomeLinkLedger.Endpoint(hardwareId, level.dimension().location().toString(),
+                anchor.getX(), anchor.getY(), anchor.getZ(), HomeLinkLedger.Kind.CONSOLE);
+        var data = HomeLinkData.get(level);
+        var active = data.ledger.activeFor(expected);
+        if (active == null) return;
+        var result = data.ledger.close(active.id(), expected);
+        if (result == null) return;
+        data.setDirty();
+        clearLoadedEnd(level, data, result.link(), result.link().console());
+        clearLoadedEnd(level, data, result.link(), result.link().tv());
+        if (result.refundCable()) Block.popResource(level, dropPos, new ItemStack(ModItems.AV_CABLE.get()));
+    }
+
+    public static void removed(Level level, BlockPos pos) {
+        if (!(level instanceof ServerLevel)) return;
+        HomeEndpointBlockEntity endpoint = loadedEndpoint(level, pos);
+        if (endpoint == null || !endpoint.beginRemoval()) return;
+        stopEndpoint(endpoint);
+        try { disconnect(endpoint, null); }
+        finally {
+            if (endpoint instanceof HomeConsoleBlockEntity console)
+                Block.popResource(level, pos, console.takeCartridge());
+        }
+    }
+}

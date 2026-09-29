@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "result": "{\"ok\":true,\"assertions\":61,\"actual_wasm_core\":true,\"minecraft_started\":false,\"commercial_rom_used\":false}\n",
+  "minecraft_started": false,
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\core\\NesCore.java": "07B729DC8DEB7B40CB2331EC180D9E3211EFB55B859AA8D5333D344970094F3B",
+    "src\\main\\java\\cn\\piq\\fcarcade\\core\\wasm\\ZapperWasmNesCore.java": "7D6EDCD8524120C2094D1A80C6957EC043E1A409E3F329D115345E839A7ADF3F",
+    "tools\\qa\\ZapperCoreProbe.java": "1CBC9B3B52A2F680071400605E428EADDAF928682CFA3A4468854187C5FB7BCC"
+  },
+  "module_sha256": "C8D8824E5CAF727678C642E6B0539DEAA7C0084F33524D96779D90C7B5DA79EF",
+  "legacy_module_sha256": "110711E30B64444414A8BE2D0A3B1AB45A442CC9B9452AC7D74DAAB508C933FF"
+}

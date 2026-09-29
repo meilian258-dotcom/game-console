@@ -1,0 +1,9 @@
+.gradle/
+build/
+run/
+*.sfc
+*.smc
+*.fig
+native/target/
+native/vendor/
+.toolchains/

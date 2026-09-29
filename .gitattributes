@@ -1,0 +1,13 @@
+# 初次接管保留现有文件的原始换行字节；不在 Git 迁移中混入全库格式改写。
+# -text 只关闭换行转换，Git 仍自动识别文本并显示源码差异。
+* -text
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.ogg binary
+*.wav binary
+*.ttf binary
+*.woff2 binary
+*.jar binary

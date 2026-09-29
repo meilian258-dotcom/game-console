@@ -1,0 +1,1182 @@
+{
+  "ok": true,
+  "schema": "piq-user-models22-independent-1",
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_fc_arcade-0.31.0-alpha.22.jar",
+      "sha256": "ECC559B11E21F389BB95AC8113A2D885DC8DE7B91F01DE5C25156AD51AEB5645"
+    },
+    "sfc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+      "sha256": "A5892700D043D51A890E59D5EC57F3E34F9F828A49EED92BE1DA759C5782F882"
+    },
+    "native": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+      "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A"
+    }
+  },
+  "strict_scope": {
+    "fc": {
+      "identical_entries": 1381,
+      "identical_classes": 1231,
+      "changed_classes": [
+        "cn/piq/fcarcade/client/ClientArcadeEvents.class",
+        "cn/piq/fcarcade/client/DualCabinetRenderer$1.class",
+        "cn/piq/fcarcade/client/DualCabinetRenderer$Cached.class",
+        "cn/piq/fcarcade/client/DualCabinetRenderer$Face.class",
+        "cn/piq/fcarcade/client/DualCabinetRenderer$ItemRenderer.class",
+        "cn/piq/fcarcade/client/DualCabinetRenderer$SkinUv.class",
+        "cn/piq/fcarcade/client/DualCabinetRenderer.class",
+        "cn/piq/fcarcade/client/RomLibraryScreen.class",
+        "cn/piq/fcarcade/client/SkinLibraryScreen.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetClientBackends.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetMenuScreen.class",
+        "cn/piq/fcarcade/client/cabinet/CabinetPeerInputs.class",
+        "cn/piq/fcarcade/layout/ArcadeOccupancyLabelLayout.class",
+        "cn/piq/fcarcade/layout/CabinetVideoGeometry.class",
+        "cn/piq/fcarcade/layout/DualCabinetGeometry.class",
+        "cn/piq/fcarcade/server/ArcadeOccupancyDisplay.class",
+        "cn/piq/fcarcade/world/DualCabinetFootprint.class"
+      ],
+      "nested_metadata_only_pending_check": [
+        "cn/piq/fcarcade/client/RomLibraryScreen$Entry.class",
+        "cn/piq/fcarcade/client/RomLibraryScreen$EntryBuilder.class",
+        "cn/piq/fcarcade/client/SkinLibraryScreen$Entry.class",
+        "cn/piq/fcarcade/world/DualCabinetFootprint$Bounds.class",
+        "cn/piq/fcarcade/world/DualCabinetFootprint$Cell.class",
+        "cn/piq/fcarcade/world/DualCabinetFootprint$Facing.class"
+      ],
+      "added_classes": [
+        "cn/piq/fcarcade/layout/DualCabinetControls$Motion.class",
+        "cn/piq/fcarcade/layout/DualCabinetControls$Part.class",
+        "cn/piq/fcarcade/layout/DualCabinetControls.class"
+      ],
+      "model_assets": {
+        "assets/piq_fc_arcade/models/block/user_dual/p1_button_1.json": "35D7573205051752FBABAE9E66045B2ECD37BD4C87DEBE14C3C6868915E09979",
+        "assets/piq_fc_arcade/models/block/user_dual/p1_button_2.json": "19C7A44B08772D1817F99AE35D1209F3E8B820E7A5CD80CF9A15DC4777583285",
+        "assets/piq_fc_arcade/models/block/user_dual/p1_button_3.json": "6BF90F1160E7A788A6AD6AE0CBAD6106CF10604E25860755B1D7D23E8D43BFB4",
+        "assets/piq_fc_arcade/models/block/user_dual/p1_button_4.json": "209F7C9DBDD3B7510A825344B6037019A50B1FAC735D31B47582222F435D195B",
+        "assets/piq_fc_arcade/models/block/user_dual/p1_button_5.json": "9FAAC670B01651F85A9F44BE218C7C8111800CDFBC970EDAFECB3BF979276095",
+        "assets/piq_fc_arcade/models/block/user_dual/p1_button_6.json": "800D3147D6DFD41BD67EF70F18D7B3F65EEDF5AB35D2AA78074AA1272EA8313B",
+        "assets/piq_fc_arcade/models/block/user_dual/p1_start.json": "A40BD97FB39EF840FFCEBA9F69A1CD19820C9FB3F7D6D7264E3D45442526CB18",
+        "assets/piq_fc_arcade/models/block/user_dual/p1_joystick.json": "8092FBF8520DBAA30A88D050EF12607769E01250E98D040ED3F23E3D59986DE7",
+        "assets/piq_fc_arcade/models/block/user_dual/p2_button_1.json": "2778A1D21EA672889A5EED06F43E2F5985EFC115125906CFCE2DFBD73DB67C61",
+        "assets/piq_fc_arcade/models/block/user_dual/p2_button_2.json": "BF78342876367357D0545F165C507CC45E7C2FB3032FE347F1EB0ABD148A000A",
+        "assets/piq_fc_arcade/models/block/user_dual/p2_button_3.json": "F4F04F879B12EF4045823206546DF2998D1634FFA0373B88F83015452A8D956C",
+        "assets/piq_fc_arcade/models/block/user_dual/p2_button_4.json": "CC20F837086121FC815055E99107CB24633DC975C9D4EF4338F596B1CA03AFD6",
+        "assets/piq_fc_arcade/models/block/user_dual/p2_button_5.json": "71156B30763C239329A394273D49C9ED2E0170671685BFCB0CA78657CC7D3573",
+        "assets/piq_fc_arcade/models/block/user_dual/p2_button_6.json": "4F0E8EBC64A6E218B73B0DF8FC0B346089ABD6F5D2AA203E33CC94B99E053321",
+        "assets/piq_fc_arcade/models/block/user_dual/p2_start.json": "EBDC17C068CB9E430B16AE70F0E6CBE192EF19FBF611604FB8F74514B5785328",
+        "assets/piq_fc_arcade/models/block/user_dual/p2_joystick.json": "FAF8D4AEE11B4A4896EE932569FB7E8ACDCE243B4EF33C7D056833EEFCB913AB",
+        "assets/piq_fc_arcade/models/block/user_dual/body.json": "C4735B141AB86530A5ED71FD1963C7210E0453008EE2E216634CE569D33C9D57",
+        "assets/piq_fc_arcade/textures/block/user_dual/skin.png": "01B61C621DE7EC93353F34868C1F6FCC52659321A365E997206C7220AB93B011"
+      },
+      "removed_entries": 0
+    },
+    "sfc": {
+      "identical_entries": 193,
+      "identical_classes": 171,
+      "changed_classes": [
+        "cn/piq/sfchome/client/SfcAvCableGeometry.class",
+        "cn/piq/sfchome/client/SfcControllerPose.class",
+        "cn/piq/sfchome/client/SfcCoverGeometry.class",
+        "cn/piq/sfchome/client/SfcHardwareItems$HardwareItemRenderer.class",
+        "cn/piq/sfchome/client/SfcHardwareMesh$Part.class",
+        "cn/piq/sfchome/client/SfcHardwareMesh.class",
+        "cn/piq/sfchome/client/SfcHardwareMeshData$Part.class",
+        "cn/piq/sfchome/client/SfcHardwareMeshData.class",
+        "cn/piq/sfchome/client/SfcHomeClient.class"
+      ],
+      "nested_metadata_only_pending_check": [
+        "cn/piq/sfchome/client/SfcHardwareItems$ItemModel.class",
+        "cn/piq/sfchome/client/SfcHomeClient$SessionOrder$Assignment.class",
+        "cn/piq/sfchome/client/SfcHomeClient$SessionOrder.class"
+      ],
+      "added_classes": [
+        "cn/piq/sfchome/client/SfcButtonAnimation$Binding.class",
+        "cn/piq/sfchome/client/SfcButtonAnimation$Transform.class",
+        "cn/piq/sfchome/client/SfcButtonAnimation.class"
+      ],
+      "model_assets": {
+        "assets/piq_sfc_home/meshes/sfc_hardware.json": "4B944A5A98CF926A38092BCDF3B8FA5E8D1B07631B116E554E7DD551B4D80E64",
+        "assets/piq_sfc_home/textures/block/user_sfc_20260911.png": "4BBBA0F53697D69A919F5FC12750E608AA50A4D71D8281F23D6428A5D02BD920",
+        "assets/piq_sfc_home/textures/block/user_sfc_cartridge_20260911.png": "7608F10AD4205635C321AA423F348CA68515B16FDDC7BDF9F111811121D4892A",
+        "assets/piq_sfc_home/models/item/console.json": "466510B9D2073126A07593BB9DB5A4083A0EBDDBF6CFBDC2D73579D37E00F33D"
+      },
+      "removed_entries": 0
+    },
+    "native": {
+      "identical_entries": 49,
+      "identical_classes": 42,
+      "changed_classes": [],
+      "nested_metadata_only_pending_check": [],
+      "added_classes": [],
+      "model_assets": {},
+      "removed_entries": 0
+    }
+  },
+  "ownership": {
+    "classes": 1485,
+    "duplicate_classes": 0,
+    "platform_owner": "fc",
+    "runtime_owners": {
+      "core/nes_rust_wasm_bg.wasm": "fc",
+      "natives/linux-x86_64/libwasmtime4j.so": "fc",
+      "natives/windows-x86_64/wasmtime4j.dll": "fc",
+      "assets/piq_sfc_arcade/core/piq_sfc_wasm.wasm": "sfc"
+    }
+  },
+  "old_method_protection": {
+    "cn.piq.fcarcade.client.ClientArcadeEvents": {
+      "protected_methods": [
+        "private cn.piq.fcarcade.client.ClientArcadeEvents();",
+        "public static void register(net.neoforged.bus.api.IEventBus);",
+        "public static void applySession(cn.piq.fcarcade.ArcadeSessionPayload);",
+        "static void applySessionReady(cn.piq.fcarcade.ArcadeSessionPayload);",
+        "public static void requestJoin(cn.piq.fcarcade.ArcadeJoinPromptPayload);",
+        "public static void promptExit(cn.piq.fcarcade.ArcadeExitPromptPayload);",
+        "public static void promptResume(cn.piq.fcarcade.ArcadeResumePromptPayload);",
+        "public static void offerMultiplayer(cn.piq.fcarcade.ArcadeMultiplayerOfferPayload);",
+        "public static void requestJoinApproval(cn.piq.fcarcade.ArcadeJoinApprovalPayload);",
+        "public static void openLibrary(cn.piq.fcarcade.ArcadeLibraryPayload);",
+        "public static void openSkinLibrary(cn.piq.fcarcade.SkinLibraryPayload);",
+        "public static void startSkinDownload(cn.piq.fcarcade.SkinDownloadStartPayload);",
+        "public static void acceptSkinDownload(cn.piq.fcarcade.SkinDownloadChunkPayload);",
+        "public static void openSettings(cn.piq.fcarcade.ArcadeSettingsPayload);",
+        "public static void openLeaderboardPanelConfig(cn.piq.fcarcade.LeaderboardPanelConfigPayload);",
+        "public static void openSaveCatalog(cn.piq.fcarcade.ArcadeSaveCatalogPayload);",
+        "public static void openSaveSlots(cn.piq.fcarcade.ArcadeSaveSlotsPayload);",
+        "public static void startRomDownload(cn.piq.fcarcade.RomDownloadStartPayload);",
+        "public static void acceptRomDownload(cn.piq.fcarcade.RomDownloadChunkPayload);",
+        "public static void advanceFrame(cn.piq.fcarcade.ArcadeFramePayload);",
+        "public static void applyHistory(cn.piq.fcarcade.ArcadeHistoryPayload);",
+        "public static void requestSnapshot(cn.piq.fcarcade.ArcadeSnapshotRequestPayload);",
+        "public static void applySnapshot(cn.piq.fcarcade.ArcadeSnapshotPayload);",
+        "public static void applyPersistentState(cn.piq.fcarcade.ArcadePersistentStatePayload);",
+        "public static boolean isControlling();",
+        "static int controllerAnimationMask(long, int);",
+        "private static void registerKeyMappings(net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent);",
+        "private static void registerRenderers(net.neoforged.neoforge.client.event.EntityRenderersEvent$RegisterRenderers);",
+        "private static void registerClientCommands(net.neoforged.neoforge.client.event.RegisterClientCommandsEvent);",
+        "private static boolean isLocalOperator();",
+        "private static cn.piq.fcarcade.client.LocalArcadePreferences preferences();",
+        "private static int reportSpectatorLimit();",
+        "static cn.piq.fcarcade.layout.ScreenAspectFit$Aspect dualScreenAspect();",
+        "static double controllerHandSize();",
+        "private static int setControllerHandSize(double);",
+        "private static int reportScreenAspect();",
+        "private static int setScreenAspect(java.lang.String);",
+        "private static int setSpectatorLimit(int);",
+        "private static int reportClientStatus();",
+        "private static void clientMessage(java.lang.String);",
+        "private static void refreshSimulationSelection(boolean);",
+        "private static void safelySetSimulation(long, cn.piq.fcarcade.client.ClientArcadeSession, boolean);",
+        "private static int runScoreCalibration(cn.piq.fcarcade.client.ClientArcadeEvents$ScoreCalibrationCommand);",
+        "private static void onRenderFrame(net.neoforged.neoforge.client.event.RenderFrameEvent$Pre);",
+        "private static void updateTransfers();",
+        "private static void onLoggingOut(net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent$LoggingOut);",
+        "private static void clearOnDisconnect();",
+        "private static void clearSessionMetadata(long);",
+        "private static void safelyLeave(long, cn.piq.fcarcade.client.ClientArcadeSession);",
+        "private static void onRenderLevel(net.neoforged.neoforge.client.event.RenderLevelStageEvent);",
+        "private static void onKeyInput(net.neoforged.neoforge.client.event.InputEvent$Key);",
+        "private static void onMouseInput(net.neoforged.neoforge.client.event.InputEvent$MouseButton$Post);",
+        "private static void onScreenOpening(net.neoforged.neoforge.client.event.ScreenEvent$Opening);",
+        "private static void captureInputEdges();",
+        "private static void lambda$reportClientStatus$25(java.util.Map$Entry);",
+        "private static int lambda$registerClientCommands$24(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$23(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$22(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static java.lang.String lambda$registerClientCommands$21(com.mojang.brigadier.context.CommandContext, cn.piq.fcarcade.client.ClientArcadeSession);",
+        "private static int lambda$registerClientCommands$20(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static boolean lambda$registerClientCommands$19(net.minecraft.commands.CommandSourceStack);",
+        "private static int lambda$registerClientCommands$18(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$17(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$16(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$15(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$14(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$13(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$12(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$11(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$10(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$9(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$8(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static int lambda$registerClientCommands$7(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;",
+        "private static void lambda$requestJoinApproval$6(net.minecraft.client.Minecraft, cn.piq.fcarcade.ArcadeJoinApprovalPayload, java.lang.Boolean);",
+        "private static void lambda$offerMultiplayer$5(net.minecraft.client.Minecraft, cn.piq.fcarcade.ArcadeMultiplayerOfferPayload, java.lang.Boolean);",
+        "private static void lambda$promptResume$4(net.minecraft.client.Minecraft);",
+        "private static void lambda$promptResume$3(net.minecraft.client.Minecraft, cn.piq.fcarcade.ArcadeResumePromptPayload, java.lang.Boolean);",
+        "private static void lambda$promptExit$2(net.minecraft.client.Minecraft);",
+        "private static void lambda$promptExit$1(net.minecraft.client.Minecraft, cn.piq.fcarcade.ArcadeExitPromptPayload, java.lang.Boolean);",
+        "private static cn.piq.fcarcade.client.ClientArcadeSession lambda$applySessionReady$0(java.lang.Long);",
+        "static {};"
+      ],
+      "new_methods": [
+        "public static int[] cabinetVisualInputs(net.minecraft.core.BlockPos);"
+      ]
+    },
+    "cn.piq.fcarcade.client.cabinet.CabinetClientBackends": {
+      "protected_methods": [
+        "private cn.piq.fcarcade.client.cabinet.CabinetClientBackends();",
+        "public static synchronized void register(net.minecraft.resources.ResourceLocation, cn.piq.fcarcade.client.cabinet.CabinetBackend);",
+        "static synchronized cn.piq.fcarcade.client.cabinet.CabinetBackend find(net.minecraft.resources.ResourceLocation);",
+        "static boolean configure(cn.piq.fcarcade.cabinet.CabinetNetwork$Menu, net.minecraft.resources.ResourceLocation);",
+        "static void cancelConfigure();",
+        "public boolean acceptsConnection(net.minecraft.network.Connection);",
+        "private static boolean guest();",
+        "private static boolean roomMessage(java.util.UUID, java.util.UUID);",
+        "public void assignment(cn.piq.fcarcade.cabinet.CabinetRoomNetwork$Assignment);",
+        "public void seat(cn.piq.fcarcade.cabinet.CabinetRoomNetwork$Seat);",
+        "public void buttons(cn.piq.fcarcade.cabinet.CabinetRoomNetwork$Buttons);",
+        "public void media(cn.piq.fcarcade.cabinet.CabinetRoomNetwork$Stream);",
+        "public void openMenu(cn.piq.fcarcade.cabinet.CabinetNetwork$Menu);",
+        "public void openBackend(cn.piq.fcarcade.cabinet.CabinetNetwork$Launch);",
+        "public void closed(cn.piq.fcarcade.cabinet.CabinetNetwork$Closed);",
+        "private static boolean localWorld();",
+        "static boolean current();",
+        "static boolean running();",
+        "static void start(java.nio.file.Path);",
+        "private static void startGame(java.nio.file.Path, boolean);",
+        "static void input(int, int);",
+        "static void clearInput();",
+        "private static void syncInput();",
+        "public static void key(net.neoforged.neoforge.client.event.InputEvent$Key);",
+        "public static void screenOpening(net.neoforged.neoforge.client.event.ScreenEvent$Opening);",
+        "static void stop(java.lang.String, boolean);",
+        "private static void release(java.util.UUID);",
+        "static void notice(java.lang.String);",
+        "static java.lang.String shortText(java.lang.String, int);",
+        "private static void dropTexture();",
+        "public static void shutdown(net.neoforged.neoforge.event.GameShuttingDownEvent);",
+        "public static void tick(net.neoforged.neoforge.client.event.ClientTickEvent$Post);",
+        "public static void render(net.neoforged.neoforge.client.event.RenderLevelStageEvent);",
+        "private static void drainMedia();",
+        "private static void lambda$startGame$6(int, boolean, java.nio.file.Path, cn.piq.fcarcade.cabinet.CabinetRomBindings$Key, cn.piq.fcarcade.client.cabinet.CabinetBackend, cn.piq.retro.api.RetroEmulatorFactory, net.minecraft.client.Minecraft);",
+        "private static void lambda$startGame$5(int, java.lang.Throwable);",
+        "private static void lambda$startGame$4(cn.piq.retro.api.RetroEmulator, int);",
+        "private static java.io.IOException lambda$startGame$3();",
+        "private static boolean lambda$configure$2(net.minecraft.resources.ResourceLocation, cn.piq.fcarcade.cabinet.CabinetBackends$Entry);",
+        "private static cn.piq.retro.api.RetroEmulator lambda$register$1(cn.piq.fcarcade.client.cabinet.CabinetBackend, java.nio.file.Path) throws java.lang.Exception;",
+        "private static java.lang.Thread lambda$static$0(java.lang.Runnable);",
+        "static {};"
+      ],
+      "new_methods": [
+        "public static int[] visualInputs(cn.piq.fcarcade.cabinet.CabinetTarget);"
+      ]
+    },
+    "cn.piq.fcarcade.client.cabinet.CabinetPeerInputs": {
+      "protected_methods": [
+        "public cn.piq.fcarcade.client.cabinet.CabinetPeerInputs();",
+        "public boolean seat(java.util.UUID, int, boolean);",
+        "public boolean input(java.util.UUID, int, long, int);",
+        "public void local(java.util.UUID, int, int);",
+        "public int mask(int);",
+        "public int guests();"
+      ],
+      "new_methods": [
+        "public int[] visualPair(int, int, int, boolean);"
+      ]
+    },
+    "cn.piq.sfchome.client.SfcHomeClient": {
+      "protected_methods": [
+        "private cn.piq.sfchome.client.SfcHomeClient();",
+        "public boolean acceptsConnection(java.lang.Object);",
+        "static boolean isCurrent(cn.piq.sfchome.client.SfcPlayback);",
+        "static cn.piq.sfchome.client.SfcPlayback currentPlayback();",
+        "static cn.piq.sfchome.net.SfcHomeNetwork$Session currentSession();",
+        "static boolean sessionCurrent(cn.piq.sfchome.net.SfcHomeNetwork$Session, java.lang.Object);",
+        "static void refreshInput();",
+        "static boolean acceptsInput();",
+        "public void session(cn.piq.sfchome.net.SfcHomeNetwork$Session);",
+        "private static boolean submitIo(java.lang.Runnable);",
+        "private static boolean waitingCurrent(cn.piq.sfchome.net.SfcHomeNetwork$Session, java.lang.Object);",
+        "private static void begin(cn.piq.sfchome.net.SfcHomeNetwork$Session, byte[]);",
+        "private static boolean hardwareCurrent(cn.piq.sfchome.net.SfcHomeNetwork$Session);",
+        "private static void maybeBegin();",
+        "public void romChunk(cn.piq.sfchome.net.SfcHomeNetwork$RomChunk);",
+        "public void frames(cn.piq.sfchome.net.SfcHomeNetwork$Frames);",
+        "public void stopped(cn.piq.sfchome.net.SfcHomeNetwork$Stopped);",
+        "public void editor(cn.piq.sfchome.net.SfcHomeNetwork$Editor);",
+        "static void leave(java.lang.String);",
+        "private static void closeLocal();",
+        "private static void showStartup();",
+        "static void toast(java.lang.String);",
+        "private static void sendInput(boolean);",
+        "public static void tick(net.neoforged.neoforge.client.event.ClientTickEvent$Post);",
+        "public static void key(net.neoforged.neoforge.client.event.InputEvent$Key);",
+        "public static void mouse(net.neoforged.neoforge.client.event.InputEvent$MouseButton$Pre);",
+        "public static void attack(net.neoforged.neoforge.client.event.InputEvent$InteractionKeyMappingTriggered);",
+        "public static void render(net.neoforged.neoforge.client.event.RenderLevelStageEvent);",
+        "private static void lambda$romChunk$6(java.nio.file.Path, cn.piq.sfchome.net.SfcHomeNetwork$Session, byte[], net.minecraft.client.Minecraft, java.lang.Object);",
+        "private static void lambda$romChunk$5(cn.piq.sfchome.net.SfcHomeNetwork$Session, java.lang.Object, java.lang.Exception);",
+        "private static void lambda$romChunk$4(cn.piq.sfchome.net.SfcHomeNetwork$Session, java.lang.Object, byte[]);",
+        "private static void lambda$session$3(java.nio.file.Path, cn.piq.sfchome.net.SfcHomeNetwork$Session, net.minecraft.client.Minecraft, java.lang.Object);",
+        "private static void lambda$session$2(cn.piq.sfchome.net.SfcHomeNetwork$Session, java.lang.Object, java.lang.Exception);",
+        "private static void lambda$session$1(cn.piq.sfchome.net.SfcHomeNetwork$Session, java.lang.Object, byte[]);",
+        "private static java.lang.Thread lambda$static$0(java.lang.Runnable);",
+        "static {};"
+      ],
+      "new_methods": [
+        "static int visualInputMask();"
+      ]
+    },
+    "cn.piq.fcarcade.client.cabinet.CabinetMenuScreen": {
+      "protected_methods": [
+        "cn.piq.fcarcade.client.cabinet.CabinetMenuScreen(cn.piq.fcarcade.cabinet.CabinetNetwork$Menu);",
+        "private cn.piq.fcarcade.cabinet.CabinetBackends$Entry focusedEntry();",
+        "private java.lang.String unavailable(cn.piq.fcarcade.cabinet.CabinetBackends$Entry);",
+        "private void choose(cn.piq.fcarcade.cabinet.CabinetBackends$Entry);",
+        "public void onClose();",
+        "public void removed();",
+        "public void tick();",
+        "public boolean isPauseScreen();",
+        "private boolean lambda$render$5(cn.piq.fcarcade.cabinet.CabinetBackends$Entry);",
+        "private boolean lambda$focusedEntry$4(cn.piq.fcarcade.cabinet.CabinetBackends$Entry);",
+        "private void lambda$init$3();",
+        "private void lambda$init$2();",
+        "private void lambda$init$1(cn.piq.fcarcade.cabinet.CabinetBackends$Entry);",
+        "private void lambda$init$0(cn.piq.fcarcade.cabinet.CabinetBackends$Entry);"
+      ],
+      "new_methods": []
+    },
+    "cn.piq.fcarcade.client.RomLibraryScreen": {
+      "protected_methods": [
+        "cn.piq.fcarcade.client.RomLibraryScreen(net.minecraft.core.BlockPos, java.lang.String, boolean, java.util.List<cn.piq.fcarcade.rom.RomDescriptor>, java.util.List<cn.piq.fcarcade.rom.RomCatalogEntry>);",
+        "private static cn.piq.fcarcade.client.ui.DeviceLayout$Rect column(cn.piq.fcarcade.client.ui.DeviceLayout$Rect, int, int, int);",
+        "private void button(java.lang.String, cn.piq.fcarcade.client.ui.DeviceLayout$Rect, java.lang.Runnable, boolean, cn.piq.fcarcade.client.ui.DeviceUi$Tone);",
+        "private cn.piq.fcarcade.client.RomLibraryScreen$Entry focusedEntry();",
+        "private void changePage(int);",
+        "public void render(net.minecraft.client.gui.GuiGraphics, int, int, float);",
+        "private void line(net.minecraft.client.gui.GuiGraphics, net.minecraft.network.chat.Component, int, int, int, int, int, int);",
+        "public boolean isPauseScreen();",
+        "private void choose(cn.piq.fcarcade.client.RomLibraryScreen$Entry);",
+        "private void rememberPage();",
+        "private void confirmDelete(cn.piq.fcarcade.client.RomLibraryScreen$Entry);",
+        "private void rename(cn.piq.fcarcade.client.RomLibraryScreen$Entry);",
+        "private net.minecraft.network.chat.Component entryLabel(cn.piq.fcarcade.client.RomLibraryScreen$Entry);",
+        "private void openRomFolder();",
+        "private void lambda$confirmDelete$16(cn.piq.fcarcade.client.RomLibraryScreen$Entry, java.lang.Boolean);",
+        "private boolean lambda$render$15(cn.piq.fcarcade.client.RomLibraryScreen$Entry);",
+        "private void lambda$init$14();",
+        "private void lambda$init$13();",
+        "private void lambda$init$12();",
+        "private void lambda$init$11(cn.piq.fcarcade.client.RomLibraryScreen$Entry);",
+        "private void lambda$init$10(cn.piq.fcarcade.client.RomLibraryScreen$Entry);",
+        "private void lambda$init$9(cn.piq.fcarcade.client.RomLibraryScreen$Entry);",
+        "private void lambda$init$8(cn.piq.fcarcade.client.RomLibraryScreen$Entry);",
+        "private void lambda$init$7(cn.piq.fcarcade.client.RomLibraryScreen$Entry);",
+        "private void lambda$init$6();",
+        "private void lambda$init$5();",
+        "private void lambda$init$4();",
+        "private void lambda$init$3();",
+        "private void lambda$init$2(int);",
+        "private static cn.piq.fcarcade.client.RomLibraryScreen$EntryBuilder lambda$new$1(java.lang.String);",
+        "private static cn.piq.fcarcade.client.RomLibraryScreen$EntryBuilder lambda$new$0(java.lang.String);",
+        "static {};"
+      ],
+      "new_methods": []
+    },
+    "cn.piq.fcarcade.client.SkinLibraryScreen": {
+      "protected_methods": [
+        "cn.piq.fcarcade.client.SkinLibraryScreen(cn.piq.fcarcade.SkinLibraryPayload, java.util.List<cn.piq.fcarcade.client.ClientSkinLibrary$LocalSkin>);",
+        "public boolean isPauseScreen();",
+        "private net.minecraft.network.chat.Component label(cn.piq.fcarcade.client.SkinLibraryScreen$Entry);",
+        "private void openFolder();",
+        "private boolean lambda$render$7(cn.piq.fcarcade.client.SkinLibraryScreen$Entry);",
+        "private void lambda$init$6();",
+        "private void lambda$init$5();",
+        "private void lambda$init$4(cn.piq.fcarcade.client.SkinLibraryScreen$Entry);",
+        "private void lambda$init$3(int);",
+        "private void lambda$init$2();",
+        "private void lambda$new$1(cn.piq.fcarcade.client.ClientSkinLibrary$LocalSkin);",
+        "private void lambda$new$0(cn.piq.fcarcade.skin.SkinDescriptor);"
+      ],
+      "new_methods": [
+        "private boolean dedicatedAppearance();"
+      ]
+    },
+    "cn.piq.fcarcade.layout.ArcadeOccupancyLabelLayout": {
+      "all_old_methods_protected": 5,
+      "exact_single_operand_change": {
+        "method": " labelY(",
+        "before": "ldc #CP // float 2.35f",
+        "after": "fconst_2 "
+      }
+    },
+    "cn.piq.fcarcade.server.ArcadeOccupancyDisplay": {
+      "all_old_methods_protected": 25,
+      "exact_single_operand_change": {
+        "method": " updateLeaderboard(",
+        "before": "ldc #CP // float 0.225f",
+        "after": "ldc #CP // float 0.16f"
+      }
+    },
+    "cn.piq.fcarcade.world.DualCabinetFootprint": {
+      "protected_methods": [
+        "private cn.piq.fcarcade.world.DualCabinetFootprint();",
+        "public static cn.piq.fcarcade.world.DualCabinetFootprint$Cell cell(cn.piq.fcarcade.world.DualCabinetFootprint$Facing, int);",
+        "public static java.util.List<cn.piq.fcarcade.world.DualCabinetFootprint$Cell> cells(cn.piq.fcarcade.world.DualCabinetFootprint$Facing);",
+        "public static boolean canPlace(cn.piq.fcarcade.world.DualCabinetFootprint$Facing, java.util.function.Predicate<cn.piq.fcarcade.world.DualCabinetFootprint$Cell>);",
+        "public static cn.piq.fcarcade.world.DualCabinetFootprint$Bounds selection(cn.piq.fcarcade.world.DualCabinetFootprint$Facing, int);",
+        "private static cn.piq.fcarcade.world.DualCabinetFootprint$Cell lambda$cells$0(cn.piq.fcarcade.world.DualCabinetFootprint$Facing, int);"
+      ],
+      "new_methods": []
+    },
+    "cn.piq.fcarcade.client.RomLibraryScreen$Entry": {
+      "protected_methods": [
+        "private cn.piq.fcarcade.client.RomLibraryScreen$Entry(java.lang.String, java.lang.String, int, int, cn.piq.fcarcade.rom.RomSaveMode, boolean, cn.piq.fcarcade.rom.RomDescriptor, cn.piq.fcarcade.rom.RomCatalogEntry);",
+        "public final java.lang.String toString();",
+        "public final int hashCode();",
+        "public final boolean equals(java.lang.Object);",
+        "public java.lang.String sha256();",
+        "public java.lang.String displayName();",
+        "public int mapper();",
+        "public int maxPlayers();",
+        "public cn.piq.fcarcade.rom.RomSaveMode saveMode();",
+        "public boolean compatible();",
+        "public cn.piq.fcarcade.rom.RomDescriptor local();",
+        "public cn.piq.fcarcade.rom.RomCatalogEntry server();"
+      ],
+      "new_methods": []
+    },
+    "cn.piq.fcarcade.client.RomLibraryScreen$EntryBuilder": {
+      "protected_methods": [
+        "private cn.piq.fcarcade.client.RomLibraryScreen$EntryBuilder();",
+        "private cn.piq.fcarcade.client.RomLibraryScreen$Entry build();"
+      ],
+      "new_methods": []
+    },
+    "cn.piq.fcarcade.client.SkinLibraryScreen$Entry": {
+      "protected_methods": [
+        "private cn.piq.fcarcade.client.SkinLibraryScreen$Entry(java.lang.String, java.lang.String, boolean, cn.piq.fcarcade.skin.SkinDescriptor, cn.piq.fcarcade.client.ClientSkinLibrary$LocalSkin);",
+        "private boolean compatible();",
+        "private static cn.piq.fcarcade.client.SkinLibraryScreen$Entry builtin();",
+        "private static cn.piq.fcarcade.client.SkinLibraryScreen$Entry server(cn.piq.fcarcade.skin.SkinDescriptor);",
+        "private static cn.piq.fcarcade.client.SkinLibraryScreen$Entry local(cn.piq.fcarcade.client.ClientSkinLibrary$LocalSkin);",
+        "public final java.lang.String toString();",
+        "public final int hashCode();",
+        "public final boolean equals(java.lang.Object);",
+        "public java.lang.String name();",
+        "public java.lang.String sha256();",
+        "public boolean defaultSkin();",
+        "public cn.piq.fcarcade.skin.SkinDescriptor server();",
+        "public cn.piq.fcarcade.client.ClientSkinLibrary$LocalSkin local();"
+      ],
+      "new_methods": []
+    },
+    "cn.piq.fcarcade.world.DualCabinetFootprint$Bounds": {
+      "protected_methods": [
+        "public cn.piq.fcarcade.world.DualCabinetFootprint$Bounds(double, double, double, double, double, double);",
+        "public final java.lang.String toString();",
+        "public final int hashCode();",
+        "public final boolean equals(java.lang.Object);",
+        "public double minX();",
+        "public double minY();",
+        "public double minZ();",
+        "public double maxX();",
+        "public double maxY();",
+        "public double maxZ();"
+      ],
+      "new_methods": []
+    },
+    "cn.piq.fcarcade.world.DualCabinetFootprint$Cell": {
+      "protected_methods": [
+        "public cn.piq.fcarcade.world.DualCabinetFootprint$Cell(int, int, int, int);",
+        "public final java.lang.String toString();",
+        "public final int hashCode();",
+        "public final boolean equals(java.lang.Object);",
+        "public int part();",
+        "public int x();",
+        "public int y();",
+        "public int z();"
+      ],
+      "new_methods": []
+    },
+    "cn.piq.fcarcade.world.DualCabinetFootprint$Facing": {
+      "protected_methods": [
+        "public static cn.piq.fcarcade.world.DualCabinetFootprint$Facing[] values();",
+        "public static cn.piq.fcarcade.world.DualCabinetFootprint$Facing valueOf(java.lang.String);",
+        "private cn.piq.fcarcade.world.DualCabinetFootprint$Facing();",
+        "private static cn.piq.fcarcade.world.DualCabinetFootprint$Facing[] $values();",
+        "static {};"
+      ],
+      "new_methods": []
+    },
+    "cn.piq.sfchome.client.SfcHardwareItems$ItemModel": {
+      "protected_methods": [
+        "cn.piq.sfchome.client.SfcHardwareItems$ItemModel(net.minecraft.client.resources.model.BakedModel);",
+        "public boolean isCustomRenderer();",
+        "public net.minecraft.client.resources.model.BakedModel applyTransform(net.minecraft.world.item.ItemDisplayContext, com.mojang.blaze3d.vertex.PoseStack, boolean);",
+        "public java.util.List<net.minecraft.client.resources.model.BakedModel> getRenderPasses(net.minecraft.world.item.ItemStack, boolean);"
+      ],
+      "new_methods": []
+    },
+    "cn.piq.sfchome.client.SfcHomeClient$SessionOrder$Assignment": {
+      "protected_methods": [
+        "private cn.piq.sfchome.client.SfcHomeClient$SessionOrder$Assignment(long, int, java.util.UUID);",
+        "public final java.lang.String toString();",
+        "public final int hashCode();",
+        "public final boolean equals(java.lang.Object);",
+        "public long session();",
+        "public int epoch();",
+        "public java.util.UUID lease();"
+      ],
+      "new_methods": []
+    },
+    "cn.piq.sfchome.client.SfcHomeClient$SessionOrder": {
+      "protected_methods": [
+        "cn.piq.sfchome.client.SfcHomeClient$SessionOrder();",
+        "static boolean sameConnection(java.lang.Object, java.lang.Object);",
+        "boolean accept(java.lang.Object, long, int, java.util.UUID);",
+        "boolean limitReached();"
+      ],
+      "new_methods": []
+    }
+  },
+  "frozen_sfc6_entries_preserved": 60,
+  "negative_controls": [
+    "server",
+    "wire",
+    "old_texture",
+    "rom",
+    "deleted_id",
+    "new_texture"
+  ],
+  "probes": {
+    "geometry": {
+      "footprint": {
+        "ok": true,
+        "assertions": 265,
+        "production_origin": "final-jar-only",
+        "legacy_cells_preserved": 12,
+        "nonempty_collision_cells": 8,
+        "empty_top_proxy_cells": 4,
+        "minecraft_or_native_core_started": false
+      },
+      "visual_projection": {
+        "ok": true,
+        "assertions": 81,
+        "production_origin": "final-jar-only",
+        "projection_does_not_change_masks_or_consume_sequences": true,
+        "minecraft_or_native_core_started": false
+      },
+      "geometry": {
+        "xOffset": 0.25,
+        "yOffset": 0.0,
+        "screenOffset": 0.0015,
+        "facings": [
+          {
+            "screen": [
+              [
+                0.5,
+                1.018939497929804,
+                0.34446820139960543
+              ],
+              [
+                1.5,
+                1.018939497929804,
+                0.34446820139960543
+              ],
+              [
+                1.5,
+                1.711849147313269,
+                0.6314807756734226
+              ],
+              [
+                0.5,
+                1.711849147313269,
+                0.6314807756734226
+              ]
+            ],
+            "normal": [
+              0.0,
+              0.3826834323650898,
+              -0.9238795325112867
+            ],
+            "bounds": [
+              [
+                0.25,
+                0.0,
+                0.023875631329235484
+              ],
+              [
+                1.75,
+                2.0,
+                1.1238756313125
+              ]
+            ]
+          },
+          {
+            "screen": [
+              [
+                0.6555317986003946,
+                1.018939497929804,
+                0.5
+              ],
+              [
+                0.6555317986003946,
+                1.018939497929804,
+                1.5
+              ],
+              [
+                0.36851922432657735,
+                1.711849147313269,
+                1.5
+              ],
+              [
+                0.36851922432657735,
+                1.711849147313269,
+                0.5
+              ]
+            ],
+            "normal": [
+              0.9238795325112867,
+              0.3826834323650898,
+              0.0
+            ],
+            "bounds": [
+              [
+                -0.12387563131250001,
+                0.0,
+                0.25
+              ],
+              [
+                0.9761243686707645,
+                2.0,
+                1.75
+              ]
+            ]
+          },
+          {
+            "screen": [
+              [
+                0.5,
+                1.018939497929804,
+                0.6555317986003946
+              ],
+              [
+                -0.5,
+                1.018939497929804,
+                0.6555317986003946
+              ],
+              [
+                -0.5,
+                1.711849147313269,
+                0.36851922432657735
+              ],
+              [
+                0.5,
+                1.711849147313269,
+                0.36851922432657735
+              ]
+            ],
+            "normal": [
+              0.0,
+              0.3826834323650898,
+              0.9238795325112867
+            ],
+            "bounds": [
+              [
+                -0.75,
+                0.0,
+                -0.12387563131250001
+              ],
+              [
+                0.75,
+                2.0,
+                0.9761243686707645
+              ]
+            ]
+          },
+          {
+            "screen": [
+              [
+                0.34446820139960543,
+                1.018939497929804,
+                0.5
+              ],
+              [
+                0.34446820139960543,
+                1.018939497929804,
+                -0.5
+              ],
+              [
+                0.6314807756734226,
+                1.711849147313269,
+                -0.5
+              ],
+              [
+                0.6314807756734226,
+                1.711849147313269,
+                0.5
+              ]
+            ],
+            "normal": [
+              -0.9238795325112867,
+              0.3826834323650898,
+              0.0
+            ],
+            "bounds": [
+              [
+                0.023875631329235484,
+                0.0,
+                -0.75
+              ],
+              [
+                1.1238756313125,
+                2.0,
+                0.75
+              ]
+            ]
+          }
+        ],
+        "parts": [
+          {
+            "name": "p1_button_1",
+            "player": 0,
+            "pivot": [
+              17.285,
+              13.3825,
+              1.397
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p1_button_2",
+            "player": 0,
+            "pivot": [
+              16.053,
+              13.3825,
+              1.529
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p1_button_3",
+            "player": 0,
+            "pivot": [
+              14.821,
+              13.3825,
+              1.397
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p1_button_4",
+            "player": 0,
+            "pivot": [
+              17.285,
+              13.3825,
+              2.75
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p1_button_5",
+            "player": 0,
+            "pivot": [
+              16.053,
+              13.3825,
+              2.882
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p1_button_6",
+            "player": 0,
+            "pivot": [
+              14.821,
+              13.3825,
+              2.75
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p1_start",
+            "player": 0,
+            "pivot": [
+              18.759,
+              13.333,
+              1.386
+            ],
+            "pressY": -0.08,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p1_joystick",
+            "player": 0,
+            "pivot": [
+              20.86,
+              13.3495,
+              2.97
+            ],
+            "pressY": 0.0,
+            "tiltX": 8.0,
+            "tiltZ": 8.0
+          },
+          {
+            "name": "p2_button_1",
+            "player": 1,
+            "pivot": [
+              5.285,
+              13.3825,
+              1.397
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p2_button_2",
+            "player": 1,
+            "pivot": [
+              4.053,
+              13.3825,
+              1.529
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p2_button_3",
+            "player": 1,
+            "pivot": [
+              2.821,
+              13.3825,
+              1.397
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p2_button_4",
+            "player": 1,
+            "pivot": [
+              5.285,
+              13.3825,
+              2.75
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p2_button_5",
+            "player": 1,
+            "pivot": [
+              4.053,
+              13.3825,
+              2.882
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p2_button_6",
+            "player": 1,
+            "pivot": [
+              2.821,
+              13.3825,
+              2.75
+            ],
+            "pressY": -0.12,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p2_start",
+            "player": 1,
+            "pivot": [
+              6.759,
+              13.333,
+              1.386
+            ],
+            "pressY": -0.08,
+            "tiltX": 0.0,
+            "tiltZ": 0.0
+          },
+          {
+            "name": "p2_joystick",
+            "player": 1,
+            "pivot": [
+              8.86,
+              13.3495,
+              2.97
+            ],
+            "pressY": 0.0,
+            "tiltX": 8.0,
+            "tiltZ": 8.0
+          }
+        ],
+        "video": [
+          {
+            "point": [
+              1.5,
+              1.018939497929804,
+              0.34446820139960543
+            ],
+            "uv": [
+              0.0,
+              1.0
+            ]
+          },
+          {
+            "point": [
+              0.5,
+              1.018939497929804,
+              0.34446820139960543
+            ],
+            "uv": [
+              1.0,
+              1.0
+            ]
+          },
+          {
+            "point": [
+              0.5,
+              1.711849147313269,
+              0.6314807756734226
+            ],
+            "uv": [
+              1.0,
+              0.0
+            ]
+          },
+          {
+            "point": [
+              1.5,
+              1.711849147313269,
+              0.6314807756734226
+            ],
+            "uv": [
+              0.0,
+              0.0
+            ]
+          }
+        ]
+      },
+      "production_compiled": false,
+      "origin_jar_sha256": "ECC559B11E21F389BB95AC8113A2D885DC8DE7B91F01DE5C25156AD51AEB5645"
+    },
+    "fml_and_outer_codec": {
+      "fml_discovery": {
+        "dependency_check": "Actual FML ModInfo + Maven VersionRange; not full FML ModSorter/bootstrap",
+        "level": "actual JarModsDotTomlModFileReader + ModFile.identifyMods + ASM compileContent",
+        "assertions": 28,
+        "loader": "FancyModLoader 4.0.43",
+        "production_origin": "final-jar-only",
+        "minecraft_or_native_core_started": false,
+        "discovery": [
+          {
+            "mods": [
+              {
+                "version": "0.31.0-alpha.22",
+                "dependencies": [
+                  {
+                    "id": "neoforge",
+                    "range": "[21.1.236,22)",
+                    "ordering": "NONE",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  },
+                  {
+                    "id": "minecraft",
+                    "range": "[1.21.1,1.21.2)",
+                    "ordering": "NONE",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  },
+                  {
+                    "id": "waterframes",
+                    "range": "[2.1.23,3)",
+                    "ordering": "AFTER",
+                    "type": "OPTIONAL",
+                    "side": "BOTH"
+                  }
+                ],
+                "id": "piq_fc_arcade"
+              }
+            ],
+            "module_name": "piq_fc_arcade",
+            "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-d4ss1e9g\\fc.jar",
+            "scanned_classes": 1257,
+            "entry_points": [
+              "piq_fc_arcade"
+            ],
+            "access_transformers": 1
+          },
+          {
+            "mods": [
+              {
+                "version": "0.2.0-alpha.6",
+                "dependencies": [
+                  {
+                    "id": "neoforge",
+                    "range": "[21.1.236,)",
+                    "ordering": "NONE",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  },
+                  {
+                    "id": "minecraft",
+                    "range": "[1.21.1,1.22)",
+                    "ordering": "NONE",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  },
+                  {
+                    "id": "piq_fc_arcade",
+                    "range": "[0.26.0,)",
+                    "ordering": "AFTER",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  }
+                ],
+                "id": "piq_sfc_arcade"
+              },
+              {
+                "version": "0.1.0-alpha.10",
+                "dependencies": [
+                  {
+                    "id": "neoforge",
+                    "range": "[21.1.236,22)",
+                    "ordering": "NONE",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  },
+                  {
+                    "id": "minecraft",
+                    "range": "[1.21.1,1.21.2)",
+                    "ordering": "NONE",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  },
+                  {
+                    "id": "piq_fc_arcade",
+                    "range": "[0.31.0-alpha.22,0.32.0)",
+                    "ordering": "AFTER",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  },
+                  {
+                    "id": "piq_sfc_arcade",
+                    "range": "[0.2.0-alpha.6,0.3.0)",
+                    "ordering": "AFTER",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  }
+                ],
+                "id": "piq_sfc_home"
+              }
+            ],
+            "module_name": "piq_sfc_arcade",
+            "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-d4ss1e9g\\sfc.jar",
+            "scanned_classes": 186,
+            "entry_points": [
+              "piq_sfc_arcade",
+              "piq_sfc_home"
+            ],
+            "access_transformers": 1
+          },
+          {
+            "mods": [
+              {
+                "version": "0.1.0-alpha.7",
+                "dependencies": [
+                  {
+                    "id": "neoforge",
+                    "range": "[21.1.236,22)",
+                    "ordering": "NONE",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  },
+                  {
+                    "id": "minecraft",
+                    "range": "[1.21.1,1.21.2)",
+                    "ordering": "NONE",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  },
+                  {
+                    "id": "piq_fc_arcade",
+                    "range": "[0.31.0-alpha.21,0.32.0)",
+                    "ordering": "AFTER",
+                    "type": "REQUIRED",
+                    "side": "BOTH"
+                  }
+                ],
+                "id": "piq_native_arcade"
+              }
+            ],
+            "module_name": "piq_native_arcade",
+            "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-d4ss1e9g\\native.jar",
+            "scanned_classes": 42,
+            "entry_points": [
+              "piq_native_arcade"
+            ],
+            "access_transformers": 0
+          }
+        ],
+        "ok": true,
+        "mod_entry_points_executed": false
+      },
+      "sfc_real_neoforge_outer_packet_codec": {
+        "passed": true,
+        "assertions": 37,
+        "max_upload_outer_packet_bytes": 30856,
+        "outer_codec": "NeoForge21.1.236 ServerboundCustomPayloadPacket.STREAM_CODEC",
+        "minecraft_started": false
+      },
+      "hash_checked_temporary_copies": {
+        "fc": {
+          "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_fc_arcade-0.31.0-alpha.22.jar",
+          "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-d4ss1e9g\\fc.jar",
+          "sha256": "ECC559B11E21F389BB95AC8113A2D885DC8DE7B91F01DE5C25156AD51AEB5645",
+          "byte_identical_before": true,
+          "byte_identical_after": true
+        },
+        "sfc": {
+          "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+          "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-d4ss1e9g\\sfc.jar",
+          "sha256": "A5892700D043D51A890E59D5EC57F3E34F9F828A49EED92BE1DA759C5782F882",
+          "byte_identical_before": true,
+          "byte_identical_after": true
+        },
+        "native": {
+          "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+          "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-d4ss1e9g\\native.jar",
+          "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A",
+          "byte_identical_before": true,
+          "byte_identical_after": true
+        }
+      },
+      "production_compiled": false,
+      "old_separate_core_on_classpath": false
+    }
+  },
+  "production_compiled": false,
+  "installed": false,
+  "minecraft_or_native_core_started": false,
+  "network_socket_opened": false,
+  "limits": [
+    "Actual FML parser/ASM discovery and outer codecs, not full mod bootstrap or live multiplayer.",
+    "User model geometry checked offline and against final pure Java; no Minecraft scene or physical controller claim.",
+    "New dual cabinet uses dedicated default UV atlas; old skin hash retained but not applied; single cabinet skins unchanged."
+  ]
+}

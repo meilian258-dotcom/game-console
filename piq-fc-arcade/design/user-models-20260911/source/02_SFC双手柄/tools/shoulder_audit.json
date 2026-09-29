@@ -1,0 +1,46 @@
+{
+  "passed": true,
+  "scope": "Read-only independent audit of the four SFC shoulder controls and preservation of the preceding console-shell repair.",
+  "sourceModel": "../../corner_fix/SFC_日版双手柄_机壳修正版.bbmodel",
+  "sourceSha256": "80dcedec357b20c13784198a1ee3c11a3f5579238e372ccbf2ade0414c8f9101",
+  "model": "../SFC_日版双手柄_线材肩键修正版.bbmodel",
+  "modelSha256": "35c487534089f8b24bd836076ef52883bfe43e90c823c0aeef6e58b44dfbf509",
+  "checks": {
+    "fourShoulderGeometriesCongruentAfterCenterNormalization": true,
+    "eachThreeSegmentFootprintSymmetricAboutItsCenterX": true,
+    "allGroupNamesAndUUIDsUnchanged": true,
+    "shoulderElementUUIDsAndGroupMembershipUnchanged": true,
+    "mappingGroupUUIDsPivotsAndElementUUIDsMatchModel": true,
+    "consoleAndCartridgeElementCountCompared": 268,
+    "consoleAndCartridgeChangedElements": [],
+    "singlePNGBytesIdenticalToSource": true,
+    "socketBaseTopRaw": 1.17,
+    "socketBaseTopFinal": 0.585,
+    "fixedUpperPanelTopFinal": 0.595,
+    "restShoulderCapTopFinal": [0.635, 0.6349, 0.6349],
+    "pressedShoulderCapTopFinal": [0.6, 0.5999, 0.5999],
+    "minimumPressedCapClearanceAboveUpperPanelFinal": 0.0049,
+    "minimumPressedCapClearanceAboveSocketFinal": 0.0149,
+    "capAndBaseVerticalOverlapRaw": 0.0068,
+    "centerAndWingSegmentsHavePositiveAreaOverlap": true,
+    "sixShoulderSolidsRemainConnectedUnderUniformPressTranslation": true
+  },
+  "pressTest": {
+    "translationYFinal": -0.035,
+    "translationYRaw": -0.07,
+    "method": "For each shoulder, sample a 121-by-61 XZ grid across the cap region, retain points inside the union of the three rotated top-cap rectangles, then compare the translated cap top against fixed-shell OBB coverage at each retained point. Independently inspect the low-angle rest and pressed previews.",
+    "qualification": "This is a modelling/preview clearance check only. It does not configure or verify in-game input binding or animation playback.",
+    "modelSavedAtRest": true,
+    "groups": [
+      {"name": "p1_shoulder_l", "uuid": "cfe3323b-0c18-4786-ac3c-2bfbfd9d0591", "sampledCapPoints": 3186, "occludedByFixedShellPoints": 0},
+      {"name": "p1_shoulder_r", "uuid": "905f2808-9585-469c-a96e-222b5703e17e", "sampledCapPoints": 3186, "occludedByFixedShellPoints": 0},
+      {"name": "p2_shoulder_l", "uuid": "0dd15aba-940d-48b1-ace2-d5ccbc426c2e", "sampledCapPoints": 3186, "occludedByFixedShellPoints": 0},
+      {"name": "p2_shoulder_r", "uuid": "e174493a-f93e-4be0-a5be-5124a29995eb", "sampledCapPoints": 3186, "occludedByFixedShellPoints": 0}
+    ]
+  },
+  "visualReview": {
+    "imagesInspected": ["../截图_手柄修复后.png", "../截图_低角度.png", "../截图_肩键按下测试.png"],
+    "finding": "The shoulder controls now follow the rear contour with joined, substantial sidewalls instead of detached narrow strips. The low-angle pressed preview preserves the complete cap and label; no fixed socket face covers the cap or splits it into fragments. Visible vertical changes in tone at the three segments are the intended faceted curve, not gaps.",
+    "initialIssueResolved": "The first socket height of raw 1.207 would have covered the cap after a -0.035 final press. The audited model lowers that fixed socket to raw 1.17."
+  }
+}

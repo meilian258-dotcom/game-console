@@ -1,0 +1,112 @@
+{
+  "texture": "GBA_完整UV.png",
+  "canvas": [
+    2048,
+    2048
+  ],
+  "front": {
+    "x": 32,
+    "y": 32,
+    "width": 800,
+    "height": 450
+  },
+  "screen": {
+    "x": 880,
+    "y": 32,
+    "width": 720,
+    "height": 480
+  },
+  "screenSourceImageSize": [
+    240,
+    160
+  ],
+  "screenScale": 3,
+  "logo": {
+    "x": 880,
+    "y": 534,
+    "width": 700,
+    "height": 95
+  },
+  "regions": [
+    {
+      "name": "机身正面整片可换皮肤",
+      "rect": {
+        "x": 32,
+        "y": 32,
+        "width": 800,
+        "height": 450
+      },
+      "face": "up"
+    },
+    {
+      "name": "可替换游戏画面",
+      "rect": {
+        "x": 880,
+        "y": 32,
+        "width": 720,
+        "height": 480
+      },
+      "face": "up"
+    },
+    {
+      "name": "镜片下方GBA字标",
+      "rect": {
+        "x": 880,
+        "y": 534,
+        "width": 700,
+        "height": 95
+      },
+      "face": "up"
+    },
+    {
+      "name": "镜片上方Nintendo标记",
+      "rect": {
+        "x": 1640,
+        "y": 32,
+        "width": 270,
+        "height": 76
+      },
+      "face": "up"
+    },
+    {
+      "name": "十字键压纹",
+      "rect": {
+        "x": 1640,
+        "y": 142,
+        "width": 240,
+        "height": 240
+      },
+      "face": "up"
+    },
+    {
+      "name": "L肩键字",
+      "rect": {
+        "x": 1640,
+        "y": 424,
+        "width": 110,
+        "height": 70
+      },
+      "face": "up"
+    },
+    {
+      "name": "R肩键字",
+      "rect": {
+        "x": 1778,
+        "y": 424,
+        "width": 110,
+        "height": 70
+      },
+      "face": "up"
+    },
+    {
+      "name": "背部型号标签",
+      "rect": {
+        "x": 32,
+        "y": 515,
+        "width": 700,
+        "height": 170
+      },
+      "face": "down"
+    }
+  ]
+}

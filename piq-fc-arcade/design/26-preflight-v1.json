@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "schema": "piq-zapper-session26-final-1",
+  "jars": {
+    "fc": {
+      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v1\\piq_fc_arcade-0.31.0-alpha.26.jar",
+      "sha256": "A712BECB54CDB242757604C55A4D6719CB90B24EBB73636FC244F2B51977581A"
+    }
+  },
+  "production_compiled": false,
+  "minecraft_started": false,
+  "installed": false,
+  "worker": {
+    "ok": true,
+    "assertions": 308,
+    "pure_tests": 10,
+    "workers": 2,
+    "consistent_join_frames": 90,
+    "p1_total_frames": 150,
+    "p1_restarts": 0,
+    "snapshot_bytes": 8595,
+    "actual_wasm": true,
+    "production_origin": "final-jar-only",
+    "minecraft_started": false,
+    "real_network_or_server": false
+  },
+  "wire": {
+    "ok": true,
+    "assertions": 806,
+    "max_outer_bytes": 19777,
+    "actual_registered_outer_codecs": true,
+    "actual_queued_connection_handler": true,
+    "production_origin": "final-jar-only",
+    "minecraft_started": false,
+    "server_world_authority_executed": false,
+    "network_socket_opened": false
+  },
+  "test_source_sha256": {
+    "tools\\qa\\ZapperCoreProbe.java": "1CBC9B3B52A2F680071400605E428EADDAF928682CFA3A4468854187C5FB7BCC",
+    "tools\\qa\\ZapperSession26Probe.java": "8F4C87A9B35CCF27C4F602A67F1A23B9067115434C467226BE67ADCFE3750866",
+    "tools\\qa\\ZapperWire26Probe.java": "F25052E8E9CFDA24B266172579FA9CCC73191937471EDF1CD643DF370E2FDC10",
+    "src\\test\\java\\cn\\piq\\fcarcade\\session\\ZapperLockstepTest.java": "59A16A79028CCE2B5D133D98F7803CC65CE5A58B8D9CBC54E2F76378CA79194B"
+  },
+  "limits": [
+    "Actual two production workers and independent WASM core, original diagnostic ROM only.",
+    "Real registered outer codecs and queued Connection handler; no Minecraft world/player construction, live socket, physical gun or gameplay acceptance.",
+    "Service authority additionally has source contracts; not a complete live server test."
+  ]
+}

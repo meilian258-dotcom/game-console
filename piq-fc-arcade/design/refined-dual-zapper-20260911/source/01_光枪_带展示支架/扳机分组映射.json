@@ -1,0 +1,29 @@
+{
+  "model": "Zapper_橙灰光枪_展示支架版.bbmodel",
+  "runtimeBindingConfigured": false,
+  "controls": [
+    {
+      "group": "trigger",
+      "groupUuid": "850c61a5-210d-4747-a4f1-5b85881e94c8",
+      "pivot": [
+        9.52327672,
+        4.03390858,
+        8.204
+      ],
+      "elementUuids": [
+        "f520afaf-97c3-488b-a3db-bbc3f2857637",
+        "bf6ee4f2-d2f0-414f-aa15-c40c9a973dd5"
+      ],
+      "suggestedRotationWhenPressed": [
+        0,
+        0,
+        8
+      ],
+      "durationSeconds": 0.07
+    }
+  ],
+  "notes": [
+    "This upright derivative uses local Z as trigger pivot axis; loose version uses Y.",
+    "No animation installed in static Java JSON."
+  ]
+}

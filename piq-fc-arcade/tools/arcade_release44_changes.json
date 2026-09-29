@@ -1,0 +1,42 @@
+{
+  "schema": "arcade44-reviewed-changes-1",
+  "approved": true,
+  "class_roots": {
+    "fc": [
+      "cn/piq/fcarcade/client/cabinet/CabinetMenuScreen",
+      "cn/piq/fcarcade/client/cabinet/CabinetSyncSettingsScreen",
+      "cn/piq/fcarcade/client/cabinet/CabinetClientBackends",
+      "cn/piq/fcarcade/cabinet/CabinetSynchronizer",
+      "cn/piq/fcarcade/cabinet/CabinetSyncSettings",
+      "cn/piq/fcarcade/runtime/RuntimeCatalog",
+      "cn/piq/fcarcade/client/runtime/RuntimeEnvironmentScreen",
+      "cn/piq/fcarcade/cabinet/CabinetRoomLedger",
+      "cn/piq/fcarcade/cabinet/CabinetRooms",
+      "cn/piq/fcarcade/cabinet/ServerCabinets",
+      "cn/piq/fcarcade/server/ArcadeDisplayOwnership",
+      "cn/piq/fcarcade/server/ArcadeOccupancyDisplay",
+      "cn/piq/fcarcade/server/ServerArcadeSessions"
+    ],
+    "native": [
+      "cn/piq/nativearcade/client/NativeCabinetBackend",
+      "cn/piq/nativearcade/client/NativeSnapshotCore",
+      "cn/piq/nativearcade/bridge/NativeSnapshotState",
+      "cn/piq/nativearcade/bridge/NativeSnapshotWorkspace",
+      "cn/piq/nativearcade/bridge/NativeSnapshotSession"
+    ]
+  },
+  "removed_classes": {"fc": [], "native": []},
+  "language_changes": {"fc": {}, "native": {}},
+  "native_description": "Windows x64 arcade with bundled fixed-version runtimes. Local input synchronization supports the verified kof97/mslug2 profiles with up to two players; audio/video streaming retains up to four input ports. Generic cabinet networking and runtime extraction are provided by Game Console; the legacy cabinet remains local-only. No ROMs, BIOS or GBA runtime included.",
+  "required_test_suites": {
+    "piq-fc-arcade": [
+      "cn.piq.fcarcade.runtime.RuntimeSyncRelease44Test",
+      "cn.piq.fcarcade.cabinet.CabinetOccupancyNamesTest",
+      "cn.piq.fcarcade.server.SharedCabinetOccupancyWiringTest",
+      "cn.piq.fcarcade.server.ArcadeDisplayOwnershipTest",
+      "cn.piq.fcarcade.cabinet.CabinetRoomLedgerTest"
+    ],
+    "piq-native-arcade": ["cn.piq.nativearcade.NativeSyncReleaseContractTest"]
+  },
+  "notes": "Root approved the exact 13 FC and 5 Native class roots after the 50-test occupancy target run passed. No language/assets/removals are authorized. Freeze still requires all fresh full Gradle suites and immutable capture. Runtime17 provenance and all three FC WASM remain unchanged."
+}

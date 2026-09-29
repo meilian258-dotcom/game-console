@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "piq_flash_box:block/player_box" },
+    "facing=east": { "model": "piq_flash_box:block/player_box", "y": 90 },
+    "facing=south": { "model": "piq_flash_box:block/player_box", "y": 180 },
+    "facing=west": { "model": "piq_flash_box:block/player_box", "y": 270 }
+  }
+}

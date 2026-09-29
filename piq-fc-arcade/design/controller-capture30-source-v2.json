@@ -1,0 +1,28 @@
+{
+  "ok": true,
+  "mode": "production-source",
+  "production_compiled": true,
+  "jars": {},
+  "actual": {
+    "ok": true,
+    "tests": 43,
+    "origin_assertions": 0,
+    "minecraft_or_core_started": false
+  },
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\ControllerCapturePolicy.java": "5B6CE9AA84F9EC46326CA68DC263A139D6EC07EA54B7936FC487E19682DC64F1",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\HomeInputSequences.java": "4A101B0F81D08C90C7403584802D434CFE78577B8D42815981EC56D2CE7A0EDE",
+    "src\\main\\java\\cn\\piq\\fcarcade\\home\\HomeRuntimeAuthority.java": "F4829911A38021A89CED7CE030800AD3FFC94577D25ED069B35BEA7F9733B5C7",
+    "src\\main\\java\\cn\\piq\\fcarcade\\session\\LockstepState.java": "5AF181EBDB426607E24AB748C03560E6599B7CB271B9F0C4AE24058CA363A51A",
+    "src\\main\\java\\cn\\piq\\fcarcade\\session\\ControllerInputTransitions.java": "ED0C8BBE51CDDB90B400940F7814C753741B735F710EDB22502C9A2E7AC6B184",
+    "src\\main\\java\\cn\\piq\\fcarcade\\session\\ZapperInput.java": "7E36921D4D1C34E48C11165E5834D35BDA863B105CB9F89FE692E38F686E6792",
+    "src\\main\\java\\cn\\piq\\fcarcade\\session\\ZapperInputQueue.java": "6347F257D6E26328A98EA7B3534763DACAF3EA9642DECBAFA0625AA9E3CBC7C9",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\ControllerCapturePolicyTest.java": "599EB3F068F9148C2EC67677136645BC98A92DC548C1E0257A314AC076510160",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\HomeInputSequencesTest.java": "F0A33152BED6513836E4DF655913742BE7529C531A0CDD4A5A4B308A94D92571",
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\HomeGunKeyboardFallbackTest.java": "DDF1DAD18F4EEDBB386F5B48140D33529D5B7A36496BDC1D1DD45F469B1AF765",
+    "src\\test\\java\\cn\\piq\\fcarcade\\home\\HomeGunController29Test.java": "B83E1505340249F2CB0658F754AAAAFEDF7DB9BF28376511F499A79CBE54DB3A",
+    "tools\\qa\\ControllerCapture30TestRunner.java": "01F97DADAA8FE95562B201C3C4A8571E2D25DD9C9B4F37B6C8463EDE5B4D9D59",
+    "tools\\check_controller_capture30.py": "4C16A8683DC3775CD2310F36C942B0F4B74A7A300E94AF7AF6035F38B28A1EDD"
+  },
+  "scope": "Real pure production receipts/identity/lease routing and FIFO transitions; no Minecraft world, player, actual permission callback, input device or network."
+}

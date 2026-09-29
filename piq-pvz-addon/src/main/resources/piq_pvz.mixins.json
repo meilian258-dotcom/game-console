@@ -1,0 +1,1 @@
+{"required":true,"package":"cn.piq.pvz.client.mixin","compatibilityLevel":"JAVA_21","client":["PvzIdleMixin","PvzToneMixin"],"injectors":{"defaultRequire":1}}

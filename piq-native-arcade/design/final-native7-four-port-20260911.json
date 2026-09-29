@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "production_compiled": false,
+  "helper_parser": {
+    "ok": true,
+    "assertions": 4185,
+    "actual_helper_parser_and_callbacks": true,
+    "mame_dll_loaded": false,
+    "minecraft_started": false
+  },
+  "minecraft_started": false,
+  "user_files_changed": false,
+  "native_bridge": {
+    "ok": true,
+    "assertions": 15,
+    "actual_mame_bridge": true,
+    "original_diagnostic_only": true,
+    "minecraft_started": false,
+    "four_player_commercial_game_tested": false
+  },
+  "runtime_sha256": {
+    "piq-native-helper.jar": "229268989AD4E263277FDF0BD5D49E59F69EEB3E980B948DD1D3628182437120",
+    "mame_libretro.dll": "6172A988AB67FE68F4177A6FC8FBB82619EB2044C330930F0F572F7B1EDC2301",
+    "jna-5.14.0.jar": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6"
+  },
+  "firmware": {
+    "path": "C:\\Users\\13498\\AppData\\Local\\Temp\\native-four-ports-i0owhgyl\\invaders.zip",
+    "zip_sha256": "10E62BBACBF6E79EFB6DB6F7A65EA1EDFB65653EAB60B41E80DBCB4673A5276C",
+    "original_firmware_sha256": "554C673E65D5957DA0BC1DF0CEB986CBAC5500D407AE2D780FEAB4F8D2EED810",
+    "notice": "Original diagnostics, not Space Invaders game code. Expected checksum warnings are intentional."
+  },
+  "parent_jar_sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A",
+  "production_origin": "final-jar-only",
+  "staged_jars": {
+    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_native_arcade-0.1.0-alpha.7.jar": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A",
+    "G:\\服务器\\服务器Codex\\piq-native-arcade\\build\\native-four-port7\\final-runtime\\piq-native-helper.jar": "229268989AD4E263277FDF0BD5D49E59F69EEB3E980B948DD1D3628182437120"
+  },
+  "limits": [
+    "Four helper input callbacks tested directly; original invaders diagnostic hardware exercises only its supported lines.",
+    "Not four-player commercial gameplay, Minecraft networking or user-instance testing."
+  ]
+}

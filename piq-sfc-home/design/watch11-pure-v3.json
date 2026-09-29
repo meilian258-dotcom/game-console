@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "tests": {
+    "passed_tests": 18,
+    "minecraft_started": false,
+    "mode": "actual-api-and-production-layout"
+  },
+  "source_sha256": {
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcWatchFrames.java": "F443B14284F56996C5907419C3907701092460317AD439E3728EFB6EC474ACD1",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcWatchDemand.java": "0A1BDE342C41D50C0AE865EE6BA25DDF57A9ACD410874B849A012B86D4D565FA",
+    "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroFrame.java": "E7563211DA48E98E045DD9DCA84704DCB55990229F458B7E488A98F9875F7F2F",
+    "piq-sfc-home\\src\\test\\java\\cn\\piq\\sfchome\\client\\SfcWatchFramesTest.java": "D0CC777C625C802AFB6AD2F6DA78510FA0B017C1FE4264905EB9610DEEDD3A0F",
+    "piq-sfc-home\\src\\test\\java\\cn\\piq\\sfchome\\client\\SfcWatchDemandTest.java": "655FE5854F7452C53FAD1BD1524609902197C4678837663EBD4F83FF3B272FC2",
+    "piq-sfc-home\\src\\test\\java\\cn\\piq\\sfchome\\client\\SfcWatchSourceTest.java": "46E01CDF3C6DE7CCD9B5D95A5894102242A7B6D1992801FFCE0029573A32E7BD",
+    "piq-fc-arcade\\tools\\qa\\DeviceUiTestRunner.java": "035E30EDC80EDFE4DF3925DBFDC7E41F51D77C2E9601E0152C4A4DC96105561E",
+    "piq-sfc-home\\tools\\check_sfc_watch_pure.py": "DDBF965F47C1930F2D350BED5D8C7C7D3D1971045BAD892FC8AD217D919379B9"
+  },
+  "minecraft_started": false,
+  "native_core_started": false,
+  "network_socket_opened": false,
+  "gradle_started": false,
+  "scope": "Executed pure frame copy/demand guards plus source architecture contracts; not actual multiplayer."
+}

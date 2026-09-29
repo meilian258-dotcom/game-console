@@ -1,0 +1,198 @@
+{
+  "ok": true,
+  "schema": "piq-zapper-visual26-1",
+  "mode": "final-jar-only",
+  "jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v1\\piq_fc_arcade-0.31.0-alpha.26.jar",
+  "sha256": "A712BECB54CDB242757604C55A4D6719CB90B24EBB73636FC244F2B51977581A",
+  "production_compiled": false,
+  "production_sources_compiled_only_pure": false,
+  "minecraft_started": false,
+  "not_a_game_screenshot": true,
+  "pure": {
+    "passed_tests": 17,
+    "minecraft_started": false,
+    "mode": "actual-production-pure-state-machines"
+  },
+  "actual_enum_transform": {
+    "mod_owner": "piq_fc_arcade",
+    "assertions": 8,
+    "new_enum_fields": [
+      "PIQ_FC_ARCADE_CONTROLLER_SINGLE_HAND",
+      "PIQ_FC_ARCADE_CONTROLLER_TWO_HANDS",
+      "PIQ_FC_ARCADE_ZAPPER"
+    ],
+    "actual_fml_enum_transform": true,
+    "minecraft_started": false,
+    "limits": "Actual parser/transformer only; no enum initialization, ModLauncher game boot or renderer execution",
+    "vanilla_constants_preserved": 10,
+    "ok": true,
+    "target_class_defined": false
+  },
+  "actual_pose_matrix": {
+    "ok": true,
+    "poses": {
+      "FIRST_RIGHT": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 0.5,
+        "yaw": -90.0,
+        "pitch": 0.0,
+        "roll": 0.0,
+        "scale": 1.0,
+        "origin": {
+          "x": 10.1,
+          "y": 2.9,
+          "z": 8.204
+        }
+      },
+      "FIRST_LEFT": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 0.5,
+        "yaw": -90.0,
+        "pitch": 0.0,
+        "roll": 0.0,
+        "scale": 1.0,
+        "origin": {
+          "x": 10.1,
+          "y": 2.9,
+          "z": 8.204
+        }
+      },
+      "THIRD_RIGHT": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 0.5,
+        "yaw": -90.0,
+        "pitch": 0.0,
+        "roll": 0.0,
+        "scale": 1.0,
+        "origin": {
+          "x": 10.1,
+          "y": 2.9,
+          "z": 8.204
+        }
+      },
+      "THIRD_LEFT": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 0.5,
+        "yaw": -90.0,
+        "pitch": 0.0,
+        "roll": 0.0,
+        "scale": 1.0,
+        "origin": {
+          "x": 10.1,
+          "y": 2.9,
+          "z": 8.204
+        }
+      },
+      "GUI": {
+        "x": 0.5,
+        "y": 0.48,
+        "z": 0.5,
+        "yaw": 210.0,
+        "pitch": 20.0,
+        "roll": 0.0,
+        "scale": 1.65,
+        "origin": {
+          "x": 8.0,
+          "y": 3.65,
+          "z": 8.204
+        }
+      },
+      "GROUND": {
+        "x": 0.5,
+        "y": 0.2,
+        "z": 0.5,
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0,
+        "scale": 0.75,
+        "origin": {
+          "x": 8.0,
+          "y": 1.8,
+          "z": 8.204
+        }
+      },
+      "FIXED": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 0.5,
+        "yaw": 180.0,
+        "pitch": 0.0,
+        "roll": 0.0,
+        "scale": 1.0,
+        "origin": {
+          "x": 8.0,
+          "y": 3.65,
+          "z": 8.204
+        }
+      }
+    },
+    "first_left": {
+      "x": -0.38,
+      "y": -0.42,
+      "z": -0.62
+    },
+    "trigger_pivot": {
+      "x": 9.52327672,
+      "y": 4.03390858,
+      "z": 8.204
+    },
+    "first_right": {
+      "x": 0.38,
+      "y": -0.42,
+      "z": -0.62
+    },
+    "assertions": 3027,
+    "minecraft_started": false,
+    "actual_minecraft_pose_stack": true,
+    "trigger_degrees": 8.0
+  },
+  "first_person": {
+    "FIRST_LEFT": {
+      "hand": {
+        "x": -0.38,
+        "y": -0.42,
+        "z": -0.62
+      },
+      "gun_unit_scale": 1.0,
+      "perspective_camera": "eye-based, no muzzle offset"
+    },
+    "FIRST_RIGHT": {
+      "hand": {
+        "x": 0.38,
+        "y": -0.42,
+        "z": -0.62
+      },
+      "gun_unit_scale": 1.0,
+      "perspective_camera": "eye-based, no muzzle offset"
+    }
+  },
+  "compiler_output": "",
+  "assets": {
+    "models/item/zapper/body.json": "57877F01B43BE62C548097856052A0B833DB9740929A850C22017942BDDDDF1E",
+    "models/item/zapper/trigger.json": "3A3AF4EA4290D68BB178BCF02AB47A088F0638F535E626F7C64C74617F25AF3F",
+    "textures/item/zapper/skin.png": "AB5C925B7BD21AD2CBBFCC96A0F38CC4FE6C4E9013BCE57DF8F866E9EA16167F",
+    "models/item/fc_zapper.json": "DF645D82F64276D6EB3511B33CA8C8D5373DE7D0D5AC8C1C31B98B490E07DED3"
+  },
+  "enum_resource_sha256": "D5F080C6D24EC77E583AD79158AC46033F1ED3595D47DD9D0EAC2721863972C0",
+  "transformed_enum_sha256": "E238E0422256BBD8514CE36CA64B83F0B1B0449A20667F8C308E00A3796DEFFA",
+  "source_sha256": {
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\ZapperPoseLayout.java": "BD38835F362F7628D58F6E8D3B101CF253F5E7E3C7E4E48A1930105FC2F91B82",
+    "src\\main\\java\\cn\\piq\\fcarcade\\layout\\ZapperAimGeometry.java": "4BFB19069DF15C5C1B46D1719F3A47E111878DD1CC6368CFE6948142F53B2D5A",
+    "src\\main\\java\\cn\\piq\\fcarcade\\client\\zapper\\ZapperInputState.java": "AC70CA785727B6FCC2D7817D1F09FEA4D1A768FFE6882EC14CDD0BE37FAC46C2",
+    "src\\test\\java\\cn\\piq\\fcarcade\\layout\\ZapperPoseLayoutTest.java": "F344C6280D9234EC864FBA6EA4D6CE24916873A4B6CA36A5A94216C8EAA34A2C",
+    "src\\test\\java\\cn\\piq\\fcarcade\\layout\\ZapperAimGeometryTest.java": "DBF2FC3790B1CCF6640E1A240F42246C537A4B68566E4AFD22B779808CBC1771",
+    "src\\test\\java\\cn\\piq\\fcarcade\\client\\zapper\\ZapperInputStateTest.java": "6962C38E37535193ACFC4780DF044580D165875728C4344317356A7CC85644C5",
+    "tools\\qa\\ZapperEnumTransformProbe.java": "58D5E33937C3129B61DF12E29FFD473910CB21897B8007749E13C474525AC478",
+    "tools\\qa\\ZapperPoseProbe.java": "539167215F20C2CC715D9EDF99F51DBAE41C92BF34D7F69D47305592A4CA4666",
+    "tools\\qa\\CabinetRoomTestRunner.java": "76F1E13154E9C577B7E0632F97A031DE709F4F62669B03992387286881A150B3"
+  },
+  "limits": [
+    "No actual player renderer/GL/window/input device was started.",
+    "Real FML parses and transforms ArmPose bytes but does not initialize the enum.",
+    "Preview retains source geometry and UV; actual gameplay is tested separately."
+  ]
+}

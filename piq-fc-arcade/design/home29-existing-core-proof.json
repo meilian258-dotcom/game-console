@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "fc": {
+    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-appliance28-v1\\piq_fc_arcade-0.31.0-alpha.28.jar",
+    "sha256": "BA563E2609CDD585FD2CAA6B989E6BA71E84916718B0A388F8CC2BD4C0E5CA78"
+  },
+  "probe": {
+    "ok": true,
+    "assertions": 178,
+    "p1_bits": 8,
+    "gun_physical_port": 2,
+    "snapshot_consistent_frames": 12,
+    "actual_wasm": true,
+    "production_origin": "final-jar-only",
+    "production_compiled": false,
+    "minecraft_started": false,
+    "commercial_rom_used": false
+  },
+  "unchanged_module_sha256": "C8D8824E5CAF727678C642E6B0539DEAA7C0084F33524D96779D90C7B5DA79EF",
+  "limits": [
+    "Original in-memory diagnostic firmware; not user game, Minecraft or socket acceptance."
+  ]
+}
