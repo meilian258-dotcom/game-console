@@ -25,6 +25,15 @@ class GitGuardIntegration(unittest.TestCase):
     def git(cls, *args):
         return subprocess.run(['git', '-C', str(cls.repo), *args], capture_output=True)
 
+    def test_git_world_ignore_is_scoped(self):
+        shutil.copyfile(Path(__file__).resolve().parents[1]/'.gitignore', self.repo/'.gitignore')
+        source='piq-fc-arcade/src/main/java/cn/piq/fcarcade/world/FcArcadeBlock.java'
+        path=self.repo/source; path.parent.mkdir(parents=True,exist_ok=True)
+        path.write_text('// source fixture\n',encoding='utf8')
+        self.assertEqual(self.git('check-ignore','--no-index',source).returncode,1)
+        self.assertEqual(self.git('check-ignore','--no-index','piq-fc-arcade/world/playerdata.json').returncode,0)
+        self.assertEqual(self.git('check-ignore','--no-index','piq-fc-arcade/run/world/level.dat').returncode,0)
+
     def test_real_hook_and_index(self):
         self.assertEqual(self.git('add', 'source-control').returncode, 0)
         # Force staging credential-looking data: the real hook must reject it.

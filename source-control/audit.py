@@ -17,7 +17,7 @@ BLOCKED_DIRS = {
     '.git', '.gradle', '.toolchains', '.idea', '.vscode', '.vs', '__pycache__',
     'node_modules', 'target', 'build', 'bin', 'obj', 'out', 'candidates',
     'run', 'logs', 'game-console', 'private-qa', 'private', 'backups', 'saves',
-    'world', 'roms', 'bios',
+    'roms', 'bios',
 }
 BLOCKED_SUFFIXES = set('log pyc pyo class o obj pdb ilk lib a rlib rmeta dmp tmp bak swp args jar dll so dylib exe wasm zip 7z rar tar gz xz nupkg nes sfc smc gba gb gbc gen rom iso chd cue swf pak sav srm state mca dat bin pem key pfx p12 jks keystore'.split())
 SECRET_RULES = {
@@ -43,6 +43,8 @@ def path_issues(name: str) -> list[str]:
         issues.append('outside-source-scope')
     if any(part.lower() in BLOCKED_DIRS or part.lower().startswith('publish') for part in parts[:-1]):
         issues.append('generated-or-private-directory')
+    if len(parts) > 2 and parts[0] in MODULES and parts[1].lower() == 'world':
+        issues.append('runtime-world-directory')
     low = p.name.lower()
     if (low.startswith('.env') or low in {'credentials.json', 'secrets.json', 'local.properties'}
             or '登录信息' in low or '服务器信息' in low):

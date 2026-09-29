@@ -31,5 +31,10 @@ class GuardTests(unittest.TestCase):
     def test_no_game_captures(self):
         self.assertTrue(path_issues('piq-fc-arcade/design/zapper-private/frame-0001.png'))
         self.assertTrue(path_issues('piq-gba/design/frame-0123.png'))
+    def test_world_java_package_is_source_not_save_directory(self):
+        self.assertEqual([],path_issues('piq-fc-arcade/src/main/java/cn/piq/fcarcade/world/FcArcadeBlock.java'))
+        self.assertEqual([],path_issues('piq-fc-arcade/src/test/java/cn/piq/fcarcade/world/FcArcadeBlockTest.java'))
+        self.assertTrue(path_issues('piq-fc-arcade/world/playerdata.json'))
+        self.assertTrue(path_issues('piq-fc-arcade/run/world/level.dat'))
 
 if __name__=='__main__':unittest.main()

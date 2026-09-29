@@ -39,7 +39,8 @@
 **/private/
 **/backups/
 **/saves/
-**/world/
+# Only a component-root runtime world, not Java packages such as cn/piq/fcarcade/world.
+/piq-*/world/
 **/roms/
 **/bios/
 *.log
