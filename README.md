@@ -6,6 +6,8 @@
 
 ## 从哪里开始
 
+当前 JNI 默认候选的范围、配套版本和保存边界见 [FC76.26 / GBA12 / 电脑11](piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md)；不是所有机型的所有模式都已接入 JNI。
+
 - 玩家：[主模组与当前版本说明](piq-fc-arcade/README.md)。按配套指南安装，不把各目录的最大版本号任意混搭。
 - 开发者：[Git 工作流](GIT_WORKFLOW.md)、[固定输入与构建](source-control/BUILDING.md)、[协作规范](piq-fc-arcade/AGENTS.md)。
 - 附属作者：[以 SFC 为蓝本的制作说明](piq-sfc-home/design/以SFC为蓝本-附属制作说明.md)、[公共层边界](piq-retro-platform/README.md)。

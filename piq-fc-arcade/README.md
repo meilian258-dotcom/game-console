@@ -1,5 +1,7 @@
 # 方块电玩 / Game Console
 
+2026-09-29 FC76.26：已接通入口默认 JNI，FC JNI 参与/旁观自动跟随；新 FC 管理默认“自动”优先 JNI。旧机模式/旧存档不强迁，保留进程入口；配套 GBA12 / 电脑11，其余未实现的 JNI 模式不冒充完成。见 [当前指南](design/FC76.26-JNI默认与自动旁观.md)，下文旧版本验证不代表本轮实机验收。
+
 开发源码已接入标准Git单仓库和 GitHub 私有远端 [meilian258-dotcom/game-console](https://github.com/meilian258-dotcom/game-console)，涵盖主包/公共层及现有附属；见[Git工作流与构建边界](../GIT_WORKFLOW.md)。源码备份不代表稳定发行或全附属已完成干净克隆构建。
 
 对外统一“方块电玩 / Game Console”；玩家交付名采用 `game-console-版本.jar`，内部 `piq_*` ID、存档和编译中间件路径不改。交付使用[统一命名工具与兼容约定](../source-control/BRANDING.md)，原历史包保留，不能把新旧文件名的同一模组同时安装。

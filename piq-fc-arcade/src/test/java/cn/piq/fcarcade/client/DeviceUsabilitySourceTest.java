@@ -14,7 +14,7 @@ class DeviceUsabilitySourceTest {
         assertTrue(s.contains("存档留在本机"));
         assertTrue(s.contains("PrivateHomeClient.start(target,path.getValue(),backend)"));
         assertTrue(s.contains("backend=LibretroRuntimes.Backend.PROCESS"));
-        assertTrue(source("PrivateHomeClient").contains("return start(target,filename,LibretroRuntimes.Backend.PROCESS);"));
+        assertTrue(source("PrivateHomeClient").contains("return start(target,filename,defaultBackend(target));"));
         assertTrue(s.contains("PrivateHomeClient.stop(\"已结束私人游戏\")"));
         assertTrue(s.contains("void onClose(){minecraft.setScreen(null);}"));
         assertFalse(s.contains("PacketDistributor"));

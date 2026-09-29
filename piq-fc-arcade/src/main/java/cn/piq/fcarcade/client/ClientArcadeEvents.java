@@ -583,8 +583,10 @@ public final class ClientArcadeEvents {
                         entry.getKey(), false, distanceSquared));
             }
         }
-        Set<Long> selected = SpectatorSelection.select(
-                candidates, selectedSimulations, preferences().maximumSpectators());
+        Set<Long> jniSessions = new java.util.HashSet<>();
+        SESSIONS.forEach((id,session)->{if(session.usesJniNetplay())jniSessions.add(id);});
+        Set<Long> selected = SpectatorSelection.selectWithJni(
+                candidates, selectedSimulations, preferences().maximumSpectators(),jniSessions);
         selectedSimulations = selected;
         // Retire first so changing the limit never transiently exceeds it.
         for (Map.Entry<Long, ClientArcadeSession> entry : SESSIONS.entrySet()) {

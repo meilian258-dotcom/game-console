@@ -23,6 +23,7 @@ public final class ComputerPrograms {
     private static final ExecutorService IO=Executors.newSingleThreadExecutor(r->{var t=new Thread(r,"Computer-Programs");t.setDaemon(true);return t;});
     private static final Properties OPTIONS=new Properties();
     private static boolean optionsLoaded,ending;
+    private static boolean optionsReadable=true;
     private static Future<ProgramBackend> loading;
     private static ProgramBackend backend;
     private static ProgramKind running=ProgramKind.HARDWARE;
@@ -31,15 +32,18 @@ public final class ComputerPrograms {
     private static DynamicTexture texture;private static ResourceLocation textureId;private static ByteBuffer pixels;
     private static String notice="仅硬件测试";
     private static Path optionsPath(){return Minecraft.getInstance().gameDirectory.toPath().resolve("config/piq-computer-client.properties");}
-    private static void loadOptions(){if(optionsLoaded)return;optionsLoaded=true;var p=optionsPath();try{if(Files.isRegularFile(p)&&Files.size(p)<65536)try(var in=Files.newInputStream(p)){OPTIONS.load(in);}}catch(Exception ex){notice="程序设置读取失败："+ex.getMessage();}}
+    private static void loadOptions(){if(optionsLoaded)return;optionsLoaded=true;var p=optionsPath();try{if(Files.exists(p)){if(!Files.isRegularFile(p)||Files.size(p)>=65536)throw new java.io.IOException("设置文件无效或过大");try(var in=Files.newInputStream(p)){OPTIONS.load(in);}}}catch(Exception ex){optionsReadable=false;notice="程序设置读取失败："+ex.getMessage();}}
     public static String path(ComputerEntity pc,ProgramKind kind){loadOptions();String value=OPTIONS.getProperty(pc.hardwareId()+"."+kind.name().toLowerCase(Locale.ROOT),"");if(value.isBlank())return value;try{return cn.piq.retro.storage.ConsoleStorage.rebind(Minecraft.getInstance().gameDirectory.toPath(),Path.of(value)).toString();}catch(java.nio.file.InvalidPathException e){return value;}}
     public static ProgramKind selection(ComputerEntity pc){loadOptions();return ProgramKind.parse(OPTIONS.getProperty(pc.hardwareId()+".kind",path(pc,ProgramKind.PVZ).isEmpty()?"HARDWARE":"PVZ"));}
     public static boolean available(ProgramKind kind){return kind!=ProgramKind.PVZ||ModList.get().isLoaded("piq_pvz");}
     public static boolean busy(){return backend!=null||loading!=null||ending;}
-    public static boolean pvzJni(){loadOptions();return "jni-v1".equals(OPTIONS.getProperty("pvz.engine","process"));}
+    public static boolean pvzJni(){loadOptions();return PvzBackendPreference.jni(OPTIONS.getProperty("pvz.engine"),
+            cn.piq.retro.libretro.LibretroRuntimes.defaultBackend(true)==cn.piq.retro.libretro.LibretroRuntimes.Backend.JNI_TRIAL,optionsReadable);}
     public static boolean pvzJni(boolean enabled){
         if(busy()){notice="请先结束当前程序再切换运行器";return false;}
-        loadOptions();var previous=new Properties();previous.putAll(OPTIONS);OPTIONS.setProperty("pvz.engine",enabled?"jni-v1":"process");
+        loadOptions();if(!optionsReadable){notice="请先修复本机程序设置文件再切换运行器";return false;}
+        if(enabled){var reason=cn.piq.retro.libretro.LibretroRuntimes.jniUnavailableReason();if(!reason.isEmpty()){notice=reason;return false;}}
+        var previous=new Properties();previous.putAll(OPTIONS);OPTIONS.setProperty("pvz.engine",enabled?"jni-v1":"process");
         try{saveOptions();return true;}catch(Exception e){OPTIONS.clear();OPTIONS.putAll(previous);notice="运行器设置未保存："+e.getMessage();return false;}
     }
     public static boolean sharing(){loadOptions();return "true".equals(OPTIONS.getProperty("stream.enabled"));}

@@ -163,13 +163,14 @@ class PrivateHomeClientTest {
         String label = between(source, "static String targetLabel(", "static Target find()");
         assertFalse(label.contains("find()"));
     }
-    @Test void jniPrivateSelectionRequiresExplicitConfirmationAndNeverChangesPublicFactorySourceGuard() throws Exception {
+    @Test void adaptedPrivateUiDefaultsToJniButKeepsExplicitFallbackAndPublicFactorySourceGuard() throws Exception {
         String screen=source("client/PrivateHomeScreen"),client=source("client/PrivateHomeClient");
-        assertTrue(screen.contains("private LibretroRuntimes.Backend backend=LibretroRuntimes.Backend.PROCESS"));
+        assertTrue(screen.contains("backend=PrivateHomeClient.defaultBackend(target)"));
         assertTrue(screen.contains("new ConfirmScreen(accepted->"));
         assertTrue(screen.contains("if(accepted&&target==confirmedTarget){backend=LibretroRuntimes.Backend.JNI_TRIAL"));
         assertTrue(client.contains("default boolean supportsJniTrial(){return false;}"));
-        assertTrue(client.contains("return start(target,filename,LibretroRuntimes.Backend.PROCESS);"));
+        assertTrue(client.contains("return start(target,filename,defaultBackend(target));"));
+        assertTrue(client.contains("LibretroRuntimes.defaultBackend(target!=null&&target.provider.supportsJniTrial())"));
         assertTrue(client.contains("if(LibretroRuntimes.isJniBusy())return"));
         assertFalse(source("core/NesCores").contains("JNI_TRIAL"));
         assertFalse(source("client/ClientArcadeSession").contains("JNI_TRIAL"));

@@ -1,6 +1,10 @@
 # 方块电玩：电脑 / Game Console: Computer
 
-当前 prototype.10。对外交付名采用 `game-console-computer-版本.jar`，见[命名规范与工具](../source-control/BRANDING.md)；内部兼容标识、保存目录和历史交付不改。
+当前候选 prototype.11，需要双方 FC76.26 / 可选 PvZ11。未设置运行器时 Windows x64 默认 JNI，已有明确进程选择保留；读取配置失败不启用新默认，存档隔离及旁观串流不变，Flash 不改。见[当前指南](../piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md)。对外交付名采用 `game-console-computer-版本.jar`，见[命名规范与工具](../source-control/BRANDING.md)；内部兼容标识、保存目录和历史交付不改。
+
+构建可用 `-PgameConsoleJar=<FC76.26完整路径> -PpvzJar=<PvZ11完整路径>` 指定配套编译输入；记录实际 SHA，不用同名旧主包。附属构建依赖尚未全部标准化。
+
+## 历史：prototype.10
 
 2026-09-29：配套 FC76.22 / 可选 PvZ11，PvZ 的 JNI 选择重新确认并写入 `jni-v1`，调用共用桥。默认独立进程、Flash、串流协议与旁观行为保持；新试验档与旧档隔离。原 PvZ10 确认不会静默启用新实现。[本轮指南](../piq-fc-arcade/design/通用JNI一期-FC76.22-使用与附属接入.md)。本地候选，未安装发布、未完成 MC 实机验收。
 

@@ -28,7 +28,7 @@ final class ComputerProgramScreen extends DeviceScreen {
         addRenderableWidget(Button.builder(Component.literal("限速："+(cn.piq.computer.stream.StreamBudget.RATES[ComputerPrograms.streamTier()]/1024)+" KiB/s"),b->{remember();ComputerPrograms.streamOptions(ComputerPrograms.sharing(),(ComputerPrograms.streamTier()+1)%3);rebuildWidgets();}).bounds(left+155,162,145,20).build());
         handoff=addRenderableWidget(Button.builder(Component.literal("交接键鼠：锁定"),b->{ComputerStreams.handoff(!ComputerStreams.handoff());}).bounds(left,190,145,20).build());
         addRenderableWidget(Button.builder(Component.literal("返回"),b->onClose()).bounds(left+155,190,145,20).build());
-        engine=null;if(kind==ProgramKind.PVZ)engine=addRenderableWidget(Button.builder(Component.literal("下次启动："+(ComputerPrograms.pvzJni()?"JNI 试验（独立试验档）":"独立进程（默认）")),b->{
+        engine=null;if(kind==ProgramKind.PVZ)engine=addRenderableWidget(Button.builder(Component.literal("下次启动："+(ComputerPrograms.pvzJni()?"JNI（默认，独立档）":"独立进程（兼容）")),b->{
             remember();if(ComputerPrograms.pvzJni()){ComputerPrograms.pvzJni(false);rebuildWidgets();return;}
             minecraft.setScreen(new ConfirmScreen(accepted->{if(accepted)ComputerPrograms.pvzJni(true);minecraft.setScreen(this);},Component.literal("启用通用 JNI v1 的 PvZ 试验？"),Component.literal("仅 Windows x64。原生故障可能让整个 Minecraft 崩溃；请先备份世界。使用新的独立试验存档，不导入原进程或旧JNI试验进度；FC/SFC/PvZ共用一个JNI活动槽。卡死后可能需要重启客户端。可结束程序后切回独立进程。")));
         }).bounds(left,218,300,20).build());updateButtons();

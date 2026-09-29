@@ -145,7 +145,10 @@ public final class PrivateHomeClient {
         return null;
     }
     static String start(Target target,String filename) {
-        return start(target,filename,LibretroRuntimes.Backend.PROCESS);
+        return start(target,filename,defaultBackend(target));
+    }
+    static LibretroRuntimes.Backend defaultBackend(Target target){
+        return LibretroRuntimes.defaultBackend(target!=null&&target.provider.supportsJniTrial());
     }
     static String start(Target target,String filename,LibretroRuntimes.Backend backend) {
         Objects.requireNonNull(backend);

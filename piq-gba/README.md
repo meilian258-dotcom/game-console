@@ -1,6 +1,8 @@
 # 方块电玩：GBA / Game Console: GBA
 
-当前版本 0.1.0-alpha.11。自定义构建完成后，用[统一交付工具](../source-control/BRANDING.md)生成 `game-console-gba-版本.jar`；保留旧 ID、运行库、存档和历史包，不改写下方历史验证记录。
+当前候选 0.1.0-alpha.12，需要双方 FC76.26。Windows x64 的掌机/本人主持机柜默认 JNI，菜单或 `/gameconsole-gba-jni` 可为本次连接切回进程；旧存档不迁移，服务器托管保持进程，不新增 GBA Netplay。见[当前默认与风险说明](../piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md)。自定义构建完成后，用[统一交付工具](../source-control/BRANDING.md)生成 `game-console-gba-版本.jar`；保留旧 ID、运行库、存档和历史包，不改写下方历史验证记录。
+
+## 历史：GBA11
 
 2026-09-29：GBA11需要双方主包FC76.24；`/gameconsole-gba-jni`本次连接显式确认后，掌机/本机主持机柜可用共用JNI，原进程和服务器托管不变。独立试验电池档保留原归属，不迁移旧档、不新增GBA Netplay。最终核心测试和安装/风险见[本轮指南](../piq-fc-arcade/design/FC76.24-GBA11-MD1-JNI试用说明.md)。以下为GBA10及更早历史。
 

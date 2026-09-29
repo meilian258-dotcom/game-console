@@ -3,7 +3,11 @@
 See the [branding and packaging policy](../source-control/BRANDING.md). Internal package names,
 API identities and build outputs remain compatible. This library is not a player-installable mod.
 
-## Runtime API v1 / opt-in JNI (FC76.22, 2026-09-29)
+## Client defaults (FC76.26, 2026-09-29)
+
+User-requested JNI defaults now use `LibretroRuntimes.defaultBackend(adapted)` for existing Windows x64 client adapters, plus connection-scoped `JniClientPreference`. Explicit runtime factories and server/process constructors remain unchanged. This is not automatic save migration, silent failure fallback or support for every emulator/mode. Addons calling these new methods require FC76.26+. See [scope and install matrix](../piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md).
+
+## Historical Runtime API v1 / opt-in JNI (FC76.22, 2026-09-29)
 
 FC76.24 extends this trial with a bounded generic two-digital-lane `RollbackTimeline`; the concrete FC Mesen network/session/permissions remain in the main mod, not in the shared library. GBA11 and MD1 reuse ABI1 without another bridge DLL. Only FC has the new JNI Netplay route; other systems must explicitly implement and validate their own capabilities. Main private provider adds default `acceptsFile/fileHint` methods so new cartridge formats need not be hardcoded in the main UI. See the [current trial guide](../piq-fc-arcade/design/FC76.24-GBA11-MD1-JNI试用说明.md).
 
