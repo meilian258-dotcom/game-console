@@ -42,7 +42,7 @@ public final class MdClient {
             var t=data.copyTag();
             return t.hasUUID("MdConsole")&&t.getUUID("MdConsole").equals(c.hardwareId())&&id.equals(c.loan())&&p.getUUID().equals(c.borrower())&&p.distanceToSqr(c.getBlockPos().getCenter())<=36;
         }
-        public PrivateEngine create(Path rom,Path root){return new MdEngine(rom,root,LibretroRuntimes.Backend.PROCESS);}
+        public PrivateEngine create(Path rom,Path root){return new MdEngine(rom,root,LibretroRuntimes.defaultBackend(true));}
         public boolean supportsJniTrial(){return true;}
         public PrivateEngine create(Path rom,Path root,LibretroRuntimes.Backend b){return new MdEngine(rom,root,b);}
     }

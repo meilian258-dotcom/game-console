@@ -12,16 +12,16 @@ final class SpectatorSelection {
     private SpectatorSelection() {
     }
 
-    /** One shared native slot: an operator takes precedence; passive JNI screens share one slot. */
+    /** Bounded JNI admission. Reserve one of four native slots for other interactive components. */
     static Set<Long> selectWithJni(Collection<Candidate> candidates,Set<Long> previous,
                                    int maximumSpectators,Set<Long> jniSessions) {
-        boolean operator=candidates.stream().anyMatch(c->c.controller()&&jniSessions.contains(c.sessionId()));
-        Long spectator=operator?null:candidates.stream().filter(c->!c.controller()&&jniSessions.contains(c.sessionId()))
+        long operators=candidates.stream().filter(c->c.controller()&&jniSessions.contains(c.sessionId())).count();
+        Set<Long> spectators=candidates.stream().filter(c->!c.controller()&&jniSessions.contains(c.sessionId()))
                 .filter(c->Double.isFinite(c.distanceSquared())&&c.distanceSquared()>=0)
-                .min(Comparator.comparingDouble((Candidate c)->priorityDistance(c,previous)).thenComparingLong(Candidate::sessionId))
-                .map(Candidate::sessionId).orElse(null);
+                .sorted(Comparator.comparingDouble((Candidate c)->priorityDistance(c,previous)).thenComparingLong(Candidate::sessionId))
+                .limit(Math.max(0,3-operators)).map(Candidate::sessionId).collect(java.util.stream.Collectors.toSet());
         return select(candidates.stream().filter(c->c.controller()||!jniSessions.contains(c.sessionId())
-                ||java.util.Objects.equals(c.sessionId(),spectator)).toList(),previous,maximumSpectators);
+                ||spectators.contains(c.sessionId())).toList(),previous,maximumSpectators);
     }
 
     static Set<Long> select(

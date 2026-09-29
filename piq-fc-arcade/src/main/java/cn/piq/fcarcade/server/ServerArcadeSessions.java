@@ -279,7 +279,6 @@ public final class ServerArcadeSessions {
         }
         if(!storageReady(player)||console==null||console.tvPos()==null||!player.serverLevel().hasChunkAt(console.tvPos())||!(player.serverLevel().getBlockEntity(console.tvPos()) instanceof cn.piq.fcarcade.home.HomeTvBlockEntity tv)
                 ||!tv.powered()||!cn.piq.fcarcade.home.HomeZapperService.facts(player,console,tv)||validStructure(player,tv.getBlockPos())==null)return false;
-        if(console.netplayJniTrial()&&gun){player.displayClientMessage(Component.literal("FC JNI Netplay 本期仅支持普通双手柄；光枪请使用原 RetroArch Netplay。"),false);return false;}
         Manager m=manager(player.getServer());if(m.homeSaveBusy.contains(player.getUUID()))return false;SessionKey key=new SessionKey(player.level().dimension(),tv.getBlockPos(),ArcadeMode.LOCKSTEP);
         Session existing=m.sessions.get(key);if(existing!=null)return existing.homeRuntime!=null&&m.validHome(player.getServer(),existing);
         if(m.sessions.values().stream().anyMatch(s->s.homeRuntime!=null&&s.homeRuntime.host().equals(player.getUUID())))return false;
@@ -991,7 +990,6 @@ public final class ServerArcadeSessions {
         private boolean createHome(ServerPlayer p,cn.piq.fcarcade.home.HomeConsoleBlockEntity c,cn.piq.fcarcade.home.HomeTvBlockEntity tv,String rom,boolean gun,
                                    RomSaveMode mode,String saveKey,String name,int players,boolean resume){
             if(c.netplayExperimental()&&c.synchronizationMode()!=CabinetSyncMode.LOCAL_SYNC)return false;
-            if(c.netplayJniTrial()&&gun)return false;
             if(mode!=RomSaveMode.NONE&&cn.piq.fcarcade.netplay.NetplaySaveServer.busy(p.getServer(),saveKey)){p.displayClientMessage(Component.literal("上局仍在保存，请稍后开机。"),true);return false;}
             if(!cn.piq.fcarcade.home.HomeSyncPolicy.runnable(c.synchronizationMode())||c.synchronizationMode()==CabinetSyncMode.LOCAL_SYNC&&!CabinetHostingConfig.localAllowed()||c.synchronizationMode()==CabinetSyncMode.MEDIA&&!CabinetHostingConfig.playerAllowed())return false;
             if(hostedSelected(c)&&(!CabinetHostingConfig.SPEC.isLoaded()||!CabinetHostingConfig.ENABLED.get())){p.displayClientMessage(Component.literal("服主未启用服务端托管（piq-sync-server.toml）。"),false);return false;}

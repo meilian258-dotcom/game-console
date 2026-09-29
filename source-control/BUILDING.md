@@ -24,7 +24,7 @@ python source-control/build_inputs.py check
 其他协作者可直接使用维护者提供的这个缓存，或逐项导入明确的文件，例如：
 
 ```powershell
-python source-control/build_inputs.py import --id libretro-jni-abi1 --file "D:/approved/piq-libretro-jni.dll"
+python source-control/build_inputs.py import --id libretro-jni-abi2 --file "D:/approved/piq-libretro-jni.dll"
 python source-control/build_inputs.py check --cache "D:/approved/build-inputs"
 ```
 

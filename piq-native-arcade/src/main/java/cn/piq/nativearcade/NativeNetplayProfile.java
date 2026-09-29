@@ -12,7 +12,13 @@ public final class NativeNetplayProfile {
     public static NetplayProfile profile(String name){
         if(!validGameName(name))throw new IllegalArgumentException("Invalid arcade ZIP name");
         return new NetplayProfile(NativeNetplayProfile.class,CORE_RESOURCE,CORE_SHA,name,
-            Map.of("fbneo-samplerate","48000","fbneo-frameskip","0","fbneo-force-60hz","disabled","fbneo-hiscores","disabled","fbneo-diagnostic-input","Hold Start + L + R"),5,48000,64*1024*1024,4);
+            Map.of(),1,48000,64*1024*1024,4).withJni(runtime());
+    }
+    public static cn.piq.retro.libretro.LibretroProfile runtime(){
+        return new cn.piq.retro.libretro.LibretroProfile("FinalBurn Neo","zip",true,List.of(1,1,1,1),false,
+            Map.of("fbneo-samplerate","48000","fbneo-fixed-frameskip","0","fbneo-force-60hz","disabled",
+                "fbneo-allow-patched-romsets","disabled","fbneo-diagnostic-input","Hold Start + L + R"),
+            Map.of("windows-x64",new cn.piq.retro.libretro.LibretroProfile.Artifact(CORE_RESOURCE,CORE_SHA)));
     }
     public static boolean validGameName(String name){return name!=null&&name.matches("[a-z0-9_]{1,32}\\.zip")&&!CabinetGameManifest.BIOS.contains(name)
         &&!name.substring(0,name.length()-4).toUpperCase(Locale.ROOT).matches("CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9]");}

@@ -81,6 +81,15 @@ void retro_unload_game() {}
 void retro_set_controller_port_device(unsigned, unsigned) {}
 void retro_run() {
     frame++;
+    if (mode == 12 && frame == 1) Sleep(2000);
+    if (mode == 13) {
+        HANDLE other = CreateThread(nullptr, 0, [](void *) -> DWORD {
+            unsigned rotation = 3;
+            environment(RETRO_ENVIRONMENT_SET_ROTATION, &rotation);
+            return 0;
+        }, nullptr, 0, nullptr);
+        if (other) { WaitForSingleObject(other, INFINITE); CloseHandle(other); }
+    }
     poll();
     for (int p = 0; p < 4; p++) {
         int mask = input(p, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);

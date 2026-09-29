@@ -3,20 +3,19 @@ package cn.piq.nativearcade.server;
 
 import cn.piq.fcarcade.cabinet.CabinetFrame;
 import cn.piq.fcarcade.server.hosted.*;
-import cn.piq.nativearcade.bridge.NativeProcessSession;
+import cn.piq.nativearcade.bridge.NativeJniMediaSession;
 import java.nio.file.Path;
 
-/** Existing isolated media process. No snapshot persistence/reset is claimed by this bridge. */
+/** Owner-thread JNI media adapter. No snapshot persistence/reset is claimed by this bridge. */
 public final class NativeServerCoreFactory implements ServerCoreFactory {
     @Override public int maxPlayers(){return 4;}
     @Override public int maxConcurrentSessions(){return 1;}
     private static Path runtime(ServerCoreContext context){return cn.piq.retro.storage.ConsoleStorage.root(context.gameRoot()).resolve("piq-native-arcade/runtime");}
     @Override public String unavailableReason(ServerCoreContext context){
-        return ServerCoreFiles.windowsRuntimeReason(runtime(context),"mame_libretro.dll","jna-5.14.0.jar",NativeProcessSession.HELPER_NAME);
+        return NativeJniMediaSession.unavailableReason();
     }
     @Override public ServerCoreHandle open(ServerCoreContext context,Path rom)throws Exception{
-        ServerCoreFiles.directory(runtime(context),false);
-        NativeProcessSession core=new NativeProcessSession(runtime(context),rom);
+        NativeJniMediaSession core=new NativeJniMediaSession(runtime(context),rom);
         return new ServerCoreHandle(){
             @Override public int maxPlayers(){return 4;}
             @Override public boolean isReady(){return core.isReady();}

@@ -5,7 +5,7 @@ base { archivesName = 'piq_native_arcade' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 neoForge { version = '21.1.236'; mods { piq_native_arcade { sourceSet(sourceSets.main) } } }
 repositories { mavenCentral() }
-def localModJars = files('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.22.jar')
+def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.26.jar'))
 dependencies {
     implementation localModJars
     testImplementation platform('org.junit:junit-bom:5.13.4')

@@ -7,13 +7,13 @@ import java.util.*;
 
 /** A distinct, versioned JNI rollback protocol inside the existing authorized relay. */
 public final class JniNetplayCodec {
-    public static final int MAGIC = 0x504a4e31, VERSION = 1, SEED_LIMIT = 4 * 1024 * 1024;
+    public static final int MAGIC = 0x504a4e31, VERSION = 2, SEED_LIMIT = 4 * 1024 * 1024;
     public static final int PART = 16000;
     private JniNetplayCodec() {}
     public sealed interface Message permits Hello, Seed, Part, End, Ready, Commands, Pad, Digest {}
     public record Hello(NetplaySaveState.Identity identity) implements Message { public Hello { Objects.requireNonNull(identity); } }
     public record Seed(int bytes, long frame, int port) implements Message {
-        public Seed { if (bytes < 5 || bytes > SEED_LIMIT || frame < 0 || frame > Long.MAX_VALUE-1024 || port < -1 || port > 1) throw bad(); }
+        public Seed { if (bytes < 5 || bytes > SEED_LIMIT || frame < 0 || frame > Long.MAX_VALUE-1024 || port < -1 || port > 3) throw bad(); }
     }
     public record Part(int offset, byte[] data) implements Message {
         public Part {
@@ -52,7 +52,8 @@ public final class JniNetplayCodec {
                 case Ready m -> {out.writeByte(5);out.writeLong(m.frame());}
                 case Commands m -> {
                     out.writeByte(6);out.writeLong(m.confirmed());out.writeLong(m.next());out.writeByte(m.inputs().size());
-                    for(var i:m.inputs()){out.writeLong(i.frame());out.writeShort(i.p1());out.writeShort(i.p2());out.writeByte(i.known());}
+                    for(var i:m.inputs()){out.writeLong(i.frame());out.writeShort(i.p1());out.writeShort(i.p2());
+                        out.writeShort(i.p3());out.writeShort(i.p4());out.writeInt(i.gun());out.writeByte(i.known());}
                 }
                 case Pad m -> {out.writeByte(7);out.writeLong(m.frame());out.writeShort(m.mask());}
                 case Digest m -> {out.writeByte(8);out.writeLong(m.frame());hash(out,m.sha());}
@@ -76,9 +77,10 @@ public final class JniNetplayCodec {
                 case 5 -> new Ready(in.readLong());
                 case 6 -> {
                     long confirmed=in.readLong(),next=in.readLong();int count=in.readUnsignedByte();
-                    if(count<1||count>32||in.available()!=13*count)throw bad();
+                    if(count<1||count>32||in.available()!=21*count)throw bad();
                     var inputs=new ArrayList<Input>(count);
-                    for(int n=0;n<count;n++)inputs.add(new Input(in.readLong(),in.readUnsignedShort(),in.readUnsignedShort(),in.readUnsignedByte()));
+                    for(int n=0;n<count;n++)inputs.add(new Input(in.readLong(),in.readUnsignedShort(),in.readUnsignedShort(),
+                            in.readUnsignedShort(),in.readUnsignedShort(),in.readInt(),in.readUnsignedByte()));
                     yield new Commands(confirmed,next,inputs);
                 }
                 case 7 -> new Pad(in.readLong(),in.readUnsignedShort());

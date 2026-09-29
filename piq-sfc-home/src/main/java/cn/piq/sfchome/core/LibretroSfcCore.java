@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.security.*;
 import java.util.*;
 
-/** SFC adapter. Native work belongs to its owner; the default transport remains an isolated process. */
+/** SFC adapter. Native work belongs to its owner; supported Windows modes default to common JNI. */
 public final class LibretroSfcCore implements SfcCore {
     private static final int MAGIC=0x50534631, MAX=16*1024*1024;
     public static final String BUILD="mesen-s-piq1-8aca17e7";
@@ -23,8 +23,8 @@ public final class LibretroSfcCore implements SfcCore {
     private long frame;
     private boolean closed;
 
-    /** Shared sessions and server-hosted callers always retain their existing process backend. */
-    public LibretroSfcCore(){this(LibretroRuntimes.Backend.PROCESS);}
+    /** Shared, local-sync and server-hosted callers share the same native adapter. */
+    public LibretroSfcCore(){this(LibretroRuntimes.Backend.JNI_TRIAL);}
     public LibretroSfcCore(LibretroRuntimes.Backend backend){
         this(()->LibretroRuntimes.create(profile(),LibretroSfcCore.class,backend));
         Objects.requireNonNull(backend);

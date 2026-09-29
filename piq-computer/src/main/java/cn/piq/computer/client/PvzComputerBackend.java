@@ -4,14 +4,14 @@ import cn.piq.pvz.runtime.PvzEngine;
 import cn.piq.pvz.runtime.PvzJniRuntime;
 import java.nio.file.Path;
 import java.util.*;
-/** Optional PvZ10 adapter. Process mode remains the default; JNI requires local opt-in. */
+/** Optional PvZ adapter. JNI by default; explicit process compatibility choice is separate. */
 final class PvzComputerBackend implements ProgramBackend {
     private final PvzEngine runtime;
     private final Set<Integer> held=new HashSet<>();
     private int pad,x,y,buttons;
     private boolean onScreen;
     private static final Map<Integer,Integer> PAD=Map.of(257,2,258,3,263,6,262,7,265,4,264,5,74,0,75,8,81,10,69,11);
-    PvzComputerBackend(Path root,Path file,UUID player)throws Exception{this(root,file,player,false);}
+    PvzComputerBackend(Path root,Path file,UUID player)throws Exception{this(root,file,player,true);}
     PvzComputerBackend(Path root,Path file,UUID player,boolean jni)throws Exception{runtime=jni?new PvzJniRuntime(root,file,player):new PvzRuntime(root,file,player);}
     public int width(){return 800;}public int height(){return 600;}
     public byte[] frame(){return runtime.poll();}public void releaseFrame(byte[] data){runtime.releaseFrame(data);}

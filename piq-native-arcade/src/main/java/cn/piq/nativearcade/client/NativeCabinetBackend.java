@@ -6,6 +6,7 @@ import cn.piq.fcarcade.cabinet.CabinetFrame;
 import cn.piq.fcarcade.client.cabinet.CabinetBackend;
 import cn.piq.fcarcade.client.rom.LocalRomLibrary;
 import cn.piq.nativearcade.bridge.NativeProcessSession;
+import cn.piq.nativearcade.bridge.NativeJniMediaSession;
 import cn.piq.nativearcade.NativeSnapshotProfile;
 import cn.piq.fcarcade.cabinet.CabinetRomBindings;
 import cn.piq.fcarcade.cabinet.CabinetSyncCore;
@@ -21,21 +22,16 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-/** FC owns the cabinet/GUI/lease; this provider owns only the isolated native child. */
+/** FC owns cabinet/GUI/leases. Media uses common JNI; legacy snapshot sync retains its verified worker. */
 public final class NativeCabinetBackend implements CabinetBackend {
-    @Override public String description(){return "Netplay 使用 FBNeo；普通音画使用 MAME，请选用匹配核心的 ROM 集";}
+    @Override public String description(){return "JNI Netplay 使用可精确恢复的 FBNeo 游戏；普通音画使用 MAME JNI。旧本地同步仍为兼容后端";}
     @Override public String extensions(){return ".zip（如 dino.zip、kov.zip；独立完整 ROM 集，BIOS 放同目录）";}
     @Override public Path defaultRom(){return NativeArcadeClient.dataRoot().resolve("diagnostic/invaders.zip");}
     @Override public Path romDirectory(){return LocalRomLibrary.arcadeDirectory(Minecraft.getInstance().gameDirectory.toPath());}
     @Override public Set<String> romExtensions(){return Set.of(".zip");}
     @Override public Set<String> romExcludedNames(){return cn.piq.fcarcade.cabinet.CabinetGameManifest.BIOS;}
     @Override public String unavailableReason(){
-        if(!System.getProperty("os.name","").startsWith("Windows")||!System.getProperty("os.arch","").equals("amd64"))
-            return "MAME 附属当前仅支持 Windows x64";
-        for(String file:List.of("mame_libretro.dll","jna-5.14.0.jar",NativeProcessSession.HELPER_NAME))
-            if(!Files.isRegularFile(NativeArcadeClient.dataRoot().resolve("runtime").resolve(file),LinkOption.NOFOLLOW_LINKS))
-                return "缺少 MAME 配套运行库："+file;
-        return NativeProcessSession.hasLiveSession()?"已有原生街机会话运行或正在关闭":null;
+        return NativeJniMediaSession.unavailableReason();
     }
     @Override public String syncUnavailableReason(){
         if(!System.getProperty("os.name","").startsWith("Windows")||!System.getProperty("os.arch","").matches("amd64|x86_64"))
@@ -73,7 +69,7 @@ public final class NativeCabinetBackend implements CabinetBackend {
         @Override public void requestClose(){cancelled.set(true);Runnable closer=signal.get();if(closer!=null)closer.run();}
     }
     @Override public CabinetEmulator open(Path rom)throws Exception{
-        NativeProcessSession core=new NativeProcessSession(NativeArcadeClient.dataRoot().resolve("runtime"),rom);
+        NativeJniMediaSession core=new NativeJniMediaSession(NativeArcadeClient.dataRoot().resolve("runtime"),rom);
         return new CabinetEmulator(){
             @Override public int maxPlayers(){return core.maxPlayers();}
             @Override public boolean isReady(){return core.isReady();}

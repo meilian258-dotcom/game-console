@@ -34,7 +34,7 @@ public final class JniNetplayConsent {
             mc.setScreen(valid?parent:null);
             if(yes&&valid)accepted.run();
         },Component.literal("恢复本机 FC JNI Netplay？"),Component.literal(
-                "仅 Windows x64、普通双手柄。JNI 原生故障可能使整个 Minecraft 崩溃；请先备份世界。个人/卡带归属不变，继续使用 JNI 独立档，不导入原 RetroArch 进度。参与和旁观自动跟随房间，同一客户端仅一个 JNI 会话。只影响后续启动，不改变正在运行的游戏。")));
+                "仅 Windows x64，支持双手柄及由服务器授权的光枪输入。JNI 原生故障可能使整个 Minecraft 崩溃；请先备份世界。个人/卡带归属不变，继续使用 JNI 独立档，不导入原 RetroArch 进度。参与和旁观自动跟随房间；公共 JNI 最多四个核心会话。只影响后续启动，不改变正在运行的游戏。")));
     }
     @SubscribeEvent public static void commands(RegisterClientCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("gameconsole-jni-netplay").executes(context->{opening=true;return 1;})

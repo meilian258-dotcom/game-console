@@ -42,7 +42,7 @@ public final class FcPrivateEngine implements PrivateEngine {
 
     /** Construction only allocates bounded mailboxes and starts a daemon; all disk/core work is off-thread. */
     public FcPrivateEngine(Path localRom, Path saveRoot) {
-        this(localRom, new PrivateSaveStore(saveRoot), NesCores::create, null);
+        this(localRom, saveRoot, LibretroRuntimes.defaultBackend(true));
     }
     /** Client-private opt-in only. The trial key cannot import or replace normal private saves. */
     public FcPrivateEngine(Path localRom, Path saveRoot, LibretroRuntimes.Backend backend) {
@@ -54,9 +54,11 @@ public final class FcPrivateEngine implements PrivateEngine {
     }
     private static CoreFactory factory(LibretroRuntimes.Backend backend) {
         Objects.requireNonNull(backend);
-        if (backend == LibretroRuntimes.Backend.PROCESS) return NesCores::create;
         return variant -> {
-            if (!variant.isLibretro()) throw new IllegalStateException("此 FC 核心尚未接入 JNI 试验，请切回独立进程");
+            if (!variant.isLibretro()) {
+                if (backend == LibretroRuntimes.Backend.PROCESS) return NesCores.create(variant);
+                throw new IllegalStateException("此历史 FC 核心尚未接入 JNI，请使用兼容后端");
+            }
             return new cn.piq.fcarcade.core.libretro.GenericLibretroNesCore(variant.isZapper(), backend);
         };
     }

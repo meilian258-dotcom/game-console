@@ -368,7 +368,7 @@ final class ClientArcadeSession {
                 nextSyncRequestNanos=System.nanoTime()+5_000_000_000L;return;
             }
             if(netplayState.jniTrial()&&cn.piq.retro.libretro.LibretroRuntimes.isJniBusy()){
-                overlay(Component.literal("正在等待本机 JNI 槽释放；同一客户端只能运行一台 JNI 游戏。"));
+                overlay(Component.literal("本机 JNI 会话名额已满，等待安全释放；不会强制停止其他游戏。"));
                 nextSyncRequestNanos=System.nanoTime()+1_000_000_000L;return;
             }
             if(netplayState.ticket().equals(usedNetplayTicket)){

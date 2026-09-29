@@ -37,7 +37,7 @@ final class PrivateHomeScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
             minecraft.setScreen(new ConfirmScreen(accepted->{
                 if(accepted&&target==confirmedTarget){backend=LibretroRuntimes.Backend.JNI_TRIAL;message="仅本次私人启动，独立试验档；不会自动导入原进度。";}
                 minecraft.setScreen(this);
-            },Component.literal("恢复本次 JNI 私人运行？"),Component.literal("仅 Windows x64。原生故障可能让整个 Minecraft 崩溃，请先备份世界。继续使用 JNI 独立存档；同一客户端仅一个 JNI 会话，未安全退出时不会强杀或自动换后端。旧进程档保留，切换后端不转换进度。重新打开页面按已适配机型默认选择 JNI。")));
+            },Component.literal("恢复本次 JNI 私人运行？"),Component.literal("仅 Windows x64。原生故障可能让整个 Minecraft 崩溃，请先备份世界。继续使用 JNI 独立存档；公共 JNI 最多四个核心会话，各机型仍有自己的占用限制，未安全退出时不会强杀或自动换后端。旧进程档保留，切换后端不转换进度。重新打开页面按已适配机型默认选择 JNI。")));
         }).bounds(left+10,top+158,w-20,20).build();
         runtime.active=target!=null&&target.provider().supportsJniTrial()&&!PrivateHomeClient.active()&&!PrivateHomeClient.busy();
         runtime.setTooltip(Tooltip.create(Component.literal("仅本次私人游戏；JNI 原生故障可能使整个 Minecraft 崩溃。旧进程存档保留，切换不迁移进度。")));

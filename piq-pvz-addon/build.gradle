@@ -9,7 +9,7 @@ neoForge {
 }
 repositories { mavenCentral() }
 dependencies {
-    implementation files('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.22.jar')
+    implementation files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.26.jar'))
     testImplementation platform('org.junit:junit-bom:5.13.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.apache.maven:maven-artifact:3.9.1'

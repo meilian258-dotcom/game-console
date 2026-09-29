@@ -23,12 +23,12 @@
       "legacyPath": "piq-fc-arcade/native/libretro/linux-x64/mesen_libretro.so",
       "purpose": "FC Linux process core; native/libretro provenance"
     },
-    "libretro-jni-abi1": {
+    "libretro-jni-abi2": {
       "filename": "piq-libretro-jni.dll",
-      "bytes": 1358336,
-      "sha256": "c87361bf03d210bc4562bf1bdf7e66f0f5ce58f62742d086a23dfd7fd68d47ec",
+      "bytes": 1375744,
+      "sha256": "60c05ac6e30f8e696d989a0fae3634a685c664f247b67fb7e4944eeea59251b5",
       "legacyPath": "piq-fc-arcade/native/libretro-jni/dist/piq-libretro-jni.dll",
-      "purpose": "Common JNI bridge; native/libretro-jni/README.md and build_native.py"
+      "purpose": "Common JNI ABI2 with four independent owner sessions; native/libretro-jni/README.md and build_native.py"
     },
     "retroarch-netplay": {
       "filename": "piq-retroarch.exe",

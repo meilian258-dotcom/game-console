@@ -34,5 +34,5 @@ public final class MdMod {
         });
         bus.addListener((BuildCreativeModeTabContentsEvent e)->{if(e.getTabKey().equals(ModCreativeTabs.FC.getKey())){e.accept(CONSOLE_ITEM);e.accept(CARTRIDGE);}});
     }
-    static void hint(net.minecraft.server.level.ServerPlayer p){p.displayClientMessage(net.minecraft.network.chat.Component.literal("MD2 初版仅自己玩：接电视、插卡、空手右键借1P手柄；手持后输入 /gameconsole-private。JNI 在私人页确认。"),false);}
+    static void hint(net.minecraft.server.level.ServerPlayer p){p.displayClientMessage(net.minecraft.network.chat.Component.literal("MD2 初版仅自己玩：接电视、插卡、空手右键借1P手柄；手持后输入 /gameconsole-private。支持的平台默认 JNI。"),false);}
 }

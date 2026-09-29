@@ -35,6 +35,9 @@ public final class NetplaySaveState {
         var descriptor=new StringBuilder("PIQ-Netplay-save-v1\n").append(profile.sha().toLowerCase(Locale.ROOT))
                 .append('\n').append(profile.contentName()).append('\n').append(profile.device()).append(':')
                 .append(profile.ports()).append(':').append(profile.sampleRate()).append('\n').append(profile.config());
+        if(profile.jni()!=null)descriptor.append("\nPIQ-JNI-Netplay-generic-v1\n")
+                .append(profile.jni().name()).append('\n').append(profile.jni().extension()).append('\n')
+                .append(profile.jni().fullPath()).append('\n').append(profile.jni().devices()).append('\n');
         var content=new StringBuilder(romHash.toLowerCase(Locale.ROOT)).append('\n');
         new TreeMap<>(auxiliaries).forEach((name,sha)->{
             if(!NetplayProfile.safeName(name)||name.equals(profile.contentName()))throw new IllegalArgumentException("Netplay 辅助文件名无效");

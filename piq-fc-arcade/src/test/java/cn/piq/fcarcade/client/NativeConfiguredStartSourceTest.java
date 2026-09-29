@@ -58,7 +58,7 @@ class NativeConfiguredStartSourceTest {
         assertTrue(start.contains("Pathrom=remember?chosen:CabinetGameSelection.load(key)"));
         assertTrue(start.contains("CabinetGameSelection.validate(rom,Set.of(\".zip\"),Set.of(\"neogeo.zip\",\"qsound_hle.zip\"));"));
         assertTrue(start.contains("if(shuttingDown||token!=generation)return;if(remember)CabinetGameSelection.remember(key,rom);"));
-        assertTrue(start.indexOf("CabinetGameSelection.validate(") < start.indexOf("newNativeProcessSession("));
+        assertTrue(start.indexOf("CabinetGameSelection.validate(") < start.indexOf("newNativeJniMediaSession("));
     }
 
     @Test void cancelOrNewConnectionClosesLateCoreBeforeItCanBecomeActive() throws Exception {

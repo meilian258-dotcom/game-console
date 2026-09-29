@@ -36,7 +36,7 @@ public final class SfcPrivateEngine implements PrivateEngine {
     private CabinetFrame picture;
 
     /** Fast construction: explicit local path validation, disk IO and core initialization happen on the worker. */
-    public SfcPrivateEngine(Path localRom,Path saveRoot){this(localRom,saveRoot,LibretroSfcCore::new,null);}
+    public SfcPrivateEngine(Path localRom,Path saveRoot){this(localRom,saveRoot,LibretroRuntimes.Backend.JNI_TRIAL);}
     /** Trial transport is explicit and never shares a key with the normal private backup. */
     public SfcPrivateEngine(Path localRom,Path saveRoot,LibretroRuntimes.Backend backend){
         this(localRom,saveRoot,factory(backend),saveNamespace(backend));

@@ -4,7 +4,9 @@ package cn.piq.retro.netplay;
 import java.util.*;
 
 /**
- * Owner-thread, bounded two-pad prediction history. This class grants no input authority:
+ * Owner-thread, bounded two-lane prediction history with host-canonical auxiliary input.
+ * Pads 3/4 and packed gun state, when present, are frame data, never polled on replay.
+ * This class grants no input authority:
  * the transport must authenticate the room, peer, frame and lane before correcting it.
  * Snapshots are BEFORE the numbered frame. Replay never publishes audio/video or polls input.
  */
@@ -15,10 +17,16 @@ public final class RollbackTimeline<V> {
         byte[] save();
         void restore(byte[] state);
         V step(int p1, int p2, boolean present);
+        default V step(Input input, boolean present) {
+            if (input.p3()!=0 || input.p4()!=0 || input.gun()!=0) throw new IllegalArgumentException("Core has no auxiliary input adapter");
+            return step(input.p1(), input.p2(), present);
+        }
     }
-    public record Input(long frame, int p1, int p2, int known) {
+    public record Input(long frame, int p1, int p2, int p3, int p4, int gun, int known) {
+        public Input(long frame,int p1,int p2,int known) { this(frame,p1,p2,0,0,0,known); }
         public Input {
-            if (frame < 0 || (p1 & ~65535) != 0 || (p2 & ~65535) != 0 || (known & ~3) != 0)
+            if (frame < 0 || ((p1|p2|p3|p4) & ~65535) != 0 || (known & ~3) != 0
+                    || (gun & ~0x3ffff)!=0 || ((gun&65536)!=0 ? (gun&65535)!=0 : ((gun>>>8)&255)>=240))
                 throw new IllegalArgumentException("Rollback input bounds");
         }
         public int pad(int lane) { checkLane(lane); return lane == 0 ? p1 : p2; }
@@ -45,11 +53,14 @@ public final class RollbackTimeline<V> {
     public int retained() { check(); return history.size(); }
     public boolean canAdvance() { check(); return history.size() < HISTORY && next < Long.MAX_VALUE - HISTORY; }
     public V advance(int p1, int p2, int known) {
+        return advance(new Input(next,p1,p2,known));
+    }
+    public V advance(Input input) {
         check();
         if (!canAdvance()) throw new IllegalStateException("Rollback history exhausted; wait for confirmation");
-        var input = new Input(next, p1, p2, known);
+        if (input.frame()!=next) throw new IllegalArgumentException("Frame is not next");
         var entry = new Entry(input, snapshot());
-        V output = core.step(p1, p2, true);
+        V output = core.step(input, true);
         history.put(next++, entry);
         return output;
     }
@@ -79,7 +90,7 @@ public final class RollbackTimeline<V> {
             if (!first && (old.known() & bit) != 0) break;
             if (old.pad(lane) != mask && changed < 0) changed = old.frame();
             e.input = new Input(old.frame(), lane == 0 ? mask : old.p1(), lane == 1 ? mask : old.p2(),
-                    first ? old.known() | bit : old.known());
+                    old.p3(), old.p4(), old.gun(), first ? old.known() | bit : old.known());
             first = false;
         }
         if (changed >= 0) replay(changed);
@@ -96,7 +107,8 @@ public final class RollbackTimeline<V> {
         }
         for (var command : commands) {
             var e = entry(command.frame());
-            if ((e.input.p1() != command.p1() || e.input.p2() != command.p2()) && changed < 0) changed = command.frame();
+            if ((e.input.p1() != command.p1() || e.input.p2() != command.p2() || e.input.p3()!=command.p3()
+                    || e.input.p4()!=command.p4() || e.input.gun()!=command.gun()) && changed < 0) changed = command.frame();
             e.input = command;
         }
         if (changed >= 0) replay(changed);
@@ -116,7 +128,7 @@ public final class RollbackTimeline<V> {
         core.restore(entry(first).before.clone());
         for (var e : history.tailMap(first, true).values()) {
             e.before = snapshot();
-            core.step(e.input.p1(), e.input.p2(), false);
+            core.step(e.input, false);
             replays++;
         }
     }

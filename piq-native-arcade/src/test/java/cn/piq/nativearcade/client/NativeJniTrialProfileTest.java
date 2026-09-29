@@ -48,7 +48,10 @@ class NativeJniTrialProfileTest {
         }
         assertEquals(wasBusy, LibretroRuntimes.isJniBusy());
         String provider = Files.readString(Path.of("src/main/java/cn/piq/nativearcade/client/NativeCabinetBackend.java"));
-        assertTrue(provider.contains("new NativeProcessSession("));
+        assertTrue(provider.contains("new NativeJniMediaSession("));
+        var media = cn.piq.nativearcade.bridge.NativeJniMediaSession.profile();
+        assertEquals("MAME", media.name());
+        assertEquals(372431360, media.cores().get("windows-x64").maxBytes());
         assertFalse(provider.contains("NativeJniTrialProfile"));
         assertFalse(provider.contains("LibretroJniRuntime"));
     }

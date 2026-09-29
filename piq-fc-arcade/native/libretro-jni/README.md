@@ -1,15 +1,17 @@
-# Generic libretro JNI bridge — experimental ABI 1
+# Generic libretro JNI bridge — ABI 2 (migration candidate)
 
 This is one shared Windows x64 frontend, not an emulator, not RetroArch Netplay,
 and not a separate Minecraft mod. The main mod packages the approved DLL once;
 addons supply fixed, SHA-verified core resources, content rules and capabilities.
-Default execution remains the existing isolated process backend.
+Execution defaults belong to the caller's supported mode, not to this bridge.
 
 ## Safety and ownership
 
-Every operation except `abiVersion()` and `reservationHeld()` belongs to the Java thread that called
-`open()`. One active JNI core is permitted per JVM; other machines can still use
-independent processes. A second call never blocks waiting for the native owner.
+Every core operation belongs to the Java thread that called `reserve()`.
+At most four reservations are permitted per JVM, including quarantined failures.
+Each owns a private core DLL, callback table and software/WGL state. A call never
+blocks waiting for another native owner. Two sessions may not share one loaded
+core module (libretro cores commonly keep global state).
 Handles are generation tokens, not addresses. A stale or foreign-thread call is
 rejected. Core asynchronous callbacks are unsupported and become fatal session
 errors. No JNI calls are made from libretro callbacks.
@@ -21,12 +23,13 @@ release its directory/slot while calls remain in flight. Failed native cleanup
 keeps the native reservation. The bridge does not change process cwd, locale,
 stdio, DLL search policy or Minecraft's OpenGL context.
 
-`open()` can throw after partially initializing the core without returning a
-token. If native startup cleanup then fails, `reservationHeld()` stays true.
-After any attempted open, Java must use that lock-free atomic query before
-releasing its active slot, loaded-library pin or workspace when its token is zero.
-No token does **not** mean no active native reservation. The query never calls
-core code, dereferences the session or waits for a potentially stuck owner.
+Reserve first, then call `openReserved(token, ...)`. Java therefore knows which
+reservation to retain even if opening or its cleanup fails. A safe failed open
+releases that slot; failed cleanup quarantines only that slot. Query
+`reservationHeld(token)` before cleanup; stale tokens cannot close a reused slot.
+`abiVersion`, `availableSlots` and `reservationHeld` are safe from any thread;
+they do not call the core or acquire a potentially stuck owner's lock. Capacity
+is a discovery hint, not a reservation: `reserve()` enforces the actual limit.
 
 Java must validate resource identity and stage a private owned workspace before
 calling `open`. Native paths must be absolute, normalized, exist, and have no
@@ -40,9 +43,11 @@ Java policy: this bridge never chooses player, cartridge or cabinet ownership.
 Class: `cn.piq.retro.libretro.jni.NativeLibretroBridge`.
 
 ```java
-static native int abiVersion(); // 1
-static native boolean reservationHeld(); // atomic query, any thread, no owner lock
-static native long open(String core, String content, String system, String save,
+static native int abiVersion(); // 2; Java/bridge must be upgraded together
+static native int availableSlots(); // 0..4, excludes quarantined reservations
+static native long reserve(); // owner thread; throws at capacity
+static native boolean reservationHeld(long handle); // any thread, no core call
+static native long openReserved(long handle, String core, String content, String system, String save,
     String expectedName, boolean fullPath, int[] devices, String[] optionPairs, int features);
 static native void metadata(long handle, int[] metadata, double[] timing);
 static native String coreVersion(long handle);
@@ -135,6 +140,8 @@ zero-copy); GL pack state is explicitly set and pixel pack buffers unbound.
 The core's `bottom_left_origin` is applied once. Maximum geometry changes after
 hardware initialization require a restart; software dynamic geometry is bounded.
 Context/device loss is reported as failure; seamless GPU recovery is not claimed.
+WGL sessions need distinct owner threads; opening a context on a thread with an
+existing GL context is rejected, rather than replacing Minecraft's context.
 No VFS, async audio, disk swapping, analog axes, rumble or netpacket support is
 advertised. These require versioned additions and tests, not bigger unchecked arrays.
 
@@ -171,6 +178,10 @@ duplicate frames, rotation, four ports, pointer/mouse/keyboard, state, RAM/RTC,
 invalid input/callback limits, stale/foreign handles, repeated start/stop, no-game
 and real WGL readback/origin. It is not a test of copyrighted games. The test-only
 Java bridge declarations must never be packaged in the mod.
+The multi-session probe additionally checks four concurrent owners, independent
+software/WGL input and snapshots, capacity/stale generations, a stalled core and
+foreign-thread callback isolation. These tests do not make untrusted native DLLs
+safe, nor certify arbitrary asynchronous callbacks after a core has unloaded.
 
 `tests/RealCoreProbe.java` is an additional independent native integration caller.
 Its arguments are bridge/core/content/private-work/name/fullPath/features/frames,
