@@ -1,0 +1,24 @@
+{
+  "exitCode": 0,
+  "seconds": 213.33,
+  "sourceCommit": "a251c76229f1637e433b93e29845039752771b6d",
+  "sourceArchiveSha256": "55cc0f5bf305d8953fa0a20c3598164d39efc03ef3740c7b01e7ebf143cd4d7a",
+  "patchSha256": "63a5094aa41231ca9d9ff37e5133b25db43dd948ac8c13bb9ee4b750b57e5908",
+  "sourceBundleSha256": "3c8a61cf1519e1f27df3776822a1be54573d640b671e6885088bbd60f41100dc",
+  "sourceBundleBytes": 29615611,
+  "cleanBuild": true,
+  "binaryReproducibilityVerified": false,
+  "compiler": "clang version 21.1.1 (https://github.com/llvm/llvm-project.git 5a86dc996c26299de63effc927075dcbfb924167)",
+  "flags": [
+    "-j4",
+    "platform=win",
+    "CC=x86_64-w64-mingw32-clang",
+    "CXX=x86_64-w64-mingw32-clang++",
+    "GIT_VERSION=unknown",
+    "SHARED=-shared -Wl,--no-undefined,--no-insert-timestamp",
+    "LDFLAGS=-static-libgcc -static-libstdc++ -static"
+  ],
+  "noROMs": true,
+  "coreSha256": "3e0ab5db5898e9e75e1704caa703d6f4e4cb269c4f971ab498b434f22d18f885",
+  "coreBytes": 61380608
+}

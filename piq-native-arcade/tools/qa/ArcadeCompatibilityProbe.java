@@ -41,6 +41,8 @@ public final class ArcadeCompatibilityProbe {
     private static void core(Path root,Path rom,boolean diagnosticOptions)throws Exception{
         var files=content(rom);String name=rom.getFileName().toString();
         var profile=NativeNetplayProfile.runtime();
+        String testCoreSha=System.getProperty("gc.probe.coreSha");
+        if(testCoreSha!=null)profile=new LibretroProfile(profile.name(),profile.extension(),profile.fullPath(),profile.devices(),profile.mesenGun(),profile.options(),Map.of("windows-x64",new LibretroProfile.Artifact("/native-runtime/qa/fbneo.dll",testCoreSha)));
         if(diagnosticOptions){var options=new TreeMap<>(profile.options());options.remove("fbneo-diagnostic-input");profile=new LibretroProfile(profile.name(),profile.extension(),profile.fullPath(),profile.devices(),profile.mesenGun(),options,profile.cores());}
         metric("diagnosticOptionsOverride",diagnosticOptions);
         int baseline=Integer.getInteger("gc.probe.baselineFrames",900);require(baseline>=900&&baseline<=7200,"Probe frame budget");
@@ -49,8 +51,10 @@ public final class ArcadeCompatibilityProbe {
             // Same early gate as the production JNI Netplay. Do not waive a failure later.
             a.run(List.of(new LibretroProcess.Controls(new int[4],0)),0);a.reset();a.run(List.of(new LibretroProcess.Controls(new int[4],0)),0);
             byte[] initial=a.serialize();a.restore(initial);byte[] resaved=a.serialize();
+            if(Boolean.getBoolean("gc.probe.dumpStates")){Files.write(root.resolve("early-before.bin"),initial);Files.write(root.resolve("early-after.bin"),resaved);}
             metric("earlyStateBytes",initial.length);metric("earlyRestoreDiffBytes",different(initial,resaved));
             metric("earlyGatePassed",initial.length<=2*1024*1024&&Arrays.equals(initial,resaved));
+            boolean exact=initial.length<=2*1024*1024&&Arrays.equals(initial,resaved);
             a.reset();
             var pictures=new HashSet<String>();long pcm=0,nonzero=0;
             for(int f=0;f<baseline;f++){
@@ -61,23 +65,37 @@ public final class ArcadeCompatibilityProbe {
             metric("baselineFrames",baseline);metric("differentPictures",pictures.size());metric("pcmShorts",pcm);metric("nonzeroPcmShorts",nonzero);
             require(pictures.size()>2&&pcm>0,"No real picture/audio output");
             byte[] checkpoint=a.serialize();var video=new ArrayList<String>();var audio=new ArrayList<String>();
-            for(int f=baseline;f<baseline+180;f++){var out=step(a,f);video.add(sha(out.rgba()));audio.add(sound(out.stereo()));}
+            boolean trace=Boolean.getBoolean("gc.probe.traceFirstDiff");var states=new ArrayList<byte[]>();
+            for(int f=baseline;f<baseline+180;f++){var out=step(a,f);video.add(sha(out.rgba()));audio.add(sound(out.stereo()));if(trace)states.add(a.serialize());}
             byte[] end=a.serialize();
+            if(Boolean.getBoolean("gc.probe.dumpStates"))Files.write(root.resolve("end-reference.bin"),end);
             a.restore(checkpoint);metric("lateRestoreDiffBytes",different(checkpoint,a.serialize()));
+            exact&=Arrays.equals(checkpoint,a.serialize());
+            if(Boolean.getBoolean("gc.probe.dumpStates")){Files.write(root.resolve("late-before.bin"),checkpoint);Files.write(root.resolve("late-after.bin"),a.serialize());}
             int videoDiff=0,audioDiff=0;
             var videoIndices=new ArrayList<Integer>();
             for(int f=baseline;f<baseline+180;f++){var out=step(a,f);if(!video.get(f-baseline).equals(sha(out.rgba()))){videoDiff++;videoIndices.add(f-baseline);}if(!audio.get(f-baseline).equals(sound(out.stereo())))audioDiff++;}
             metric("localVideoDiffIndices",videoIndices);
             metric("localReplayVideoDiffFrames",videoDiff);metric("localReplayPcmDiffFrames",audioDiff);metric("localReplayEndStateDiffBytes",different(end,a.serialize()));
+            exact&=videoDiff==0&&audioDiff==0&&Arrays.equals(end,a.serialize());
+            if(Boolean.getBoolean("gc.probe.dumpStates"))Files.write(root.resolve("end-local.bin"),a.serialize());
             try(var b=new LibretroJniRuntime(profile,NativeNetplayProfile.class)){
                 b.loadFiles(name,files,null);b.run(List.of(new LibretroProcess.Controls(new int[4],0)),0);b.reset();b.run(List.of(new LibretroProcess.Controls(new int[4],0)),0);
                 b.restore(checkpoint);metric("crossRestoreDiffBytes",different(checkpoint,b.serialize()));videoDiff=audioDiff=0;
+                exact&=Arrays.equals(checkpoint,b.serialize());
                 videoIndices.clear();
-                for(int f=baseline;f<baseline+180;f++){var out=step(b,f);if(!video.get(f-baseline).equals(sha(out.rgba()))){videoDiff++;videoIndices.add(f-baseline);}if(!audio.get(f-baseline).equals(sound(out.stereo())))audioDiff++;}
+                for(int f=baseline;f<baseline+180;f++){var out=step(b,f);if(!video.get(f-baseline).equals(sha(out.rgba()))){videoDiff++;videoIndices.add(f-baseline);}if(!audio.get(f-baseline).equals(sound(out.stereo()))){
+                    if(trace&&audioDiff==0){metric("firstCrossPcmDiffIndex",f-baseline);Files.write(root.resolve("frame-reference.bin"),states.get(f-baseline));Files.write(root.resolve("frame-cross.bin"),b.serialize());metric("firstCrossStateDiff",different(states.get(f-baseline),b.serialize()));}
+                    audioDiff++;
+                }}
                 metric("crossVideoDiffIndices",videoIndices);
                 metric("crossReplayVideoDiffFrames",videoDiff);metric("crossReplayPcmDiffFrames",audioDiff);metric("crossReplayEndStateDiffBytes",different(end,b.serialize()));
+                exact&=videoDiff==0&&audioDiff==0&&Arrays.equals(end,b.serialize());
+                if(Boolean.getBoolean("gc.probe.dumpStates"))Files.write(root.resolve("end-cross.bin"),b.serialize());
             }
             metric("replayFramesPerPath",180);
+            metric("exactRestorePassed",exact);
+            if(Boolean.getBoolean("gc.probe.requireExact"))require(exact,"Exact state/video/PCM restore failed");
         }
     }
     private static void media(Path root,Path rom)throws Exception{

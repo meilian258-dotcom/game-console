@@ -74,13 +74,13 @@ def prepareRuntime011 = tasks.register('prepareEmbeddedRuntime011', Exec) {
             '--archive', embeddedRuntimeArchive.absolutePath, '--helper', helper011.get().asFile.absolutePath,
             '--output', embeddedRuntime011.get().asFile.absolutePath
 }
-def fbneoRuntime = layout.buildDirectory.dir('generated/fbneoNetplay014')
-def prepareFbneo = tasks.register('prepareFbneoNetplay013', Exec) {
-    inputs.files('tools/prepare_fbneo_netplay014.py', 'design/fbneo-study/pgm-cycle75/fbneo_libretro.dll', 'design/fbneo-study/pgm-cycle75/pgm-cycle-carry.patch', 'design/fbneo-study/pgm-cycle75/build.json', 'design/fbneo-study/vendor/license.txt')
+def fbneoRuntime = layout.buildDirectory.dir('generated/fbneoNetplay015')
+def prepareFbneo = tasks.register('prepareFbneoNetplay015', Exec) {
+    inputs.files('tools/prepare_fbneo_netplay015.py', 'design/fbneo-study/jni-state-v3/fbneo_libretro.dll', 'design/fbneo-study/jni-state-v3/state-v3.patch', 'design/fbneo-study/jni-state-v3/build.json', 'design/fbneo-study/jni-state-v3/README.md', 'design/fbneo-study/jni-state-v3/FBNeo-a251c76-jni-state-v3-source.zip', 'design/fbneo-study/vendor/license.txt')
     outputs.dir(fbneoRuntime)
     workingDir projectDir
     commandLine providers.gradleProperty('embeddedRuntimePython').getOrElse('python'),
-            file('tools/prepare_fbneo_netplay014.py').absolutePath, '--output', fbneoRuntime.get().asFile.absolutePath
+            file('tools/prepare_fbneo_netplay015.py').absolutePath, '--output', fbneoRuntime.get().asFile.absolutePath
 }
 jar {
     dependsOn prepareFbneo

@@ -207,7 +207,17 @@ public final class JniNetplaySession implements AutoCloseable {
                     if(joining==null&&!waitingJoin&&timeline.next()-confirmed<PREDICTION&&now>=nextPresent)hostFrame();
                     handleCapture();
                     if(persistence!=null&&now>=nextSave){nextSave=now+TimeUnit.SECONDS.toNanos(30);saveNow();}
-                } else if(ready){if(now>=nextPresent)peerFrame();checkDigests();}
+                } else if(ready){
+                    // Consume a bounded catch-up batch after a delayed ordered delivery.
+                    // Do not skip emulated frames or expand the authority window.
+                    for(int n=0;n<4;n++) {
+                        long before=timeline.next();
+                        if(System.nanoTime()<nextPresent&&lastHostNext-before<=4)break;
+                        peerFrame();checkDigests();
+                        if(timeline.next()==before)break;
+                    }
+                    checkDigests();
+                }
                 if(grant.host()||ready)trim();
                 confirmedVisible=confirmed;replayed=timeline.replayedFrames();
                 LockSupport.parkNanos(500_000L);
@@ -240,6 +250,10 @@ public final class JniNetplaySession implements AutoCloseable {
     private LibretroProcess.Controls neutral(){return new LibretroProcess.Controls(new int[cabinet==null?2:4],gunMode?65536:0);}
     private void drain() {
         for(int n=0;n<128;n++) {
+            // Backpressure on decoded Commands, not permission to accept arbitrary
+            // future frames. Let emulation consume this ordered prefix before
+            // draining the next burst from the already bounded ingress queue.
+            if(!grant.host()&&ready&&lastHostNext-timeline.next()>=8)return;
             Event event=events.poll();if(event==null)return;
             synchronized(intakeLock){intakeBytes-=event.chunk().byteLength();}
             var chunk=event.chunk();var peer=peers.get(chunk.ticket());
@@ -300,7 +314,9 @@ public final class JniNetplaySession implements AutoCloseable {
             phase=runningLabel();send(peer,new Ready(parts.frame()));nextPresent=System.nanoTime();return;
         }
         if(message instanceof Commands commands&&ready) {
-            if(commands.confirmed()<confirmed||commands.next()<lastHostNext||commands.next()>timeline.next()+32)throw new IllegalArgumentException("主持时间线倒退或超限");
+            if(commands.confirmed()<confirmed||commands.next()<lastHostNext||commands.next()>timeline.next()+32)
+                throw new IllegalArgumentException("主持时间线倒退或超限：confirmed="+commands.confirmed()+"/"+confirmed
+                        +" next="+commands.next()+" previous="+lastHostNext+" local="+timeline.next());
             var corrections=new ArrayList<Input>();
             for(var command:commands.inputs()) {
                 validateInput(command);

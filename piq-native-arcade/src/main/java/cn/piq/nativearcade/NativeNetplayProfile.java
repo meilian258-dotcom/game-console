@@ -6,8 +6,8 @@ import java.util.*;
 
 /** Common-side trusted profile: the server never loads a client backend class. */
 public final class NativeNetplayProfile {
-    public static final String CORE_SHA="73579C4C50D1F16F5D52A1E5BF4D81106C40962BC284E83E4A96DC7BB68FD424";
-    public static final String CORE_RESOURCE="/native-runtime/win-x64-fbneo-pgm-v2/fbneo_libretro.dll";
+    public static final String CORE_SHA="3E0AB5DB5898E9E75E1704CAA703D6F4E4CB269C4F971AB498B434F22D18F885";
+    public static final String CORE_RESOURCE="/native-runtime/win-x64-fbneo-state-v3/fbneo_libretro.dll";
     private NativeNetplayProfile(){}
     public static NetplayProfile profile(String name){
         if(!validGameName(name))throw new IllegalArgumentException("Invalid arcade ZIP name");

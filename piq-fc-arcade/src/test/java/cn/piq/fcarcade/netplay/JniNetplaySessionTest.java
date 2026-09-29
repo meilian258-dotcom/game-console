@@ -52,13 +52,16 @@ class JniNetplaySessionTest {
         final boolean gun;
         final Core hostCore;
         volatile int delay=0;
+        volatile JniNetplaySession bufferedTarget;
+        final Queue<Runnable> buffered=new ConcurrentLinkedQueue<>();
         Room(boolean persist){
             this(persist,false);
         }
         Room(boolean persist,boolean gun){
             this.gun=gun;hostCore=new Core(gun);
             relay=new NetplayRelay<>(700,hostKey,(target,message)->{
-                var run=runs.get(target);if(run!=null)wire.schedule(()->run.receive(message.chunk(),message.port()),delay,TimeUnit.MILLISECONDS);
+                var run=runs.get(target);if(run!=null){Runnable delivery=()->run.receive(message.chunk(),message.port());
+                    synchronized(buffered){if(run==bufferedTarget)buffered.add(delivery);else wire.schedule(delivery,delay,TimeUnit.MILLISECONDS);}}
             });
             var ticket=relay.grant(hostKey,0);
             host=new JniNetplaySession(new NetplayProcess.Grant(700,ticket.id(),true,true,0),()->ROM,
@@ -193,6 +196,21 @@ class JniNetplaySessionTest {
             assertTrue(FcNetplaySaves.accepts(true,true,NetplaySaveState.hash(ROM),room.saved.get()));
             assertFalse(FcNetplaySaves.accepts(false,true,NetplaySaveState.hash(ROM),room.saved.get()));
             room.healthy();
+        }
+    }
+    @Test void orderedBurstAfterSpectatorDelayCatchesUpWithoutWeakeningTimelineChecks()throws Exception {
+        try(var room=new Room(false,true)) {
+            until(room.host::ready,room);
+            var peer=room.join(-1);until(peer::ready,room);
+            until(()->peer.framesReceived()>70,room);
+            room.bufferedTarget=peer;long before=room.host.framesReceived();
+            until(()->room.host.framesReceived()>before+75,room);
+            assertTrue(room.buffered.size()>32,"exercise a burst beyond the canonical window");
+            // Keep collecting while the exact queued deliveries are released in order.
+            room.wire.submit(()->{synchronized(room.buffered){Runnable r;while((r=room.buffered.poll())!=null)r.run();room.bufferedTarget=null;}}).get(3,TimeUnit.SECONDS);
+            until(()->peer.framesReceived()>before+75,room);
+            until(()->room.host.framesReceived()-peer.framesReceived()<12,room);
+            assertTrue(room.host.diagnostic().contains("拒绝异常连接：0"));
         }
     }
     @Test void fourPortCabinetUsesHostAuthorizedInputsAndConsumesPaidCoinsOnlyOnce()throws Exception {

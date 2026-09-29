@@ -1,0 +1,382 @@
+--- a/src/burn/drv/capcom/cps.h
++++ b/src/burn/drv/capcom/cps.h
+@@ -421,6 +421,7 @@
+ extern Cps1ObjDrawCallback Cps1ObjDrawCallbackFunction;
+ 
+ INT32  CpsObjInit();
++void CpsObjScan();
+ INT32  CpsObjExit();
+ INT32  CpsObjGet();
+ INT32 FcrashObjGet();
+--- a/src/burn/drv/capcom/cps_mem.cpp
++++ b/src/burn/drv/capcom/cps_mem.cpp
+@@ -535,6 +535,7 @@
+ 
+ 		SCAN_VAR(nCpsCyclesExtra);
+ 		SCAN_VAR(nCpsObjectBank);
++		CpsObjScan();
+ 
+ 		if (Cps1OverrideLayers) {
+ 			SCAN_VAR(nCps1Layers);
+--- a/src/burn/drv/capcom/cps_obj.cpp
++++ b/src/burn/drv/capcom/cps_obj.cpp
+@@ -123,9 +123,11 @@
+ 	}
+ 
+ 	// Set up the frame buffers
++	memset(ObjMem, 0, (nMax << 3) * nFrameCount);
+ 	for (INT32 i = 0; i < nFrameCount; i++) {
+ 		of[i].Obj = ObjMem + (nMax << 3) * i;
+ 		of[i].nCount = 0;
++		of[i].nShiftX = of[i].nShiftY = 0;
+ 	}
+ 
+ 	nGetNext=0;
+@@ -137,6 +139,19 @@
+ 	}
+ 
+ 	return 0;
++}
++
++void CpsObjScan()
++{
++	// Sprite rendering deliberately lags one frame. CPU RAM alone cannot
++	// reconstruct these buffers at a frame boundary. Never scan pointers.
++	ScanVar(ObjMem, (nMax << 3) * nFrameCount, "CPS sprite history");
++	SCAN_VAR(nGetNext);
++	for (INT32 i = 0; i < nFrameCount; i++) {
++		SCAN_VAR(of[i].nShiftX);
++		SCAN_VAR(of[i].nShiftY);
++		SCAN_VAR(of[i].nCount);
++	}
+ }
+ 
+ INT32 CpsObjExit()
+--- a/src/burn/drv/capcom/qs_c.cpp
++++ b/src/burn/drv/capcom/qs_c.cpp
+@@ -767,6 +767,9 @@
+ 
+ INT32 QscScan(INT32 nAction)
+ {
++	SCAN_VAR(nPos);
++	SCAN_VAR(nDelta);
++	SCAN_VAR(interpolate_buffer);
+ 	struct BurnArea ba;
+ 	char szName[16];
+ 
+--- a/src/burn/drv/pgm/pgm_run.cpp
++++ b/src/burn/drv/pgm/pgm_run.cpp
+@@ -1302,6 +1302,8 @@
+ 
+ 	if (nAction & ACB_DRIVER_DATA) {
+ 	
++		// Cycle overrun is carried into the next frame and must rewind with CPUs.
++		SCAN_VAR(nCyclesDone);
+ 		SekScan(nAction);
+ 		ZetScan(nAction);
+ 
+--- a/src/burn/snd/ay8910.c
++++ b/src/burn/snd/ay8910.c
+@@ -1017,6 +1017,10 @@
+ 	if (pnMin && *pnMin < 0x029496) {			// Return minimum compatible version
+ 		*pnMin = 0x029496;
+ 	}
++	SCAN_VAR(ay_lastin_r);
++	SCAN_VAR(ay_lastout_r);
++	SCAN_VAR(ay_lastin_l);
++	SCAN_VAR(ay_lastout_l);
+ 
+ 	for (i = 0; i < num; i++) {
+ 		char szName[32];
+--- a/src/burn/snd/burn_ym2151.cpp
++++ b/src/burn/snd/burn_ym2151.cpp
+@@ -373,6 +373,9 @@
+ 	}
+ 
+ 	SCAN_VAR(nBurnCurrentYM2151Register);
++	SCAN_VAR(nYM2151Position);
++	SCAN_VAR(nFractionalPosition);
++	if (pBuffer) ScanVar(pBuffer, 4096 * (bYM2151_MultiChip ? 4 : 2) * sizeof(INT16), "YM2151 resampler");
+ 
+ 	BurnYM2151Scan_int(nAction); // Scan the YM2151's internal registers
+ 
+--- a/src/burn/snd/burn_ym2610.cpp
++++ b/src/burn/snd/burn_ym2610.cpp
+@@ -504,5 +504,8 @@
+ 	if (nAction & ACB_DRIVER_DATA) {
+ 		SCAN_VAR(nYM2610Position);
+ 		SCAN_VAR(nAY8910Position);
+-	}
+-}
++		SCAN_VAR(nFractionalPosition);
++		if (pBuffer) ScanVar(pBuffer, 4096 * 6 * sizeof(INT16), "YM2610 resampler");
++		if (pAYBuffer) ScanVar(pAYBuffer, 4096 * sizeof(INT32), "YM2610 AY mix");
++	}
++}
+--- a/src/burn/snd/burn_ym3812.cpp
++++ b/src/burn/snd/burn_ym3812.cpp
+@@ -355,5 +355,7 @@
+ 	
+ 	if (nAction & ACB_DRIVER_DATA) {
+ 		SCAN_VAR(nYM3812Position);
+-	}
+-}
++		SCAN_VAR(nFractionalPosition);
++		if (pBuffer) ScanVar(pBuffer, 4096 * nNumChips * sizeof(INT16), "YM3812 resampler");
++	}
++}
+--- a/src/burn/snd/fm.c
++++ b/src/burn/snd/fm.c
+@@ -1383,7 +1383,7 @@
+ 				if ( !(OPN->eg_cnt & ((1<<SLOT->eg_sh_rr)-1) ) )
+ 				{
+ 					/* SSG-EG affects Release phase also (Nemesis) */
+-					if ((SLOT->ssg&0x08) && ((OPN->type = TYPE_YM2612) || (OPN->type = TYPE_YM2608)))
++					if ((SLOT->ssg&0x08) && ((OPN->type == TYPE_YM2612) || (OPN->type == TYPE_YM2608)))
+ 					{
+ 						SLOT->volume += 6 * eg_inc[SLOT->eg_sel_rr + ((OPN->eg_cnt>>SLOT->eg_sh_rr)&7)];
+ 					}
+@@ -3760,7 +3760,6 @@
+ 		INTERNAL_TIMER_A( State , cch[1] )
+ 	}
+ 	INTERNAL_TIMER_B(State,length)
+-
+ }
+ 
+ #if BUILD_YM2610B
+@@ -3911,50 +3910,28 @@
+ #ifdef _STATE_H
+ static void YM2610_postload(void)
+ {
+-	int num , r;
++	int num;
+ 
+ 	FM_IS_POSTLOADING = 1;
+ 
+ 	for(num=0;num<YM2610NumChips;num++)
+ 	{
+ 		YM2610 *F2610 = &(FM2610[num]);
+-		/* SSG registers */
+-		for(r=0;r<16;r++)
+-		{
+-			SSGWrite(num,0,r);
+-			SSGWrite(num,1,F2610->REGS[r]);
+-		}
+-
+-		/* OPN registers */
+-		/* DT / MULTI , TL , KS / AR , AMON / DR , SR , SL / RR , SSG-EG */
+-		for(r=0x30;r<0x9e;r++)
+-			if((r&3) != 3)
+-			{
+-				OPNWriteReg(&F2610->OPN,r,F2610->REGS[r]);
+-				OPNWriteReg(&F2610->OPN,r|0x100,F2610->REGS[r|0x100]);
+-			}
+-		/* FB / CONNECT , L / R / AMS / PMS */
+-		for(r=0xb0;r<0xb6;r++)
+-			if((r&3) != 3)
+-			{
+-				OPNWriteReg(&F2610->OPN,r,F2610->REGS[r]);
+-				OPNWriteReg(&F2610->OPN,r|0x100,F2610->REGS[r|0x100]);
+-			}
+-		/* FM channels */
+-		/*FM_channel_postload(F2610->CH,6);*/
+-
+-		/* rhythm(ADPCMA) */
+-		FM_ADPCMAWrite(F2610,1,F2610->REGS[0x101]);
+-		for( r=0 ; r<6 ; r++)
+-		{
+-			FM_ADPCMAWrite(F2610,r+0x08,F2610->REGS[r+0x108]);
+-			FM_ADPCMAWrite(F2610,r+0x10,F2610->REGS[r+0x110]);
+-			FM_ADPCMAWrite(F2610,r+0x18,F2610->REGS[r+0x118]);
+-			FM_ADPCMAWrite(F2610,r+0x20,F2610->REGS[r+0x120]);
+-			FM_ADPCMAWrite(F2610,r+0x28,F2610->REGS[r+0x128]);
+-		}
+-		/* Delta-T ADPCM unit */
+-		YM_DELTAT_postload(&F2610->deltaT , &F2610->REGS[0x010] );
++		int ch, slot;
++		// Channel/AY scalars are scanned. Replaying register writes corrupts
++		// reset and deferred envelope state. Reconnect local pointers only.
++		for(ch=0;ch<6;ch++) {
++			setup_connection(&F2610->CH[ch], ch);
++			for(slot=0;slot<4;slot++)
++				F2610->CH[ch].SLOT[slot].DT = F2610->OPN.ST.dt_tab[F2610->CH[ch].SLOT[slot].dt_val & 7];
++		}
++
++		// ADPCMA and DeltaT scalars (including now_data) are already scanned.
++		F2610->deltaT.pan = &F2610->deltaT.output_pointer[F2610->deltaT.pan_index & 3];
++		// Like YM2608, only reconnect process-local pan pointers. Replaying
++		// writes here overwrites saved reset/latch state, not just pointers.
++		for(ch=0;ch<6;ch++)
++			F2610->adpcm[ch].pan = &out_adpcm[F2610->adpcm[ch].pan_raw&0x03];
+ 	}
+ 
+ 	FM_IS_POSTLOADING = 0;
+@@ -3972,9 +3949,17 @@
+ 		YM2610 *F2610 = &(FM2610[num]);
+ 
+ 		state_save_register_UINT8 (statename, num, "regs"   , F2610->REGS   , 512);
++		state_save_register_UINT32(statename, num, "adpcmreg", F2610->adpcmreg, 0x30);
++		state_save_register_UINT8 (statename, num, "adpcmTL", &F2610->adpcmTL, 1);
++		state_save_register_UINT32(statename, num, "eg_cnt", &F2610->OPN.eg_cnt, 1);
++		state_save_register_UINT32(statename, num, "eg_timer", &F2610->OPN.eg_timer, 1);
++		state_save_register_UINT32(statename, num, "lfo_cnt", &F2610->OPN.lfo_cnt, 1);
++		state_save_register_UINT32(statename, num, "lfo_inc", &F2610->OPN.lfo_inc, 1);
++		state_save_register_UINT32(statename, num, "pan", F2610->OPN.pan, 12);
+ 		FMsave_state_st(statename,num,&FM2610[num].OPN.ST);
+ 		FMsave_state_channel(statename,num,FM2610[num].CH,6);
+ 		/* 3slots */
++		state_save_register_UINT32(statename, num, "slot3block_fnum", F2610->OPN.SL3.block_fnum, 3);
+ 		state_save_register_UINT32(statename, num, "slot3fc" , F2610->OPN.SL3.fc   , 3);
+ 		state_save_register_UINT8 (statename, num, "slot3fh" , &F2610->OPN.SL3.fn_h, 1);
+ 		state_save_register_UINT8 (statename, num, "slot3kc" , F2610->OPN.SL3.kcode, 3);
+@@ -4138,6 +4123,7 @@
+ 		/* F2610->adpcm[i].delta     = 21866; */
+ 		F2610->adpcm[i].vol_mul   = 0;
+ 		F2610->adpcm[i].pan       = &out_adpcm[OUTD_CENTER]; /* default center */
++		F2610->adpcm[i].pan_raw   = OUTD_CENTER;
+ 		F2610->adpcm[i].flagMask  = 1<<i;
+ 		F2610->adpcm[i].flag      = 0;
+ 		F2610->adpcm[i].adpcm_acc = 0;
+--- a/src/burn/snd/k054539.cpp
++++ b/src/burn/snd/k054539.cpp
+@@ -836,6 +836,9 @@
+ 		SCAN_VAR(info->delay_decay);
+ 		SCAN_VAR(info->cur_ptr);
+ 		SCAN_VAR(info->cur_limit);
++		SCAN_VAR(nFractionalPosition[i]);
++		SCAN_VAR(nPosition[i]);
++		if (soundbuf[i]) ScanVar(soundbuf[i], (800 * sizeof(INT16) * 2) * 4, "K054539 resampler");
+ 
+ 		if (i == 0) {
+ 			timerScan();
+@@ -846,17 +849,7 @@
+ 			info->cur_zone =
+ 				data == 0x80 ? info->delay_ram :
+ 				info->rom + 0x20000*data;
+-			info->cur_limit = data == 0x80 ? 0x4000 : 0x20000;
+-
+-			if (~nAction & ACB_RUNAHEAD) {
+-				for (INT32 chip = 0; chip < 2; chip++) {
+-					nFractionalPosition[chip] = 0;
+-					nPosition[chip] = 0;
+-				}
+-
+-				memset(soundbuf[0], 0, (800 * sizeof(INT16) * 2) * 4);
+-				memset(soundbuf[1], 0, (800 * sizeof(INT16) * 2) * 4);
+-			}
+-		}
+-	}
+-}
++			// cur_limit and interpolation history above are state, not defaults.
++		}
++	}
++}
+--- a/src/burn/snd/msm6295.cpp
++++ b/src/burn/snd/msm6295.cpp
+@@ -157,6 +157,13 @@
+ 	{
+ 		ScanVar(&MSM6295[nChip], STRUCT_SIZE_HELPER(struct MSM6295Struct, nSampleInfo), "MSM6295 Chip");
+ 		SCAN_VAR(nMSM6295Status[nChip]);
++		SCAN_VAR(MSM6295[nChip].nFractionalPosition);
++		SCAN_VAR(nPreviousSample[nChip]);
++		SCAN_VAR(nCurrentSample[nChip]);
++#if CUBIC_ENABLED
++		for (INT32 channel = 0; channel < 4; channel++)
++			if (MSM6295ChannelData[nChip][channel]) ScanVar(MSM6295ChannelData[nChip][channel], 0x1000 * sizeof(INT32), "MSM6295 interpolation");
++#endif
+ 	}
+ }
+ 
+--- a/src/burn/snd/ymdeltat.c
++++ b/src/burn/snd/ymdeltat.c
+@@ -273,6 +273,7 @@
+ 		}
+ 
+ 		DELTAT->pan = &DELTAT->output_pointer[(v>>6)&0x03];
++		DELTAT->pan_index = (v>>6)&0x03;
+ 		if ((DELTAT->control2 & 3) != (v & 3))
+ 		{
+ 			/*0-DRAM x1, 1-ROM, 2-DRAM x8, 3-ROM (3 is bad setting - not allowed by the manual) */
+@@ -421,6 +422,7 @@
+ 	DELTAT->limit     = ~0; /* this way YM2610 and Y8950 (both of which don't have limit address reg) will still work */
+ 	DELTAT->volume    = 0;
+ 	DELTAT->pan       = &DELTAT->output_pointer[pan];
++	DELTAT->pan_index = pan & 3;
+ 	DELTAT->acc       = 0;
+ 	DELTAT->prev_acc  = 0;
+ 	DELTAT->adpcmd    = 127;
+@@ -464,6 +466,7 @@
+ 	// hooked up proper deltaT states -dink july31, 2021
+ 	// hint: mechatt now works with run-ahead! :)
+ 	state_save_register_UINT8 (statename, num, "DeltaT.now_data" , &DELTAT->now_data, 1);
++	state_save_register_UINT8 (statename, num, "DeltaT.pan_index", &DELTAT->pan_index, 1);
+ 	state_save_register_UINT8 (statename, num, "DeltaT.CPU_data" , &DELTAT->CPU_data, 1);
+ 	state_save_register_UINT8 (statename, num, "DeltaT.portstate", &DELTAT->portstate, 1);
+ 	state_save_register_UINT8 (statename, num, "DeltaT.control2" , &DELTAT->control2, 1);
+--- a/src/burn/snd/ymdeltat.h
++++ b/src/burn/snd/ymdeltat.h
+@@ -67,6 +67,7 @@
+ 
+ 	UINT8	reg[16];		/* adpcm registers		*/
+ 	UINT8	emulation_mode;	/* which chip we're emulating */
++	UINT8 pan_index; /* save routing without process-local pointers */
+ }YM_DELTAT;
+ 
+ /*void YM_DELTAT_BRDY_callback(YM_DELTAT *DELTAT);*/
+--- a/src/burner/libretro/libretro.cpp
++++ b/src/burner/libretro/libretro.cpp
+@@ -79,6 +79,7 @@
+ 
+ static UINT8* pVidImage              = NULL;
+ static bool bVidImageNeedRealloc     = false;
++static size_t nAllocatedVideoBytes = 0;
+ static bool bRotationDone            = false;
+ static int16_t *pAudBuffer           = NULL;
+ static char text_missing_files[2048] = "";
+@@ -1363,6 +1364,7 @@
+ 		pVidImage = (UINT8*)malloc(nSize);
+ 	if (pVidImage)
+ 		memset(pVidImage, 0, nSize);
++	nAllocatedVideoBytes = pVidImage ? nSize : 0;
+ }
+ 
+ void retro_run()
+@@ -1534,7 +1536,9 @@
+ void retro_get_system_av_info(struct retro_system_av_info *info)
+ {
+ 	int game_aspect_x, game_aspect_y;
+-	bVidImageNeedRealloc = true;
++	// Merely querying AV after a restore must not discard the next frame.
++	if (!pVidImage || nAllocatedVideoBytes != size_t(nGameWidth) * nGameHeight * nBurnBpp)
++		bVidImageNeedRealloc = true;
+ 	if (nBurnDrvActive != ~0U)
+ 	{
+ 		BurnDrvGetAspect(&game_aspect_x, &game_aspect_y);
+--- a/src/burner/libretro/retro_common.cpp
++++ b/src/burner/libretro/retro_common.cpp
+@@ -956,7 +956,10 @@
+ 	vars_systems.push_back(&var_fbneo_cyclone);
+ #endif
+ 
+-	if (pgi_diag)
++	// The frontend pins this mapping for every driver. Drivers without a
++	// diagnostic input expose the same inert option; check_variables still
++	// requires pgi_diag before binding it to an emulated input.
++	if (true)
+ 	{
+ 		var_fbneo_diagnostic_input.desc             = RETRO_DIAGNOSTIC_CAT_DESC;
+ 		var_fbneo_diagnostic_input.info             = RETRO_DIAGNOSTIC_CAT_INFO;
+--- a/src/burner/libretro/retro_memory.cpp
++++ b/src/burner/libretro/retro_memory.cpp
+@@ -277,9 +277,8 @@
+ 
+ 	BurnAreaScan(nAction, 0);
+ 
+-	// We want to serialize this for single-instance runahead, otherwise the counter increases faster
+-	if (nAction & ACB_RUNAHEAD)
+-		SCAN_VAR(nDiagInputHoldCounter);
++	// The hold counter also affects rollback and cross-instance restore.
++	SCAN_VAR(nDiagInputHoldCounter);
+ 
+ 	return 0;
+ }

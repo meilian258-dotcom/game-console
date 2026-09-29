@@ -13,8 +13,8 @@ import java.util.*;
  * FBNeo is separately licensed. The legacy MAME snapshot backend is unchanged.
  */
 public final class NativeNetplayContent {
-    public static final String CORE_SHA="73579C4C50D1F16F5D52A1E5BF4D81106C40962BC284E83E4A96DC7BB68FD424";
-    public static final String CORE_RESOURCE="/native-runtime/win-x64-fbneo-pgm-v2/fbneo_libretro.dll";
+    public static final String CORE_SHA=cn.piq.nativearcade.NativeNetplayProfile.CORE_SHA;
+    public static final String CORE_RESOURCE=cn.piq.nativearcade.NativeNetplayProfile.CORE_RESOURCE;
     private NativeNetplayContent(){}
     public static CabinetBackend.NetplayContent load(Path rom)throws IOException{
         Path source=rom.toAbsolutePath().normalize();

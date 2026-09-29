@@ -38,17 +38,23 @@ public final class JniArcadeProbe {
             check(r.isTerminated()&&r.error()==null,"MAME close: "+r.error());check(NativeLibretroBridge.availableSlots()==4,"slot release");
             System.out.println("MAME_JNI_MEDIA_OK frames=180 differentPictures="+crcs.size()+" pcmShorts="+audio);return;
         }
-        var profile=NativeNetplayProfile.profile(rom.getFileName().toString());byte[] content=Files.readAllBytes(rom);var extras=new TreeMap<String,byte[]>();
+        var profile=NativeNetplayProfile.profile(rom.getFileName().toString());
+        String testCoreSha=System.getProperty("gc.probe.coreSha");
+        if(testCoreSha!=null){var p=profile.jni();String resource="/native-runtime/qa/fbneo.dll";
+            var runtime=new cn.piq.retro.libretro.LibretroProfile(p.name(),p.extension(),p.fullPath(),p.devices(),p.mesenGun(),p.options(),Map.of("windows-x64",new cn.piq.retro.libretro.LibretroProfile.Artifact(resource,testCoreSha)));
+            profile=new NetplayProfile(profile.owner(),resource,testCoreSha,profile.contentName(),profile.options(),profile.device(),profile.sampleRate(),profile.maxRomBytes(),profile.ports()).withJni(runtime);}
+        byte[] content=Files.readAllBytes(rom);var extras=new TreeMap<String,byte[]>();
         for(String name:List.of("pgm.zip","neogeo.zip","qsound_hle.zip","qsound.zip")){Path p=rom.getParent().resolve(name);if(Files.isRegularFile(p))extras.put(name,Files.readAllBytes(p));}
         var hashes=new TreeMap<String,String>();extras.forEach((n,b)->hashes.put(n,NetplaySaveState.hash(b)));var identity=NetplaySaveState.identity(profile,NetplaySaveState.hash(content),hashes);
         byte[][] save={null};int[] commits={0};Object hostKey=new Object();var keys=List.of(hostKey,new Object(),new Object(),new Object());
         relay=new NetplayRelay<>(950,hostKey,(target,p)->send(()->{var r=runs.get(target);if(r!=null)r.receive(p.chunk(),p.port());}),4);
+        var firstRelay=relay;
         wire.scheduleAtFixedRate(()->relay.renew(Set.copyOf(runs.keySet())),0,100,TimeUnit.MILLISECONDS);
         try {
             for(int p=0;p<4;p++){
                 Object key=keys.get(p);var ticket=relay.grant(key,p);boolean host=p==0;
                 var r=new NetplayProcess(new NetplayProcess.Grant(950,ticket.id(),host,true,p),()->content,
-                    packet->{if(host)relay.receive(key,packet);else send(()->relay.receive(key,packet));},profile,()->extras,true,true);
+                    packet->{if(host)firstRelay.receive(key,packet);else send(()->firstRelay.receive(key,packet));},profile,()->extras,true,true);
                 if(host)r.persistence(new NetplayProcess.Persistence(){public byte[] load(NetplaySaveState.Identity i){check(identity.equals(i),"content/core/BIOS identity");return null;}
                     public CompletableFuture<Void> save(byte[] b){NetplaySaveState.decode(b,identity);save[0]=b.clone();commits[0]++;return CompletableFuture.completedFuture(null);}});
                 runs.put(key,r);r.start();until(r::ready);
@@ -64,7 +70,21 @@ public final class JniArcadeProbe {
             host.saveNow().get(20,TimeUnit.SECONDS);check(save[0]!=null,"cabinet server save");
             for(int p=1;p<4;p++)stop(keys.get(p));stop(hostKey);check(commits[0]>=2,"cabinet final save");
             check(NativeLibretroBridge.availableSlots()==4,"all slots released");Files.write(root.resolve("cabinet-save.pns"),save[0],StandardOpenOption.CREATE_NEW);
-            System.out.println("ARCADE_JNI_NETPLAY_OK four cores; four server-authorized ports; 50ms one way; CRC; paid coin; manual/final save; "+identity);
+            byte[] saved=save[0].clone();long savedFrame=NetplaySaveState.decode(saved,identity).frame();
+            firstRelay.close();Object reopenKey=new Object();
+            var reopenRelay=new NetplayRelay<Object>(951,reopenKey,(target,p)->send(()->{var r=runs.get(target);if(r!=null)r.receive(p.chunk(),p.port());}),4);
+            relay=reopenRelay;var ticket=reopenRelay.grant(reopenKey,0);boolean[] loaded={false};
+            var reopened=new NetplayProcess(new NetplayProcess.Grant(951,ticket.id(),true,true,0),()->content,
+                    packet->reopenRelay.receive(reopenKey,packet),profile,()->extras,true,true);
+            reopened.persistence(new NetplayProcess.Persistence(){
+                public byte[] load(NetplaySaveState.Identity i){check(identity.equals(i),"reopen identity");loaded[0]=true;return saved.clone();}
+                public CompletableFuture<Void> save(byte[] b){check(NetplaySaveState.decode(b,identity).frame()>savedFrame,"reopened save must advance");return CompletableFuture.completedFuture(null);}
+            });
+            runs.put(reopenKey,reopened);reopened.start();until(reopened::ready);until(()->reopened.framesReceived()>=180);
+            check(loaded[0],"fresh native instance loaded persisted checkpoint");reopened.saveNow().get(20,TimeUnit.SECONDS);stop(reopenKey);
+            check(NativeLibretroBridge.availableSlots()==4,"reopen releases all slots");
+            System.out.println("METRIC\tsaveReopenPassed\ttrue");
+            System.out.println("ARCADE_JNI_NETPLAY_OK four cores; four server-authorized ports; 50ms one way; CRC; paid coin; manual/final save; fresh-instance reopen; "+identity);
         }catch(Throwable t){diagnostics();throw t;}
         finally{
             // Keep the original test failure: asynchronous close must not submit to a terminated wire.
