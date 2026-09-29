@@ -8,7 +8,7 @@
 
 首个提交是真实的当前源码基线，**不是稳定版，也不保证等于任何已发布 JAR**。原来没有有效 Git 历史，因此不从旧 ZIP 伪造提交或版本标签。旧文件、成品、历史证据及素材草稿保留在原位置，今后的源码修改以提交及 diff 为准，不以“哪个备份目录较新”判断。新建其他组件必须先审核并更新根忽略白名单和 `source-control/audit.py`。
 
-最初接管只建立本地仓库。2026-09-29 经维护者明确选择并完成本机授权，现已接入 GitHub **私有**远端：[meilian258-dotcom/block-arcade](https://github.com/meilian258-dotcom/block-arcade)，`origin` 为 `https://github.com/meilian258-dotcom/block-arcade.git`，默认分支 `main`。没有公开开源、发布游戏版本或改动服务器、客户端及模拟器功能。
+最初接管只建立本地仓库。2026-09-29 经维护者明确选择并完成本机授权，现已接入 GitHub **私有**远端：[meilian258-dotcom/game-console](https://github.com/meilian258-dotcom/game-console)，`origin` 为 `https://github.com/meilian258-dotcom/game-console.git`，默认分支 `main`。同日按用户确认从 `block-arcade` 更名，仓库 ID 和历史保留；没有公开开源、发布游戏版本或改动服务器、客户端及模拟器功能。
 
 Git 提交署名保留用户确认的 `Meilian <meilian258@gmail.com>`，仅仓库级配置；该邮箱已在提交元数据中，仓库协作者可见，以后公开仓库会一并公开。不要擅自改写历史或借用维护者身份；新协作者使用自己的署名。
 
@@ -25,7 +25,9 @@ python source-control/audit.py
 
 新克隆不会自动启用 Git hooks，必须执行 setup。它只配置当前仓库的 hooks/Python/显示及换行策略；不改全局配置，有其他 hooks 时会停止。已有署名可省略两个参数，不能借用他人署名。它不会下载或执行模拟器。
 
-获准访问的协作者可用 `git clone https://github.com/meilian258-dotcom/block-arcade.git` 获取代码。私有仓库需要自己的 GitHub 权限和本机登录，不能索取维护者令牌。原维护机仓库在 `G:\服务器\服务器Codex`。工作区专用的根 AGENTS/维护手册、服务凭据和其他项目没有纳入这个仓库；独立克隆以本文件、`piq-fc-arcade/AGENTS.md` 及各组件规范为入口，不需要复制维护机私有数据。
+获准访问的协作者可用 `git clone https://github.com/meilian258-dotcom/game-console.git` 获取代码。私有仓库需要自己的 GitHub 权限和本机登录，不能索取维护者令牌。原维护机仓库在 `G:\服务器\服务器Codex`。工作区专用的根 AGENTS/维护手册、服务凭据和其他项目没有纳入这个仓库；独立克隆以本文件、`piq-fc-arcade/AGENTS.md` 及各组件规范为入口，不需要复制维护机私有数据。
+
+已克隆旧地址的协作者可执行 `git remote set-url origin https://github.com/meilian258-dotcom/game-console.git`。分享源码需所有者在 Settings → Collaborators → Add people 邀请并由对方接受；个人私有仓库的协作者拥有读写权限，不是只读分享。参考 [GitHub 权限说明](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/permission-levels-for-a-personal-account-repository)。对外正式名与交付文件名见[命名规范](source-control/BRANDING.md)，内部兼容 ID 不改。
 
 ## 私有远端与备份边界
 

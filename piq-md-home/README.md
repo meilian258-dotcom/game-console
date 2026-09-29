@@ -1,4 +1,6 @@
-# 方块电玩 · MD2（alpha.1 私人单人试验）
+# 方块电玩：MD / Game Console: MD
+
+当前 MD2 alpha.1 私人单人试验。按[命名规范](../source-control/BRANDING.md)交付为 `game-console-md-版本.jar`；原 ID、路径、保存和能力不变，旧成品保留。
 
 适用：Minecraft 1.21.1、NeoForge 21.1.236+、Java21；需两端同装主包 **FC76.24** 与 `game_console_md-0.1.0-alpha.1.jar`。这是新增附属，不另装内部平台 JAR，不修改 SFC 附属。当前执行端仅 Windows x64。
 

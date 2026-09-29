@@ -1,4 +1,6 @@
-# 方块电玩：SFC 家用机附属
+# 方块电玩：SFC / Game Console: SFC
+
+对外命名与交付遵循[Game Console 命名规范](../source-control/BRANDING.md)。完整玩家包为 `game-console-sfc-版本.jar`；本目录独立构建仍是开发薄包，不能冒充完整 SFC。兼容 ID、原存档和历史成品不改。
 
 ## 当前：完整 SFC43 / FC76.22（2026-09-29，本地候选）
 

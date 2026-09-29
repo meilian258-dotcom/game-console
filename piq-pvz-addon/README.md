@@ -1,4 +1,6 @@
-# 方块电玩：PvZ 测试附属（prototype.11 / 通用 JNI 一期）
+# 方块电玩：PvZ / Game Console: PvZ
+
+当前 prototype.11 / 通用 JNI 一期。交付使用 `game-console-pvz-版本.jar`，见[命名规范](../source-control/BRANDING.md)。仅统一对外品牌，固定核心、玩家自备游戏资源、存档和兼容 ID 均不变；原交付包不覆盖。
 
 2026-09-29：配套 FC76.22 / 电脑10，显式试验入口改用主包共用 JNI ABI1。默认独立进程不变；旧 `pvz.engine=jni` 不会直接开启新版，需重新确认。使用 `jni-common-v1-saves`，不覆盖进程档或 PvZ10 试验档。真实核心不支持即时状态保存，使用自身文件保存机制；不能把其非零 state_size 当作支持存档。旧专用桥资源保留兼容/历史测试但当前运行器不再调用它。[本轮安装与验证](../piq-fc-arcade/design/通用JNI一期-FC76.22-使用与附属接入.md)。未安装发布，MC多人/性能待验。
 

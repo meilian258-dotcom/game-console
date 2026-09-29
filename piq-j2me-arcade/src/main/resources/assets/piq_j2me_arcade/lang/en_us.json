@@ -1,5 +1,5 @@
 {
-  "block.piq_j2me_arcade.j2me_arcade": "PIQ Java Phone Arcade",
+  "block.piq_j2me_arcade.j2me_arcade": "Game Console Java Phone Arcade",
   "message.piq_j2me_arcade.scan_failed": "Failed to read Java games: %s",
   "message.piq_j2me_arcade.game_selected": "This machine now uses: %s",
   "message.piq_j2me_arcade.op_only": "Only administrators can change this machine's game",

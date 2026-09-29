@@ -1,4 +1,6 @@
-# PIQ SFC Arcade
+# 方块电玩：SFC 核心 / Game Console: SFC Core
+
+当前作为 SFC 完整附属的历史核心组件；对外统一[Game Console 命名](../source-control/BRANDING.md)，内部 `piq_sfc_arcade` 标识不改。单独构建不当完整玩家包交付。下方保留早期原型的能力和使用记录。
 
 面向 Minecraft 1.21.1、NeoForge 21.1.x、Java 21 的独立 SFC/SNES 街机模组。SFC 街机是新增方块，不会替换现有 FC 街机；运行时复用 PIQ FC Arcade 已提供的 Wasmtime，避免重复打包大体积原生库。
 

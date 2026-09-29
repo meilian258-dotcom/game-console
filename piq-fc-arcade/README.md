@@ -1,6 +1,8 @@
-# PIQ FC Arcade
+# 方块电玩 / Game Console
 
-开发源码已于2026-09-29接入标准Git单仓库，涵盖主包/公共层及现有附属；见[Git工作流与构建边界](../GIT_WORKFLOW.md)。初始提交仅当前源码基线，未上传远端、不代表稳定发行或已完成干净克隆构建。
+开发源码已接入标准Git单仓库和 GitHub 私有远端 [meilian258-dotcom/game-console](https://github.com/meilian258-dotcom/game-console)，涵盖主包/公共层及现有附属；见[Git工作流与构建边界](../GIT_WORKFLOW.md)。源码备份不代表稳定发行或全附属已完成干净克隆构建。
+
+对外统一“方块电玩 / Game Console”；玩家交付名采用 `game-console-版本.jar`，内部 `piq_*` ID、存档和编译中间件路径不改。交付使用[统一命名工具与兼容约定](../source-control/BRANDING.md)，原历史包保留，不能把新旧文件名的同一模组同时安装。
 
 FC 构建一期已接入[固定外部输入与构建说明](../source-control/BUILDING.md)：先导入/校验9个固定哈希输入，再执行 `check jar`，不再隐式读取历史 outputs 或未提交的原生资源。独立源码目录加显式缓存已通过2558项测试（10跳过）；仍需已缓存的Maven依赖，不代表所有附属/原生核心从零构建或Minecraft实机通过。构建验证包不自动安装或成为新发行；同时补齐首次Git误忽略的Java world包。
 

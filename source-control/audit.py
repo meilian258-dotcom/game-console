@@ -12,7 +12,7 @@ MODULES = (
     'piq-native-arcade', 'piq-gba', 'piq-j2me-arcade', 'piq-computer',
     'piq-flash-box', 'piq-pvz-addon', 'piq-md-home',
 )
-ROOT_FILES = {'.gitignore', '.gitattributes', 'GIT_WORKFLOW.md'}
+ROOT_FILES = {'.gitignore', '.gitattributes', 'GIT_WORKFLOW.md', 'README.md'}
 BLOCKED_DIRS = {
     '.git', '.gradle', '.toolchains', '.idea', '.vscode', '.vs', '__pycache__',
     'node_modules', 'target', 'build', 'bin', 'obj', 'out', 'candidates',

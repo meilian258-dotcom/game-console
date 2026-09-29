@@ -1,4 +1,6 @@
-# 方块电玩：Flash 播放盒 · 原型 8（FC61 兼容补丁）
+# 方块电玩：Flash 播放盒 / Game Console: Flash Box
+
+当前原型8（FC61兼容补丁）。命名遵循[Game Console 规范](../source-control/BRANDING.md)，交付名为 `game-console-flash-版本.jar`。这是历史播放盒，不因改名扩大主包兼容范围；内部 ID、运行库路径和旧包保留。
 
 适用版本：`0.1.0-prototype.8`，2026-09-20。仅拓宽 FC 依赖至 `[0.31.0-alpha.56,0.31.0-alpha.62)`，编译使用 FC61；Flash 自身 Java 类、模型、Mixin 和 runtime0.1.2 不变。双方主包用同一版本；有 Flash 才把双方附属换为 `game_console_flash_box-0.1.0-prototype.8.jar`。SFC 非必需。运行器安装方法与下列原型7相同，已完整安装 0.1.2 的客户端无需换运行器。
 

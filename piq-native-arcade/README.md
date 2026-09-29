@@ -1,4 +1,6 @@
-# 方块电玩：街机 0.1.5.4 通用 JNI 开发者适配候选
+# 方块电玩：街机 / Game Console: Arcade
+
+当前 0.1.5.4 为通用 JNI 开发者适配候选。对外交付名使用 `game-console-arcade-版本.jar`，见[统一命名规范](../source-control/BRANDING.md)；兼容 ID、运行库路径与原成品不改。
 
 2026-09-29：配套 FC76.22。新增 `NativeJniTrialProfile`，固定 FBNeo 核心与实际支持的选项、四端口、ZIP 原名及 BIOS 文件加载。仅开发者直接使用通用桥的验证入口，**游戏内没有新增街机 JNI 模式**；MAME/现有 Netplay/OP维护/长期保存规则不变，不把独立测试当成多人验收。[范围与接入说明](../piq-fc-arcade/design/通用JNI一期-FC76.22-使用与附属接入.md)。未安装发布、不标稳定。
 
