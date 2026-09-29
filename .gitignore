@@ -3,6 +3,7 @@
 !/.gitignore
 !/.gitattributes
 !/GIT_WORKFLOW.md
+!/README.md
 !/source-control/
 !/piq-fc-arcade/
 !/piq-retro-platform/

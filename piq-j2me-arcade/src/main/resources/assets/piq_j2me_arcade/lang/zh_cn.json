@@ -1,5 +1,5 @@
 {
-  "block.piq_j2me_arcade.j2me_arcade": "PIQ Java 手机游戏机",
+  "block.piq_j2me_arcade.j2me_arcade": "方块电玩 Java 手机游戏机",
   "message.piq_j2me_arcade.scan_failed": "读取 Java 游戏失败：%s",
   "message.piq_j2me_arcade.game_selected": "这台机器已更换游戏：%s",
   "message.piq_j2me_arcade.op_only": "只有管理员可以更换这台机器的游戏",

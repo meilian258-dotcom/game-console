@@ -51,6 +51,8 @@ python source-control/build_inputs.py check
 
 ## 3. 实现与后续
 
+对外命名补充（2026-09-29）：`build/libs` 的原内部文件名保留，以免破坏已有固定版本编译依赖。经过完整交付审核的 JAR 再用 [Game Console 命名工具](BRANDING.md) 生成正式名称的字节相同副本；工具不补运行库、不合并 SFC、不更改版本或兼容范围，也不把开发构建自动认证为可发布。
+
 `locked-inputs.gradle`是可复用构建期解析器；FC worker/JNA、Mesen两平台、共用JNI、Netplay EXE、三个WASM及FC JNI核心由缓存复制到生成资源，原src中的旧二进制保持但不再优先使用。运行时格式/路径/SHA合同不变，游戏核心没有重新编译。
 
 后续分批处理：附属源码依赖/完整打包、原生工具链及可取得的对应源码/许可证、空缓存CI与远端备份。各阶段单独测真实构建，不用“已写清单”替代“已构建通过”。本期验证证据会登记在工作区 `outputs/build-standard-phase1-20260929/` 和维护手册/工作台。

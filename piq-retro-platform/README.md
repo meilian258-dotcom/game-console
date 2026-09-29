@@ -1,4 +1,7 @@
-# PIQ Retro — internal shared library
+# Game Console: Retro Platform — internal shared library
+
+See the [branding and packaging policy](../source-control/BRANDING.md). Internal package names,
+API identities and build outputs remain compatible. This library is not a player-installable mod.
 
 ## Runtime API v1 / opt-in JNI (FC76.22, 2026-09-29)
 

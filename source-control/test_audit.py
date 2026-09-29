@@ -3,6 +3,7 @@ from audit import path_issues, content_issues
 
 class GuardTests(unittest.TestCase):
     def test_source_scope(self):
+        self.assertEqual([],path_issues('README.md'))
         self.assertEqual([],path_issues('piq-fc-arcade/src/main/java/cn/piq/Test.java'))
         self.assertEqual([],path_issues('piq-md-home/src/main/resources/assets/piq_md_home/models/block/md2_empty.json'))
         self.assertIn('outside-source-scope',path_issues('piq-server-assistant/server.py'))

@@ -1,4 +1,8 @@
-# PIQ J2ME Arcade
+# 方块电玩：Java ME / Game Console: Java ME
+
+Player-facing names follow the [Game Console branding policy](../source-control/BRANDING.md).
+Stage reviewed builds as `game-console-j2me-<version>.jar`; preserve legacy mod/resource IDs,
+runtime paths, authors and old artifacts. The naming change does not add runtime capabilities.
 
 Independent Java ME/MIDP arcade prototype for Minecraft 1.21.1 and NeoForge
 21.1.236. It intentionally does not depend on `piq-fc-arcade`: the FC mod stays
