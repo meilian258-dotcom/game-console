@@ -2,7 +2,11 @@
 
 对外命名与交付遵循[Game Console 命名规范](../source-control/BRANDING.md)。完整玩家包为 `game-console-sfc-版本.jar`；本目录独立构建仍是开发薄包，不能冒充完整 SFC。兼容 ID、原存档和历史成品不改。
 
-## 当前：完整 SFC43 / FC76.22（2026-09-29，本地候选）
+## 当前：完整 SFC43 / FC76.26（2026-09-29，本地候选）
+
+配套新主包时，Windows x64 的 SFC 私人页面默认 JNI，仍可明确选回进程，继续使用独立保存；SFC43 JAR 不因此重新构建，公共/Netplay/街机模式未改成 JNI。见[默认范围与配套指南](../piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md)。MC 真人待验。
+
+## 历史：完整 SFC43 / FC76.22
 
 私人模式可在启动前明确选择通用 JNI 试验，默认仍为进程；需要风险确认，使用单独试验存档，不覆盖个人/卡带 Netplay 档和原本机备份。共享局与 SFC 街机不自动改用 JNI。双方使用完整 SFC43（保留 core9）及 FC76.22，不装薄包或独立公共平台 JAR。[本轮安装和开发入口](../piq-fc-arcade/design/通用JNI一期-FC76.22-使用与附属接入.md)。Minecraft 实机验收未完成，不标稳定。以下为历史记录。
 

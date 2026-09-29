@@ -62,7 +62,7 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
                     &&(setting.editable()&&setting.mode()!=mode||mode==4&&setting.mode()==4&&!JniNetplayConsent.allowed());
             button.setTooltip(Tooltip.create(Component.literal((setting.supported()&(1<<mode))==0
                 ?status
-                :(mode==0?"由开机玩家运行游戏，向其他玩家发送音画。":mode==1?"各客户端运行游戏，同步操作数据。":mode==2?"由服务器运行游戏，向玩家发送音画。":mode==4?"FC 普通双手柄 JNI 回滚试验，原生崩溃可影响整个 MC。每位玩家先本机确认；个人/卡带独立试验存档，不与原 Netplay 混接。":"RetroArch Netplay 同步操作与状态；Windows x64。按卡带策略保存，开机恢复；网络页可手动保存。")
+                :(mode==0?"由开机玩家运行游戏，向其他玩家发送音画。":mode==1?"各客户端运行游戏，同步操作数据。":mode==2?"由服务器运行游戏，向玩家发送音画。":mode==4?"FC 普通双手柄 JNI 回滚，原生崩溃可影响整个 MC。Windows x64默认允许，参与和旁观跟随房间；个人/卡带独立JNI档，不与原 Netplay 混接。":"RetroArch Netplay 同步操作与状态；Windows x64。按卡带策略保存，开机恢复；网络页可手动保存。")
                     +"\n管理员关机后可修改；已借手柄无需归还。")));
             addRenderableWidget(button);
         }

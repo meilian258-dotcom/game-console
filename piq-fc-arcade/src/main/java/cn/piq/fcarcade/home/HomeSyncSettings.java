@@ -180,7 +180,12 @@ public final class HomeSyncSettings {
     }
     static CabinetSyncMode placementMode(net.minecraft.server.level.ServerLevel level, HomeEndpointBlockEntity console, CabinetSyncMode fallback) {
         int desired=cn.piq.fcarcade.config.GameConsoleAdminSettings.defaultMode(level.getServer());
-        return CabinetSyncMode.checked(cn.piq.fcarcade.config.GameConsoleAdminPolicy.selectNewMode(desired,supported(level,console),fallback.ordinal()));
+        int modes=supported(level,console);
+        if(console instanceof HomeConsoleBlockEntity fc&&cn.piq.fcarcade.config.GameConsoleAdminPolicy.defaultFcJni(desired,modes)){
+            fc.netplayExperimental(true);fc.netplayJniTrial(true);
+            return CabinetSyncMode.LOCAL_SYNC;
+        }
+        return CabinetSyncMode.checked(cn.piq.fcarcade.config.GameConsoleAdminPolicy.selectNewMode(desired,modes,fallback.ordinal()));
     }
     /** OP command convenience; uses the same identity, protection, provider and idle gates as the GUI. */
     public static boolean adminCommand(ServerPlayer player, BlockHitResult hit, int mode, Integer range) {

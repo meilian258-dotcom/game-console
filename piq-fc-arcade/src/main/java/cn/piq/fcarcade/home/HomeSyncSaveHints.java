@@ -6,7 +6,7 @@ public final class HomeSyncSaveHints {
     private HomeSyncSaveHints() {}
 
     public static String modeSaved(String system, int mode) {
-        if(fc(system)&&mode==4)return "FC JNI Netplay 试验已选择；仅普通双手柄。每位参与/旁观玩家须本机确认风险；独立试验档。";
+        if(fc(system)&&mode==4)return "FC JNI Netplay 已选择；仅普通双手柄。Windows x64参与/旁观自动跟随；JNI独立档，旧档保留。";
         if(sfc(system)&&mode==3)return "Netplay 实验已启用；卡带工作台可选个人／卡带存档，主持 P1、另一玩家 P2。";
         if(fc(system)&&mode==3)return "Netplay 实验已启用；支持手柄或光枪，按卡带设置保存，Netplay 档与旧模式隔离。";
         String detail;
@@ -21,7 +21,7 @@ public final class HomeSyncSaveHints {
     }
 
     public static String footer(String system, int mode) {
-        if(fc(system)&&mode==4)return FOOTER+"JNI 试验：按个人/卡带归属另存 · /gameconsole-jni-netplay 确认";
+        if(fc(system)&&mode==4)return FOOTER+"JNI：按个人/卡带归属另存 · 旁观自动跟随";
         if(sfc(system)&&mode==3)return FOOTER+"Netplay 实验：个人／卡带独立存档 · Windows x64";
         if(fc(system)&&mode==3)return FOOTER+"Netplay 实验：按卡带存档设置执行 · Windows x64";
         if (sfc(system) && (mode == 0 || mode == 1))

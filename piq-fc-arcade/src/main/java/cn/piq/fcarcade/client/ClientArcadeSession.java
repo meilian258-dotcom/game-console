@@ -34,6 +34,7 @@ final class ClientArcadeSession {
     private cn.piq.fcarcade.netplay.NetplayProcess netplay;
     private java.util.UUID usedNetplayTicket;
     void netplayAuthority(cn.piq.fcarcade.netplay.NetplayNetwork.State value){netplayState=value;}
+    boolean usesJniNetplay(){return netplayState!=null&&netplayState.jniTrial();}
     private NesAudioPlayer audioPlayer;
     private DynamicTexture texture;
     private ResourceLocation textureId;
@@ -363,8 +364,12 @@ final class ClientArcadeSession {
         if(netplayState!=null){
             awaitingSnapshot=false;workerReady=false;
             if(netplayState.jniTrial()&&!JniNetplayConsent.allowed()){
-                overlay(Component.literal("本机未启用 JNI；输入 /gameconsole-jni-netplay 确认风险后，再开机/加入。"));
+                overlay(Component.literal("本机已停用 FC JNI 或平台不支持；Windows x64 可用 /gameconsole-jni-netplay 恢复。"));
                 nextSyncRequestNanos=System.nanoTime()+5_000_000_000L;return;
+            }
+            if(netplayState.jniTrial()&&cn.piq.retro.libretro.LibretroRuntimes.isJniBusy()){
+                overlay(Component.literal("正在等待本机 JNI 槽释放；同一客户端只能运行一台 JNI 游戏。"));
+                nextSyncRequestNanos=System.nanoTime()+1_000_000_000L;return;
             }
             if(netplayState.ticket().equals(usedNetplayTicket)){
                 if(!computeHost&&connected()&&System.nanoTime()>=nextSyncRequestNanos){FcNetwork.sendRomReady(sessionId,romSha256);nextSyncRequestNanos=System.nanoTime()+3_000_000_000L;}

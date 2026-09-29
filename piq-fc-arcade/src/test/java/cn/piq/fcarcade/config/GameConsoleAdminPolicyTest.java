@@ -4,6 +4,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameConsoleAdminPolicyTest {
+    @Test void automaticNewFcChoosesJniOnlyWhenAdvertisedAndNotExplicitlyOverridden(){
+        for(int mask=0;mask<=31;mask++)for(int preference=-1;preference<=2;preference++)
+            assertEquals(preference==-1&&(mask&16)!=0,GameConsoleAdminPolicy.defaultFcJni(preference,mask));
+        assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.defaultFcJni(-2,31));
+        assertThrows(IllegalArgumentException.class,()->GameConsoleAdminPolicy.defaultFcJni(-1,32));
+    }
     @Test void selectedModesNeverExpandCapabilities() {
         for(int mask=0;mask<=31;mask++)for(int preferred=-1;preferred<=2;preferred++)for(int fallback=0;fallback<=2;fallback++) {
             int result=GameConsoleAdminPolicy.selectNewMode(preferred,mask,fallback);

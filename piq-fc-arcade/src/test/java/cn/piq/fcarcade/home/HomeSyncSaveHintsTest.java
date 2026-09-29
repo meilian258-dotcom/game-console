@@ -48,7 +48,9 @@ class HomeSyncSaveHintsTest {
             }
         assertEquals(HomeSyncSaveHints.footer("SFC",0),HomeSyncSaveHints.footer("sfc",0));
         assertTrue(HomeSyncSaveHints.modeSaved("FC",4).contains("JNI"));
-        assertTrue(HomeSyncSaveHints.footer("FC",4).contains("试验"));
+        assertTrue(HomeSyncSaveHints.footer("FC",4).contains("按个人/卡带归属另存"));
+        assertTrue(HomeSyncSaveHints.footer("FC",4).contains("旁观自动跟随"));
+        assertTrue(HomeSyncSaveHints.modeSaved("FC",4).contains("旧档保留"));
         assertTrue(HomeSyncSaveHints.modeSaved("SFC",4).contains("对应机型说明"));
     }
     @Test void serverAndClientUseSameAcknowledgedSystemAndModeWithVersionedBounds() throws Exception {

@@ -9,6 +9,11 @@ public final class GameConsoleAdminPolicy {
     private GameConsoleAdminPolicy() {}
     public static boolean validMode(int mode) { return mode >= -1 && mode <= 2; }
     public static boolean validRange(int range) { return range >= MIN_RANGE && range <= MAX_RANGE; }
+    /** Applied only to new FC placements; explicit global modes and old NBT are preserved. */
+    public static boolean defaultFcJni(int preferred,int supported) {
+        if(!validMode(preferred)||(supported&~KNOWN_CAPABILITIES)!=0)throw new IllegalArgumentException("Invalid console defaults");
+        return preferred==-1&&(supported&16)!=0;
+    }
     public static int selectNewMode(int preferred, int supported, int fallback) {
         if (!validMode(preferred) || fallback < 0 || fallback > 2 || (supported & ~KNOWN_CAPABILITIES) != 0)
             throw new IllegalArgumentException("Invalid console defaults");

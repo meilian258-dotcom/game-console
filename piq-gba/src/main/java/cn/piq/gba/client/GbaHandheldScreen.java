@@ -34,7 +34,7 @@ public final class GbaHandheldScreen extends DeviceScreen {
         button(GbaHandheldClient.openingOrRunning()?"掌机运行中（关闭设置继续）":"开始所选游戏",x+10,y+113,inner,this::start,!busy&&selected!=null&&!GbaHandheldClient.openingOrRunning());
         button("关闭掌机",x+10,y+137,half,()->{GbaHandheldClient.stop("掌机已关闭；电池存档正在本机后台收尾");rebuildWidgets();},GbaHandheldClient.openingOrRunning());
         button("返回",x+14+half,y+137,inner-half-4,this::onClose,true);
-        button(GbaJniChoice.enabled()?"运行：JNI 试验":"运行：独立进程",x+10,y+161,half,()->GbaJniChoice.choose(this),!busy&&!GbaHandheldClient.openingOrRunning());
+        button(GbaJniChoice.enabled()?"运行：JNI 默认":"运行：进程兼容",x+10,y+161,half,()->GbaJniChoice.choose(this),!busy&&!GbaHandheldClient.openingOrRunning());
         button("同步方式说明",x+14+half,y+161,inner-half-4,()->minecraft.setScreen(new GbaHandheldSyncInfoScreen(this,binding)),!busy);
         if(readNow)load();
     }

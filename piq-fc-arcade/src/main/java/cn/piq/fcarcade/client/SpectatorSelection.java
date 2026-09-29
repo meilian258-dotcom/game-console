@@ -12,6 +12,18 @@ final class SpectatorSelection {
     private SpectatorSelection() {
     }
 
+    /** One shared native slot: an operator takes precedence; passive JNI screens share one slot. */
+    static Set<Long> selectWithJni(Collection<Candidate> candidates,Set<Long> previous,
+                                   int maximumSpectators,Set<Long> jniSessions) {
+        boolean operator=candidates.stream().anyMatch(c->c.controller()&&jniSessions.contains(c.sessionId()));
+        Long spectator=operator?null:candidates.stream().filter(c->!c.controller()&&jniSessions.contains(c.sessionId()))
+                .filter(c->Double.isFinite(c.distanceSquared())&&c.distanceSquared()>=0)
+                .min(Comparator.comparingDouble((Candidate c)->priorityDistance(c,previous)).thenComparingLong(Candidate::sessionId))
+                .map(Candidate::sessionId).orElse(null);
+        return select(candidates.stream().filter(c->c.controller()||!jniSessions.contains(c.sessionId())
+                ||java.util.Objects.equals(c.sessionId(),spectator)).toList(),previous,maximumSpectators);
+    }
+
     static Set<Long> select(
             Collection<Candidate> candidates,
             Set<Long> previous,
