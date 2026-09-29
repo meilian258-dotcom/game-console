@@ -5,6 +5,8 @@ API identities and build outputs remain compatible. This library is not a player
 
 ## Client defaults (FC76.26, 2026-09-29)
 
+New confirmed migration target (2026-09-29): FC, SFC, GBA, native arcade, PvZ and MD must migrate their existing runtime modes to the shared JNI route, including existing light-gun support. Future emulator addons use JNI as their default integration target; Flash and Java ME are excluded from this migration. This is a development requirement, not a claim of completed adapters, multi-instance support or gun Netplay. See the [scope and acceptance plan](../piq-fc-arcade/design/JNI全面迁移-范围与验收.md). The following FC76.26 description remains the shipped baseline.
+
 User-requested JNI defaults now use `LibretroRuntimes.defaultBackend(adapted)` for existing Windows x64 client adapters, plus connection-scoped `JniClientPreference`. Explicit runtime factories and server/process constructors remain unchanged. This is not automatic save migration, silent failure fallback or support for every emulator/mode. Addons calling these new methods require FC76.26+. See [scope and install matrix](../piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md).
 
 ## Historical Runtime API v1 / opt-in JNI (FC76.22, 2026-09-29)
