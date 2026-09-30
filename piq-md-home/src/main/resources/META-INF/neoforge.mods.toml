@@ -1,11 +1,11 @@
 modLoader="javafml"
 loaderVersion="[4,)"
-license="GPL-3.0-or-later (code); supplied model redistribution permission pending"
+license="GPL-3.0-or-later (adapter); Genesis Plus GX non-commercial (see licenses); supplied model redistribution permission pending"
 [[mods]]
 modId="piq_md_home"
-version="0.1.0-alpha.2"
+version="0.1.0-alpha.3"
 displayName="方块电玩 · MD2"
-description='''MD2 家用机试验：老式电脑写卡、实体电源、AV电视、1P手柄，默认共用JNI。当前单人本机画面，不支持公开多人/Netplay/CD/32X。'''
+description='''MD2 家用机：Genesis Plus GX 默认公共JNI，保留BlastEm旧档兼容；老式电脑写卡、实体电源、AV电视、1P手柄。Genesis Plus GX禁止商业用途。当前单人本机画面；MC公开多人/Netplay/CD/32X未开放。'''
 [[dependencies.piq_md_home]]
 modId="neoforge"
 type="required"

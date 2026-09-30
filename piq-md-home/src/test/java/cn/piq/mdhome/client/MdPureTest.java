@@ -9,5 +9,43 @@ class MdPureTest {
     @Test void rejectsOtherHardwareAndBadSizes(){for(String h:List.of("SEGA 32X        ","SEGA PICO       ","SEGA CD         ","garbage         ")){byte[] b=rom();System.arraycopy(h.getBytes(),0,b,256,16);assertThrows(IOException.class,()->MdRom.validate(b));}assertThrows(IOException.class,()->MdRom.validate(new byte[512]));assertThrows(IOException.class,()->MdRom.validate(new byte[513]));}
     @Test void rejectsInvalidResetVector(){byte[] b=rom();b[7]=1;assertThrows(IOException.class,()->MdRom.validate(b));byte[] f=rom();f[4]=1;assertThrows(IOException.class,()->MdRom.validate(f));}
     @Test void audioIsBoundedAndChunkIndependent(){short[] wave=new short[20000];for(int i=0;i<wave.length;i++)wave[i]=(short)(i%2000);MdAudio whole=new MdAudio(),split=new MdAudio();short[] expected=whole.convert(wave,53267);var list=new ArrayList<Short>();for(int at=0;at<wave.length;at+=1000)for(short s:split.convert(Arrays.copyOfRange(wave,at,at+1000),53267))list.add(s);assertEquals(expected.length,list.size());for(int i=0;i<expected.length;i++)assertEquals(expected[i],list.get(i));assertThrows(IllegalArgumentException.class,()->whole.convert(new short[3],53267));assertThrows(IllegalArgumentException.class,()->whole.convert(new short[32770],53267));}
-    @Test void profileNeverEnablesNetworkingOrExternalFirmware(){var p=MdProfile.profile();assertEquals("off",p.options().get("blastem_megawifi"));assertEquals("md1va3",p.options().get("blastem_model"));assertEquals(Set.of("windows-x64"),p.cores().keySet());assertTrue(p.fullPath());}
+    @Test void profileNeverEnablesNetworkingOrExternalFirmware(){
+        var p=MdProfile.profile();assertEquals("Genesis Plus GX",p.name());assertEquals(List.of(513,513),p.devices());
+        for(String key:List.of("bios","lock_on","frameskip","overscan"))assertEquals("disabled",p.options().get("genesis_plus_gx_"+key));
+        assertEquals(Set.of("windows-x64"),p.cores().keySet());assertTrue(p.fullPath());
+        var old=MdProfile.profile(MdProfile.Core.BLASTEM);assertEquals("off",old.options().get("blastem_megawifi"));assertEquals("md1va3",old.options().get("blastem_model"));
+    }
+    @Test void gxAllInputCombinationsPreserveBindings(){
+        int[] expected={1,10,2,3,4,5,6,7,0,9,11,8};Set<Integer> seen=new HashSet<>();
+        for(int mask=0;mask<4096;mask++){
+            int mapped=0;for(int bit=0;bit<12;bit++)if((mask&(1<<bit))!=0)mapped|=1<<expected[bit];
+            assertEquals(mapped,MdProfile.input(MdProfile.Core.GENESIS_PLUS_GX,mask));
+            assertEquals(mask,MdProfile.input(MdProfile.Core.BLASTEM,mask));seen.add(mapped);
+        }
+        assertEquals(4096,seen.size());assertThrows(IllegalArgumentException.class,()->MdProfile.input(MdProfile.Core.GENESIS_PLUS_GX,4096));
+    }
+    @Test void gxTrimmedBatteryOnlyRestoredBeforeFirstRun(){
+        var full=new cn.piq.retro.libretro.LibretroSaveMemory(new byte[65536],new byte[0]);
+        byte[] padded=MdSaves.startupRam(new byte[]{-1,0x5a},full);assertEquals(65536,padded.length);assertEquals(0x5a,padded[1]);
+        for(int i=2;i<padded.length;i++)assertEquals((byte)0xff,padded[i]);
+        assertEquals(65536,MdSaves.startupRam(new byte[0],full).length);
+        assertArrayEquals(new byte[65536],MdSaves.startupRam(new byte[65536],full));
+        assertEquals(0,MdSaves.startupRam(new byte[0],new cn.piq.retro.libretro.LibretroSaveMemory(new byte[0],new byte[0])).length);
+        assertThrows(IllegalStateException.class,()->MdSaves.startupRam(new byte[65537],full));
+        assertThrows(IllegalStateException.class,()->MdSaves.startupRam(new byte[2],new cn.piq.retro.libretro.LibretroSaveMemory(new byte[2],new byte[0])));
+        assertThrows(IllegalStateException.class,()->MdSaves.startupRam(new byte[0],new cn.piq.retro.libretro.LibretroSaveMemory(new byte[65536],new byte[1])));
+    }
+    @Test void namespacesKeepLegacyAndSeparateNewContract(){
+        var jni=cn.piq.retro.libretro.LibretroRuntimes.Backend.JNI_TRIAL;
+        assertEquals("jni-v1/"+MdProfile.LEGACY_SHA,MdProfile.saveNamespace(MdProfile.Core.BLASTEM,jni));
+        var gx=MdProfile.saveNamespace(MdProfile.Core.GENESIS_PLUS_GX,jni);assertTrue(gx.startsWith("jni-v1/gx-v1/"+MdProfile.SHA+"/"));
+        assertNotEquals(gx,MdProfile.saveNamespace(MdProfile.Core.BLASTEM,jni));
+        for(var backend:cn.piq.retro.libretro.LibretroRuntimes.Backend.values())if(backend!=jni)assertNotEquals(gx,MdProfile.saveNamespace(MdProfile.Core.GENESIS_PLUS_GX,backend));
+    }
+    @Test void gxAudio44100IsChunkIndependent(){
+        short[] wave=new short[22050];for(int i=0;i<wave.length;i++)wave[i]=(short)(i%1000);
+        var whole=new MdAudio();var split=new MdAudio();short[] expected=whole.convert(wave,44100);var actual=new ArrayList<Short>();
+        for(int i=0;i<wave.length;i+=882)for(short s:split.convert(Arrays.copyOfRange(wave,i,Math.min(i+882,wave.length)),44100))actual.add(s);
+        assertEquals(expected.length,actual.size());for(int i=0;i<expected.length;i++)assertEquals(expected[i],actual.get(i));
+    }
 }

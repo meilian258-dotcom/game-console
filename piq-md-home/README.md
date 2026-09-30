@@ -1,5 +1,17 @@
 # 方块电玩：MD / Game Console: MD
 
+## 当前候选：MD alpha.3 · Genesis Plus GX（2026-09-30）
+
+默认核心改为官方 **Genesis Plus GX v1.7.4 c2838c7**，默认仍走现有通用 JNI。此次**只更新 MD 附属**，复用已完成的拷卡、实体电源、AV、租约和保存接口，不要求主包再出新版。实测配套主包 FC76.28；两端安装 MD alpha.3，实际运行端 Windows x64 / Java21，MC1.21.1 / NeoForge21.1.236+ 的21.1系列。
+
+游戏操作沿下方 alpha.2：老式电脑拷 MD 卡、AV 线接已开机电视、插卡、借1P手柄、点顶面电源。默认键位不变；适配新核心六键映射、44.1kHz音频转48kHz、动态画面比例和电池存档。**仍为私人单人，尚无 Minecraft MD Netplay、公共双人或旁观。**官方核心支持 Netplay 不代表本模组已经接好。
+
+新旧核心存档分开，绝不自动转换。需继续旧 BlastEm 进度：先关机并等保存完成，再执行 `/gameconsole-md core blastem`；恢复新默认用 `/gameconsole-md core genesis`，查询用 `/gameconsole-md`。此选择只在本机本次连接有效，退出服务器重置 Genesis。切换运行器仍用 `/gameconsole-private cartridge-runtime process` 或 `jni`；核心与运行器是两个独立选择，都须关机操作。
+
+**许可限制：Genesis Plus GX 禁止商业用途**，不能把核心随本附属统一标为 GPL。完整许可、固定源码、制品SHA与当前验收在[MD3指南](design/MD3-GenesisPlusGX.md)。模型公开分发授权仍待核对；本包仅测试候选，不是已经可商用的正式发行。
+
+验证：12项单元测试通过；最终JAR新核心JNI/进程各28项、旧核心各19项真实诊断通过，七包隔离专服正常启动退出。Netplay回滚门禁未通过，保留失败证据且未开放入口。MC实际游戏、键位手感、旧世界与长时待验。下面内容为保留的历史说明，当前核心/版本以本节为准。
+
 ## 当前候选：MD alpha.2 + 主包 FC76.27（2026-09-30）
 
 本轮补齐老式电脑写入 MD 内容卡、实体电源启动与 AV 交互优先级。两端同装 FC76.27 和 MD alpha.2；MC 1.21.1、NeoForge 21.1.236+ 的 21.1 系列、Java 21，实际执行端 Windows x64。完整步骤、权限、回退和验收范围见[本版指南](design/MD2-拷卡与实体开机-20260930.md)。

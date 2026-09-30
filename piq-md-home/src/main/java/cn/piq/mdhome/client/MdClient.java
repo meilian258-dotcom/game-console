@@ -19,15 +19,15 @@ import java.util.UUID;
 
 @EventBusSubscriber(modid=MdMod.ID,value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
 public final class MdClient {
-    @SubscribeEvent public static void setup(FMLClientSetupEvent e){e.enqueueWork(()->{var p=new Provider();ControllerCapture.register(MdMod.SYSTEM,p);PrivateHomeClient.register(MdMod.SYSTEM,p);});}
+    @SubscribeEvent public static void setup(FMLClientSetupEvent e){e.enqueueWork(()->{var p=new Provider();ControllerCapture.register(MdMod.SYSTEM,p);PrivateHomeClient.register(MdMod.SYSTEM,p);MdCoreChoice.register();});}
     public static final class Provider implements PrivateHomeClient.Provider {
-        public String label(){return "MD2（私人单人）";}
+        public String label(){return "MD2 · "+MdProfile.profile(MdCoreChoice.selected()).name()+"（私人单人）";}
         public String storageKey(){return "md";}
         public boolean cartridgePower(){return true;}
         public boolean acceptsFile(String name){return MdRom.accepts(name);}
         public String fileHint(){return ".md / .bin / .gen（普通卡带，非CD/32X）";}
         public KeyboardConfig.Profile profile(){return KeyboardConfig.Profile.SFC;}
-        // Existing configurable canonical 12-bit layout, mapped by BlastEm: B→A, A→B, R→C, Y→X, X→Y, L→Z.
+        // Preserve canonical bindings; MdProfile maps them to the selected core's RetroPad layout.
         public int[][] keys(){return new int[][]{{74},{76},{259},{257},{87},{83},{65},{68},{75},{73},{79},{80}};}
         public UUID identity(ItemStack s){return MdController.loan(s);}
         public UUID lease(ItemStack s){return s.getCount()==1?identity(s):null;}
@@ -43,8 +43,8 @@ public final class MdClient {
             var t=data.copyTag();
             return t.hasUUID("MdConsole")&&t.getUUID("MdConsole").equals(c.hardwareId())&&id.equals(c.loan())&&p.getUUID().equals(c.borrower())&&p.distanceToSqr(c.getBlockPos().getCenter())<=36;
         }
-        public PrivateEngine create(Path rom,Path root){return new MdEngine(rom,root,LibretroRuntimes.defaultBackend(true));}
+        public PrivateEngine create(Path rom,Path root){return create(rom,root,LibretroRuntimes.defaultBackend(true));}
         public boolean supportsJniTrial(){return true;}
-        public PrivateEngine create(Path rom,Path root,LibretroRuntimes.Backend b){return new MdEngine(rom,root,b);}
+        public PrivateEngine create(Path rom,Path root,LibretroRuntimes.Backend b){return new MdEngine(rom,root,b,MdCoreChoice.selected());}
     }
 }

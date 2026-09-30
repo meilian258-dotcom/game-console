@@ -1,0 +1,18 @@
+Genesis Plus GX v1.7.4 c2838c7, Libretro Windows x64 official build.
+Copyright (c) 1998-2003 Charles MacDonald; (c) 2007-2026 Eke-Eke.
+Some portions copyright Nicola Salmoria and the MAME team; additional components in LICENSE.txt.
+Non-commercial terms apply to this core. The adapter's GPL identifier does not relicense it.
+See LICENSE.txt for the complete conditions and third-party notices.
+
+Unmodified binary obtained 2026-09-30 from:
+https://buildbot.libretro.com/nightly/windows/x86_64/latest/genesis_plus_gx_libretro.dll.zip
+ZIP SHA256: 36b60039012d38d99e651cfdf06da4ffa3e75f1aa7e50907389771d00564dbcb
+DLL SHA256: 9ffa10a115b20e1b49e9caf0b53f287c640ed4e5bb93f7ed9a23b416a4ccfdf7
+Reported binary version: v1.7.4 c2838c7
+Corresponding source revision: c2838c7dc4236fc2fe94e5dbd08b41486067918e
+https://github.com/libretro/Genesis-Plus-GX/tree/c2838c7dc4236fc2fe94e5dbd08b41486067918e
+https://codeload.github.com/libretro/Genesis-Plus-GX/zip/c2838c7dc4236fc2fe94e5dbd08b41486067918e
+Source archive SHA256: dd4f5ef7ad3bae410854da8d0d7b99c99f13caa1df77f4ef1f2b8f59be3b6977
+
+The dated downloaded bytes are pinned; do not replace with a newer 'latest' under the same name.
+No ROM, BIOS, commercial game or end-user save is included.
