@@ -108,6 +108,22 @@ public final class HomeAvCableLayout {
         return sample(start, end, roundCorners(path,console.filletGuard(),tv.filletGuard()), support, sameBase);
     }
 
+    /** Custom rear connector, legacy TV; reuses the same housing avoidance and corner sampler. */
+    static List<Point> routeMultiOut(Point start,HomeAvCableMesh.Box source,int sourceTurns,
+                                    Point[] remote,HomeAvCableMesh.Box target,int targetTurns,double dy){
+        if(remote.length!=3)return List.of();
+        Rect console=new Rect(source.minX(),source.minZ(),source.maxX(),source.maxZ()).expanded();
+        Rect tv=new Rect(target.minX(),target.minZ(),target.maxX(),target.maxZ()).expanded();
+        double support=Math.min(0,dy)+USER_TV_SUPPORT;
+        Point from=lowerJunction(exit(start,console,sourceTurns),support);
+        Point to=lowerJunction(exit(remote[1],tv,targetTurns),support);
+        if(intersects(start,from,tv)||intersects(remote[1],to,console)||console.contains(to)||tv.contains(from))return List.of();
+        var nodes=new ArrayList<Point>();nodes.add(from);nodes.add(to);
+        addCorners(nodes,console,tv);addCorners(nodes,tv,console);
+        var path=shortestPath(nodes,console,tv);if(path.isEmpty())return List.of();
+        return sample(start,remote[0],roundCorners(path,console.filletGuard(),tv.filletGuard()),support,true);
+    }
+
     private static Point lateral(Point point, double amount, int turns) {
         return switch(Math.floorMod(turns,4)) {
             case 1 -> new Point(point.x(),point.y(),point.z()+amount);

@@ -39,6 +39,26 @@ public final class UserTvCableMesh {
         return build(new Point[]{socket},new Housing(box,box,null),consoleTurns,scale,false,true,tv,tvTurns,dx,dy,dz,seed);
     }
 
+    /** Ordinary old TVs retain their exact socket/body geometry; no FC socket is substituted. */
+    public static List<Quad> buildMultiOutLegacy(Point socket,Bounds bounds,int consoleTurns,double scale,
+            boolean centered,boolean lcd,boolean wide,boolean large,boolean vintage,int tvTurns,double dx,double dy,double dz){
+        if(socket==null||bounds==null||!Double.isFinite(scale)||scale<.2||scale>1||!Double.isFinite(dx+dy+dz)||dx*dx+dy*dy+dz*dz>64)return List.of();
+        var b=new Box(bounds.minX,bounds.minY,bounds.minZ,bounds.maxX,bounds.maxY,bounds.maxZ);
+        var source=new Housing(b,b,null);
+        var target=tvHousing(centered,lcd||wide||large,wide,large,vintage,tvTurns,dx,dy,dz);
+        var sockets=HomeAvCableMesh.tvSockets(centered,lcd,wide,large,vintage,tvTurns,new Point(dx,dy,dz));
+        var route=HomeAvCableLayout.routeMultiOut(socket,b,consoleTurns,sockets,target.outer(),tvTurns,dy);
+        if(route.isEmpty())return List.of();
+        var result=new ArrayList<Quad>();tube(result,route.subList(1,route.size()-1),CABLE_RADIUS,RUBBER);
+        if(!clearOf(result,0,b)||!clearOf(result,0,target.outer()))return List.of();
+        if(!multiOut(result,socket,outward(consoleTurns),scale,route.get(1),unit(subtract(route.get(2),route.get(1))),source,target.outer()))return List.of();
+        if(!plugs(result,sockets,outward(tvTurns),route.get(route.size()-2),.65,
+                unit(subtract(route.get(route.size()-3),route.get(route.size()-2))),target,b,false,CABLE_RADIUS))return List.of();
+        if(result.size()>MAX_QUADS)return List.of();
+        for(var q:result)for(var p:List.of(q.a(),q.b(),q.c(),q.d()))if(!Double.isFinite(p.x()+p.y()+p.z())||p.y()<Math.min(0,dy)-1e-9)return List.of();
+        return List.copyOf(result);
+    }
+
     public static Point[] tvSockets(ArcadeDisplayStyle style,int turns,Point offset) {
         Point[] sockets=new Point[3];
         for(int c=0;c<3;c++){var p=UserTvLayout.socket(style,turns,c);sockets[c]=add(new Point(p.x(),p.y(),p.z()),offset);}

@@ -31,6 +31,12 @@ public final class MdMod {
         ContentCards.register(SYSTEM,new ContentCards.Adapter(CARTRIDGE,"MD2",java.util.Set.of("md","bin","gen"),cn.piq.mdhome.client.MdRom::validate));
         HomeApplianceService.registerControls(SYSTEM,MdControls::pick);
         HomeSystems.register(SYSTEM,new HomeSystems.ServerHooks(){
+            public boolean deviceSettingsAvailable(){return true;}
+            public String deviceSettingsStatus(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){
+                var md=(MdConsole)c;
+                return "私人单人 · "+(md.running()?"已通电 / 启动或运行中":"关机")+" · "+(md.televisionPos()==null?"未接电视":"已接电视")
+                        +"\n卡带："+md.cartridgeTitle()+"\n1P手柄："+(md.borrower()==null?"未借出":"已借出")+"；不支持公共联机或旁观。";
+            }
             public boolean onPowerOn(net.minecraft.server.level.ServerPlayer p,HomeSystems.Connection c){return ((MdConsole)c.console()).powerOn(p,c);}
             public void onPowerOff(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){((MdConsole)c).powerOff();}
             public boolean isRunning(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){return ((MdConsole)c).running();}

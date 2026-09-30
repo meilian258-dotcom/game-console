@@ -186,6 +186,25 @@ public final class PrivateHomeClient {
         var r=current;return r==null||r.target.provider!=PROVIDERS.get(system)||!r.target.console.getBlockPos().equals(pos)?-1:r.engine.isReady()?1:0;
     }
     public static void stopCartridge(ResourceLocation system,BlockPos pos){if(cartridgeState(system,pos)>=0)stop("实体主机关机，正在保存");}
+    /** Local preferences/diagnostics only; opening settings does not acquire a play lease. */
+    static String cartridgeRuntimeLabel(ResourceLocation system,BlockPos pos){
+        var r=current;
+        if(r!=null&&r.target.provider==PROVIDERS.get(system)&&r.target.console.getBlockPos().equals(pos))
+            return "当前运行器："+(r.trial?"JNI":"独立进程（JNA）")+" · "+r.target.provider.label();
+        var p=PROVIDERS.get(system);
+        var backend=cartridgeBackend==null?LibretroRuntimes.defaultBackend(p!=null&&p.supportsJniTrial()):cartridgeBackend;
+        return "下次开机："+(backend==LibretroRuntimes.Backend.JNI_TRIAL?"JNI":"独立进程（JNA）")+(p==null?"":" · "+p.label());
+    }
+    static boolean cartridgeRuntimeEditable(){return current==null&&!closing&&!opening&&!ContentCardClient.starting();}
+    static void cycleCartridgeRuntime(ResourceLocation system){
+        if(!cartridgeRuntimeEditable())return;
+        var p=PROVIDERS.get(system);if(p==null||!p.cartridgePower())return;
+        var b=cartridgeBackend==null?LibretroRuntimes.defaultBackend(p.supportsJniTrial()):cartridgeBackend;
+        cartridgeBackend(b==LibretroRuntimes.Backend.JNI_TRIAL?LibretroRuntimes.Backend.PROCESS:LibretroRuntimes.Backend.JNI_TRIAL);
+    }
+    static cn.piq.retro.client.KeyboardConfig.Profile settingsProfile(ResourceLocation system){
+        var p=PROVIDERS.get(system);return p==null?cn.piq.retro.client.KeyboardConfig.Profile.SFC:p.profile();
+    }
     static LibretroRuntimes.Backend defaultBackend(Target target){
         return LibretroRuntimes.defaultBackend(target!=null&&target.provider.supportsJniTrial());
     }

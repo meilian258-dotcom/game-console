@@ -49,6 +49,7 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         DeviceUi.prepare();
         layout=HomeSyncSettingsLayout.fit(width,height);panelWidth=layout.width();left=layout.left();top=layout.top();
         if(layout.compact()){addRenderableWidget(Button.builder(Component.literal("关闭"),b->onClose()).bounds(left,Math.max(35,height-32),panelWidth,20).build());return;}
+        if(diagnosticsOnly()){initDiagnostics();return;}
         for(int mode=0;mode<5;mode++) {
             final int selected=mode;
             String label=(setting.mode()==mode?"✓ ":"")+LABELS[mode];
@@ -92,6 +93,21 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         addRenderableWidget(Button.builder(Component.literal("关闭"),b->onClose()).bounds(left+34+4*footer,top+HomeSyncSettingsLayout.FOOTER_ROW,footer,20).build());
     }
     private boolean ready(){return !pending&&!timedOut&&cooldown==0;}
+    private boolean diagnosticsOnly(){return minecraft.level!=null&&minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity c
+            &&cn.piq.fcarcade.home.HomeSystems.privateDeviceSettings(c.systemId());}
+    private net.minecraft.resources.ResourceLocation deviceSystem(){
+        return minecraft.level!=null&&minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity c?c.systemId():cn.piq.fcarcade.home.HomeSystems.NES_SYSTEM;
+    }
+    private void diagnosticButton(String label,int row,Runnable action,boolean active){
+        addRenderableWidget(DeviceUi.button(font,label,left+10,top+112+row*23,panelWidth-20,20,action,active,DeviceUi.Tone.NORMAL));
+    }
+    private void initDiagnostics(){
+        diagnosticButton("控制设置…",0,()->minecraft.setScreen(new cn.piq.retro.client.ControlSettingsScreen(this,PrivateHomeClient.settingsProfile(deviceSystem()),setting.system())),true);
+        diagnosticButton("运行环境 / 复制诊断…",1,()->minecraft.setScreen(new cn.piq.fcarcade.client.runtime.RuntimeEnvironmentScreen(this)),true);
+        diagnosticButton("切换下次开机运行器（仅本机）",2,()->{if(current())PrivateHomeClient.cycleCartridgeRuntime(deviceSystem());rebuildWidgets();},PrivateHomeClient.cartridgeRuntimeEditable());
+        diagnosticButton("刷新设备状态",3,()->apply(-1,-1,-1),ready());
+        diagnosticButton("返回",4,this::onClose,true);
+    }
     private void apply(int mode,int occupancy,int approval) {
         if(!ready()||!current()||(mode>=0||occupancy>=0||approval>=0)&&!setting.editable()
             ||mode>=0&&(setting.supported()&(1<<mode))==0||occupancy>=0&&!setting.occupancySupported())return;
@@ -123,6 +139,16 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         String target="目标坐标："+setting.console().getX()+", "+setting.console().getY()+", "+setting.console().getZ();
         DeviceUi.panel(g,font,left,top,panelWidth,HomeSyncSettingsLayout.HEIGHT,"设备设置 · "+setting.system(),target);
         if(layout.compact()){g.drawWordWrap(font,Component.literal("请降低GUI缩放或放大窗口。"),left,top+43,panelWidth,DeviceUi.TEXT);super.render(g,mx,my,partial);return;}
+        if(diagnosticsOnly()){
+            var details=font.split(Component.literal(status),panelWidth-20);
+            for(int i=0;i<Math.min(4,details.size());i++)g.drawString(font,details.get(i),left+10,top+43+i*10,DeviceUi.TEXT,false);
+            String runtime=PrivateHomeClient.cartridgeRuntimeLabel(deviceSystem(),setting.console());
+            DeviceUi.text(g,font,runtime,left+10,top+85,panelWidth-20,DeviceUi.TEXT);
+            DeviceUi.text(g,font,"个人本机存档 · 核心 / ROM / 运行器分开；切换不迁移进度",left+10,top+98,panelWidth-20,DeviceUi.MUTED);
+            super.render(g,mx,my,partial);
+            if(mx>left&&mx<left+panelWidth&&my>top+40&&my<top+110)g.renderTooltip(font,Component.literal(status+"\n"+runtime+"\n不同后端存档隔离；JNI 原生故障可能导致 Minecraft 崩溃。"),mx,my);
+            return;
+        }
         var lines=font.split(Component.literal(status),panelWidth-20);
         for(int i=0;i<Math.min(3,lines.size());i++)g.drawString(font,lines.get(i),left+10,top+HomeSyncSettingsLayout.STATUS_ROW+i*10,DeviceUi.TEXT,false);
         var hint=font.split(Component.literal(HomeSyncSaveHints.footer(setting.system(),setting.mode())),panelWidth-20);

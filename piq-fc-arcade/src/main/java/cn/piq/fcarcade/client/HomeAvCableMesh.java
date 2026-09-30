@@ -191,7 +191,7 @@ public final class HomeAvCableMesh {
         return new Housing(box, box, null);
     }
 
-    private static Housing tvHousing(boolean centered, boolean lcd, boolean wideLcd, boolean largeLcd, boolean vintageTv, int turns, double dx, double dy, double dz) {
+    static Housing tvHousing(boolean centered, boolean lcd, boolean wideLcd, boolean largeLcd, boolean vintageTv, int turns, double dx, double dy, double dz) {
         if(vintageTv){
             var b=cn.piq.fcarcade.home.VintageTvLayout.bounds(0);
             Point offset=new Point(dx,dy,dz);

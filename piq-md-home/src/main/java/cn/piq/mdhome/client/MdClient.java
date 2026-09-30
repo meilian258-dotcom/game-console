@@ -19,6 +19,11 @@ import java.util.UUID;
 
 @EventBusSubscriber(modid=MdMod.ID,value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
 public final class MdClient {
+    @SubscribeEvent public static void renderers(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers e){
+        e.registerBlockEntityRenderer(MdMod.ENTITY.get(),context->new ExternalHomeAvRenderer<>(
+                new HomeHardwareRenderLayout.Point(6.45/16,1.23/16,15.321/16),
+                new UserTvCableMesh.Bounds(3.4/16,0,6.5/16,12.6/16,6.5/16,15.321/16),.30));
+    }
     @SubscribeEvent public static void setup(FMLClientSetupEvent e){e.enqueueWork(()->{var p=new Provider();ControllerCapture.register(MdMod.SYSTEM,p);PrivateHomeClient.register(MdMod.SYSTEM,p);MdCoreChoice.register();});}
     public static final class Provider implements PrivateHomeClient.Provider {
         public String label(){return "MD2 · "+MdProfile.profile(MdCoreChoice.selected()).name()+"（私人单人）";}

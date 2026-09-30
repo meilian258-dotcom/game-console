@@ -24,6 +24,7 @@ public final class MdConsole extends ExternalHomeConsoleBlockEntity {
     private int ticks;
     public MdConsole(BlockPos p,BlockState s){super(MdMod.ENTITY.get(),p,s,MdMod.SYSTEM);}
     public boolean hasInsertedCartridge(){return !cartridge.isEmpty();}
+    public String cartridgeTitle(){return cartridge.isEmpty()?"未插卡":ContentCardData.title(cartridge).isBlank()?"空白卡带":ContentCardData.title(cartridge);}
     public UUID borrower(){return borrower;}
     public UUID loan(){return loan;}
     public boolean running(){return running;}

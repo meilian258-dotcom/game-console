@@ -49,7 +49,7 @@ public final class ContentCards {
         if(old!=null&&System.nanoTime()-old.opened<500_000_000L)return;
         if(old==null&&s.edits.size()>=4){say(p,"写卡服务繁忙，请稍后重试。");return;}
         var e=new Edit(p,hand,pos,computer,system,stack);s.edits.put(p.getUUID(),e);
-        reply(p,e,OPEN,a.label+"：选择游戏后明确写入卡带",0,List.of());list(p,s,e,0);
+        reply(p,e,OPEN,a.label+"：选择游戏后明确写入卡带",0,List.of());card(p,e);list(p,s,e,0,"");
     }
     private static boolean valid(ServerPlayer p,State s,Edit e){return !s.closed&&s.edits.get(p.getUUID())==e&&online(p,e.connection)&&p.serverLevel()==e.level&&e.level.hasChunkAt(e.pos)
             &&e.binding.permits(e.computer.computerId(),p.serverLevel().dimension().location().toString(),e.level.getBlockEntity(e.pos)==e.computer,
@@ -66,18 +66,29 @@ public final class ContentCards {
         if(m.op()==CANCEL){s.edits.remove(p.getUUID());return;}
         if(e.busy)return;
         try{
-            if(m.op()==LIST){if(System.nanoTime()-e.lastList<1_000_000_000L){reply(p,e,STATUS,"刷新过快，请稍后再试",0,List.of());return;}list(p,s,e,m.offset());}
+            if(e.upload!=null&&m.op()!=PART)return;
+            if(m.op()==RENAME||m.op()==WRITE||m.op()==UPLOAD){
+                long now=System.nanoTime();if(now-e.lastMutation<250_000_000L){reply(p,e,STATUS,"操作过快，请稍后重试",0,List.of());return;}e.lastMutation=now;
+            }
+            if(m.op()==LIST){if(System.nanoTime()-e.lastList<1_000_000_000L){reply(p,e,STATUS,"刷新过快，请稍后再试",0,List.of());return;}list(p,s,e,m.offset(),m.name());}
+            else if(m.op()==RENAME&&e.upload==null){
+                var current=ContentCardData.read(e.stack,e.system);
+                if(current==null||!current.hash().equals(m.hash()))throw new IllegalArgumentException("卡带内容已变化，请重新打开");
+                write(p,e,current,ContentCardWorkbench.title(m.name()));
+            }
             else if(m.op()==WRITE&&e.upload==null){
                 if(!PlayerContentAccess.canUseServerRom(p))throw new IllegalArgumentException("没有使用服务器 ROM 的权限");
                 var selected=e.catalog.stream().filter(v->v.hash().equals(m.hash())).findFirst().orElseThrow();
+                String title=ContentCardWorkbench.title(m.name().isBlank()?selected.name():m.name());
                 job(p,s,e,()->{e.store.read(selected);return selected;},entry->{
-                    if(!PlayerContentAccess.canUseServerRom(p))throw new IllegalArgumentException("服务器 ROM 权限已撤销");write(p,e,entry,entry.name());
+                    if(!PlayerContentAccess.canUseServerRom(p))throw new IllegalArgumentException("服务器 ROM 权限已撤销");write(p,e,entry,title);
                 });
             }else if(m.op()==UPLOAD){
                 if(!PlayerContentAccess.canUploadRom(p))throw new IllegalArgumentException("管理员未允许上传 ROM");
                 if(e.upload!=null||m.size()<1||m.size()>ADAPTERS.get(e.system).maxBytes||reserved(s)+m.size()>64L*1024*1024)throw new IllegalArgumentException("上传大小或总预算无效，请稍后重试");
                 var entry=new ContentCardStore.Entry(m.hash(),m.name(),m.size());
                 if(!e.store.accepts(entry.name()))throw new IllegalArgumentException("文件扩展名不匹配");
+                e.uploadTitle=ContentCardWorkbench.uploadTitle(m.data(),entry.name());
                 e.upload=new CartridgeTransfer(m.size(),System.nanoTime());e.entry=entry;reply(p,e,READY,"开始上传到服务器；完成后写卡",0,List.of());
             }else if(m.op()==PART){
                 if(!PlayerContentAccess.canUploadRom(p)||e.upload==null||e.upload.expired(System.nanoTime()))throw new IllegalArgumentException("上传已取消或超时");
@@ -85,18 +96,24 @@ public final class ContentCards {
                 if(e.upload.received()<e.upload.total())reply(p,e,READY,"正在上传…",e.upload.received(),List.of());
                 else {byte[] complete=e.upload.finish();e.upload=null;var entry=e.entry;
                     job(p,s,e,()->e.store.store(entry.name(),entry.hash(),complete),stored->{
-                        if(!PlayerContentAccess.canUploadRom(p))throw new IllegalArgumentException("上传权限已撤销；原卡未改动");write(p,e,stored,entry.name());
+                        if(!PlayerContentAccess.canUploadRom(p))throw new IllegalArgumentException("上传权限已撤销；原卡未改动");write(p,e,stored,e.uploadTitle);
                     });
                 }
             }
         }catch(RuntimeException error){e.upload=null;reply(p,e,STATUS,"操作失败，原卡未改动："+clean(error),0,List.of());}
     }
-    private static void list(ServerPlayer p,State s,Edit e,int page){
-        e.lastList=System.nanoTime();if(page<0||page>31)return;
-        job(p,s,e,e.store::list,entries->{e.catalog=entries;int from=Math.min(page*8,entries.size());reply(p,e,LIST,"服务器游戏；上传权限以管理终端为准",page,entries.subList(from,Math.min(from+8,entries.size())));});
+    private static void list(ServerPlayer p,State s,Edit e,int page,String query){
+        ContentCardWorkbench.page(List.of(),query,page);e.lastList=System.nanoTime();
+        job(p,s,e,e.store::list,entries->{e.catalog=entries;var result=ContentCardWorkbench.page(entries,query,page);
+            send(p,new Message(LIST,e.system,e.token,e.pos,"",result.total()==0?"服务器没有匹配游戏；请检查ROM目录或搜索条件":"选择只预览，点击“写入卡带”才生效",result.total(),result.index(),new byte[0],result.entries()));});
+    }
+    private static void card(ServerPlayer p,Edit e){
+        var entry=ContentCardData.read(e.stack,e.system);
+        send(p,new Message(CARD,e.system,e.token,e.pos,entry==null?"":entry.hash(),ContentCardData.title(e.stack),
+                PlayerContentAccess.capabilities(p),0,new byte[0],entry==null?List.of():List.of(entry)));
     }
     private static void write(ServerPlayer p,Edit e,ContentCardStore.Entry entry,String title){
-        ContentCardData.write(e.stack,e.system,entry,title);e.snapshot=e.stack.copy();p.inventoryMenu.broadcastChanges();reply(p,e,STATUS,"写卡成功："+title,0,List.of());
+        ContentCardData.write(e.stack,e.system,entry,title);e.snapshot=e.stack.copy();p.inventoryMenu.broadcastChanges();card(p,e);reply(p,e,STATUS,"写卡成功："+title,0,List.of());
     }
     private static <T> void job(ServerPlayer p,State s,Edit e,Callable<T> task,Consumer<T> done){
         e.busy=true;var server=p.getServer();
@@ -150,7 +167,7 @@ public final class ContentCards {
     private static final class Edit{
         final UUID token=UUID.randomUUID(),computerId;final Object connection;final ServerLevel level;final BlockPos pos;final CartridgeComputerBlockEntity computer;
         final ResourceLocation system;final InteractionHand hand;final int slot;final ItemStack stack;final CartridgeComputerBinding binding;ItemStack snapshot;final long opened=System.nanoTime();
-        final ContentCardStore store;long lastList;boolean busy;CartridgeTransfer upload;ContentCardStore.Entry entry;List<ContentCardStore.Entry> catalog=List.of();
+        final ContentCardStore store;long lastList,lastMutation;boolean busy;CartridgeTransfer upload;String uploadTitle="";ContentCardStore.Entry entry;List<ContentCardStore.Entry> catalog=List.of();
         Edit(ServerPlayer p,InteractionHand h,BlockPos pos,CartridgeComputerBlockEntity c,ResourceLocation system,ItemStack stack){connection=p.connection.getConnection();level=p.serverLevel();this.pos=pos.immutable();computer=c;computerId=c.computerId();binding=new CartridgeComputerBinding(computerId,level.dimension().location().toString(),pos.getX(),pos.getY(),pos.getZ());this.system=system;store=store(p,system);hand=h;slot=p.getInventory().selected;this.stack=stack;snapshot=stack.copy();}
     }
     private static final class Play{

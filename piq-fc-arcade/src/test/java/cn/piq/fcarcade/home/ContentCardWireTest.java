@@ -28,4 +28,16 @@ class ContentCardWireTest {
         assertThrows(IllegalArgumentException.class,()->ContentCardNetwork.msg(3,system,UUID.randomUUID(),BlockPos.ZERO,"","",0,0,new byte[ContentCardStore.CHUNK+1]));
         assertThrows(IllegalArgumentException.class,()->ContentCardNetwork.msg(3,system,UUID.randomUUID(),BlockPos.ZERO,"wrong","",0,0,new byte[0]));
     }
+    @Test void previewSnapshotRenameAndExplicitUploadTitleRoundTrip(){
+        var card=new ContentCardStore.Entry("a".repeat(64),"游戏.md",2048);
+        for(int op:new int[]{ContentCardNetwork.CARD,ContentCardNetwork.RENAME,ContentCardNetwork.UPLOAD}){
+            var payload=new ContentCardNetwork.Message(op,system,UUID.randomUUID(),BlockPos.ZERO,card.hash(),"显示名称",7,0,
+                    op==ContentCardNetwork.UPLOAD?"改名之后".getBytes(java.nio.charset.StandardCharsets.UTF_8):new byte[0],op==ContentCardNetwork.CARD?List.of(card):List.of());
+            var buf=new RegistryFriendlyByteBuf(Unpooled.buffer(),RegistryAccess.EMPTY);
+            try{ContentCardNetwork.Message.CODEC.encode(buf,payload);var decoded=ContentCardNetwork.Message.CODEC.decode(buf);
+                assertEquals(op,decoded.op());assertEquals(payload.name(),decoded.name());assertEquals(payload.entries(),decoded.entries());
+                assertEquals(payload.size(),decoded.size());assertArrayEquals(payload.data(),decoded.data());assertEquals(0,buf.readableBytes());
+            }finally{buf.release();}
+        }
+    }
 }
