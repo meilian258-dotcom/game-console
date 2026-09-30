@@ -64,7 +64,7 @@ public final class GbaHandheldRenderer extends BlockEntityWithoutLevelRenderer {
             }
             @Override public boolean applyForgeHandTransform(PoseStack poses,LocalPlayer player,HumanoidArm arm,ItemStack stack,float partial,float equip,float swing){
                 // Fallback when vanilla retains hand ownership (invisibility/scoping/another pose).
-                apply(poses,GbaHandheldLayout.first(arm==HumanoidArm.RIGHT,false,equip,swing));return true;
+                apply(poses,GbaHandheldLayout.first(arm==HumanoidArm.RIGHT,false,equip,swing,GbaHandheldClient.raised(stack)));return true;
             }
         },GbaMod.HANDHELD.get());
     }
@@ -126,7 +126,7 @@ public final class GbaHandheldRenderer extends BlockEntityWithoutLevelRenderer {
             boolean two=other.isEmpty();HumanoidArm side=holding==InteractionHand.MAIN_HAND?player.getMainArm():player.getMainArm().getOpposite();
             event.setCanceled(true);PoseStack poses=event.getPoseStack();poses.pushPose();boolean previous=DRAWING_ARMS.get();
             try{
-                apply(poses,GbaHandheldLayout.first(side==HumanoidArm.RIGHT,two,event.getEquipProgress(),event.getSwingProgress()));
+                apply(poses,GbaHandheldLayout.first(side==HumanoidArm.RIGHT,two,event.getEquipProgress(),event.getSwingProgress(),GbaHandheldClient.raised(current)));
                 DRAWING_ARMS.set(true);
                 for(HumanoidArm arm:HumanoidArm.values())if(two||arm==side){var p=GbaHandheldLayout.arm(arm==HumanoidArm.RIGHT);poses.pushPose();
                     try{poses.translate(p.x(),p.y(),p.z());poses.mulPose(Axis.ZP.rotationDegrees((float)p.roll()));poses.mulPose(Axis.XP.rotationDegrees((float)p.pitch()));poses.scale((float)p.scale(),(float)p.scale(),(float)p.scale());

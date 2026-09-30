@@ -8,7 +8,7 @@ import java.util.*;
 
 /** Ordinary cartridge files, immutable writes and bounded scans. IO-worker only. */
 public final class ContentCardStore {
-    public static final int MAX_BYTES=8*1024*1024, MAX_FILES=256, CHUNK=cn.piq.fcarcade.home.CartridgeLimits.CHUNK_BYTES;
+    public static final int DEFAULT_MAX_BYTES=8*1024*1024, MAX_BYTES=32*1024*1024, MAX_FILES=256, CHUNK=cn.piq.fcarcade.home.CartridgeLimits.CHUNK_BYTES;
     @FunctionalInterface public interface Validator { void validate(byte[] bytes) throws IOException; }
     public record Entry(String hash,String name,int size) {
         public Entry {
@@ -20,16 +20,21 @@ public final class ContentCardStore {
     private final Path root;
     private final Set<String> extensions;
     private final Validator validator;
+    private final int maxBytes;
     public ContentCardStore(Path root,Set<String> extensions,Validator validator){
-        this.root=root.toAbsolutePath().normalize();this.extensions=Set.copyOf(extensions);this.validator=validator;
+        this(root,extensions,validator,DEFAULT_MAX_BYTES);
+    }
+    public ContentCardStore(Path root,Set<String> extensions,Validator validator,int maxBytes){
+        if(maxBytes<1||maxBytes>MAX_BYTES)throw new IllegalArgumentException("Card size budget");
+        this.root=root.toAbsolutePath().normalize();this.extensions=Set.copyOf(extensions);this.validator=validator;this.maxBytes=maxBytes;
     }
     public boolean accepts(String name){int dot=name.lastIndexOf('.');return dot>=0&&extensions.contains(name.substring(dot+1).toLowerCase(Locale.ROOT));}
     public static String hash(byte[] bytes){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));}catch(NoSuchAlgorithmException impossible){throw new AssertionError(impossible);}}
     public byte[] readPath(Path path)throws IOException{
         if(!accepts(path.getFileName().toString()))throw new IOException("卡带文件格式不支持");
         var before=CabinetGameStore.regular(path);
-        if(before.size()<1||before.size()>MAX_BYTES)throw new IOException("ROM 不能超过 8 MiB");
-        byte[] bytes;try(var in=Files.newInputStream(path,LinkOption.NOFOLLOW_LINKS)){bytes=in.readNBytes(MAX_BYTES+1);}
+        if(before.size()<1||before.size()>maxBytes)throw new IOException("ROM 不能超过 "+maxBytes/1024/1024+" MiB");
+        byte[] bytes;try(var in=Files.newInputStream(path,LinkOption.NOFOLLOW_LINKS)){bytes=in.readNBytes(maxBytes+1);}
         var after=CabinetGameStore.regular(path);
         if(bytes.length!=before.size()||after.size()!=before.size()||!after.lastModifiedTime().equals(before.lastModifiedTime())
                 ||!Objects.equals(before.fileKey(),after.fileKey()))throw new IOException("ROM 读取期间发生变化");
@@ -55,6 +60,7 @@ public final class ContentCardStore {
         return bytes;
     }
     public Entry store(String name,String hash,byte[] bytes)throws IOException{
+        if(bytes.length>maxBytes)throw new IOException("ROM 超过此机型大小限制");
         new Entry(hash,name,bytes.length);
         if(!accepts(name)||!hash(bytes).equals(hash))throw new IOException("卡带格式或 SHA256 不匹配");
         validator.validate(bytes);CabinetGameStore.directory(root);

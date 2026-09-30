@@ -21,8 +21,9 @@ import static cn.piq.fcarcade.home.content.ContentCardNetwork.*;
 
 /** Shared writer and authorized one-player content transfer. Native execution stays in the addon. */
 public final class ContentCards {
-    public record Adapter(Supplier<Item> item,String label,Set<String> extensions,ContentCardStore.Validator validator){
-        public Adapter{Objects.requireNonNull(item);Objects.requireNonNull(label);extensions=Set.copyOf(extensions);Objects.requireNonNull(validator);}
+    public record Adapter(Supplier<Item> item,String label,Set<String> extensions,ContentCardStore.Validator validator,int maxBytes){
+        public Adapter(Supplier<Item> item,String label,Set<String> extensions,ContentCardStore.Validator validator){this(item,label,extensions,validator,ContentCardStore.DEFAULT_MAX_BYTES);}
+        public Adapter{Objects.requireNonNull(item);Objects.requireNonNull(label);extensions=Set.copyOf(extensions);Objects.requireNonNull(validator);if(maxBytes<1||maxBytes>ContentCardStore.MAX_BYTES)throw new IllegalArgumentException("Card size budget");}
     }
     private static final Map<ResourceLocation,Adapter> ADAPTERS=new ConcurrentHashMap<>();
     private static final Map<MinecraftServer,State> STATES=new WeakHashMap<>();
@@ -37,7 +38,7 @@ public final class ContentCards {
     private static State state(ServerPlayer p){return STATES.computeIfAbsent(p.getServer(),s->new State());}
     // New content-card storage has no legacy directory to migrate. Resolve only here;
     // directory creation, validation and file reads belong to the bounded IO worker.
-    private static ContentCardStore store(ServerPlayer p,ResourceLocation system){var a=ADAPTERS.get(system);return new ContentCardStore(ConsoleStorage.location(p.getServer().getServerDirectory()).resolve("content-cards").resolve(system.getNamespace()).resolve(system.getPath()),a.extensions,a.validator);}
+    private static ContentCardStore store(ServerPlayer p,ResourceLocation system){var a=ADAPTERS.get(system);return new ContentCardStore(ConsoleStorage.location(p.getServer().getServerDirectory()).resolve("content-cards").resolve(system.getNamespace()).resolve(system.getPath()),a.extensions,a.validator,a.maxBytes);}
     private static boolean online(ServerPlayer p,Object connection){return p!=null&&p.getServer()!=null&&p.getServer().isSameThread()&&!p.hasDisconnected()&&p.connection.getConnection()==connection&&p.getServer().getPlayerList().getPlayer(p.getUUID())==p&&p.isAlive()&&!p.isSpectator();}
     public static void open(ServerPlayer p,InteractionHand hand,BlockPos pos,ResourceLocation system){
         var a=ADAPTERS.get(system);if(a==null||!PlayerContentAccess.canBrowse(p)) {say(p,"没有游戏库访问权，请联系管理员。");return;}
@@ -74,7 +75,7 @@ public final class ContentCards {
                 });
             }else if(m.op()==UPLOAD){
                 if(!PlayerContentAccess.canUploadRom(p))throw new IllegalArgumentException("管理员未允许上传 ROM");
-                if(e.upload!=null||m.size()<1||m.size()>ContentCardStore.MAX_BYTES)throw new IllegalArgumentException("上传状态无效");
+                if(e.upload!=null||m.size()<1||m.size()>ADAPTERS.get(e.system).maxBytes||reserved(s)+m.size()>64L*1024*1024)throw new IllegalArgumentException("上传大小或总预算无效，请稍后重试");
                 var entry=new ContentCardStore.Entry(m.hash(),m.name(),m.size());
                 if(!e.store.accepts(entry.name()))throw new IllegalArgumentException("文件扩展名不匹配");
                 e.upload=new CartridgeTransfer(m.size(),System.nanoTime());e.entry=entry;reply(p,e,READY,"开始上传到服务器；完成后写卡",0,List.of());
@@ -106,7 +107,8 @@ public final class ContentCards {
     }
     /** Caller supplies a live world/lease/power grant. Callback false means shutdown, never native success. */
     public static UUID play(ServerPlayer p,ResourceLocation system,BlockPos pos,ContentCardStore.Entry entry,BooleanSupplier authorized,Consumer<Boolean> status){
-        var s=state(p);if(s.closed||s.plays.containsKey(p.getUUID())||s.plays.size()>=4||!authorized.getAsBoolean())return null;
+        var s=state(p);var adapter=ADAPTERS.get(system);
+        if(adapter==null||entry.size()>adapter.maxBytes||reserved(s)+entry.size()>64L*1024*1024||s.closed||s.plays.containsKey(p.getUUID())||s.plays.size()>=4||!authorized.getAsBoolean())return null;
         var play=new Play(p,system,pos,entry,authorized,status);s.plays.put(p.getUUID(),play);var server=p.getServer();var files=store(p,system);
         try{IO.execute(()->{byte[] data=null;Exception error=null;try{data=files.read(entry);}catch(Exception ex){error=ex;}var bytes=data;var failure=error;
             server.execute(()->{if(!valid(p,s,play))return;if(failure!=null){say(p,"卡带启动失败："+clean(failure));stop(p,s,play);return;}
@@ -114,6 +116,10 @@ public final class ContentCards {
         });}catch(RejectedExecutionException full){stop(p,s,play);return null;}return play.token;
     }
     private static boolean valid(ServerPlayer p,State s,Play play){return !s.closed&&s.plays.get(p.getUUID())==play&&online(p,play.connection)&&play.authorized.getAsBoolean();}
+    private static long reserved(State s){
+        long bytes=0;for(var e:s.edits.values()){if(e.upload!=null)bytes+=e.upload.total();else if(e.busy&&e.entry!=null)bytes+=e.entry.size();}
+        for(var p:s.plays.values())if(!p.started)bytes+=p.entry.size();return bytes;
+    }
     private static void playMessage(ServerPlayer p,State s,Play play,Message m){
         if(!valid(p,s,play)){stop(p,s,play);return;}
         if(m.op()==STOP){stop(p,s,play);return;}

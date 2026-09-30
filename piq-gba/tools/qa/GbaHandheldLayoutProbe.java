@@ -35,6 +35,21 @@ public final class GbaHandheldLayoutProbe {
             }
         }
         var keys=Map.of("button_a",8,"button_b",0,"button_select",2,"button_start",3,"shoulder_l",10,"shoulder_r",11);
+        for(boolean right:new boolean[]{false,true})for(boolean two:new boolean[]{false,true}){
+            var rig=GbaHandheldLayout.first(right,two,0,0,true);
+            var low=GbaHandheldLayout.first(right,two,0,0,false);
+            check(rig.scale()>low.scale()*1.8,"Raised screen materially enlarged");
+            var points=new ArrayList<GbaHandheldLayout.Point>();
+            for(int corner=0;corner<4;corner++){
+                var p=GbaHandheldLayout.point(GbaHandheldLayout.screen(corner),GbaHandheldLayout.item(GbaHandheldLayout.View.FIRST));
+                p=GbaHandheldLayout.transform(new GbaHandheldLayout.Point(p.x()-.5,p.y()-.5,p.z()-.5),rig);points.add(p);
+                check(p.z()<-.2,"Raised display in front of camera");
+                check(Math.abs(p.y()/p.z())<Math.tan(Math.toRadians(35)),"Raised display fits vertical 70-degree bounds");
+                check(Math.abs(p.x()/p.z())<Math.tan(Math.toRadians(35))*4/3,"Raised display fits 4:3 view");
+            }
+            near(distance(points.get(0),points.get(3))/distance(points.get(0),points.get(1)),1.5);
+            check(points.get(3).x()>points.get(0).x()&&points.get(0).y()>points.get(1).y(),"Raised orientation correct");
+        }
         for(var e:keys.entrySet())for(int bit=0;bit<12;bit++){
             var move=GbaHandheldLayout.motion(e.getKey(),1<<bit);check((move.y()<0)==(bit==e.getValue()),"Exact input-to-model button "+e.getKey()+" bit"+bit);
             near(move.pitch(),0);near(move.roll(),0);

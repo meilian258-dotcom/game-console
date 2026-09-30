@@ -27,6 +27,10 @@ public final class GbaHandheldLayout {
         double x=Math.cos(roll)*hx-Math.sin(roll)*hy,y=Math.sin(roll)*hx+Math.cos(roll)*hy;
         return new Arm(side*.29-scale*x,-.09-scale*y,.015-scale*hz,30,side*60,scale);
     }
+    public static Pose first(boolean right,boolean two,double equip,double swing,boolean raised){
+        // Front-on 3:2 screen occupies ~38% of view height at the default hand FOV.
+        return raised?new Pose(0,-.02,-.95,0,0,0,2.8):first(right,two,equip,swing);
+    }
     public static boolean eligible(boolean item,boolean alive,boolean using,boolean invisible,boolean scoping,boolean swimming,boolean flying){return item&&alive&&!using&&!invisible&&!scoping&&!swimming&&!flying;}
     public static Point screen(int corner){return switch(corner){
         case 0->new Point(SCREEN_X0,SCREEN_Y,SCREEN_Z0);case 1->new Point(SCREEN_X0,SCREEN_Y,SCREEN_Z1);

@@ -1,6 +1,12 @@
 # 方块电玩：GBA / Game Console: GBA
 
-当前候选 0.1.0-alpha.12，需要双方 FC76.26。Windows x64 的掌机/本人主持机柜默认 JNI，菜单或 `/gameconsole-gba-jni` 可为本次连接切回进程；旧存档不迁移，服务器托管保持进程，不新增 GBA Netplay。见[当前默认与风险说明](../piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md)。自定义构建完成后，用[统一交付工具](../source-control/BRANDING.md)生成 `game-console-gba-版本.jar`；保留旧 ID、运行库、存档和历史包，不改写下方历史验证记录。
+当前候选 **0.1.0-alpha.13，需要两端主包 FC76.28**。掌机右键举起/放下不断电，Shift＋右键开关；新增实体GBA卡带，老式电脑写卡，主副手任意顺序插入，设置菜单退卡。见[本版完整使用、安装与验证](design/GBA13-实体卡带与掌机操作.md)。保留当前mGBA、公共JNI默认、显式进程回退和本机个人电池档；没有GBA Netplay或掌机音画广播。代码/自动检查通过不等于Minecraft真人验收；不自动安装或推送。
+
+构建与包级QA用 `tools/build_current.py` / `tools/check_current.py` 的显式输入，命令见本版指南。自定义构建完成后，用[统一交付工具](../source-control/BRANDING.md)生成品牌JAR名。下方均为历史版本记录，不能把旧右键/Shift操作或进程限定当成本版行为。
+
+## 历史：GBA12
+
+0.1.0-alpha.12 的默认与风险记录见[FC76.26指南](../piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md)。其后GC110已将服务器机柜执行工厂接到JNI；不代表个人掌机远程托管。保留旧ID、核心、运行库、存档和历史成品。
 
 ## 历史：GBA11
 

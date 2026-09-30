@@ -47,4 +47,21 @@ class ContentCardStoreTest {
         Files.createDirectory(root.resolve("fake.md"));assertThrows(IOException.class,()->store().list());
         assertThrows(IOException.class,()->store().readPath(root.resolve("other.exe")));
     }
+    @Test void legacyStoreKeepsEightMiBLimit()throws Exception{
+        byte[] large=new byte[ContentCardStore.DEFAULT_MAX_BYTES+1];large[256]='S';
+        var file=root.resolve("large.md");Files.write(file,large);
+        assertThrows(IOException.class,()->store().readPath(file));
+        assertThrows(IOException.class,()->store().store("large.md",ContentCardStore.hash(large),large));
+        var adapter=new cn.piq.fcarcade.home.content.ContentCards.Adapter(()->null,"MD",Set.of("md"),b->{});
+        assertEquals(8*1024*1024,adapter.maxBytes());
+    }
+    @Test void explicitlyRegistered32MiBStoreRoundTrips()throws Exception{
+        var gba=new ContentCardStore(root,Set.of("gba"),b->{if(b[0xb2]!=(byte)0x96)throw new IOException("GBA header");},32*1024*1024);
+        byte[] bytes=new byte[32*1024*1024];bytes[0xb2]=(byte)0x96;bytes[bytes.length-1]=42;
+        var entry=gba.store("full.gba",ContentCardStore.hash(bytes),bytes);
+        assertEquals(bytes.length,entry.size());assertArrayEquals(bytes,gba.read(entry));
+        assertThrows(IllegalArgumentException.class,()->new ContentCardStore(root,Set.of("gba"),b->{},ContentCardStore.MAX_BYTES+1));
+        assertThrows(IllegalArgumentException.class,()->new ContentCardStore(root,Set.of("gba"),b->{},0));
+        assertThrows(IllegalArgumentException.class,()->new cn.piq.fcarcade.home.content.ContentCards.Adapter(()->null,"bad",Set.of("gba"),b->{},ContentCardStore.MAX_BYTES+1));
+    }
 }

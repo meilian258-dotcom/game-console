@@ -20,22 +20,37 @@ import static cn.piq.fcarcade.home.content.ContentCardNetwork.*;
 public final class ContentCardClient {
     private static final ThreadPoolExecutor IO=new ThreadPoolExecutor(1,1,30,TimeUnit.SECONDS,new ArrayBlockingQueue<>(2),r->{var t=new Thread(r,"GameConsole-card-client-io");t.setDaemon(true);return t;});
     private static Writer writer;private static Download download;private static boolean installed;
+    /** Optional handheld/runtime adapter. Main-thread callbacks; no IO/native work in start. */
+    public interface Runtime {
+        default boolean accept(Message message){return true;}
+        String start(Message message,Path rom);
+        int state(Message message);
+        void stop(Message message);
+    }
+    private static final Map<net.minecraft.resources.ResourceLocation,Runtime> RUNTIMES=new HashMap<>();
+    private static final Runtime HOME=new Runtime(){
+        public String start(Message m,Path p){return PrivateHomeClient.startCartridge(m.system(),m.pos(),p);}
+        public int state(Message m){return PrivateHomeClient.cartridgeState(m.system(),m.pos());}
+        public void stop(Message m){PrivateHomeClient.stopCartridge(m.system(),m.pos());}
+    };
+    public static void registerRuntime(net.minecraft.resources.ResourceLocation system,Runtime runtime){if(RUNTIMES.putIfAbsent(system,Objects.requireNonNull(runtime))!=null)throw new IllegalArgumentException("Duplicate card runtime");}
+    private static Runtime runtime(Message m){return RUNTIMES.getOrDefault(m.system(),HOME);}
     private static void install(){if(installed)return;installed=true;
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e)->tick());
-        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e)->{writer=null;var d=download;download=null;if(d!=null)PrivateHomeClient.stopCartridge(d.message.system(),d.message.pos());});
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e)->{writer=null;var d=download;download=null;if(d!=null)runtime(d.message).stop(d.message);});
     }
     public static void receive(Message m){
         install();var mc=Minecraft.getInstance();if(mc.player==null||mc.getConnection()==null)return;
         if(m.op()==OPEN){if(writer!=null)writer.cancel();writer=new Writer(m);mc.setScreen(writer);return;}
         if(m.op()==DOWNLOAD){
             if(download!=null){send(with(m,STOP,0,new byte[0]));return;}
-            var a=ContentCards.adapter(m.system());if(a==null||m.size()<1){send(with(m,STOP,0,new byte[0]));return;}
-            try{new ContentCardStore.Entry(m.hash(),m.name(),m.size());download=new Download(m,mc.getConnection());send(with(m,GET,0,new byte[0]));}
+            var a=ContentCards.adapter(m.system());if(a==null||m.size()<1||m.size()>a.maxBytes()){send(with(m,STOP,0,new byte[0]));return;}
+            try{if(!runtime(m).accept(m)){send(with(m,STOP,0,new byte[0]));return;}new ContentCardStore.Entry(m.hash(),m.name(),m.size());download=new Download(m,mc.getConnection());send(with(m,GET,0,new byte[0]));}
             catch(RuntimeException invalid){send(with(m,STOP,0,new byte[0]));}return;
         }
         var d=download;
         if(d!=null&&d.message.token().equals(m.token())&&d.message.system().equals(m.system())&&d.message.pos().equals(m.pos())){
-            if(m.op()==STOP){download=null;PrivateHomeClient.stopCartridge(m.system(),m.pos());return;}
+            if(m.op()==STOP){download=null;runtime(m).stop(m);return;}
             if(m.op()==DATA)receiveData(d,m);return;
         }
         var w=writer;if(w==null||!w.open.token().equals(m.token())||!w.open.system().equals(m.system()))return;
@@ -60,14 +75,15 @@ public final class ContentCardClient {
         try{IO.execute(()->{
             Path rom=null;String error=null;
             try{
-                var store=new ContentCardStore(root,a.extensions(),a.validator());var entry=store.store(m.name(),m.hash(),bytes);
+                var store=new ContentCardStore(root,a.extensions(),a.validator(),a.maxBytes());var entry=store.store(m.name(),m.hash(),bytes);
                 rom=root.resolve(entry.name());
             }catch(Exception failure){error="卡带校验/缓存失败："+failure.getMessage();}
             var path=rom;var failure=error;mc.execute(()->{
                 if(download!=d||mc.getConnection()!=d.connection)return;
                 if(failure!=null){stop(d,failure);return;}
-                String failed=PrivateHomeClient.startCartridge(m.system(),m.pos(),path);
-                if(failed!=null){stop(d,failed);return;}d.started=true;d.busy=false;
+                try{String failed=runtime(m).start(m,path);
+                    if(failed!=null){stop(d,failed);return;}d.started=true;d.busy=false;
+                }catch(RuntimeException|LinkageError problem){stop(d,"卡带运行器启动失败："+problem.getClass().getSimpleName());}
             });
         });}catch(RejectedExecutionException full){stop(d,"卡带 IO 繁忙，请重试");}
     }
@@ -75,10 +91,11 @@ public final class ContentCardClient {
         var mc=Minecraft.getInstance();var w=writer;
         if(w!=null&&w.loading&&System.nanoTime()-w.last>120_000_000_000L){w.cancel();notice("写卡请求超时，原卡未改动");}
         var d=download;if(d==null)return;
-        if(mc.getConnection()!=d.connection||mc.player==null){download=null;PrivateHomeClient.stopCartridge(d.message.system(),d.message.pos());return;}
+        if(mc.getConnection()!=d.connection||mc.player==null){download=null;runtime(d.message).stop(d.message);return;}
         if(System.nanoTime()-d.opened>120_000_000_000L&&!d.ready){stop(d,"卡带启动超时");return;}
         if(!d.started)return;
-        int status=PrivateHomeClient.cartridgeState(d.message.system(),d.message.pos());
+        int status;
+        try{status=runtime(d.message).state(d.message);}catch(RuntimeException|LinkageError problem){stop(d,"卡带运行器状态异常");return;}
         if(status<0){stop(d,null);return;}
         if(status==1&&!d.ready){d.ready=true;send(with(d.message,STARTED,0,new byte[0]));}
         if(d.ready&&++d.ticks%40==0)send(with(d.message,HEARTBEAT,0,new byte[0]));
@@ -86,7 +103,7 @@ public final class ContentCardClient {
     private static void stop(Download d,String why){
         if(download!=d)return;download=null;
         if(Minecraft.getInstance().getConnection()==d.connection)send(with(d.message,STOP,0,new byte[0]));
-        PrivateHomeClient.stopCartridge(d.message.system(),d.message.pos());if(why!=null)notice(why);
+        runtime(d.message).stop(d.message);if(why!=null)notice(why);
     }
     private static Message with(Message m,int op,int offset,byte[] data){return msg(op,m.system(),m.token(),m.pos(),"","",0,offset,data);}
     private static void notice(String message){var p=Minecraft.getInstance().player;if(p!=null)p.displayClientMessage(Component.literal(message),false);}
@@ -117,7 +134,7 @@ public final class ContentCardClient {
             Path dir=ConsoleStorage.location(minecraft.gameDirectory.toPath()).resolve("content-cards").resolve(open.system().getNamespace()).resolve(open.system().getPath());
             minecraft.setScreen(new LocalRomPickerScreen(Component.literal("选择 ROM：将上传到服务器并写入当前卡带"),dir,a.extensions(),Set.of(),"需管理员授予 ROM 上传权限；不会覆盖原游戏文件",path->{
                 minecraft.setScreen(this);loading=true;last=System.nanoTime();status="读取并校验本地游戏…";rebuildWidgets();
-                try{IO.execute(()->{byte[] data=null;String error=null;String digest=null;try{data=new ContentCardStore(dir,a.extensions(),a.validator()).readPath(path);digest=ContentCardStore.hash(data);new ContentCardStore.Entry(digest,path.getFileName().toString(),data.length);}catch(Exception failure){error=failure.getMessage();}
+                try{IO.execute(()->{byte[] data=null;String error=null;String digest=null;try{data=new ContentCardStore(dir,a.extensions(),a.validator(),a.maxBytes()).readPath(path);digest=ContentCardStore.hash(data);new ContentCardStore.Entry(digest,path.getFileName().toString(),data.length);}catch(Exception failure){error=failure.getMessage();}
                     var bytes=data;var failure=error;var hash=digest;minecraft.execute(()->{
                         if(closed||writer!=this||minecraft.getConnection()!=connection)return;
                         if(failure!=null){loading=false;status="读取失败："+failure;rebuildWidgets();return;}

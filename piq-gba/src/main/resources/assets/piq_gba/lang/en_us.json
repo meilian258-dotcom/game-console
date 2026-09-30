@@ -1,5 +1,8 @@
 {
   "item.piq_gba.handheld": "Game Boy Advance",
-  "tooltip.piq_gba.handheld.use": "Right-click: power · Shift + right-click: choose game",
-  "tooltip.piq_gba.handheld.local": "Local games and battery saves · No GBA link cable"
+  "tooltip.piq_gba.handheld.use": "Right-click: raise/lower (keep running) · Shift + right-click: power",
+  "tooltip.piq_gba.handheld.local": "Physical cartridges · Local battery saves · No GBA link cable",
+  "item.piq_gba.gba_cartridge": "GBA Game Cartridge",
+  "key.piq_gba.settings": "GBA Settings / Eject Cartridge",
+  "key.categories.piq_gba": "Game Console · GBA"
 }

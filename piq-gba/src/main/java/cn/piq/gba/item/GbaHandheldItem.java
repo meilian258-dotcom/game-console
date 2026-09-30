@@ -25,5 +25,8 @@ public final class GbaHandheldItem extends Item {
     @Override public void appendHoverText(ItemStack stack,TooltipContext context,List<Component> lines,TooltipFlag flag){
         lines.add(Component.translatable("tooltip.piq_gba.handheld.use"));
         lines.add(Component.translatable("tooltip.piq_gba.handheld.local"));
+        var card=GbaCartridgeSlot.card(stack);
+        lines.add(Component.literal(card.isEmpty()?"未插卡：掌机和卡带分持两手，右键插入":"已插卡："+cn.piq.fcarcade.home.content.ContentCardData.title(card)));
+        lines.add(Component.literal("设置/退卡：/gameconsole-gba，或绑定“GBA 掌机设置”按键"));
     }
 }

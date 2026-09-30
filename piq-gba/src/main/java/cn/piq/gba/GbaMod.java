@@ -25,8 +25,11 @@ public final class GbaMod {
     public static final ResourceLocation BACKEND=ResourceLocation.fromNamespaceAndPath(ID,"gba");
     private static final DeferredRegister.Items ITEMS=DeferredRegister.createItems(ID);
     public static final DeferredItem<GbaHandheldItem> HANDHELD=ITEMS.register("handheld",()->new GbaHandheldItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> CARTRIDGE=ITEMS.register("gba_cartridge",()->new cn.piq.fcarcade.home.content.ContentCartridgeItem(new Item.Properties().stacksTo(1),BACKEND));
     public GbaMod(IEventBus bus){
         ITEMS.register(bus);
+        cn.piq.fcarcade.home.content.ContentCards.register(BACKEND,new cn.piq.fcarcade.home.content.ContentCards.Adapter(CARTRIDGE,"GBA",java.util.Set.of("gba"),cn.piq.gba.item.GbaCardRom::validate,cn.piq.gba.item.GbaCardRom.MAX_BYTES));
+        bus.addListener(cn.piq.gba.item.GbaHandheldNetwork::register);
         bus.addListener((FMLCommonSetupEvent e)->e.enqueueWork(GbaMod::registerBackend));
         // Loading worker, after Arcade's common-setup extraction; never a render/server tick.
         bus.addListener((FMLLoadCompleteEvent e)->GbaBundledRuntime.prepare());
@@ -36,12 +39,12 @@ public final class GbaMod {
         NeoForge.EVENT_BUS.addListener(GbaMod::handheldSpecificEntityUse);
     }
     private static void creativeContents(BuildCreativeModeTabContentsEvent event){
-        if(event.getTabKey().equals(ModCreativeTabs.FC.getKey()))event.accept(HANDHELD.get());
+        if(event.getTabKey().equals(ModCreativeTabs.FC.getKey())){event.accept(HANDHELD.get());event.accept(CARTRIDGE.get());}
     }
     private static void handheldBlockUse(PlayerInteractEvent.RightClickBlock event){
         // The handheld owns right click while held; do not also open a chest/cabinet,
         // including the secondary-hand pass. Never enable an otherwise denied item use.
-        if(event.getEntity().getMainHandItem().is(HANDHELD.get()))event.setUseBlock(TriState.FALSE);
+        if(held(event))event.setUseBlock(TriState.FALSE);
     }
     private static void handheldEntityUse(PlayerInteractEvent.EntityInteract event){
         if(disableEntityUse(event)){event.setCancellationResult(InteractionResult.SUCCESS);event.setCanceled(true);}
@@ -51,8 +54,9 @@ public final class GbaMod {
     }
     private static boolean disableEntityUse(PlayerInteractEvent event){
         // Client cancellation also dispatches its local toggle; don't pre-cancel that handler.
-        return !event.getLevel().isClientSide&&event.getEntity().getMainHandItem().is(HANDHELD.get());
+        return !event.getLevel().isClientSide&&held(event);
     }
+    private static boolean held(PlayerInteractEvent e){return e.getEntity().getMainHandItem().is(HANDHELD.get())||e.getEntity().getOffhandItem().is(HANDHELD.get());}
     public static void registerBackend(){
         CabinetBackends.register(BACKEND,"GBA · 单席游戏",false);
         CabinetBackends.registerNetwork(BACKEND,1);

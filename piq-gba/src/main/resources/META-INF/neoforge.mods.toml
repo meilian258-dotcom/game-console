@@ -3,10 +3,10 @@ loaderVersion="[4,)"
 license="GPL-3.0-or-later"
 [[mods]]
 modId="piq_gba"
-version="0.1.0-alpha.12"
+version="0.1.0-alpha.13"
 displayName="方块电玩：GBA"
 authors="PIQ / Codex"
-description='''Portable GBA handheld and a one-seat cabinet backend. Windows x64 clients default to common JNI for handheld and client-hosted cabinet with isolated battery saves; explicit process fallback retained. No GBA link or Netplay. Server hosting remains process-only. See capability and risk guide.'''
+description='''Portable GBA handheld with physical game cartridges copied at the retro computer. Right-click raises/lowers without powering off; Shift+right-click toggles power. Windows x64 defaults to the common JNI with isolated battery saves; supported client entries retain explicit process fallback. One-seat cabinet and hosted JNI remain separate from the personal handheld. No GBA link or Netplay. See capability and risk guide.'''
 [[dependencies.piq_gba]]
 modId="neoforge"
 type="required"
@@ -22,6 +22,6 @@ side="BOTH"
 [[dependencies.piq_gba]]
 modId="piq_fc_arcade"
 type="required"
-versionRange="[0.31.0-alpha.76.26,0.31.0-alpha.77)"
+versionRange="[0.31.0-alpha.76.28,0.31.0-alpha.77)"
 ordering="AFTER"
 side="BOTH"

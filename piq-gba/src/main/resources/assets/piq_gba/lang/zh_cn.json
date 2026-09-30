@@ -1,5 +1,8 @@
 {
   "item.piq_gba.handheld": "GBA",
-  "tooltip.piq_gba.handheld.use": "右键开关机 · Shift＋右键选择游戏",
-  "tooltip.piq_gba.handheld.local": "本机游戏与电池存档 · 不支持掌机通讯线"
+  "tooltip.piq_gba.handheld.use": "右键举起/放下（不断电）· Shift＋右键开关机",
+  "tooltip.piq_gba.handheld.local": "实体卡带 · 本机电池存档 · 不支持掌机通讯线",
+  "item.piq_gba.gba_cartridge": "GBA 游戏卡带",
+  "key.piq_gba.settings": "GBA 掌机设置 / 退卡",
+  "key.categories.piq_gba": "方块电玩 · GBA"
 }
