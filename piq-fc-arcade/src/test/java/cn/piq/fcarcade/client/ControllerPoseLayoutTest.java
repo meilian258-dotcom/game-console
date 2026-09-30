@@ -251,7 +251,9 @@ class ControllerPoseLayoutTest {
         String renderer=source("HomeHardwareRenderer"),pose=source("ControllerPose");
         assertTrue(renderer.contains("return ControllerPose.firstTransform(poses, player, arm, stack, equip, swing)"));
         assertTrue(renderer.contains("return ControllerPose.armPose(entity, hand, stack)"));
-        assertTrue(pose.contains("if (!HomeControllerData.isController(stack)) return false"));
+        assertTrue(pose.contains("if (!controller(stack)) return false"));
+        assertTrue(pose.contains("return HomeControllerData.isController(stack) || EXTERNAL.contains(stack.getItem())"));
+        assertTrue(pose.contains("EXTERNAL.add(java.util.Objects.requireNonNull(item))"));
         assertTrue(pose.contains("if (event.isCanceled()) return"));
         assertTrue(pose.contains("event.getItemStack().isEmpty() && player.getItemInHand(event.getHand()).isEmpty()"));
         assertTrue(pose.contains("renderer.renderRightHand(")); assertTrue(pose.contains("renderer.renderLeftHand("));

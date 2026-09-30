@@ -72,6 +72,24 @@ public class MdNativeProbe {
             check(disk.sram().length>batteryIndex&&disk.sram()[batteryIndex]==0x5a,"disk SRAM survives restart "+trial);
         }
         check(!LibretroRuntimes.isJniBusy(),"engine slot freed");
+        // Exercise the public engine lifecycle used by physical reset and the explicit no-save preference.
+        var oldFiles=fence(out.resolve("saves"));
+        var noSave=new MdEngine(out.resolve("diagnostic.md"),out.resolve("saves"),backend,selected,false);
+        awaitReady(noSave);check(noSave.isReady(),"no-save can start beside existing saved progress");
+        noSave.offerInput(0,0);Thread.sleep(180);var neutral=noSave.pollFrame();
+        noSave.offerInput(1,0);Thread.sleep(180);var pressed=noSave.pollFrame();
+        check(neutral!=null&&pressed!=null&&!Arrays.equals(neutral.abgr(),pressed.abgr()),"engine input reaches native pad");
+        noSave.paused(true);check(noSave.requestReset(),"reset accepted while controller is returned/paused");
+        Thread.sleep(180);check(noSave.pollFrame()==null,"reset does not resume absent controller");
+        noSave.paused(false);noSave.offerInput(0,0);Thread.sleep(180);var reset=noSave.pollFrame();
+        check(reset!=null&&Arrays.equals(neutral.abgr(),reset.abgr()),"reset resumes clean neutral video without stale input");
+        var noResult=noSave.stopAndSave().get(15,TimeUnit.SECONDS);
+        check(!noResult.saved()&&noResult.message().contains("不存档"),"no-save reports no save instead of false success");
+        check(oldFiles.equals(fence(out.resolve("saves"))),"no-save and reset preserve every existing save byte");
+        check(!noSave.requestReset(),"reset rejected after close");
+        var freshRoot=out.resolve("none-never-created");var fresh=new MdEngine(out.resolve("diagnostic.md"),freshRoot,backend,selected,false);
+        awaitReady(fresh);check(fresh.isReady(),"no-save fresh session ready");fresh.stopAndSave().get(15,TimeUnit.SECONDS);
+        check(!Files.exists(freshRoot),"no-save never creates a progress directory");
         if(selected==MdProfile.Core.GENESIS_PLUS_GX){
             for(boolean hasBattery:new boolean[]{true,false}){
                 Path diagnostic=out.resolve(hasBattery?"empty-battery.md":"no-battery.md");byte[] bytes=rom.clone();
@@ -91,4 +109,14 @@ public class MdNativeProbe {
         System.out.println("PASS checks="+checks);
     }
     static int[] toInts(short[] s){int[] r=new int[s.length];for(int i=0;i<s.length;i++)r[i]=s[i];return r;}
+    static void awaitReady(MdEngine engine)throws Exception{
+        long until=System.nanoTime()+20_000_000_000L;
+        while(!engine.isReady()&&engine.error()==null&&System.nanoTime()<until)Thread.sleep(20);
+        if(!engine.isReady()){engine.stopAndSave().get(15,TimeUnit.SECONDS);throw new AssertionError("engine start: "+engine.error());}
+    }
+    static Map<String,String> fence(Path root)throws Exception{
+        var result=new TreeMap<String,String>();try(var files=Files.walk(root)){
+            for(var file:files.filter(Files::isRegularFile).toList())result.put(root.relativize(file).toString(),PrivateSaveStore.sha256(Files.readAllBytes(file)));
+        }return result;
+    }
 }

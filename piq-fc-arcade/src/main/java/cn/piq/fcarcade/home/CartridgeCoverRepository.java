@@ -8,6 +8,8 @@ import java.nio.file.StandardCopyOption;
 
 /** Content-addressed PNG storage. No caller-controlled path or URL is accepted. */
 public final class CartridgeCoverRepository {
+    // FC and content-card writers can own separate repository instances for the same shared directory.
+    private static final Object WRITES = new Object();
     private final Path root;
     public CartridgeCoverRepository(Path root) { this.root = root.toAbsolutePath().normalize(); }
     public Path root() { return root; }
@@ -49,8 +51,11 @@ public final class CartridgeCoverRepository {
         CartridgeCoverCodec.validate(bytes, hash);
         return bytes;
     }
-    public synchronized void store(String hash, byte[] png) throws IOException {
+    public void store(String hash, byte[] png) throws IOException {
         CartridgeCoverCodec.validate(png, hash);
+        synchronized (WRITES) { storeValidated(hash, png); }
+    }
+    private void storeValidated(String hash, byte[] png) throws IOException {
         Path destination = path(hash);
         Files.createDirectories(root);
         if (Files.exists(destination, LinkOption.NOFOLLOW_LINKS)) { read(hash); return; }

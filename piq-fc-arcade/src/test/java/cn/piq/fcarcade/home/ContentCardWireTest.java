@@ -13,9 +13,9 @@ class ContentCardWireTest {
     private final ResourceLocation system=ResourceLocation.fromNamespaceAndPath("example","system");
     @Test void maximumPageAndChunkFitServerboundLimitAndRoundTrip(){
         var entries=java.util.stream.IntStream.range(0,8).mapToObj(i->new ContentCardStore.Entry("a".repeat(64),"游".repeat(120)+".md",ContentCardStore.MAX_BYTES)).toList();
-        for(int op:new int[]{ContentCardNetwork.LIST,ContentCardNetwork.DATA}){
+        for(int op:new int[]{ContentCardNetwork.LIST,ContentCardNetwork.COVER_LIST,ContentCardNetwork.DATA}){
             var original=new ContentCardNetwork.Message(op,system,UUID.randomUUID(),new BlockPos(-18,-60,6),"b".repeat(64),"状".repeat(256),ContentCardStore.MAX_BYTES,0,
-                op==ContentCardNetwork.DATA?new byte[ContentCardStore.CHUNK]:new byte[0],op==ContentCardNetwork.LIST?entries:List.of());
+                op==ContentCardNetwork.DATA?new byte[ContentCardStore.CHUNK]:new byte[0],op!=ContentCardNetwork.DATA?entries:List.of());
             var b=new RegistryFriendlyByteBuf(Unpooled.buffer(),RegistryAccess.EMPTY);
             try{ContentCardNetwork.Message.CODEC.encode(b,original);assertTrue(b.readableBytes()<32767);
                 var actual=ContentCardNetwork.Message.CODEC.decode(b);assertEquals(original.op(),actual.op());assertEquals(original.entries(),actual.entries());
@@ -39,5 +39,15 @@ class ContentCardWireTest {
                 assertEquals(payload.size(),decoded.size());assertArrayEquals(payload.data(),decoded.data());assertEquals(0,buf.readableBytes());
             }finally{buf.release();}
         }
+    }
+    @Test void newCoverPreferenceAndResetOperationsRoundTripWithoutIncreasingBounds(){
+        for(int op:new int[]{ContentCardNetwork.RESET,ContentCardNetwork.COVER_WRITE,ContentCardNetwork.COVER_UPLOAD,ContentCardNetwork.SAVE_MODE}){
+            var message=ContentCardNetwork.msg(op,system,UUID.randomUUID(),BlockPos.ZERO,"a".repeat(64),"",32,2,new byte[0]);
+            var b=new RegistryFriendlyByteBuf(Unpooled.buffer(),RegistryAccess.EMPTY);
+            try{ContentCardNetwork.Message.CODEC.encode(b,message);assertTrue(b.readableBytes()<256);
+                var actual=ContentCardNetwork.Message.CODEC.decode(b);assertEquals(op,actual.op());assertEquals(2,actual.offset());assertEquals(message.token(),actual.token());
+            }finally{b.release();}
+        }
+        assertThrows(IllegalArgumentException.class,()->ContentCardNetwork.msg(ContentCardNetwork.SAVE_MODE+1,system,UUID.randomUUID(),BlockPos.ZERO,"","",0,0,new byte[0]));
     }
 }

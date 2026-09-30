@@ -13,11 +13,12 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 /** One bounded bidirectional registration; direction is dispatched by the registrar. */
 public final class ContentCardNetwork {
     public static final int OPEN=0,LIST=1,UPLOAD=2,PART=3,WRITE=4,CANCEL=5,STATUS=6,READY=7,
-            DOWNLOAD=8,GET=9,DATA=10,STARTED=11,STOP=12,HEARTBEAT=13,RENAME=14,CARD=15;
+            DOWNLOAD=8,GET=9,DATA=10,STARTED=11,STOP=12,HEARTBEAT=13,RENAME=14,CARD=15,RESET=16,
+            COVER_LIST=17,COVER_WRITE=18,COVER_UPLOAD=19,SAVE_MODE=20;
     public record Message(int op,ResourceLocation system,UUID token,BlockPos pos,String hash,String name,
                           int size,int offset,byte[] data,List<ContentCardStore.Entry> entries) implements CustomPacketPayload {
         public Message {
-            if(op<0||op>CARD||system==null||token==null||pos==null||hash==null||(!hash.isEmpty()&&!hash.matches("[0-9a-f]{64}"))
+            if(op<0||op>SAVE_MODE||system==null||token==null||pos==null||hash==null||(!hash.isEmpty()&&!hash.matches("[0-9a-f]{64}"))
                     ||name==null||name.length()>256||name.chars().anyMatch(Character::isISOControl)
                     ||size<0||size>ContentCardStore.MAX_BYTES||offset<0||offset>ContentCardStore.MAX_BYTES
                     ||data==null||data.length>ContentCardStore.CHUNK||entries==null||entries.size()>8)throw new IllegalArgumentException("Invalid content-card message");
@@ -40,7 +41,7 @@ public final class ContentCardNetwork {
     }
     public static Message msg(int op,ResourceLocation system,UUID token,BlockPos pos,String hash,String name,int size,int offset,byte[] data){return new Message(op,system,token,pos,hash,name,size,offset,data,List.of());}
     public static void register(RegisterPayloadHandlersEvent event){
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"content-card-2").playBidirectional(Message.TYPE,Message.CODEC,
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"content-card-3").playBidirectional(Message.TYPE,Message.CODEC,
             (m,c)->c.enqueueWork(()->{
                 if(c.flow().isClientbound())Client.receive(m,c.connection());
                 else if(c.player() instanceof ServerPlayer p)ContentCards.handle(p,m);

@@ -26,6 +26,14 @@ public final class ContentCards {
         public Adapter{Objects.requireNonNull(item);Objects.requireNonNull(label);extensions=Set.copyOf(extensions);Objects.requireNonNull(validator);if(maxBytes<1||maxBytes>ContentCardStore.MAX_BYTES)throw new IllegalArgumentException("Card size budget");}
     }
     private static final Map<ResourceLocation,Adapter> ADAPTERS=new ConcurrentHashMap<>();
+    public record Features(boolean covers,boolean localSaveSettings){}
+    private static final Map<ResourceLocation,Features> FEATURES=new ConcurrentHashMap<>();
+    public static void features(ResourceLocation id,Features features){if(!ADAPTERS.containsKey(id)||FEATURES.putIfAbsent(id,features)!=null)throw new IllegalArgumentException("Content-card features");}
+    public static Features features(ResourceLocation id){return FEATURES.getOrDefault(id,new Features(false,false));}
+    private static cn.piq.fcarcade.home.CartridgeCoverRepository covers(ServerPlayer p){
+        return new cn.piq.fcarcade.home.CartridgeCoverRepository(cn.piq.fcarcade.storage.FcStoragePaths.prepareUnchecked(
+                p.getServer().getServerDirectory(),cn.piq.fcarcade.storage.FcStoragePaths.Area.SHARED_COVERS));
+    }
     private static final Map<MinecraftServer,State> STATES=new WeakHashMap<>();
     private static final ThreadPoolExecutor IO=new ThreadPoolExecutor(1,1,30,TimeUnit.SECONDS,new ArrayBlockingQueue<>(8),r->{var t=new Thread(r,"GameConsole-content-card-io");t.setDaemon(true);return t;});
     private static boolean installed;
@@ -49,6 +57,7 @@ public final class ContentCards {
         if(old!=null&&System.nanoTime()-old.opened<500_000_000L)return;
         if(old==null&&s.edits.size()>=4){say(p,"写卡服务繁忙，请稍后重试。");return;}
         var e=new Edit(p,hand,pos,computer,system,stack);s.edits.put(p.getUUID(),e);
+        e.originalCover=ContentCardData.cover(stack);
         reply(p,e,OPEN,a.label+"：选择游戏后明确写入卡带",0,List.of());card(p,e);list(p,s,e,0,"");
     }
     private static boolean valid(ServerPlayer p,State s,Edit e){return !s.closed&&s.edits.get(p.getUUID())==e&&online(p,e.connection)&&p.serverLevel()==e.level&&e.level.hasChunkAt(e.pos)
@@ -67,10 +76,33 @@ public final class ContentCards {
         if(e.busy)return;
         try{
             if(e.upload!=null&&m.op()!=PART)return;
-            if(m.op()==RENAME||m.op()==WRITE||m.op()==UPLOAD){
+            if(m.op()==RENAME||m.op()==WRITE||m.op()==UPLOAD||m.op()==COVER_WRITE||m.op()==COVER_UPLOAD||m.op()==SAVE_MODE){
                 long now=System.nanoTime();if(now-e.lastMutation<250_000_000L){reply(p,e,STATUS,"操作过快，请稍后重试",0,List.of());return;}e.lastMutation=now;
             }
-            if(m.op()==LIST){if(System.nanoTime()-e.lastList<1_000_000_000L){reply(p,e,STATUS,"刷新过快，请稍后再试",0,List.of());return;}list(p,s,e,m.offset(),m.name());}
+            if(m.op()==COVER_LIST){
+                if(!features(e.system).covers()||!PlayerContentAccess.canUseServerCover(p))throw new IllegalArgumentException("封面库不可用或未授权");
+                if(System.nanoTime()-e.lastCoverList<1_000_000_000L)throw new IllegalArgumentException("刷新过快，请稍后重试");
+                ContentCardWorkbench.page(List.of(),m.name(),m.offset());e.lastCoverList=System.nanoTime();
+                job(p,s,e,()->covers(p).list().stream().map(hash->new ContentCardStore.Entry(hash,hash.substring(0,12)+".png",1)).toList(),entries->{
+                    if(!PlayerContentAccess.canUseServerCover(p))throw new IllegalArgumentException("封面权限已撤销");
+                    e.coverCatalog=entries;var result=ContentCardWorkbench.page(entries,m.name(),m.offset());
+                    send(p,new Message(COVER_LIST,e.system,e.token,e.pos,"","选择封面后点击应用",result.total(),result.index(),new byte[0],result.entries()));
+                });
+            }else if(m.op()==COVER_WRITE){
+                if(!features(e.system).covers())throw new IllegalArgumentException("此机型尚未接入封面");
+                if(m.hash().isEmpty()){applyCover(p,e,"");}
+                else{
+                    if(!PlayerContentAccess.canUseServerCover(p)||(!m.hash().equals(e.originalCover)&&e.coverCatalog.stream().noneMatch(c->c.hash().equals(m.hash()))))throw new IllegalArgumentException("请先刷新并选择服务器封面");
+                    job(p,s,e,()->covers(p).read(m.hash()),bytes->{if(!PlayerContentAccess.canUseServerCover(p))throw new IllegalArgumentException("封面权限已撤销");applyCover(p,e,m.hash());});
+                }
+            }else if(m.op()==SAVE_MODE){
+                if(!features(e.system).localSaveSettings())throw new IllegalArgumentException("此机型未接入保存设置");
+                ContentCardData.saveMode(e.stack,m.offset());e.snapshot=e.stack.copy();p.inventoryMenu.broadcastChanges();card(p,e);reply(p,e,STATUS,"保存方式已设置；已有存档保留，下次开机生效",0,List.of());
+            }else if(m.op()==COVER_UPLOAD){
+                if(!features(e.system).covers()||!PlayerContentAccess.canUploadCover(p))throw new IllegalArgumentException("管理员未允许上传封面");
+                if(m.size()<1||m.size()>cn.piq.fcarcade.home.CartridgeLimits.MAX_COVER_BYTES||reserved(s)+m.size()>64L*1024*1024)throw new IllegalArgumentException("封面超出传输预算");
+                e.entry=new ContentCardStore.Entry(m.hash(),"cover.png",m.size());e.uploadCover=true;e.upload=new CartridgeTransfer(m.size(),System.nanoTime());reply(p,e,READY,"开始上传封面",0,List.of());
+            }else if(m.op()==LIST){if(System.nanoTime()-e.lastList<1_000_000_000L){reply(p,e,STATUS,"刷新过快，请稍后再试",0,List.of());return;}list(p,s,e,m.offset(),m.name());}
             else if(m.op()==RENAME&&e.upload==null){
                 var current=ContentCardData.read(e.stack,e.system);
                 if(current==null||!current.hash().equals(m.hash()))throw new IllegalArgumentException("卡带内容已变化，请重新打开");
@@ -84,6 +116,7 @@ public final class ContentCards {
                     if(!PlayerContentAccess.canUseServerRom(p))throw new IllegalArgumentException("服务器 ROM 权限已撤销");write(p,e,entry,title);
                 });
             }else if(m.op()==UPLOAD){
+                e.uploadCover=false;
                 if(!PlayerContentAccess.canUploadRom(p))throw new IllegalArgumentException("管理员未允许上传 ROM");
                 if(e.upload!=null||m.size()<1||m.size()>ADAPTERS.get(e.system).maxBytes||reserved(s)+m.size()>64L*1024*1024)throw new IllegalArgumentException("上传大小或总预算无效，请稍后重试");
                 var entry=new ContentCardStore.Entry(m.hash(),m.name(),m.size());
@@ -91,10 +124,15 @@ public final class ContentCards {
                 e.uploadTitle=ContentCardWorkbench.uploadTitle(m.data(),entry.name());
                 e.upload=new CartridgeTransfer(m.size(),System.nanoTime());e.entry=entry;reply(p,e,READY,"开始上传到服务器；完成后写卡",0,List.of());
             }else if(m.op()==PART){
-                if(!PlayerContentAccess.canUploadRom(p)||e.upload==null||e.upload.expired(System.nanoTime()))throw new IllegalArgumentException("上传已取消或超时");
+                if(!(e.uploadCover?PlayerContentAccess.canUploadCover(p):PlayerContentAccess.canUploadRom(p))||e.upload==null||e.upload.expired(System.nanoTime()))throw new IllegalArgumentException("上传已取消或超时");
                 e.upload.append(m.offset(),m.data());
                 if(e.upload.received()<e.upload.total())reply(p,e,READY,"正在上传…",e.upload.received(),List.of());
                 else {byte[] complete=e.upload.finish();e.upload=null;var entry=e.entry;
+                    if(e.uploadCover){
+                        job(p,s,e,()->{covers(p).store(entry.hash(),complete);return entry.hash();},hash->{
+                            if(!PlayerContentAccess.canUploadCover(p))throw new IllegalArgumentException("封面上传权限已撤销");applyCover(p,e,hash);
+                        });return;
+                    }
                     job(p,s,e,()->e.store.store(entry.name(),entry.hash(),complete),stored->{
                         if(!PlayerContentAccess.canUploadRom(p))throw new IllegalArgumentException("上传权限已撤销；原卡未改动");write(p,e,stored,e.uploadTitle);
                     });
@@ -110,8 +148,9 @@ public final class ContentCards {
     private static void card(ServerPlayer p,Edit e){
         var entry=ContentCardData.read(e.stack,e.system);
         send(p,new Message(CARD,e.system,e.token,e.pos,entry==null?"":entry.hash(),ContentCardData.title(e.stack),
-                PlayerContentAccess.capabilities(p),0,new byte[0],entry==null?List.of():List.of(entry)));
+                PlayerContentAccess.capabilities(p),ContentCardData.saveMode(e.stack),ContentCardData.cover(e.stack).getBytes(java.nio.charset.StandardCharsets.US_ASCII),entry==null?List.of():List.of(entry)));
     }
+    private static void applyCover(ServerPlayer p,Edit e,String hash){ContentCardData.cover(e.stack,hash);e.snapshot=e.stack.copy();p.inventoryMenu.broadcastChanges();card(p,e);reply(p,e,STATUS,"卡带封面已更新",0,List.of());}
     private static void write(ServerPlayer p,Edit e,ContentCardStore.Entry entry,String title){
         ContentCardData.write(e.stack,e.system,entry,title);e.snapshot=e.stack.copy();p.inventoryMenu.broadcastChanges();card(p,e);reply(p,e,STATUS,"写卡成功："+title,0,List.of());
     }
@@ -133,6 +172,12 @@ public final class ContentCards {
         });}catch(RejectedExecutionException full){stop(p,s,play);return null;}return play.token;
     }
     private static boolean valid(ServerPlayer p,State s,Play play){return !s.closed&&s.plays.get(p.getUUID())==play&&online(p,play.connection)&&play.authorized.getAsBoolean();}
+    /** Server world action only; clients cannot send this opcode to gain reset authority. */
+    public static boolean reset(ServerPlayer p,UUID token){
+        var s=STATES.get(p.getServer());var play=s==null?null:s.plays.get(p.getUUID());
+        if(play==null||!play.token.equals(token)||!play.started||!valid(p,s,play))return false;
+        send(p,msg(RESET,play.system,play.token,play.pos,"","",0,0,new byte[0]));return true;
+    }
     private static long reserved(State s){
         long bytes=0;for(var e:s.edits.values()){if(e.upload!=null)bytes+=e.upload.total();else if(e.busy&&e.entry!=null)bytes+=e.entry.size();}
         for(var p:s.plays.values())if(!p.started)bytes+=p.entry.size();return bytes;
@@ -167,7 +212,7 @@ public final class ContentCards {
     private static final class Edit{
         final UUID token=UUID.randomUUID(),computerId;final Object connection;final ServerLevel level;final BlockPos pos;final CartridgeComputerBlockEntity computer;
         final ResourceLocation system;final InteractionHand hand;final int slot;final ItemStack stack;final CartridgeComputerBinding binding;ItemStack snapshot;final long opened=System.nanoTime();
-        final ContentCardStore store;long lastList,lastMutation;boolean busy;CartridgeTransfer upload;String uploadTitle="";ContentCardStore.Entry entry;List<ContentCardStore.Entry> catalog=List.of();
+        final ContentCardStore store;long lastList,lastCoverList,lastMutation;boolean busy,uploadCover;CartridgeTransfer upload;String uploadTitle="",originalCover;ContentCardStore.Entry entry;List<ContentCardStore.Entry> catalog=List.of(),coverCatalog=List.of();
         Edit(ServerPlayer p,InteractionHand h,BlockPos pos,CartridgeComputerBlockEntity c,ResourceLocation system,ItemStack stack){connection=p.connection.getConnection();level=p.serverLevel();this.pos=pos.immutable();computer=c;computerId=c.computerId();binding=new CartridgeComputerBinding(computerId,level.dimension().location().toString(),pos.getX(),pos.getY(),pos.getZ());this.system=system;store=store(p,system);hand=h;slot=p.getInventory().selected;this.stack=stack;snapshot=stack.copy();}
     }
     private static final class Play{

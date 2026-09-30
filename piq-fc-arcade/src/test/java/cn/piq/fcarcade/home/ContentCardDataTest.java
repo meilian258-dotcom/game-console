@@ -38,4 +38,27 @@ class ContentCardDataTest {
         stack.setCount(2);assertThrows(IllegalArgumentException.class,()->ContentCardData.write(stack,SYSTEM,GAME,"新卡"));
         assertEquals("原卡",ContentCardData.title(stack));assertEquals(GAME,ContentCardData.read(stack,SYSTEM));
     }
+    @Test void coverAndSavePreferenceSurviveRenameAndReplacingRom(){
+        var stack=new ItemStack(Items.PAPER);assertEquals(2,ContentCardData.saveMode(stack));
+        ContentCardData.cover(stack,"b".repeat(64));ContentCardData.saveMode(stack,0);
+        ContentCardData.write(stack,SYSTEM,GAME,"第一款");
+        ContentCardData.write(stack,SYSTEM,GAME,"改名");
+        var second=new ContentCardStore.Entry("c".repeat(64),"second.md",2048);
+        ContentCardData.write(stack,SYSTEM,second,"第二款");
+        assertEquals(second,ContentCardData.read(stack,SYSTEM));assertEquals("b".repeat(64),ContentCardData.cover(stack));
+        assertEquals(0,ContentCardData.saveMode(stack));
+        ContentCardData.saveMode(stack,2);ContentCardData.cover(stack,"");
+        assertEquals(2,ContentCardData.saveMode(stack));assertEquals("",ContentCardData.cover(stack));
+        assertEquals(second,ContentCardData.read(stack,SYSTEM));
+    }
+    @Test void unsupportedCardSaveModeOrBadCoverCannotMutateExistingMetadata(){
+        var stack=new ItemStack(Items.PAPER);ContentCardData.write(stack,SYSTEM,GAME,"旧卡");var before=stack.copy();
+        for(int mode:new int[]{-1,1,3,Integer.MAX_VALUE})assertThrows(IllegalArgumentException.class,()->ContentCardData.saveMode(stack,mode));
+        assertThrows(IllegalArgumentException.class,()->ContentCardData.cover(stack,"../wrong"));
+        assertTrue(ItemStack.matches(before,stack));
+        var nbt=stack.get(DataComponents.CUSTOM_DATA).copyTag();var card=nbt.getCompound("GameConsoleContentCard");
+        card.remove("SaveMode");card.putString("Cover","malformed");stack.set(DataComponents.CUSTOM_DATA,CustomData.of(nbt));
+        assertEquals(2,ContentCardData.saveMode(stack));assertEquals("",ContentCardData.cover(stack));
+        assertEquals(GAME,ContentCardData.read(stack,SYSTEM));
+    }
 }

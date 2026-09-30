@@ -18,6 +18,7 @@ class DeviceScreenSourceTest {
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/ArcadeSaveCatalogScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/ArcadeSettingsScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/HomeSyncSettingsScreen.java",
+            "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/HomeRuntimeSettingsScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/TvRemoteSettingsScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/NetworkDiagnosticsScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/NetplaySaveScreen.java",
@@ -74,7 +75,7 @@ class DeviceScreenSourceTest {
                 }
             }
         }
-        assertEquals(24, PAGES.size());
+        assertEquals(25, PAGES.size());
         assertEquals(Set.copyOf(PAGES), actual);
     }
 

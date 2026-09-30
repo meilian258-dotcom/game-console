@@ -33,7 +33,11 @@ public final class ClientCartridgeCovers {
     private static Resource baseResource;
     private ClientCartridgeCovers() {}
     public static ResourceLocation texture(ItemStack stack) {
-        String hash = FcCartridgeData.coverSha(stack);
+        return texture(FcCartridgeData.coverSha(stack));
+    }
+    /** Shared content-card cache: the caller retains its own cartridge identity/schema. */
+    public static ResourceLocation texture(String hash) {
+        if(!hash.isEmpty()&&!CartridgeLimits.validHash(hash))return null;
         if (hash.isEmpty()) return null;
         ResourceLocation found = TEXTURES.get(hash);
         if (found != null) return found;

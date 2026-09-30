@@ -17,7 +17,9 @@ public final class MdEngine implements PrivateEngine {
     private final CompletableFuture<SaveResult> finished=new CompletableFuture<>();
     private final short[] sound=new short[32768];
     private final Thread owner;
+    private final boolean saving;
     private volatile boolean closing,paused,ready;
+    private final AtomicBoolean resetRequested=new AtomicBoolean();
     private volatile String error;
     private volatile LibretroRuntime core;
     private int offered,held,head,size;private boolean neutral=true;private long revision;
@@ -27,6 +29,10 @@ public final class MdEngine implements PrivateEngine {
     }
     public static boolean active(){return ACTIVE.get();}
     public MdEngine(Path rom,Path root,LibretroRuntimes.Backend backend,MdProfile.Core selected){
+        this(rom,root,backend,selected,true);
+    }
+    public MdEngine(Path rom,Path root,LibretroRuntimes.Backend backend,MdProfile.Core selected,boolean saving){
+        this.saving=saving;
         Objects.requireNonNull(rom);Objects.requireNonNull(root);Objects.requireNonNull(backend);
         Objects.requireNonNull(selected);
         if(!ACTIVE.compareAndSet(false,true))throw new IllegalStateException("MD 上一局尚未安全退出");
@@ -47,13 +53,14 @@ public final class MdEngine implements PrivateEngine {
     private void clearMedia(){synchronized(media){latest=null;head=size=0;}}
     public CompletableFuture<SaveResult> stopAndSave(){closing=true;ready=false;clearInput();clearMedia();if(owner!=null)LockSupport.unpark(owner);return finished;}
     public void close(){stopAndSave();}
+    public boolean requestReset(){if(!isReady())return false;resetRequested.set(true);clearInput();LockSupport.unpark(owner);return true;}
     private void run(Path rom,Path root,LibretroRuntimes.Backend backend,MdProfile.Core selected){
         PrivateSaveStore store=null;PrivateSaveStore.Key key=null;boolean initialized=false,closed=true;
         SaveResult result=new SaveResult(false,"MD 尚未开始，原存档未更改");
         try{
             if(closing)return;byte[] content=MdRom.read(rom);
             key=new PrivateSaveStore.Key("md",MdProfile.saveNamespace(selected,backend),PrivateSaveStore.sha256(content));
-            store=new PrivateSaveStore(root);var saved=store.load(key);if(closing)return;
+            store=new PrivateSaveStore(root);var saved=saving?store.load(key):java.util.Optional.<PrivateSaveStore.Snapshot>empty();if(closing)return;
             core=LibretroRuntimes.create(MdProfile.profile(selected),MdProfile.class,backend);check(core.load(content),selected);
             // GX exposes full SRAM capacity only before the first retro_run; later lengths are trimmed.
             // Restore the validated battery first, never loosen the shared bridge's exact-size checks.
@@ -68,17 +75,19 @@ public final class MdEngine implements PrivateEngine {
             }
             initialized=true;ready=!closing;var audio=new MdAudio();long due=System.nanoTime(),saveDue=due+30_000_000_000L;
             while(!closing){
+                if(resetRequested.getAndSet(false)){core.reset();clearInput();clearMedia();audio=new MdAudio();due=System.nanoTime();saveDue=due+30_000_000_000L;}
                 if(paused){due=System.nanoTime();LockSupport.parkNanos(5_000_000);continue;}
                 int mask;long rev;synchronized(controls){if(!inputs.isEmpty())held=inputs.removeFirst();mask=held;rev=revision;}
                 var out=core.run(List.of(new LibretroProcess.Controls(new int[]{MdProfile.input(selected,mask),0},0)),3);check(out.info(),selected);
                 publish(out,audio,rev);long now=System.nanoTime();
-                if(now>=saveDue){save(store,key);saveDue=now+30_000_000_000L;}
+                if(saving&&now>=saveDue){save(store,key);saveDue=now+30_000_000_000L;}
                 long frame=(long)(1e9/out.info().fps());due+=frame;if(due<now-4*frame)due=now;if(due>now)LockSupport.parkNanos(due-now);
             }
         }catch(Exception|LinkageError e){error="MD："+(e.getMessage()==null?e.getClass().getSimpleName():e.getMessage());}
         finally{
             closing=true;ready=false;clearInput();clearMedia();
             if(error()!=null)result=new SaveResult(false,error()+"；原保存保留");
+            else if(initialized&&!saving)result=new SaveResult(false,"本卡设置为不存档；未读取或写入进度，旧档保留");
             else if(initialized){try{save(store,key);result=new SaveResult(true,"MD 私人进度已保存到本机（当前后端独立档）");}catch(Exception e){result=new SaveResult(false,"MD 保存失败："+e.getMessage()+"；原件保留");}}
             try{if(core!=null)core.close();}catch(RuntimeException|LinkageError e){closed=false;error="MD 关闭未确认，请正常重启客户端";result=new SaveResult(result.saved(),result.message()+"；"+error);}
             if(closed)ACTIVE.set(false);finished.complete(result);

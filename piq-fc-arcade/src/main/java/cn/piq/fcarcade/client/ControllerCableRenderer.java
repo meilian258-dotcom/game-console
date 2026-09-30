@@ -55,6 +55,11 @@ public final class ControllerCableRenderer {
 
     public static void render(BlockEntity console, int turns, Style style, Lease p1, Lease p2, Receipt receipt,
                               float partial, PoseStack poses, MultiBufferSource buffers, int light, int overlay) {
+        render(console,turns,style,p1,p2,receipt,null,null,partial,poses,buffers,light,overlay);
+    }
+    /** Optional north-facing sockets in block units; null retains the original FC/SFC geometry. */
+    public static void render(BlockEntity console, int turns, Style style, Lease p1, Lease p2, Receipt receipt,
+                              Point socket1,Point socket2,float partial,PoseStack poses,MultiBufferSource buffers,int light,int overlay) {
         Minecraft mc = Minecraft.getInstance();
         var level = console.getLevel();
         if (level == null || level != mc.level || console.isRemoved() || mc.getConnection() == null
@@ -67,11 +72,11 @@ public final class ControllerCableRenderer {
         if (frame == null) return;
         if (frame.toStorage(mc.gameRenderer.getMainCamera().getPosition()).distanceToSqr(origin.add(.5, .5, .5))
                 > ControllerCableGeometry.VIEW_RANGE * ControllerCableGeometry.VIEW_RANGE) return;
-        drawPort(mc, console, style, turns, 0, p1, receipt, partial, origin, poses, buffers, light, overlay);
-        drawPort(mc, console, style, turns, 1, p2, receipt, partial, origin, poses, buffers, light, overlay);
+        drawPort(mc, console, style, turns, 0, p1, receipt, socket1,partial, origin, poses, buffers, light, overlay);
+        drawPort(mc, console, style, turns, 1, p2, receipt, socket2,partial, origin, poses, buffers, light, overlay);
     }
     private static void drawPort(Minecraft mc, BlockEntity console, Style style, int turns, int port, Lease visual,
-                                 Receipt receipt, float partial, Vec3 origin, PoseStack poses,
+                                 Receipt receipt, Point socket,float partial, Vec3 origin, PoseStack poses,
                                  MultiBufferSource buffers, int light, int overlay) {
         if (visual == null || visual.player() == null || visual.lease() == null) return;
         Player player = console.getLevel().getPlayerByUUID(visual.player());
@@ -112,7 +117,8 @@ public final class ControllerCableRenderer {
             if (grip == null) return;
         }
         Vec3 end = grip.subtract(origin);
-        drawCable(ControllerCableGeometry.cable(ControllerCableGeometry.socket(style, port, turns),
+        if(socket!=null){for(int i=0;i<Math.floorMod(turns,4);i++)socket=new Point(1-socket.z(),socket.y(),socket.x());}
+        drawCable(ControllerCableGeometry.cable(socket==null?ControllerCableGeometry.socket(style, port, turns):socket,
                 new Point(end.x, end.y, end.z)), poses, buffers, light, overlay);
     }
     private static void drawCable(List<Point> path, PoseStack poses, MultiBufferSource buffers, int light, int overlay) {

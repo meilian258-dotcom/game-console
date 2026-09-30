@@ -20,15 +20,29 @@ import java.util.UUID;
 @EventBusSubscriber(modid=MdMod.ID,value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
 public final class MdClient {
     @SubscribeEvent public static void renderers(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers e){
-        e.registerBlockEntityRenderer(MdMod.ENTITY.get(),context->new ExternalHomeAvRenderer<>(
-                new HomeHardwareRenderLayout.Point(6.45/16,1.23/16,15.321/16),
-                new UserTvCableMesh.Bounds(3.4/16,0,6.5/16,12.6/16,6.5/16,15.321/16),.30));
+        e.registerBlockEntityRenderer(MdMod.ENTITY.get(),context->new MdRenderer());
     }
-    @SubscribeEvent public static void setup(FMLClientSetupEvent e){e.enqueueWork(()->{var p=new Provider();ControllerCapture.register(MdMod.SYSTEM,p);PrivateHomeClient.register(MdMod.SYSTEM,p);MdCoreChoice.register();});}
+    @SubscribeEvent public static void setup(FMLClientSetupEvent e){e.enqueueWork(()->{var p=new Provider();ControllerCapture.register(MdMod.SYSTEM,p);PrivateHomeClient.register(MdMod.SYSTEM,p);MdCoreChoice.register();ControllerPose.registerController(MdMod.CONTROLLER.get());});}
+    @SubscribeEvent public static void extensions(net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent e){
+        e.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions(){
+            private MdCartridgeRenderer renderer;
+            public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer(){if(renderer==null)renderer=new MdCartridgeRenderer();return renderer;}
+        },MdMod.CARTRIDGE.get());
+        e.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions(){
+            public net.minecraft.client.model.HumanoidModel.ArmPose getArmPose(net.minecraft.world.entity.LivingEntity entity,net.minecraft.world.InteractionHand hand,ItemStack stack){return ControllerPose.armPose(entity,hand,stack);}
+            public boolean applyForgeHandTransform(com.mojang.blaze3d.vertex.PoseStack poses,net.minecraft.client.player.LocalPlayer player,net.minecraft.world.entity.HumanoidArm arm,ItemStack stack,float partial,float equip,float swing){return ControllerPose.firstTransform(poses,player,arm,stack,equip,swing);}
+        },MdMod.CONTROLLER.get());
+    }
+    @SubscribeEvent public static void models(net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional e){e.register(MdCartridgeRenderer.MODEL);}
     public static final class Provider implements PrivateHomeClient.Provider {
         public String label(){return "MD2 · "+MdProfile.profile(MdCoreChoice.selected()).name()+"（私人单人）";}
         public String storageKey(){return "md";}
         public boolean cartridgePower(){return true;}
+        public boolean independentCartridgePower(){return true;}
+        public UUID cartridgeSession(Player p,BlockEntity entity){
+            return p!=null&&p.isAlive()&&!p.isSpectator()&&entity instanceof MdConsole c&&!c.isRemoved()&&c.getLevel()==p.level()
+                    &&c.running()&&c.hasInsertedCartridge()&&p.getUUID().equals(c.powerHost())?c.powerSession():null;
+        }
         public boolean acceptsFile(String name){return MdRom.accepts(name);}
         public String fileHint(){return ".md / .bin / .gen（普通卡带，非CD/32X）";}
         public KeyboardConfig.Profile profile(){return KeyboardConfig.Profile.SFC;}
@@ -44,12 +58,16 @@ public final class MdClient {
         }
         public boolean matches(Player p,ItemStack s,BlockEntity entity){
             var id=lease(s);var data=s.get(DataComponents.CUSTOM_DATA);
-            if(id==null||data==null||!(entity instanceof MdConsole c)||c.isRemoved()||p==null||!p.isAlive()||p.isSpectator()||c.getLevel()!=p.level()||!c.hasInsertedCartridge()||!c.running())return false;
+            if(id==null||data==null||!(entity instanceof MdConsole c)||c.isRemoved()||p==null||!p.isAlive()||p.isSpectator()||c.getLevel()!=p.level())return false;
             var t=data.copyTag();
-            return t.hasUUID("MdConsole")&&t.getUUID("MdConsole").equals(c.hardwareId())&&id.equals(c.loan())&&p.getUUID().equals(c.borrower())&&p.distanceToSqr(c.getBlockPos().getCenter())<=36;
+            return t.hasUUID("MdConsole")&&t.getUUID("MdConsole").equals(c.hardwareId())&&id.equals(c.loan())&&p.getUUID().equals(c.borrower())&&MdInteractionPolicy.inControllerRange(p.distanceToSqr(c.getBlockPos().getCenter()));
         }
         public PrivateEngine create(Path rom,Path root){return create(rom,root,LibretroRuntimes.defaultBackend(true));}
         public boolean supportsJniTrial(){return true;}
         public PrivateEngine create(Path rom,Path root,LibretroRuntimes.Backend b){return new MdEngine(rom,root,b,MdCoreChoice.selected());}
+        public PrivateEngine createCartridge(Path rom,Path root,LibretroRuntimes.Backend b,BlockEntity entity){
+            if(!(entity instanceof MdConsole c))throw new IllegalArgumentException("MD 主机已失效");
+            return new MdEngine(rom,root,b,MdCoreChoice.selected(),cn.piq.fcarcade.home.content.ContentCardData.saveMode(c.cartridge())!=0);
+        }
     }
 }

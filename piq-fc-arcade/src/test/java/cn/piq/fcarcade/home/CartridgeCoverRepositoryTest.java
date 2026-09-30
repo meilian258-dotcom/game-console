@@ -23,6 +23,16 @@ class CartridgeCoverRepositoryTest {
     @Test void absentCatalogIsEmptyWithoutCreatingDirectories() throws Exception {
         Path missing=root.resolve("missing");assertTrue(new CartridgeCoverRepository(missing).list().isEmpty());assertFalse(Files.exists(missing));
     }
+    @Test void separateRepositoriesShareAnIdempotentWriterAndLeaveNoPartialFile() throws Exception {
+        byte[] png=CartridgeCoverCodecTest.label();String hash=RomRepository.sha256(png);
+        try(var workers=java.util.concurrent.Executors.newFixedThreadPool(4)){
+            var jobs=new java.util.ArrayList<java.util.concurrent.Future<?>>();
+            for(int i=0;i<12;i++)jobs.add(workers.submit(()->{new CartridgeCoverRepository(root).store(hash,png);return null;}));
+            for(var job:jobs)job.get(10,java.util.concurrent.TimeUnit.SECONDS);
+        }
+        assertArrayEquals(png,new CartridgeCoverRepository(root).read(hash));
+        try(var files=Files.list(root)){assertEquals(1,files.count());}
+    }
     @Test void storesVerifiedContentOnceAndReadsExactOriginalBytes() throws Exception {
         byte[] png = CartridgeCoverCodecTest.label(); String hash = RomRepository.sha256(png);
         CartridgeCoverRepository repository = new CartridgeCoverRepository(root);

@@ -40,3 +40,5 @@ with zipfile.ZipFile(source) as z:
     data=root/'src/main/resources/data/piq_md_home/loot_table/blocks'
     write(data/'md2.json',{'type':'minecraft:block','pools':[{'rolls':1,'entries':[{'type':'minecraft:item','name':'piq_md_home:md2'}],'conditions':[{'condition':'minecraft:survives_explosion'}]}]})
     print(json.dumps({'sourceSha256':hashlib.sha256(source.read_bytes()).hexdigest(),'models':[len(m['elements']) for m in models],'controller':len(pad['elements']),'cartridge':len(cart['elements'])}))
+from interaction_models import prepare
+prepare(assets)

@@ -47,6 +47,10 @@ public final class PrivateHomeClient {
         default boolean publicBusy(){return false;}
         /** Opt-in physical cartridge session; the addon validates its server-issued power lease. */
         default boolean cartridgePower(){return false;}
+        /** Independent power identity: returning a controller must not revoke this session. */
+        default boolean independentCartridgePower(){return false;}
+        default UUID cartridgeSession(Player player,BlockEntity console){return null;}
+        default PrivateEngine createCartridge(Path rom,Path saveRoot,LibretroRuntimes.Backend backend,BlockEntity console){return create(rom,saveRoot,backend);}
         default UUID identity(ItemStack stack){return lease(stack);}
     }
     record Target(Provider provider, Object connection, Object level, UUID player, UUID lease,
@@ -64,7 +68,7 @@ public final class PrivateHomeClient {
         double aspect = 4.0/3; boolean paused = true; int lastMask = -1, hand = -1;
         Run(Target target, Object owner, Path rom, Path saveRoot,LibretroRuntimes.Backend backend) {
             this.target=target;this.owner=owner;trial=backend==LibretroRuntimes.Backend.JNI_TRIAL;
-            engine=target.provider.create(rom,saveRoot,backend);engine.paused(true);
+            engine=target.provider.cartridgePower()?target.provider.createCartridge(rom,saveRoot,backend,target.console):target.provider.create(rom,saveRoot,backend);engine.paused(true);
         }
     }
     private PrivateHomeClient() {}
@@ -174,6 +178,12 @@ public final class PrivateHomeClient {
         var console=mc.level.getBlockEntity(pos);
         if(!(console instanceof ExternalHomeConsoleBlockEntity ex)||ex.televisionPos()==null
                 ||!mc.level.hasChunkAt(ex.televisionPos())||!(mc.level.getBlockEntity(ex.televisionPos()) instanceof HomeTvBlockEntity tv))return "请先接好电视";
+        if(provider.independentCartridgePower()){
+            var session=provider.cartridgeSession(mc.player,console);
+            if(session==null)return "主机开机授权已失效";
+            var target=new Target(provider,mc.getConnection(),mc.level,mc.player.getUUID(),session,console,hardware(console),tv,tv.hardwareId(),link(console),tv.powered());
+            return start(target,rom.toString(),cartridgeBackend==null?defaultBackend(target):cartridgeBackend);
+        }
         for(int i=0;i<mc.player.getInventory().getContainerSize();i++){
             var item=mc.player.getInventory().getItem(i);var lease=provider.lease(item);
             if(lease==null||!provider.matches(mc.player,item,console)||!ControllerCapture.unique(mc.player,item,lease,provider::identity))continue;
@@ -186,6 +196,11 @@ public final class PrivateHomeClient {
         var r=current;return r==null||r.target.provider!=PROVIDERS.get(system)||!r.target.console.getBlockPos().equals(pos)?-1:r.engine.isReady()?1:0;
     }
     public static void stopCartridge(ResourceLocation system,BlockPos pos){if(cartridgeState(system,pos)>=0)stop("实体主机关机，正在保存");}
+    public static void resetCartridge(ResourceLocation system,BlockPos pos){
+        var r=current;if(r!=null&&r.target.provider==PROVIDERS.get(system)&&r.target.console.getBlockPos().equals(pos)&&valid(r.target)){
+            releaseKeys(r);r.engine.requestReset();
+        }
+    }
     /** Local preferences/diagnostics only; opening settings does not acquire a play lease. */
     static String cartridgeRuntimeLabel(ResourceLocation system,BlockPos pos){
         var r=current;
@@ -255,8 +270,11 @@ public final class PrivateHomeClient {
         return null;
     }
     private static ItemStack held(Target t){var p=Minecraft.getInstance().player;if(p==null)return null;
-        for(var stack:List.of(p.getMainHandItem(),p.getOffhandItem()))if(t.lease.equals(t.provider.lease(stack))
-                &&ControllerCapture.unique(p,stack,t.lease,t.provider::identity))return stack;return null;}
+        for(var stack:List.of(p.getMainHandItem(),p.getOffhandItem())){
+            var lease=t.provider.lease(stack);
+            if(lease!=null&&(t.provider.independentCartridgePower()?t.provider.matches(p,stack,t.console):t.lease.equals(lease))
+                &&ControllerCapture.unique(p,stack,lease,t.provider::identity))return stack;
+        }return null;}
     private static boolean valid(Target t) {
         var mc=Minecraft.getInstance();
         if(t==null||!connected()||mc.getConnection()!=t.connection||mc.level!=t.level||!mc.player.getUUID().equals(t.player)
@@ -265,6 +283,8 @@ public final class PrivateHomeClient {
                 ||!Objects.equals(t.hardware,hardware(t.console))||!t.television.equals(t.tv.hardwareId())||t.link==null
                 ||!t.link.equals(link(t.console))||!t.link.equals(t.tv.linkId())||(!t.provider.cartridgePower()&&t.tv.signalPresent())
                 ||t.tv.powered()!=t.tvPower||PROVIDERS.values().stream().anyMatch(Provider::publicBusy))return false;
+        if(t.provider.independentCartridgePower())return t.lease.equals(t.provider.cartridgeSession(mc.player,t.console))
+                &&HomeHardware.connected(mc.level,t.console,t.tv);
         var stack=owned(t);
         return stack!=null&&t.provider.matches(mc.player,stack,t.console)&&HomeHardware.connected(mc.level,t.console,t.tv);
     }

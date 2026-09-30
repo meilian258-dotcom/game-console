@@ -37,7 +37,7 @@ class ContentCardRegistrationTest {
     @Test void registersExactlyOnceForBothDirections(){
         int count=registrations.size();ContentCardNetwork.register(new RegisterPayloadHandlersEvent());
         var r=registrations.get(Message.TYPE.id());assertEquals(count+1,registrations.size());
-        assertEquals("content-card-2",r.version());assertFalse(r.optional());assertTrue(r.flow().isEmpty());
+        assertEquals("content-card-3",r.version());assertFalse(r.optional());assertTrue(r.flow().isEmpty());
         for(var flow:PacketFlow.values())assertSame(Message.CODEC,NetworkRegistry.getCodec(Message.TYPE.id(),ConnectionProtocol.PLAY,flow));
         assertThrows(UnsupportedOperationException.class,()->ContentCardNetwork.register(new RegisterPayloadHandlersEvent()));
     }

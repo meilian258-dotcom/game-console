@@ -47,7 +47,9 @@ class PrivateHomeClientTest {
         assertTrue(source.contains("c.controllerVisualPlayer(r.port())"));
         assertTrue(source.contains("c.controllerVisualLease(r.port()),c.controllerDocked(r.port())"));
         assertTrue(source.contains("ControllerCapture.unique(mc.player,held,lease,p::identity)"));
-        assertEquals(2, source.split("ControllerCapture\\.unique\\(p,stack,t\\.lease,t\\.provider::identity\\)", -1).length - 1);
+        assertTrue(source.contains("ControllerCapture.unique(p,stack,t.lease,t.provider::identity)"));
+        assertTrue(source.contains("ControllerCapture.unique(p,stack,lease,t.provider::identity)"));
+        assertTrue(source.contains("t.provider.independentCartridgePower()?t.provider.matches(p,stack,t.console):t.lease.equals(lease)"));
         assertFalse(source.contains("ControllerCapture.unique(mc.player,held,lease,p::lease)"));
         assertFalse(source.contains("ControllerCapture.unique(p,stack,t.lease,t.provider::lease)"));
     }
@@ -100,7 +102,9 @@ class PrivateHomeClientTest {
         assertTrue(source.contains("!provider.matches(mc.player,item,console)||!ControllerCapture.unique(mc.player,item,lease,provider::identity)"));
         before(start, "CabinetClientOwner.acquire(reservation)", "new Run(target,reservation,rom,root,backend)");
         assertTrue(start.contains("if(current==null||current.owner!=reservation)CabinetClientOwner.release(reservation)"));
-        assertTrue(source.contains("engine=target.provider.create(rom,saveRoot,backend);engine.paused(true)"));
+        assertTrue(source.contains("target.provider.cartridgePower()?target.provider.createCartridge(rom,saveRoot,backend,target.console):target.provider.create(rom,saveRoot,backend);engine.paused(true)"));
+        assertTrue(source.contains("default boolean independentCartridgePower(){return false;}"));
+        assertTrue(source.contains("t.lease.equals(t.provider.cartridgeSession(mc.player,t.console))"));
     }
     @Test void handSwitchAndFocusLossClearInputsBeforeNeutralRearmSourceGuards() throws Exception {
         String source = source("client/PrivateHomeClient");
