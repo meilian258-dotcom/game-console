@@ -22,6 +22,11 @@ public final class GbaHandheldGate {
                 &&connected&&alive&&!spectator&&sameItemAndComponents&&count==1;
     }
     public static int input(int mask){return mask&INPUT_MASK;}
+    public enum UseAction { INSERT,POWER,RAISE }
+    /** Cartridge insertion has priority over the power modifier in either hand order. */
+    public static UseAction useAction(boolean cartridgeInOtherHand,boolean shift) {
+        return cartridgeInOtherHand?UseAction.INSERT:shift?UseAction.POWER:UseAction.RAISE;
+    }
     /** Holding right click, or duplicate air/block callbacks, must not toggle twice. */
     public static final class UseGate {
         private boolean pressed;

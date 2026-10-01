@@ -1,4 +1,4 @@
-"""Final-JAR-only GBA13 probes. Uses original diagnostic ROM, never user saves/ROMs.
+"""Final-JAR-only current GBA probes. Uses original diagnostic ROM, never user saves/ROMs.
 Requires explicit local Java21/NeoForge dependency directory; does not download/deploy.
 """
 import argparse,hashlib,json,os,subprocess,sys,tempfile,shutil
@@ -19,7 +19,7 @@ def main():
     deps=[f for f in a.dependencies.glob('*.jar') if not f.name.startswith(('piq_','game-console'))]
     cp=os.pathsep.join(str(f.resolve()) for f in [classes,gba,fc,*deps,a.minecraft_client])
     args=a.output/'classpath.args';args.write_text('-cp\n"'+cp.replace('\\','/')+'"\n',encoding='utf8')
-    probe=[R/'tools/qa'/name for name in ('GbaCartridge13Probe.java','GbaHandheldClientProbe.java','GbaHandheldLayoutProbe.java','GbaJniProbe.java')]
+    probe=[R/'tools/qa'/name for name in ('GbaCartridge13Probe.java','GbaHandheldClientProbe.java','GbaHandheldLayoutProbe.java','GbaHandheldModelProbe.java','GbaSafeEjectProbe.java','GbaJniProbe.java')]
     def run(name,command,timeout=90):
         with (a.output/(name+'.log')).open('xb') as log:code=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,timeout=timeout).returncode
         if code:raise RuntimeError(name+' failed; see '+str(a.output/(name+'.log')))
@@ -28,6 +28,8 @@ def main():
     run('card',java+['GbaCartridge13Probe',str(gba)])
     run('gate',java+['cn.piq.gba.client.GbaHandheldClientProbe',str(qa/'gate'),str(gba)])
     run('layout',java+['cn.piq.gba.client.GbaHandheldLayoutProbe'])
+    run('model',java+['cn.piq.gba.client.GbaHandheldModelProbe',str(gba)])
+    run('safe-eject',java+['cn.piq.gba.client.GbaSafeEjectProbe',str(gba)])
     sys.path.insert(0,str(R/'tools'));from diagnostic_rom import create
     native=qa/'native';native.mkdir();(native/'diagnostic.gba').write_bytes(create())
     run('native',java+['GbaJniProbe',str(native.resolve())])

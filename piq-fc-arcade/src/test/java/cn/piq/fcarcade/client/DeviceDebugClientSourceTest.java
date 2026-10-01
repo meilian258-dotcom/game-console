@@ -38,6 +38,15 @@ class DeviceDebugClientSourceTest {
         assertFalse(debug.contains("startGame("));
         assertTrue(method.contains("new CabinetMenuScreen(menu)"),"Legacy backend-menu route remains intact");
     }
+    @Test void privatePrototypeLinksToRealLocalSettingsWithoutPretendingToEnableNetwork() throws Exception {
+        String code=source("HomeSyncSettingsScreen");
+        assertTrue(code.contains("if(privateOnly&&selected==4){if(ready()&&current())openLocalSettings();}"));
+        assertTrue(code.contains("私人单人 · 本机设置…"));
+        assertTrue(code.contains("（尚未接入）"));
+        assertTrue(code.contains("不是权限不足"));
+        assertTrue(code.contains("new HomeRuntimeSettingsScreen(this,deviceSystem(),setting.system())"));
+        assertTrue(code.contains("mode>=0&&(setting.supported()&(1<<mode))==0"),"Server capability guard retained");
+    }
     @Test void cabinetHeaderIdentifiesPhysicalTargetWithoutSubstitutingLinkedAnchor() throws Exception {
         String code=source("cabinet/CabinetSyncSettingsScreen");
         assertTrue(code.contains("target.dual()?\"双人街机\":\"单人街机\""));

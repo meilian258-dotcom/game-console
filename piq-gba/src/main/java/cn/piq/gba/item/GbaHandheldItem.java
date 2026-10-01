@@ -26,7 +26,8 @@ public final class GbaHandheldItem extends Item {
         lines.add(Component.translatable("tooltip.piq_gba.handheld.use"));
         lines.add(Component.translatable("tooltip.piq_gba.handheld.local"));
         var card=GbaCartridgeSlot.card(stack);
-        lines.add(Component.literal(card.isEmpty()?"未插卡：掌机和卡带分持两手，右键插入":"已插卡："+cn.piq.fcarcade.home.content.ContentCardData.title(card)));
+        lines.add(Component.literal(card.isEmpty()?"未插卡：掌机和卡带分持两手，Shift＋右键插入（普通右键也可）":"已插卡："+cn.piq.fcarcade.home.content.ContentCardData.title(card)));
+        lines.add(Component.literal("Shift＋左键：安全拔卡；无待插卡时 Shift＋右键：开关机"));
         lines.add(Component.literal("设置/退卡：/gameconsole-gba，或绑定“GBA 掌机设置”按键"));
     }
 }

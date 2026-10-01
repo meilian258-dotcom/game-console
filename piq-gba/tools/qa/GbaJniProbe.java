@@ -1,4 +1,5 @@
 import cn.piq.gba.bridge.*;
+import cn.piq.gba.client.GbaSafeEject;
 import cn.piq.retro.libretro.*;
 import cn.piq.retro.storage.RuntimeWorkspace;
 import java.nio.file.*;
@@ -22,7 +23,10 @@ public class GbaJniProbe {
                 pixel(s,0xff000000);check(s.isReady(),"real mGBA JNI ready");
                 try{new GbaJniSession(rom,saves);throw new AssertionError("double allowed");}catch(java.io.IOException expected){check(true,"second GBA rejected");}
                 if(n==0){s.offerInput(257);var f=pixel(s,0xff000018);check(f.abgr().length==38400,"geometry and A+B");check(f.pcm48k().length>0&&f.pcm48k().length<=32768,"bounded resampled PCM");check(java.util.stream.IntStream.range(0,f.pcm48k().length).anyMatch(i->f.pcm48k()[i]!=0),"audible diagnostic tone");s.clearInput();pixel(s,0xff000000);}
-            }finally{s.close();check(s.awaitClosed(6000),"owner close and save completed");}
+            }finally{
+                if(n==0){var result=GbaSafeEject.finish(s);check(result.safe(),"real JNI safe-eject save barrier: "+result.failure());}
+                else{s.close();check(s.awaitClosed(6000),"owner close and save completed");}
+            }
             check(s.error()==null,"no JNI session error: "+s.error());check(!LibretroRuntimes.isJniBusy()&&!GbaJniSession.active(),"shared slot released");
             List<Path> files;try(var walk=Files.walk(saves)){files=walk.filter(p->p.getFileName().toString().equals("sram.bin")).toList();}
             check(files.size()==1&&files.getFirst().toString().contains("jni-trial-v1-mgba-e31759b"),"isolated battery namespace");

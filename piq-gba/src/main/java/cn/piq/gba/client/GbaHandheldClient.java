@@ -25,6 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.LevelResource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
@@ -110,7 +111,11 @@ public final class GbaHandheldClient {
         }
     }
     private static final GbaHandheldGate.UseGate USE=new GbaHandheldGate.UseGate();
+    private static final GbaHandheldGate.UseGate ATTACK=new GbaHandheldGate.UseGate();
     private static Play play;
+    private static GbaSession closingCore;
+    private static Binding closingBinding;
+    private static Object ejecting;
     private static Binding view,pending;
     private static boolean raised;
     private static long requested;
@@ -159,27 +164,87 @@ public final class GbaHandheldClient {
         event.setCancellationResult(InteractionResult.SUCCESS);event.setCanceled(true);
         use();
     }
+    @SubscribeEvent(priority=EventPriority.HIGHEST) public static void mouse(InputEvent.MouseButton.Pre event){
+        var mc=Minecraft.getInstance();
+        if(event.isCanceled()||mc.screen!=null||mc.player==null||!mc.isWindowActive()||heldHand()==null)return;
+        boolean attack=mc.options.keyAttack.matchesMouse(event.getButton())&&shiftDown();
+        boolean use=mc.options.keyUse.matchesMouse(event.getButton());
+        if(!attack&&!use)return;
+        // Run before the shared gameplay router: its position lock intentionally
+        // clears vanilla Shift and may capture mouse mappings while the GBA is raised.
+        event.setCanceled(true);
+        if(attack){
+            mc.options.keyAttack.setDown(false);if(mc.gameMode!=null)mc.gameMode.stopDestroyBlock();
+            if(event.getAction()==GLFW.GLFW_PRESS&&ATTACK.press())request(GbaHandheldNetwork.EJECT);
+            if(event.getAction()==GLFW.GLFW_RELEASE)ATTACK.observe(false);
+        }else{
+            mc.options.keyUse.setDown(false);
+            if(event.getAction()==GLFW.GLFW_PRESS)use();
+            if(event.getAction()==GLFW.GLFW_RELEASE)USE.observe(false);
+        }
+    }
+    @SubscribeEvent(priority=EventPriority.HIGHEST) public static void attack(InputEvent.InteractionKeyMappingTriggered event){
+        var mc=Minecraft.getInstance();
+        if(!event.isAttack()||mc.screen!=null||mc.player==null||!mc.isWindowActive()
+                ||!shiftDown()||heldHand()==null)return;
+        // Same early interception as FC cartridge disassembly: covers air, blocks and
+        // entities before vanilla attack/mining. Do not let a held press mine next tick.
+        event.setCanceled(true);event.setSwingHand(false);mc.options.keyAttack.setDown(false);
+        if(mc.gameMode!=null)mc.gameMode.stopDestroyBlock();
+        if(ATTACK.press())request(GbaHandheldNetwork.EJECT);
+    }
     private static void use(){
         var mc=Minecraft.getInstance();if(mc.screen!=null||!mc.isWindowActive()||!USE.press())return;
         try{
             var binding=capture();if(binding==null){notice("当前玩家或世界不可用，无法打开掌机");return;}
             var other=binding.hand==InteractionHand.MAIN_HAND?InteractionHand.OFF_HAND:InteractionHand.MAIN_HAND;
-            if(mc.player.getItemInHand(other).is(GbaMod.CARTRIDGE.get())&&!mc.player.isShiftKeyDown()){request(GbaHandheldNetwork.INSERT);return;}
-            if(mc.player.isShiftKeyDown()){request(GbaHandheldNetwork.POWER);return;}
+            var action=GbaHandheldGate.useAction(mc.player.getItemInHand(other).is(GbaMod.CARTRIDGE.get()),shiftDown());
+            if(action==GbaHandheldGate.UseAction.INSERT){request(GbaHandheldNetwork.INSERT);return;}
+            if(action==GbaHandheldGate.UseAction.POWER){request(GbaHandheldNetwork.POWER);return;}
             if(view==null||!view.current()){view=binding;raised=false;}
             raised=!raised;refreshInput();
             if(!raised&&play!=null)releaseInput(play);
-            notice(raised?"已举起 GBA；Shift＋右键开关机，/gameconsole-gba 打开设置":"已放下 GBA；游戏继续运行，Shift＋右键关机");
+            notice(raised?"已举起 GBA；Shift＋左键拔卡；无待插卡时 Shift＋右键开关机":"已放下 GBA；游戏继续运行；Shift＋左键拔卡");
         }catch(RuntimeException failure){cn.piq.fcarcade.client.ui.DeviceNotices.record("GBA","掌机不可用："+failure.getMessage(),failure);}
     }
     static void request(int action){
         var b=capture();if(b==null)return;
+        if(ejecting!=null){notice("正在关闭并保存，请等退卡结果后再操作");return;}
+        if(action==GbaHandheldNetwork.EJECT){eject(b);return;}
         var nonce=UUID.randomUUID();
         if(action==GbaHandheldNetwork.POWER){
             if(play!=null||pending!=null){action=GbaHandheldNetwork.OFF;clearPending();stop("掌机已关闭；正在保存电池存档");}
             else {clearPending();pending=b;pendingNonce=nonce;requested=System.nanoTime();}
         }
         net.neoforged.neoforge.network.PacketDistributor.sendToServer(new GbaHandheldNetwork.Request(action,b.hand,GbaCartridgeSlot.id(b.original),nonce));
+    }
+    private static void eject(Binding binding){
+        if(GbaCartridgeSlot.card(binding.original).isEmpty()){notice("掌机未插卡");return;}
+        var lastBinding=play==null?closingBinding:play.binding;
+        // An unrelated old session's save error must not lock a different handheld.
+        // IDs and full components travel with the machine when moved between hands.
+        var core=lastBinding!=null&&lastBinding.listener==binding.listener
+                &&ItemStack.isSameItemSameComponents(lastBinding.original,binding.original)?play==null?closingCore:play.core:null;
+        clearPending();raised=false;view=null;
+        Object attempt=new Object();ejecting=attempt;
+        try{stop(null);}catch(RuntimeException|LinkageError failure){
+            // Still perform the bounded close check below; presentation cleanup must
+            // never be taken as evidence that a save completed.
+            cn.piq.fcarcade.client.ui.DeviceNotices.record("GBA","退卡前清理异常",failure);
+        }
+        notice("正在关闭掌机并保存电池存档，完成后退出卡带");
+        Thread.ofPlatform().daemon(true).name("PIQ-GBA-safe-eject").start(()->{
+            var result=GbaSafeEject.finish(core);
+            Minecraft.getInstance().execute(()->{
+                if(ejecting!=attempt)return;
+                ejecting=null;
+                if(shutdown||!binding.current())return; // never target another slot/world/connection
+                if(!result.safe()){notice("未退出卡带："+result.failure()+"；原卡仍在掌机中");return;}
+                if(closingCore==core){closingCore=null;closingBinding=null;}
+                net.neoforged.neoforge.network.PacketDistributor.sendToServer(new GbaHandheldNetwork.Request(
+                        GbaHandheldNetwork.EJECT,binding.hand,GbaCartridgeSlot.id(binding.original),UUID.randomUUID()));
+            });
+        });
     }
     private static void clearPending(){pending=null;pendingNonce=null;pendingToken=null;}
     public static void reply(GbaHandheldNetwork.Reply r){if(r.nonce().equals(pendingNonce)){if(r.starting())pendingToken=r.token();else clearPending();}}
@@ -266,24 +331,29 @@ public final class GbaHandheldClient {
         if(openSettings){openSettings=false;settings();}
         if(view!=null&&!view.current()){view=null;raised=false;}
         if(pending!=null&&(!pending.current()||System.nanoTime()-requested>120_000_000_000L))clearPending();
-        USE.observe(useDown());safePump();
+        USE.observe(useDown());ATTACK.observe(keyDown(Minecraft.getInstance().options.keyAttack));safePump();
     }
     @SubscribeEvent public static void frame(RenderFrameEvent.Pre event){safePump();}
     @SubscribeEvent public static void screen(ScreenEvent.Opening event){
         var value=play;if(value!=null&&event.getNewScreen()!=null){KeyboardInput.pause(value.owner);clear(value);value.audio.silence();value.focused=false;}
     }
     @SubscribeEvent public static void shutdown(GameShuttingDownEvent event){shutdown=true;try{stop(null);}finally{GbaProcessSession.shutdown();GbaJniSession.shutdown();}}
-    @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut e){clearPending();view=null;raised=false;openSettings=false;stop(null);}
+    @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut e){clearPending();ejecting=null;view=null;raised=false;openSettings=false;stop(null);}
     private static void safePump(){try{pump();}catch(RuntimeException|LinkageError failure){fail("掌机输出异常："+failure.getMessage(),failure);}}
     private static boolean useDown(){
-        var mc=Minecraft.getInstance();var key=mc.options.keyUse.getKey();long window=mc.getWindow().getWindow();
+        return keyDown(Minecraft.getInstance().options.keyUse);
+    }
+    private static boolean shiftDown(){var mc=Minecraft.getInstance();return keyDown(mc.options.keyShift)||(mc.player!=null&&mc.player.isShiftKeyDown());}
+    private static boolean keyDown(net.minecraft.client.KeyMapping mapping){
+        var mc=Minecraft.getInstance();var key=mapping.getKey();long window=mc.getWindow().getWindow();
         if(key.getType()==InputConstants.Type.MOUSE)return GLFW.glfwGetMouseButton(window,key.getValue())==GLFW.GLFW_PRESS;
         if(key.getType()==InputConstants.Type.KEYSYM)return InputConstants.isKeyDown(window,key.getValue());
-        return mc.options.keyUse.isDown();
+        return mapping.isDown();
     }
     static void stop(String reason){
         var value=play;if(value==null)return;play=null;
         // Schedule SRAM shutdown before optional input/texture cleanup can throw.
+        closingCore=value.core;closingBinding=value.binding;
         value.core.close();value.audio.close();
         KeyboardInput.release(value.owner);clear(value);GamepadInput.release(value.owner);CabinetClientOwner.release(value.owner);
         if(value.textureId!=null)Minecraft.getInstance().getTextureManager().release(value.textureId);
@@ -295,7 +365,7 @@ public final class GbaHandheldClient {
     public static boolean raised(ItemStack stack){return raised&&view!=null&&view.current()&&stack==Minecraft.getInstance().player.getItemInHand(view.hand);}
     public static ResourceLocation screenTexture(){return running()?play.textureId:null;}
     public static int visualInputMask(){return running()?play.mask:0;}
-    static boolean openingOrRunning(){return play!=null||pending!=null;}
+    static boolean openingOrRunning(){return play!=null||pending!=null||ejecting!=null;}
     static Path currentRom(){return play==null?null:play.rom;}
     private static void fail(String reason,Throwable failure){cn.piq.fcarcade.client.ui.DeviceNotices.record("GBA",reason,failure);stop(null);}
     static void notice(String text){cn.piq.fcarcade.client.ui.DeviceNoticesClient.message("GBA",text);}

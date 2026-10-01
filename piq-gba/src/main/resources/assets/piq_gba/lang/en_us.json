@@ -1,6 +1,6 @@
 {
   "item.piq_gba.handheld": "Game Boy Advance",
-  "tooltip.piq_gba.handheld.use": "Right-click: raise/lower (keep running) · Shift + right-click: power",
+  "tooltip.piq_gba.handheld.use": "Right-click: raise/lower (keep running) · Shift cartridge/power controls below",
   "tooltip.piq_gba.handheld.local": "Physical cartridges · Local battery saves · No GBA link cable",
   "item.piq_gba.gba_cartridge": "GBA Game Cartridge",
   "key.piq_gba.settings": "GBA Settings / Eject Cartridge",

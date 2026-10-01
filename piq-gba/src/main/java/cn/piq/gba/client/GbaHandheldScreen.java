@@ -19,7 +19,7 @@ public final class GbaHandheldScreen extends DeviceScreen {
         button("键盘 / 位置锁",x+10,y+66,half,()->minecraft.setScreen(new ControlSettingsScreen(this,KeyboardConfig.Profile.SFC,"GBA（共享 SFC）")),true);
         button("实体手柄",x+14+half,y+66,half,()->minecraft.setScreen(GamepadInput.settings(this,GamepadInput.ProfileKind.SFC,"GBA（共享 SFC）")),true);
         button(GbaHandheldClient.openingOrRunning()?"关闭掌机":"启动卡带",x+10,y+92,inner,()->{GbaHandheldClient.request(GbaHandheldNetwork.POWER);onClose();},true);
-        button("退出卡带（先关机）",x+10,y+118,inner,()->{GbaHandheldClient.request(GbaHandheldNetwork.EJECT);onClose();},!GbaHandheldClient.openingOrRunning());
+        button("安全退出卡带（Shift＋左键）",x+10,y+118,inner,()->{GbaHandheldClient.request(GbaHandheldNetwork.EJECT);onClose();},!GbaCartridgeSlot.card(binding.original).isEmpty());
         button(GbaJniChoice.enabled()?"运行：JNI 默认":"运行：进程兼容",x+10,y+144,half,()->GbaJniChoice.choose(this),!GbaHandheldClient.openingOrRunning());
         button("同步说明",x+14+half,y+144,half,()->minecraft.setScreen(new GbaHandheldSyncInfoScreen(this,binding)),true);
         button("返回（不断电）",x+10,y+190,inner,this::onClose,true);
@@ -30,10 +30,10 @@ public final class GbaHandheldScreen extends DeviceScreen {
     @Override public boolean isPauseScreen(){return false;}
     @Override public void render(GuiGraphics g,int mx,int my,float partial){
         if(width<250||height<232){g.fill(0,0,width,height,DeviceUi.BG);g.drawCenteredString(font,title,width/2,8,DeviceUi.TEXT);super.render(g,mx,my,partial);return;}
-        g.fill(0,0,width,height,DeviceUi.BG);DeviceUi.panel(g,font,x,y,w,222,"GBA 掌机设置","右键举起/放下 · Shift＋右键开关");
+        g.fill(0,0,width,height,DeviceUi.BG);DeviceUi.panel(g,font,x,y,w,222,"GBA 掌机设置","右键举放 · Shift＋右键：有待插卡则插入，否则开关");
         var card=GbaCartridgeSlot.card(binding.original);String title=ContentCardData.title(card);
         DeviceUi.text(g,font,card.isEmpty()?"尚未插卡":title.isBlank()?"空白 GBA 卡带":title,x+10,y+46,w-20,DeviceUi.TEXT);
-        DeviceUi.text(g,font,"卡带右键老式电脑拷卡；放下只释放操作，不关机",x+10,y+171,w-20,DeviceUi.MUTED);
+        DeviceUi.text(g,font,"Shift＋左键安全拔卡；放下只释放操作，不关机",x+10,y+171,w-20,DeviceUi.MUTED);
         super.render(g,mx,my,partial);
     }
 }

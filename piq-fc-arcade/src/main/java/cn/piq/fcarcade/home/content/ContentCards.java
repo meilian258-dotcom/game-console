@@ -46,7 +46,7 @@ public final class ContentCards {
     private static State state(ServerPlayer p){return STATES.computeIfAbsent(p.getServer(),s->new State());}
     // New content-card storage has no legacy directory to migrate. Resolve only here;
     // directory creation, validation and file reads belong to the bounded IO worker.
-    private static ContentCardStore store(ServerPlayer p,ResourceLocation system){var a=ADAPTERS.get(system);return new ContentCardStore(ConsoleStorage.location(p.getServer().getServerDirectory()).resolve("content-cards").resolve(system.getNamespace()).resolve(system.getPath()),a.extensions,a.validator,a.maxBytes);}
+    private static ContentCardStore store(ServerPlayer p,ResourceLocation system){var a=ADAPTERS.get(system);return new ContentCardStore(ContentCardDirectories.roms(p.getServer().getServerDirectory(),system),a.extensions,a.validator,a.maxBytes);}
     private static boolean online(ServerPlayer p,Object connection){return p!=null&&p.getServer()!=null&&p.getServer().isSameThread()&&!p.hasDisconnected()&&p.connection.getConnection()==connection&&p.getServer().getPlayerList().getPlayer(p.getUUID())==p&&p.isAlive()&&!p.isSpectator();}
     public static void open(ServerPlayer p,InteractionHand hand,BlockPos pos,ResourceLocation system){
         var a=ADAPTERS.get(system);if(a==null||!PlayerContentAccess.canBrowse(p)) {say(p,"没有游戏库访问权，请联系管理员。");return;}
@@ -83,10 +83,11 @@ public final class ContentCards {
                 if(!features(e.system).covers()||!PlayerContentAccess.canUseServerCover(p))throw new IllegalArgumentException("封面库不可用或未授权");
                 if(System.nanoTime()-e.lastCoverList<1_000_000_000L)throw new IllegalArgumentException("刷新过快，请稍后重试");
                 ContentCardWorkbench.page(List.of(),m.name(),m.offset());e.lastCoverList=System.nanoTime();
-                job(p,s,e,()->covers(p).list().stream().map(hash->new ContentCardStore.Entry(hash,hash.substring(0,12)+".png",1)).toList(),entries->{
+                job(p,s,e,()->covers(p).scan(),scan->{
                     if(!PlayerContentAccess.canUseServerCover(p))throw new IllegalArgumentException("封面权限已撤销");
+                    var entries=scan.entries();logFailures(e,scan);
                     e.coverCatalog=entries;var result=ContentCardWorkbench.page(entries,m.name(),m.offset());
-                    send(p,new Message(COVER_LIST,e.system,e.token,e.pos,"","选择封面后点击应用",result.total(),result.index(),new byte[0],result.entries()));
+                    send(p,new Message(COVER_LIST,e.system,e.token,e.pos,"",scan.summary("服务器封面"),result.total(),result.index(),scan.diagnostics(),result.entries()));
                 });
             }else if(m.op()==COVER_WRITE){
                 if(!features(e.system).covers())throw new IllegalArgumentException("此机型尚未接入封面");
@@ -142,9 +143,10 @@ public final class ContentCards {
     }
     private static void list(ServerPlayer p,State s,Edit e,int page,String query){
         ContentCardWorkbench.page(List.of(),query,page);e.lastList=System.nanoTime();
-        job(p,s,e,e.store::list,entries->{e.catalog=entries;var result=ContentCardWorkbench.page(entries,query,page);
-            send(p,new Message(LIST,e.system,e.token,e.pos,"",result.total()==0?"服务器没有匹配游戏；请检查ROM目录或搜索条件":"选择只预览，点击“写入卡带”才生效",result.total(),result.index(),new byte[0],result.entries()));});
+        job(p,s,e,e.store::scan,scan->{var entries=scan.entries();e.catalog=entries;logFailures(e,scan);var result=ContentCardWorkbench.page(entries,query,page);
+            send(p,new Message(LIST,e.system,e.token,e.pos,"",scan.summary("服务器游戏")+(result.total()==0&&!entries.isEmpty()?"；没有匹配搜索结果":""),result.total(),result.index(),scan.diagnostics(),result.entries()));});
     }
+    private static void logFailures(Edit e,ContentCardStore.Scan scan){for(var failure:scan.failures())cn.piq.fcarcade.FcArcadeMod.LOGGER.warn("[ContentCard {}] 扫描拒绝 {}",e.system,failure);}
     private static void card(ServerPlayer p,Edit e){
         var entry=ContentCardData.read(e.stack,e.system);
         send(p,new Message(CARD,e.system,e.token,e.pos,entry==null?"":entry.hash(),ContentCardData.title(e.stack),

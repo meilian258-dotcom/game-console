@@ -11,6 +11,9 @@ def main():
     a.output.mkdir(parents=True,exist_ok=False)
     sources=sorted((ROOT/'src/main/java').rglob('*.java'))+[ROOT/'helper/src/main/java/cn/piq/gba/bridge/PcmResampler.java']
     resources=sorted(p for p in (ROOT/'src/main/resources').rglob('*') if p.is_file())
+    from prepare_handheld_model import BODY, remove_front_decal
+    if remove_front_decal(json.loads(BODY.read_text(encoding='utf-8'))):
+        raise ValueError('Run tools/prepare_handheld_model.py after regenerating the original model; front branding must not return')
     inputs={str(p):sha(p) for p in [a.fc,a.runtime_base,*sources,*resources]}
     with zipfile.ZipFile(a.runtime_base) as z:
         names=z.namelist();assert len(names)==len(set(names));assert z.testzip() is None

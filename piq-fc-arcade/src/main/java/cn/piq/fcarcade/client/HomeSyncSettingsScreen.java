@@ -53,16 +53,21 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
             final int selected=mode;
             boolean privateOnly=diagnosticsOnly();
             String label=(setting.mode()==mode&&!privateOnly?"✓ ":"")+LABELS[mode];
-            if(privateOnly&&mode==4)label="✓ 私人单人（当前可用）";
+            if(privateOnly&&mode==4)label="私人单人 · 本机设置…";
+            else if(privateOnly)label+="（尚未接入）";
             else if((setting.supported()&(1<<mode))==0)label+="（不可用）";
             var button=Button.builder(Component.literal(label),b->{
-                if(selected==4)JniNetplayConsent.confirm(this,()->{if(current()&&setting.mode()!=4)apply(4,-1,-1);});
+                if(privateOnly&&selected==4){if(ready()&&current())openLocalSettings();}
+                else if(selected==4)JniNetplayConsent.confirm(this,()->{if(current()&&setting.mode()!=4)apply(4,-1,-1);});
                 else apply(selected,-1,-1);
             })
                 .bounds(left+10,top+HomeSyncSettingsLayout.MODE_ROW+mode*HomeSyncSettingsLayout.MODE_STEP,panelWidth-20,16).build();
-            button.active=ready()&&(setting.supported()&(1<<mode))!=0
-                    &&(setting.editable()&&setting.mode()!=mode||mode==4&&setting.mode()==4&&!JniNetplayConsent.allowed());
-            button.setTooltip(Tooltip.create(Component.literal((setting.supported()&(1<<mode))==0
+            button.active=ready()&&(privateOnly&&mode==4||(setting.supported()&(1<<mode))!=0
+                    &&(setting.editable()&&setting.mode()!=mode||mode==4&&setting.mode()==4&&!JniNetplayConsent.allowed()));
+            button.setTooltip(Tooltip.create(Component.literal(privateOnly
+                ?(mode==4?"打开已可用的本机控制、运行环境与运行器设置；不会开关机或切换公共模式。"
+                        :"本附属尚未接入此公共运行方式；不是权限不足，也不能通过此按钮解锁。当前仅私人单人，附近玩家不能旁观。")
+                :(setting.supported()&(1<<mode))==0
                 ?status
                 :(mode==0?"由开机玩家运行游戏，向其他玩家发送音画。":mode==1?"各客户端运行游戏，同步操作数据。":mode==2?"由服务器运行游戏，向玩家发送音画。":mode==4?"FC 普通双手柄 JNI 回滚，原生崩溃可影响整个 MC。Windows x64默认允许，参与和旁观跟随房间；个人/卡带独立JNI档，不与原 Netplay 混接。":"RetroArch Netplay 同步操作与状态；Windows x64。按卡带策略保存，开机恢复；网络页可手动保存。")
                     +"\n管理员关机后可修改；已借手柄无需归还。")));
@@ -91,11 +96,12 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         var network=Button.builder(Component.literal("网络"),b->NetworkDiagnosticsScreen.open(this)).bounds(left+22+2*footer,top+HomeSyncSettingsLayout.FOOTER_ROW,footer,20).build();
         network.active=ready();addRenderableWidget(network);
         addRenderableWidget(Button.builder(Component.literal(diagnosticsOnly()?"本机设置":"私人模式"),b->{
-            if(diagnosticsOnly())minecraft.setScreen(new HomeRuntimeSettingsScreen(this,deviceSystem(),setting.system()));else PrivateHomeClient.open();
+            if(diagnosticsOnly())openLocalSettings();else PrivateHomeClient.open();
         }).bounds(left+28+3*footer,top+HomeSyncSettingsLayout.FOOTER_ROW,footer,20).build());
         addRenderableWidget(Button.builder(Component.literal("关闭"),b->onClose()).bounds(left+34+4*footer,top+HomeSyncSettingsLayout.FOOTER_ROW,footer,20).build());
     }
     private boolean ready(){return !pending&&!timedOut&&cooldown==0;}
+    private void openLocalSettings(){minecraft.setScreen(new HomeRuntimeSettingsScreen(this,deviceSystem(),setting.system()));}
     private boolean diagnosticsOnly(){return minecraft.level!=null&&minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity c
             &&cn.piq.fcarcade.home.HomeSystems.privateDeviceSettings(c.systemId());}
     private net.minecraft.resources.ResourceLocation deviceSystem(){

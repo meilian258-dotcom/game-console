@@ -37,6 +37,13 @@ public final class GbaHandheldClientProbe {
         for(int mask=0;mask<4096;mask++)check(GbaHandheldGate.input(mask)==(mask&0xDFD),"Canonical GBA button routing");
         var use=new GbaHandheldGate.UseGate();
         for(int i=0;i<50;i++){check(use.press(),"New physical press");check(!use.press(),"Same-tick air/block duplicate");use.observe(true);check(!use.press(),"Held right-click repeat");use.observe(false);}
+        check(GbaHandheldGate.useAction(true,true)==GbaHandheldGate.UseAction.INSERT,"Shift with card inserts, never powers");
+        check(GbaHandheldGate.useAction(true,false)==GbaHandheldGate.UseAction.INSERT,"Ordinary two-hand insert compatibility");
+        check(GbaHandheldGate.useAction(false,true)==GbaHandheldGate.UseAction.POWER,"Shift without incoming card toggles power");
+        check(GbaHandheldGate.useAction(false,false)==GbaHandheldGate.UseAction.RAISE,"Ordinary use changes presentation only");
+        var attack=new GbaHandheldGate.UseGate();
+        check(attack.press(),"First eject gesture");for(int i=0;i<50;i++){attack.observe(true);check(!attack.press(),"Holding attack cannot repeat eject");}
+        attack.observe(false);check(attack.press(),"Physical release rearms eject");
         Path root=Path.of(args[0]).toAbsolutePath();Files.createDirectories(root);
         var a=GbaSaveScope.of("server:example.test:25565",player);var b=GbaSaveScope.of("server:other.test:25565",player);
         var first=new GbaHandheldSelectionStore(root,a);var other=new GbaHandheldSelectionStore(root,b);

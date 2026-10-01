@@ -21,26 +21,32 @@ public final class GbaHandheldServer {
         var machine=p.getItemInHand(r.hand());
         if(!machine.is(GbaMod.HANDHELD.get())||machine.getCount()!=1||!GbaCartridgeSlot.id(machine).equals(r.device()))return;
         var use=USES.computeIfAbsent(p,k->new Use());long now=System.nanoTime();
-        if(use.seen.contains(r.nonce())||(!use.seen.isEmpty()&&now-use.time<200_000_000L))return;
+        if(use.seen.contains(r.nonce()))return;
+        // A safety stop/eject must not be dropped just because opening occurred <200ms
+        // ago. These actions remain nonce-guarded and never start another core.
+        if(r.action()!=GbaHandheldNetwork.OFF&&r.action()!=GbaHandheldNetwork.EJECT&&!use.seen.isEmpty()&&now-use.time<200_000_000L){say(p,"操作过快，请稍后重试");return;}
         use.time=now;use.seen.addLast(r.nonce());if(use.seen.size()>32)use.seen.removeFirst();
         if(!GbaCartridgeSlot.valid(machine)){say(p,"掌机卡槽数据异常，未改动任何物品");return;}
         var other=r.hand()==InteractionHand.MAIN_HAND?InteractionHand.OFF_HAND:InteractionHand.MAIN_HAND;
         UUID active=ACTIVE.get(p);
         if(r.action()==GbaHandheldNetwork.OFF){if(active!=null)ContentCards.stop(p,active);return;}
-        if(active!=null){say(p,"请先 Shift＋右键关机，再插拔卡带");return;}
+        if(r.action()==GbaHandheldNetwork.EJECT){
+            // The normal client waits for its local save/close first. Server authority
+            // still owns the item transaction and cancels its exact old play grant.
+            if(active!=null)ContentCards.stop(p,active);
+            var card=GbaCartridgeSlot.card(machine);if(card.isEmpty()){say(p,"掌机未插卡");return;}
+            if(p.getItemInHand(other).isEmpty())p.setItemInHand(other,card);
+            else if(!p.getInventory().add(card)){say(p,"背包已满，卡带仍在掌机内；请腾出另一手或一个物品格");return;}
+            GbaCartridgeSlot.set(machine,ItemStack.EMPTY);p.inventoryMenu.broadcastChanges();say(p,"已退出卡带；掌机已关机");return;
+        }
+        if(active!=null){say(p,"掌机运行中，不能换卡；Shift＋左键安全拔卡，或先收起另一手卡带再 Shift＋右键关机");return;}
         if(r.action()==GbaHandheldNetwork.INSERT){
             var incoming=p.getItemInHand(other);if(!incoming.is(GbaMod.CARTRIDGE.get())||incoming.getCount()!=1)return;
             var old=GbaCartridgeSlot.card(machine);GbaCartridgeSlot.set(machine,incoming);
-            p.setItemInHand(other,old);p.inventoryMenu.broadcastChanges();say(p,"已插入 GBA 卡带；Shift＋右键开机");return;
-        }
-        if(r.action()==GbaHandheldNetwork.EJECT){
-            var card=GbaCartridgeSlot.card(machine);if(card.isEmpty()){say(p,"掌机未插卡");return;}
-            if(p.getItemInHand(other).isEmpty())p.setItemInHand(other,card);
-            else if(!p.getInventory().add(card)){say(p,"背包已满，请先腾出副手或一个物品格");return;}
-            GbaCartridgeSlot.set(machine,ItemStack.EMPTY);p.inventoryMenu.broadcastChanges();say(p,"已退出卡带");return;
+            p.setItemInHand(other,old);p.inventoryMenu.broadcastChanges();say(p,old.isEmpty()?"已插入 GBA 卡带；Shift＋右键开机":"已换入 GBA 卡带，旧卡已归还另一手；收起旧卡后 Shift＋右键开机");return;
         }
         var entry=ContentCardData.read(GbaCartridgeSlot.card(machine),GbaMod.BACKEND);
-        if(entry==null){say(p,"请先用 GBA 卡带右键老式电脑写入游戏，再将卡带与掌机分持两手右键插卡");return;}
+        if(entry==null){say(p,"请先用 GBA 卡带右键老式电脑写入游戏，再将卡带与掌机分持两手 Shift＋右键插卡");return;}
         if(!PlayerContentAccess.canBrowse(p)||!PlayerContentAccess.canUseServerRom(p)){say(p,"没有服务器游戏使用权限，请联系管理员");return;}
         GbaCartridgeSlot.identify(machine);p.inventoryMenu.broadcastChanges();
         var snapshot=machine.copy();var connection=p.connection.getConnection();var level=p.serverLevel();int slot=p.getInventory().selected;

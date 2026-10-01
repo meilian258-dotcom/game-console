@@ -44,8 +44,62 @@ class ContentCardStoreTest {
         assertThrows(IOException.class,()->store().list());
     }
     @Test void nonRomAndDirectoryCannotBeExecuted()throws Exception{
-        Files.createDirectory(root.resolve("fake.md"));assertThrows(IOException.class,()->store().list());
+        Files.createDirectory(root.resolve("fake.md"));var scan=store().scan();
+        assertTrue(scan.entries().isEmpty());assertEquals(1,scan.failures().size());assertEquals("fake.md",scan.failures().getFirst().name());
+        assertThrows(IOException.class,()->store().readPath(root.resolve("fake.md")));
         assertThrows(IOException.class,()->store().readPath(root.resolve("other.exe")));
+    }
+    @Test void rejectedFileDoesNotHideValidRomAndOriginalsRemainUnchanged()throws Exception{
+        byte[] good=rom(9),bad=new byte[1023];
+        Files.write(root.resolve("Zero Wing.md"),good);Files.write(root.resolve("Zombie High.md"),bad);
+        var scan=store().scan();
+        assertEquals(1,scan.entries().size());assertEquals("Zero Wing.md",scan.entries().getFirst().name());
+        assertEquals(ContentCardStore.hash(good),scan.entries().getFirst().hash());
+        assertEquals(1,scan.failures().size());assertEquals("Zombie High.md",scan.failures().getFirst().name());assertEquals("not MD",scan.failures().getFirst().reason());
+        assertArrayEquals(good,Files.readAllBytes(root.resolve("Zero Wing.md")));assertArrayEquals(bad,Files.readAllBytes(root.resolve("Zombie High.md")));
+        assertArrayEquals(good,store().read(scan.entries().getFirst()));assertThrows(IOException.class,()->store().readPath(root.resolve("Zombie High.md")));
+        assertEquals(scan.entries(),store().list());
+    }
+    @Test void emptyAllRejectedAndPartialScansAreDistinct()throws Exception{
+        assertTrue(store().scan().failures().isEmpty());assertTrue(store().scan().entries().isEmpty());
+        Files.write(root.resolve("bad.md"),new byte[]{1});
+        var failed=store().scan();assertTrue(failed.entries().isEmpty());assertEquals(1,failed.failures().size());
+        Files.write(root.resolve("good.md"),rom(3));
+        var partial=store().scan();assertEquals(1,partial.entries().size());assertEquals(1,partial.failures().size());
+    }
+    @Test void perFileRuntimeValidatorFailureIsIsolated()throws Exception{
+        Files.write(root.resolve("a.md"),rom(1));Files.write(root.resolve("b.md"),rom(2));
+        var s=new ContentCardStore(root,Set.of("md"),bytes->{if(bytes[700]==1)throw new IllegalArgumentException("unsupported revision");});
+        var scan=s.scan();assertEquals("b.md",scan.entries().getFirst().name());assertEquals("a.md",scan.failures().getFirst().name());
+    }
+    @Test void unsupportedExtensionsRemainDiagnosticOnlyBesideValidGames()throws Exception{
+        byte[] good=rom(7);Files.write(root.resolve("good.md"),good);Files.write(root.resolve("unknown.smd"),good);Files.write(root.resolve("archive.zip"),new byte[]{1});
+        var scan=store().scan();assertEquals(1,scan.entries().size());assertEquals("good.md",scan.entries().getFirst().name());assertEquals(2,scan.failures().size());
+        assertTrue(scan.failures().stream().allMatch(f->f.reason().contains("未扫描：扩展名不支持")&&f.reason().contains(".md")));
+        assertThrows(IOException.class,()->store().readPath(root.resolve("unknown.smd")));
+        assertThrows(IOException.class,()->store().store("unknown.smd",ContentCardStore.hash(good),good));
+        assertArrayEquals(good,Files.readAllBytes(root.resolve("unknown.smd")));
+    }
+    @Test void allUnsupportedFilesAreNotReportedAsAnEmptyDirectory()throws Exception{
+        Files.write(root.resolve("game.smd"),rom(1));Files.write(root.resolve("archive.zip"),new byte[]{1});
+        var scan=store().scan();assertTrue(scan.entries().isEmpty());assertEquals(2,scan.failures().size());
+        assertFalse(new String(scan.diagnostics(),java.nio.charset.StandardCharsets.UTF_8).isBlank());
+        assertTrue(scan.summary("本地").contains("2 项被拒绝"));
+    }
+    @Test void unsupportedExtensionDoesNotSkipOrdinaryFileCheck()throws Exception{
+        Files.createDirectory(root.resolve("not-a-file.zip"));
+        var scan=store().scan();assertTrue(scan.entries().isEmpty());assertEquals(1,scan.failures().size());
+        assertTrue(scan.failures().getFirst().reason().contains("not an ordinary non-link file"));
+    }
+    @Test void filenameAndSizeFailuresStayVisibleButNotSelectable()throws Exception{
+        Files.write(root.resolve("x".repeat(129)+".md"),rom(1));Files.write(root.resolve("empty.md"),new byte[0]);Files.write(root.resolve("good.md"),rom(2));
+        var scan=store().scan();assertEquals(1,scan.entries().size());assertEquals(2,scan.failures().size());
+    }
+    @Test void diagnosticsAreBoundedAndDoNotContainControlCharactersInsideNames(){
+        var failures=java.util.stream.IntStream.range(0,256).mapToObj(i->new ContentCardStore.Failure("游".repeat(128)+i,"原".repeat(160))).toList();
+        var scan=new ContentCardStore.Scan(java.util.List.of(),failures);
+        assertTrue(scan.diagnostics().length<=8*1024);assertTrue(new String(scan.diagnostics(),java.nio.charset.StandardCharsets.UTF_8).contains("服务器日志"));
+        assertEquals("a b",new ContentCardStore.Failure("a\nb","reason").name());
     }
     @Test void legacyStoreKeepsEightMiBLimit()throws Exception{
         byte[] large=new byte[ContentCardStore.DEFAULT_MAX_BYTES+1];large[256]='S';
