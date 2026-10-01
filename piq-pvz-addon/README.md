@@ -4,6 +4,21 @@
 
 2026-09-29：配套 FC76.22 / 电脑10，显式试验入口改用主包共用 JNI ABI1。默认独立进程不变；旧 `pvz.engine=jni` 不会直接开启新版，需重新确认。使用 `jni-common-v1-saves`，不覆盖进程档或 PvZ10 试验档。真实核心不支持即时状态保存，使用自身文件保存机制；不能把其非零 state_size 当作支持存档。旧专用桥资源保留兼容/历史测试但当前运行器不再调用它。[本轮安装与验证](../piq-fc-arcade/design/通用JNI一期-FC76.22-使用与附属接入.md)。未安装发布，MC多人/性能待验。
 
+## 上游源码：Git submodule（2026-10-01）
+
+`vendor/PvZ-Portable` 现为 [KLuoNuoYa/PvZ-Portable](https://github.com/KLuoNuoYa/PvZ-Portable/tree/libretro) 的子模块，来源分支 `libretro`，首次固定提交 `6a3cbeee46679eaae2859d25a98207182388e149`。父仓库的 gitlink 记录具体提交；分支名只说明来源，日常获取不会自动升级到最新分支。
+
+在**方块电玩仓库根目录**执行：
+
+```powershell
+git submodule update --init --checkout -- piq-pvz-addon/vendor/PvZ-Portable
+git submodule status -- piq-pvz-addon/vendor/PvZ-Portable
+```
+
+已有克隆拉取本次父仓库提交后也需要执行一次；不要用 `--remote` 代替固定版本恢复。GitHub 的父仓库 ZIP / `git archive` 不会自动装入子模块源码，开发者请使用 Git 获取。旧目录若有自己修改的文件，先备份和核对，不用强制更新覆盖。
+
+旧目录只有两个许可和一个 `libretro.h`；核对后两个许可字节一致，头文件仅 CRLF → LF，没有代码补丁丢失。原生桥构建器的 include 路径不变。本轮**没有重新编译或替换核心 DLL、host、JNI 桥、JAR，也不更改存档**；新上游的能力说明不能视为当前已交付 DLL 的能力或对应源码证明。完整核对、恢复与升级规则见[源码子模块说明](design/PvZ源码子模块.md)。
+
 ## 历史：prototype.10
 
 2026-09-28：配套电脑9，新增默认关闭的 Windows x64 JNI 试验。独立工作线程/WGL上下文、固定内置核心、隔离试验存档、有界音画/输入；旧独立进程及播放盒不变。JNI原生故障可能让Minecraft一起退出，不能安全强杀挂住的核心。仅电脑程序页明确确认后启用，不由服务器选择或给旁观者加载。当前范围、安装和实测边界见[JNI试验指南](design/PvZ10-JNI试验说明.md)；未安装、发布或MC实机验收，不标稳定。以下为历史，不要混用旧配套范围和路径。

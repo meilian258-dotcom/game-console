@@ -29,6 +29,21 @@ python source-control/audit.py
 
 已克隆旧地址的协作者可执行 `git remote set-url origin https://github.com/meilian258-dotcom/game-console.git`。分享源码需所有者在 Settings → Collaborators → Add people 邀请并由对方接受；个人私有仓库的协作者拥有读写权限，不是只读分享。参考 [GitHub 权限说明](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/permission-levels-for-a-personal-account-repository)。对外正式名与交付文件名见[命名规范](source-control/BRANDING.md)，内部兼容 ID 不改。
 
+### PvZ 上游源码子模块
+
+自 2026-10-01 起，`piq-pvz-addon/vendor/PvZ-Portable` 通过 Git submodule 管理；来源为用户确认的 `https://github.com/KLuoNuoYa/PvZ-Portable.git` / `libretro`。父仓库保存固定 gitlink 提交，不在父仓库重复保存上游全量代码。
+
+克隆或拉取含此变更的父仓库提交后，在仓库根执行：
+
+```powershell
+git submodule update --init --checkout -- piq-pvz-addon/vendor/PvZ-Portable
+git submodule status -- piq-pvz-addon/vendor/PvZ-Portable
+```
+
+只取父仓库 ZIP、运行 `git archive` 或只备份父库 bundle，不会包含子模块的代码对象；完整离线恢复还须单独保留对应子模块提交。`branch = libretro` 不代表日常使用 `--remote` 自动升级。更新上游需另外审查差异、许可和构建/运行影响，再提交新的 gitlink；未提交的子库修改不能靠父库提交保存。见 [PvZ 核对及恢复说明](piq-pvz-addon/design/PvZ源码子模块.md)。
+
+源码检查只允许已登记的这一处子模块及精确来源/分支；`.gitmodules` 的未知字段、额外来源和冲突索引会报错。`--staged` 校验实际索引的 `.gitmodules` 和 gitlink；工作树检查另核实已初始化子库的提交及脏改动，未初始化会明确标注。**父库检查不递归认证第三方子库的全部内容**，报告将其与父库普通文件分开列出；新 pin 仍须人工审查，不执行上游脚本来“验证安全”。其余原有文件/秘密/二进制检查保留。
+
 ## 私有远端与备份边界
 
 - 首次推送只包含经过检查的 `main` 及其祖先提交，不使用 `--all`、`--mirror` 或 `--force`；旧本地任务分支保留，不自动推送其他引用。
