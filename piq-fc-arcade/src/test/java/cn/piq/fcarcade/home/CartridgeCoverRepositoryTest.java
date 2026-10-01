@@ -23,6 +23,16 @@ class CartridgeCoverRepositoryTest {
     @Test void absentCatalogIsEmptyWithoutCreatingDirectories() throws Exception {
         Path missing=root.resolve("missing");assertTrue(new CartridgeCoverRepository(missing).list().isEmpty());assertFalse(Files.exists(missing));
     }
+    @Test void separateRepositoriesShareAnIdempotentWriterAndLeaveNoPartialFile() throws Exception {
+        byte[] png=CartridgeCoverCodecTest.label();String hash=RomRepository.sha256(png);
+        try(var workers=java.util.concurrent.Executors.newFixedThreadPool(4)){
+            var jobs=new java.util.ArrayList<java.util.concurrent.Future<?>>();
+            for(int i=0;i<12;i++)jobs.add(workers.submit(()->{new CartridgeCoverRepository(root).store(hash,png);return null;}));
+            for(var job:jobs)job.get(10,java.util.concurrent.TimeUnit.SECONDS);
+        }
+        assertArrayEquals(png,new CartridgeCoverRepository(root).read(hash));
+        try(var files=Files.list(root)){assertEquals(1,files.count());}
+    }
     @Test void storesVerifiedContentOnceAndReadsExactOriginalBytes() throws Exception {
         byte[] png = CartridgeCoverCodecTest.label(); String hash = RomRepository.sha256(png);
         CartridgeCoverRepository repository = new CartridgeCoverRepository(root);
@@ -44,5 +54,34 @@ class CartridgeCoverRepositoryTest {
         assertThrows(IOException.class, () -> repository.read(hash));
         assertThrows(IOException.class, () -> repository.store(hash, png));
         assertArrayEquals(corrupted, Files.readAllBytes(file));
+    }
+    @Test void contentCardCoverScanRetainsValidImagesAndReportsEachRejectedFile() throws Exception {
+        byte[] good=CartridgeCoverCodecTest.label();String hash=RomRepository.sha256(good);
+        var repository=new CartridgeCoverRepository(root);repository.store(hash,good);
+        var bad=root.resolve("a".repeat(64)+".png");Files.write(bad,new byte[]{1,2,3});
+        Files.createDirectory(root.resolve("b".repeat(64)+".png"));
+        Files.write(root.resolve("not-a-hash.png"),good);
+        var scan=repository.scan();assertEquals(1,scan.entries().size());assertEquals(hash,scan.entries().getFirst().hash());
+        assertEquals(3,scan.failures().size());assertTrue(scan.failures().stream().anyMatch(f->f.name().equals("not-a-hash.png")));
+        assertArrayEquals(good,repository.read(hash));assertArrayEquals(new byte[]{1,2,3},Files.readAllBytes(bad));
+        assertThrows(IOException.class,()->repository.read("a".repeat(64)));
+    }
+    @Test void localCoverScanChecksPngAndIsolatesInvalidFilesWithoutUploading() throws Exception {
+        byte[] good=CartridgeCoverCodecTest.label();Files.write(root.resolve("my-cover.png"),good);Files.write(root.resolve("bad.png"),new byte[]{1,2,3});
+        var local=new cn.piq.fcarcade.home.content.ContentCardStore(root,java.util.Set.of("png"),bytes->CartridgeCoverCodec.prepare(bytes),CartridgeLimits.MAX_SOURCE_COVER_BYTES);
+        var scan=local.scan();assertEquals(1,scan.entries().size());assertEquals("my-cover.png",scan.entries().getFirst().name());
+        assertEquals(1,scan.failures().size());assertEquals("bad.png",scan.failures().getFirst().name());
+        try(var files=Files.list(root)){assertEquals(2,files.count());}
+        assertArrayEquals(good,Files.readAllBytes(root.resolve("my-cover.png")));
+    }
+    @Test void contentCardCoverScanStillRejectsDirectoryOverBudget() throws Exception {
+        for(int i=0;i<257;i++)Files.write(root.resolve(i+".txt"),new byte[]{1});
+        assertThrows(IOException.class,()->new CartridgeCoverRepository(root).scan());
+    }
+    @Test void unsupportedCoverFilesAreReportedWithoutChangingLegacyCatalog() throws Exception {
+        Files.write(root.resolve("cover.zip"),new byte[]{1});
+        var repository=new CartridgeCoverRepository(root);var scan=repository.scan();
+        assertTrue(scan.entries().isEmpty());assertEquals(1,scan.failures().size());assertTrue(scan.failures().getFirst().reason().contains("未扫描：扩展名不支持（支持 .png）"));
+        assertTrue(repository.list().isEmpty());
     }
 }

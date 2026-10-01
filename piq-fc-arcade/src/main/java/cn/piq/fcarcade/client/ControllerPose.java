@@ -16,30 +16,39 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
-/** Public NeoForge hooks, scoped strictly to FC controllers and their otherwise empty support hand. */
-final class ControllerPose {
+/** Public NeoForge hooks for FC and explicitly registered controllers, with an empty support hand. */
+public final class ControllerPose {
+    private static final java.util.Set<net.minecraft.world.item.Item> EXTERNAL = new java.util.HashSet<>();
     private static boolean registered;
     private static final ThreadLocal<Boolean> DRAWING_FIRST_ARMS = ThreadLocal.withInitial(() -> false);
     private ControllerPose() {}
 
+    /** Visual opt-in only; this never grants input or an inventory lease. */
+    public static void registerController(net.minecraft.world.item.Item item) {
+        EXTERNAL.add(java.util.Objects.requireNonNull(item)); register();
+    }
+    private static boolean controller(ItemStack stack) {
+        return HomeControllerData.isController(stack) || EXTERNAL.contains(stack.getItem());
+    }
+
     static void register() {
         if (!registered) { registered = true; NeoForge.EVENT_BUS.addListener(ControllerPose::renderHands); ClientControllerAnimation.register(); }
     }
-    static HumanoidModel.ArmPose armPose(LivingEntity entity, InteractionHand hand, ItemStack stack) {
+    public static HumanoidModel.ArmPose armPose(LivingEntity entity, InteractionHand hand, ItemStack stack) {
         if (!eligible(entity, stack)) return null;
         boolean two = ControllerPoseLayout.twoHands(true, entity.getItemInHand(other(hand)).isEmpty());
         return (two ? ControllerArmPoseParameters.TWO_HANDS : ControllerArmPoseParameters.SINGLE_HAND).getValue();
     }
     private static boolean eligible(LivingEntity entity, ItemStack stack) {
-        return ControllerPoseLayout.eligible(HomeControllerData.isController(stack), entity instanceof Player,
+        return ControllerPoseLayout.eligible(controller(stack), entity instanceof Player,
                 entity.isAlive(), entity.isUsingItem(), entity.isVisuallySwimming(), entity.isFallFlying());
     }
     private static InteractionHand other(InteractionHand hand) {
         return hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
     }
-    static boolean firstTransform(PoseStack poses, LocalPlayer player, HumanoidArm arm, ItemStack stack,
+    public static boolean firstTransform(PoseStack poses, LocalPlayer player, HumanoidArm arm, ItemStack stack,
                                   float equip, float swing) {
-        if (!HomeControllerData.isController(stack)) return false;
+        if (!controller(stack)) return false;
         InteractionHand hand = arm == player.getMainArm() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
         boolean two = ControllerPoseLayout.twoHands(eligible(player, stack), player.getItemInHand(other(hand)).isEmpty());
         applyFirst(poses, ControllerPoseLayout.first(arm == HumanoidArm.RIGHT, two, equip, swing));
@@ -85,7 +94,7 @@ final class ControllerPose {
             if (event.getItemStack().isEmpty() && player.getItemInHand(event.getHand()).isEmpty()) event.setCanceled(true);
             return;
         }
-        if (!HomeControllerData.isController(event.getItemStack())
+        if (!controller(event.getItemStack())
                 || !ItemStack.isSameItemSameComponents(event.getItemStack(), player.getItemInHand(holding))) return;
         if (!(minecraft.getEntityRenderDispatcher().getRenderer(player) instanceof PlayerRenderer renderer)) return;
         PoseStack poses = event.getPoseStack();

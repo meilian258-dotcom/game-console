@@ -27,6 +27,10 @@ public final class GbaHandheldLayout {
         double x=Math.cos(roll)*hx-Math.sin(roll)*hy,y=Math.sin(roll)*hx+Math.cos(roll)*hy;
         return new Arm(side*.29-scale*x,-.09-scale*y,.015-scale*hz,30,side*60,scale);
     }
+    public static Pose first(boolean right,boolean two,double equip,double swing,boolean raised){
+        // Front-on 3:2 screen occupies ~38% of view height at the default hand FOV.
+        return raised?new Pose(0,-.02,-.95,0,0,0,2.8):first(right,two,equip,swing);
+    }
     public static boolean eligible(boolean item,boolean alive,boolean using,boolean invisible,boolean scoping,boolean swimming,boolean flying){return item&&alive&&!using&&!invisible&&!scoping&&!swimming&&!flying;}
     public static Point screen(int corner){return switch(corner){
         case 0->new Point(SCREEN_X0,SCREEN_Y,SCREEN_Z0);case 1->new Point(SCREEN_X0,SCREEN_Y,SCREEN_Z1);
@@ -35,7 +39,16 @@ public final class GbaHandheldLayout {
     public static Motion motion(String part,int mask){
         int bit;double press=.045;Point pivot;
         switch(part){
-            case "dpad"->{pivot=new Point(5,1.265,7.44);double pitch=((mask&(1<<4))!=0?-2:0)+((mask&(1<<5))!=0?2:0),roll=((mask&(1<<6))!=0?2:0)+((mask&(1<<7))!=0?-2:0);return new Motion(0,(mask&0xf0)==0?0:-press,0,pitch,roll,pivot);}
+            case "dpad"->{
+                // The cap is a rocker, not four buttons travelling down together. Source
+                // up is -Z and left is -X. The old .045 drop exceeded its 2-degree tilt,
+                // so even the opposite end sank. Keep the bearing fixed and rock the cap.
+                pivot=new Point(5,1.349,7.44);
+                int vertical=((mask&(1<<5))!=0?1:0)-((mask&(1<<4))!=0?1:0);
+                int horizontal=((mask&(1<<6))!=0?1:0)-((mask&(1<<7))!=0?1:0);
+                double degrees=vertical!=0&&horizontal!=0?6/Math.sqrt(2):6;
+                return new Motion(0,0,0,vertical*degrees,horizontal*degrees,pivot);
+            }
             case "button_a"->{bit=8;pivot=new Point(11.58,1.265,7.15);}
             case "button_b"->{bit=0;pivot=new Point(10.92,1.265,7.67);}
             case "button_select"->{bit=2;press=.03;pivot=new Point(4.86,1.265,8.78);}

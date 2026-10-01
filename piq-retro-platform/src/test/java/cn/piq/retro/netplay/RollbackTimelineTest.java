@@ -87,4 +87,25 @@ class RollbackTimelineTest {
         for(int f=3994;f<4000;f++) t.supply(f,1,inputs.get(f));
         assertEquals(r.state,c.state); assertEquals(4000,c.presented); assertTrue(c.replayed>20000);
     }
+    @Test void auxiliaryInputsAreRecordedAndReplayedNotResampled() {
+        class FullCore extends Core {
+            @Override public Long step(RollbackTimeline.Input input,boolean present) {
+                long base=super.step(input.p1(),input.p2(),present);
+                return state=base+input.p3()*7L+input.p4()*11L+input.gun()*13L;
+            }
+        }
+        var actual=new FullCore();var reference=new FullCore();var t=new RollbackTimeline<>(actual,0);
+        var input0=new RollbackTimeline.Input(0,1,0,4,5,65536,1);
+        var input1=new RollbackTimeline.Input(1,2,0,8,9,(1<<17)|230|(211<<8),1);
+        t.advance(input0);t.advance(input1);t.supply(0,1,6);
+        reference.step(new RollbackTimeline.Input(0,1,6,4,5,65536,3),true);
+        reference.step(new RollbackTimeline.Input(1,2,6,8,9,input1.gun(),1),true);
+        assertEquals(reference.state,actual.state);assertEquals(2,actual.replayed);
+        assertEquals(input1.gun(),t.input(1).gun());assertEquals(8,t.input(1).p3());
+        var corrected=new RollbackTimeline.Input(1,2,6,8,9,65536,3);
+        reference.restore(t.stateBefore(1));reference.step(corrected,true);
+        assertTrue(t.canonical(List.of(corrected)));assertEquals(reference.state,actual.state);
+        assertThrows(IllegalArgumentException.class,()->new RollbackTimeline.Input(0,0,0,0,0,65537,3));
+        assertThrows(IllegalArgumentException.class,()->new RollbackTimeline.Input(0,0,0,0,0,240<<8,3));
+    }
 }

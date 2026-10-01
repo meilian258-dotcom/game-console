@@ -12,7 +12,12 @@ MODULES = (
     'piq-native-arcade', 'piq-gba', 'piq-j2me-arcade', 'piq-computer',
     'piq-flash-box', 'piq-pvz-addon', 'piq-md-home',
 )
-ROOT_FILES = {'.gitignore', '.gitattributes', 'GIT_WORKFLOW.md', 'README.md'}
+ROOT_FILES = {'.gitignore', '.gitattributes', '.gitmodules', 'GIT_WORKFLOW.md', 'README.md'}
+APPROVED_SUBMODULES = {
+    'piq-pvz-addon/vendor/PvZ-Portable': {
+        'url': 'https://github.com/KLuoNuoYa/PvZ-Portable.git', 'branch': 'libretro',
+    },
+}
 BLOCKED_DIRS = {
     '.git', '.gradle', '.toolchains', '.idea', '.vscode', '.vs', '__pycache__',
     'node_modules', 'target', 'build', 'bin', 'obj', 'out', 'candidates',
@@ -75,49 +80,175 @@ def content_issues(name: str, data: bytes) -> list[str]:
         issues.append('rom-magic')
     return issues
 
-def working_files():
-    tracked = git('ls-files', '-z').split(b'\0')
-    new = git('ls-files', '--others', '--exclude-standard', '-z').split(b'\0')
-    for raw in sorted(set(tracked + new)):
-        if not raw: continue
-        name = raw.decode('utf8')
-        p = ROOT / name
-        if not p.is_file() or p.is_symlink() or p.resolve() != p.absolute():
-            yield name, None, 'missing-or-link'; continue
-        yield name, p.read_bytes(), None
-
-def indexed_files():
+def index_entries():
     entries = []
     for raw in git('ls-files', '--stage', '-z').split(b'\0'):
         if not raw: continue
         meta, name = raw.split(b'\t', 1)
         mode, oid, stage = meta.split()
         entries.append((name.decode('utf8'), oid, mode, stage))
+    return entries
+
+
+def working_files(entries=None):
+    entries = index_entries() if entries is None else entries
+    tracked = {name for name, _, _, _ in entries}
+    links = {name for name, _, mode, _ in entries if mode == b'160000'}
+    unmerged = {name for name, _, _, stage in entries if stage != b'0'}
+    new = git('ls-files', '--others', '--exclude-standard', '-z').split(b'\0')
+    for name in sorted(tracked | {raw.decode('utf8') for raw in new if raw}):
+        if name in links:
+            yield name, None, 'non-regular-or-unmerged' if name in unmerged else None
+            continue
+        p = ROOT / name
+        if not p.is_file() or p.is_symlink() or p.resolve() != p.absolute():
+            yield name, None, 'missing-or-link'; continue
+        yield name, p.read_bytes(), 'non-regular-or-unmerged' if name in unmerged else None
+
+
+def indexed_files(entries=None):
+    entries = index_entries() if entries is None else entries
+    # Gitlink commits live in the other repository, not this object database.
+    blobs = [entry for entry in entries if entry[2] != b'160000']
+    for name, _, mode, stage in entries:
+        if mode == b'160000':
+            yield name, None, None if stage == b'0' else 'non-regular-or-unmerged'
     proc = subprocess.run(['git', '-C', str(ROOT), 'cat-file', '--batch'],
-                          input=b''.join(oid + b'\n' for _, oid, _, _ in entries),
+                          input=b''.join(oid + b'\n' for _, oid, _, _ in blobs),
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
     data = proc.stdout; offset = 0
-    for name, oid, mode, stage in entries:
+    for name, oid, mode, stage in blobs:
         end = data.index(b'\n', offset)
         header = data[offset:end].split()
-        if len(header) != 3 or header[1] != b'blob':
-            raise ValueError('Non-blob index entry: ' + name)
-        size = int(header[2]); offset = end + 1
+        offset = end + 1
+        if len(header) == 2 and header[1] == b'missing':
+            yield name, None, 'missing-index-object'; continue
+        if len(header) != 3:
+            raise ValueError('Invalid object header: ' + name)
+        size = int(header[2])
         blob = data[offset:offset + size]; offset += size + 1
+        if len(header) != 3 or header[1] != b'blob':
+            yield name, None, 'non-blob-index-object'; continue
         yield name, blob, None if mode in (b'100644', b'100755') and stage == b'0' else 'non-regular-or-unmerged'
+
+
+def submodule_config(data: bytes | None):
+    """Accept only our reviewed, ordinary Git config subset; never execute it."""
+    if data is None:
+        return {}, ['missing-gitmodules']
+    try:
+        data.decode('utf8')
+        # Let Git parse its own syntax; includes are data, never followed.
+        parsed = subprocess.run(['git', 'config', '--no-includes', '--null', '--file', '-', '--list'],
+                                input=data, capture_output=True, check=False)
+        if parsed.returncode:
+            return {}, ['invalid-gitmodules']
+        allowed = {
+            'submodule.' + name + '.' + key: (name, key, value)
+            for name, config in APPROVED_SUBMODULES.items()
+            for key, value in dict(path=name, **config).items()
+        }
+        declared = {}; seen = set()
+        for raw in parsed.stdout.split(b'\0'):
+            if not raw: continue
+            key, sep, value = raw.decode('utf8').partition('\n')
+            if not sep or key not in allowed or key in seen:
+                return {}, ['unapproved-submodule-config']
+            seen.add(key)
+            name, field, expected = allowed[key]
+            if value != expected:
+                return {}, ['unapproved-submodule-config']
+            declared.setdefault(name, {})[field] = value
+        if any(set(values) != {'path', 'url', 'branch'} for values in declared.values()):
+            return {}, ['unapproved-submodule-config']
+        return declared, []
+    except (UnicodeError, OSError):
+        return {}, ['invalid-gitmodules']
+
+
+def working_submodule(name: str, oid: bytes):
+    """Read checkout metadata only; no fetch, hooks, build or recursive source audit."""
+    path = ROOT / name
+    if path.is_symlink() or path.resolve() != path.absolute():
+        return 'invalid', ['submodule-path-is-link']
+    if not path.exists():
+        return 'uninitialized', []
+    if not path.is_dir():
+        return 'invalid', ['submodule-path-not-directory']
+    dotgit = path / '.git'
+    if not dotgit.exists():
+        return ('invalid', ['submodule-directory-not-checkout']) if any(path.iterdir()) else ('uninitialized', [])
+    if dotgit.is_symlink() or dotgit.resolve() != dotgit.absolute():
+        return 'invalid', ['submodule-git-metadata-is-link']
+    def read(*args):
+        return subprocess.run(['git', '-c', 'core.fsmonitor=false', '-C', str(path), *args],
+                              capture_output=True, check=True).stdout
+    try:
+        top = Path(read('rev-parse', '--show-toplevel').decode('utf8').strip()).resolve()
+        if top != path.resolve():
+            return 'invalid', ['submodule-checkout-path-mismatch']
+        head = read('rev-parse', '--verify', 'HEAD').strip()
+        issues = [] if head == oid else ['submodule-checkout-pin-mismatch']
+        if read('status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignore-submodules=none'):
+            issues.append('submodule-dirty-checkout')
+        return 'initialized', issues
+    except (OSError, UnicodeError, subprocess.CalledProcessError):
+        return 'invalid', ['submodule-checkout-unreadable']
+
+
+def inspect_submodules(entries, candidates, staged):
+    links = [(name, oid, stage) for name, oid, mode, stage in entries if mode == b'160000']
+    config_files = [(data, problem) for name, data, problem in candidates if name == '.gitmodules']
+    findings = [dict(path=name, rules=['approved-submodule-path-not-gitlink'])
+                for name, _, mode, _ in entries if name in APPROVED_SUBMODULES and mode != b'160000']
+    records = []
+    if not links and not config_files:
+        return findings, records
+    data = config_files[0][0] if len(config_files) == 1 and config_files[0][1] is None else None
+    declared, issues = submodule_config(data)
+    if issues:
+        findings.append(dict(path='.gitmodules', rules=issues))
+    names = {name for name, _, _ in links}
+    for name in sorted(set(declared) - names):
+        findings.append(dict(path=name, rules=['declared-submodule-not-gitlink']))
+    for name, oid, stage in links:
+        rules = []
+        if name not in APPROVED_SUBMODULES: rules.append('unapproved-gitlink')
+        if name not in declared: rules.append('gitlink-without-approved-config')
+        if stage != b'0': rules.append('non-regular-or-unmerged')
+        if not re.fullmatch(rb'(?:[0-9a-f]{40}|[0-9a-f]{64})', oid) or not oid.strip(b'0'):
+            rules.append('invalid-gitlink-pin')
+        if any(other.startswith(name + '/') for other, _, _, _ in entries):
+            rules.append('gitlink-overlapping-index-path')
+        record = dict(path=name, commit=oid.decode('ascii', errors='replace'),
+                      auditScope='gitlink-metadata-only; submodule source not recursively audited',
+                      checkout='not-inspected')
+        if not rules:
+            record.update(APPROVED_SUBMODULES[name])
+            if not staged:
+                record['checkout'], checkout_issues = working_submodule(name, oid)
+                rules += checkout_issues
+        records.append(record)
+        if rules: findings.append(dict(path=name, rules=rules))
+    return findings, records
+
 
 def audit(staged=False):
     findings=[]; files=[]; counts={}
-    for name, data, problem in (indexed_files() if staged else working_files()):
+    entries = index_entries()
+    candidates = list(indexed_files(entries) if staged else working_files(entries))
+    for name, data, problem in candidates:
         issues = path_issues(name) + ([problem] if problem else [])
         if data is not None:
             issues += content_issues(name, data)
             files.append(dict(path=name, bytes=len(data), sha256=hashlib.sha256(data).hexdigest()))
             component=name.split('/')[0];counts[component]=counts.get(component,0)+1
         if issues: findings.append(dict(path=name, rules=issues))
+    submodule_findings, submodules = inspect_submodules(entries, candidates, staged)
+    findings += submodule_findings
     return dict(ok=not findings, mode='index' if staged else 'working-tree',
                 count=len(files), bytes=sum(f['bytes'] for f in files), components=counts,
-                findings=findings, files=files)
+                findings=findings, files=files, submodules=submodules)
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--staged',action='store_true');parser.add_argument('--report',type=Path)

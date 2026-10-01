@@ -6,5 +6,9 @@ public final class SfcNetplayProfile {
     private SfcNetplayProfile(){}
     public static NetplayProfile profile(){return new NetplayProfile(SfcNetplayProfile.class,
         "/core/sfc-libretro/windows-x64/mesen-s_libretro.dll","8aca17e76efbd7a70b0c247b42aaba04d0c1c90f693213bd1e76573986670b42","content.sfc",
-        Map.of("mesen-s_region","NTSC","mesen-s_ramstate","All 0s","mesen-s_overscan_vertical","None","mesen-s_overscan_horizontal","None","mesen-s_overclock","None","mesen-s_hle_coprocessor","enabled"),257,48000,32*1024*1024+512);}
+        Map.of("mesen-s_region","NTSC","mesen-s_ramstate","All 0s","mesen-s_overscan_vertical","None","mesen-s_overscan_horizontal","None","mesen-s_overclock","None","mesen-s_hle_coprocessor","enabled"),257,48000,32*1024*1024+512).withJni(runtime());}
+    private static cn.piq.retro.libretro.LibretroProfile runtime(){
+        var base=LibretroSfcCore.profile();var options=new java.util.TreeMap<>(base.options());options.put("mesen-s_region","NTSC");
+        return new cn.piq.retro.libretro.LibretroProfile(base.name(),base.extension(),base.fullPath(),base.devices(),false,options,base.cores());
+    }
 }

@@ -41,6 +41,11 @@ public final class HomeSystems {
         default boolean isRunning(ServerLevel level, ExternalHomeConsoleBlockEntity console) { return false; }
         /** Opt-in: unadapted addons cannot advertise a configurable execution lane. */
         default boolean synchronizationSettingsAvailable() { return false; }
+        /** Read-only device diagnostics must not advertise an unsupported execution mode. */
+        default boolean deviceSettingsAvailable() { return synchronizationSettingsAvailable(); }
+        default String deviceSettingsStatus(ServerLevel level, ExternalHomeConsoleBlockEntity console) {
+            return "此设备未开放公共联机模式。";
+        }
         default int synchronizationSupportedModes(ServerLevel level, ExternalHomeConsoleBlockEntity console) { return 2; }
         default String synchronizationUnavailableReason(ServerLevel level, ExternalHomeConsoleBlockEntity console, cn.piq.fcarcade.cabinet.CabinetSyncMode mode) { return HomeSyncPolicy.unavailable(mode); }
         /** Includes startup/join/save transactions, not borrowed idle controllers. */
@@ -54,6 +59,13 @@ public final class HomeSystems {
     /** Call during common setup; the registry locks before the first server starts. */
     public static void register(ResourceLocation systemId, ServerHooks hooks) { SYSTEMS.register(systemId, hooks); }
     static ServerHooks applianceHooks(ResourceLocation id) { return SYSTEMS.get(id); }
+
+    /** Device diagnostics opt-in is independent of server policy disabling public modes. */
+    public static boolean privateDeviceSettings(ResourceLocation id) {
+        var hooks=SYSTEMS.get(id);
+        try { return hooks!=null&&hooks.deviceSettingsAvailable()&&!hooks.synchronizationSettingsAvailable(); }
+        catch(RuntimeException|LinkageError unavailable){return false;}
+    }
 
     static synchronized void installLifecycle() {
         if (lifecycleRegistered) return;

@@ -25,9 +25,9 @@ public final class GenericLibretroNesCore implements NesCore {
     private boolean closed;
 
     public GenericLibretroNesCore(boolean zapper) {
-        this(zapper, LibretroRuntimes.Backend.PROCESS);
+        this(zapper, LibretroRuntimes.defaultBackend(true));
     }
-    /** Explicit worker-side selection. Shared/server callers retain the process constructor. */
+    /** Windows shared/server workers now use JNI; unsupported platforms retain explicit compatibility support. */
     public GenericLibretroNesCore(boolean zapper, LibretroRuntimes.Backend backend) {
         this(zapper, LibretroRuntimes.create(profile(zapper), GenericLibretroNesCore.class, backend));
     }

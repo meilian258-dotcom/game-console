@@ -119,7 +119,8 @@ public final class HomeApplianceClient {
         HomeApplianceControl control = HomeApplianceService.controlAt(mc.level,hit.getBlockPos(),eye,
                 eye.add(mc.player.getLookAngle().scale(Math.min(6,mc.player.blockInteractionRange()))),
                 mc.getTimer().getGameTimeDeltaPartialTick(true));
-        if (control != HomeApplianceControl.POWER && control != HomeApplianceControl.RESET) return;
+        if (control != HomeApplianceControl.POWER && control != HomeApplianceControl.RESET
+                && control.port()<0 && control!=HomeApplianceControl.VIDEO_DISCONNECT) return;
         var pos = hit.getBlockPos();
         var endpoint = mc.level.getBlockEntity(pos);
         if (endpoint instanceof HomeTvPartBlockEntity || endpoint instanceof WideLcdTvPartBlockEntity || endpoint instanceof LargeLcdTvPartBlockEntity || endpoint instanceof PanelTvPartBlockEntity) {
@@ -132,7 +133,9 @@ public final class HomeApplianceClient {
         boolean powered = endpoint instanceof HomeTvBlockEntity tv ? tv.powered()
                 : endpoint instanceof HomeConsoleBlockEntity device ? device.visualPowered()
                 : endpoint instanceof ExternalHomeConsoleBlockEntity external && external.visualPowered();
-        Component message = Component.literal(cn.piq.fcarcade.client.ui.DeviceNoticePolicy.buttonLabel(control.name(),powered));
+        String label=cn.piq.fcarcade.client.ui.DeviceNoticePolicy.buttonLabel(control.name(),powered);
+        if(label==null)label=control.port()>=0?"右键 · "+(control.port()+1)+"P 手柄":"空手右键 · 拔下 AV 线";
+        Component message = Component.literal(label);
         var gui = event.getGuiGraphics();
         int w = mc.font.width(message), x = (gui.guiWidth()-w)/2, y = gui.guiHeight()/2+18;
         gui.fill(x-4,y-3,x+w+4,y+mc.font.lineHeight+3,0xa0000000);

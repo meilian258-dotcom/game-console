@@ -6,7 +6,8 @@ import cn.piq.fcarcade.client.cabinet.CabinetClientOwner;
 import cn.piq.fcarcade.home.*;
 import cn.piq.pvz.net.PvzNetwork;
 import cn.piq.pvz.registry.PvzRegistries;
-import cn.piq.pvz.runtime.PvzRuntime;
+import cn.piq.pvz.runtime.PvzEngine;
+import cn.piq.pvz.runtime.PvzJniRuntime;
 import cn.piq.pvz.world.PvzBlockEntity;
 import java.nio.file.Path;
 import java.nio.ByteBuffer;
@@ -32,7 +33,7 @@ public final class PvzClient implements PvzNetwork.Client {
     private static final ExecutorService IO=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"PvZ-Lifecycle");t.setDaemon(true);return t;});
     private static PvzNetwork.Open target;
     private static Object connection;
-    private static PvzRuntime runtime;
+    private static PvzEngine runtime;
     private static DynamicTexture texture;
     private static ResourceLocation textureId;
     private static ByteBuffer uploadBuffer;
@@ -40,7 +41,7 @@ public final class PvzClient implements PvzNetwork.Client {
     private static long uploads,uploadWindow=System.nanoTime();
     private static int displayFps;
     private static volatile int generation;
-    private static final java.util.concurrent.atomic.AtomicReference<PvzRuntime> pending=new java.util.concurrent.atomic.AtomicReference<>();
+    private static final java.util.concurrent.atomic.AtomicReference<PvzEngine> pending=new java.util.concurrent.atomic.AtomicReference<>();
     private static boolean busy,ending;
     private static String notice="选择本机 main.pak 开始",lastPath="";
     @EventBusSubscriber(modid="piq_pvz",bus=EventBusSubscriber.Bus.MOD,value=Dist.CLIENT)
@@ -71,9 +72,9 @@ public final class PvzClient implements PvzNetwork.Client {
         lastPath=path;int attempt=++generation;busy=true;notice="正在准备 PvZ…";
         var mc=Minecraft.getInstance();Path root=mc.gameDirectory.toPath();var id=mc.player.getUUID();
         IO.execute(()->{
-            PvzRuntime result=null;String error="";
-            try{result=new PvzRuntime(root,file,id);}catch(Exception e){error=e.getMessage();}
-            PvzRuntime loaded=result;String failure=error;
+            PvzEngine result=null;String error="";
+            try{result=new PvzJniRuntime(root,file,id);}catch(Exception e){error=e.getMessage();}
+            PvzEngine loaded=result;String failure=error;
             if(loaded!=null)pending.set(loaded);
             mc.execute(()->{
                 if(attempt!=generation||!valid()){if(loaded!=null&&pending.compareAndSet(loaded,null))IO.execute(loaded::close);return;}
@@ -83,9 +84,9 @@ public final class PvzClient implements PvzNetwork.Client {
         });
     }
     static void stop(){
-        ++generation;boolean loading=busy;busy=false;PvzRuntime old=runtime;runtime=null;releaseTexture();
+        ++generation;boolean loading=busy;busy=false;PvzEngine old=runtime;runtime=null;releaseTexture();
         if(old!=null||loading){ending=true;notice="正在结束并写入本机进度…";IO.execute(()->{
-            PvzRuntime launching=pending.getAndSet(null);if(launching!=null)launching.close();if(old!=null)old.close();
+            PvzEngine launching=pending.getAndSet(null);if(launching!=null)launching.close();if(old!=null)old.close();
             Minecraft.getInstance().execute(()->{ending=false;notice=old==null||old.error().isEmpty()?"已正常结束；进度由游戏自身保存":"退出未确认："+old.error();});
         });}
     }
@@ -113,7 +114,7 @@ public final class PvzClient implements PvzNetwork.Client {
         var tv=(HomeTvBlockEntity)mc.level.getBlockEntity(target.television());
         runtime.pause(!mc.isWindowActive()||!tv.powered()||mc.screen!=null&&!(mc.screen instanceof PvzScreen)||mc.isPaused());
         runtime.volume(tv.powered()?mc.options.getSoundSourceVolume(SoundSource.MASTER)*.7f:0);
-        if(!upload)return;PvzRuntime current=runtime;byte[] data=current.poll();if(data==null)return;
+        if(!upload)return;PvzEngine current=runtime;byte[] data=current.poll();if(data==null)return;
         try{
             RenderSystem.assertOnRenderThread();long began=System.nanoTime();
             if(texture==null){texture=new DynamicTexture(800,600,false);texture.setFilter(false,false);textureId=mc.getTextureManager().register("pvz_preview",texture);uploadBuffer=MemoryUtil.memAlloc(800*600*4);}

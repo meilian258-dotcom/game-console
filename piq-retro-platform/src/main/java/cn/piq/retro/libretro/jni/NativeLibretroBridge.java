@@ -11,9 +11,9 @@ import java.util.*;
 
 /** Implementation ABI, not an addon entry point. Use LibretroJniRuntime with a pinned profile. */
 public final class NativeLibretroBridge {
-    public static final int ABI = 1;
-    private static boolean loaded;
-    private static String loadFailure;
+    public static final int ABI = 2;
+    private static volatile boolean loaded;
+    private static volatile String loadFailure;
     // System.load keeps this bridge for the JVM lifetime. Never delete while a native call may use it.
     private static RuntimeWorkspace libraryWorkspace;
     private static AutoCloseable libraryPin;
@@ -22,6 +22,7 @@ public final class NativeLibretroBridge {
         if (loadFailure != null) throw new IOException(loadFailure);
         Properties manifest = new Properties();
         try (var in = resource("/core/libretro-jni/runtime.properties")) { manifest.load(in); }
+        if (!Integer.toString(ABI).equals(manifest.getProperty("abi"))) throw new IOException("Bundled generic JNI ABI mismatch");
         String sha = manifest.getProperty("windows-x64.sha256", "");
         if (!sha.matches("[A-Fa-f0-9]{64}")) throw new IOException("Missing pinned generic JNI manifest");
         RuntimeWorkspace workspace = RuntimeWorkspace.create("libretro", 16L * 1024 * 1024);
@@ -68,9 +69,13 @@ public final class NativeLibretroBridge {
         if (!HexFormat.of().formatHex(sha.digest()).equalsIgnoreCase(expected)) throw new IOException("Native artifact checksum mismatch");
     }
     public static native int abiVersion();
-    /** Nonblocking atomic query, including an open that failed before returning a token. */
-    public static native boolean reservationHeld();
-    public static native long open(String core, String content, String system, String save, String expectedName,
+    /** Does not load native code during discovery, or wait for a potentially stuck core owner. */
+    public static boolean atCapacity() { return loadFailure != null || loaded && availableSlots() == 0; }
+    public static native int availableSlots();
+    /** Reserve before staging/open: cleanup failures always have a known, generation-safe identity. */
+    public static native long reserve() throws IOException;
+    public static native boolean reservationHeld(long token);
+    public static native long openReserved(long token, String core, String content, String system, String save, String expectedName,
                                    boolean fullPath, int[] devices, String[] optionPairs, int features) throws IOException;
     public static native void metadata(long token, int[] metadata, double[] timing) throws IOException;
     public static native String coreVersion(long token) throws IOException;

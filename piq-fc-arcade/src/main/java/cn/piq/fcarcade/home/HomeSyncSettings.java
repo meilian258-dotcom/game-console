@@ -106,6 +106,7 @@ public final class HomeSyncSettings {
         if (request.mode() >= 0 || request.occupancy() >= 0 || request.approval() >= 0) {
             boolean busy = busy(player,intent.console);
             if (!player.hasPermissions(2)) reason = "只有管理员可更改主机高级设置。";
+            else if (diagnosticsOnly(c)) reason = "此设备仅提供诊断；没有可修改的公共联机设置。";
             else if (busy) reason = "请先关机并关闭加入、存档选择窗口；已借手柄无需归还。";
             else if (request.occupancy() >= 0 && !(c instanceof HomeConsoleBlockEntity)) reason="此机型不支持使用者标牌。";
             else if (request.mode() >= 0 && (supported(player,intent.console)&(1<<request.mode()))==0)
@@ -134,17 +135,22 @@ public final class HomeSyncSettings {
         var c = intent.console;
         String system = system(c);
         int modes=supported(player,c);
-        if(reason.equals("联机设置下次开机生效。")) {
+        if(reason.equals("联机设置下次开机生效。")&&!diagnosticsOnly(c)) {
             if(!player.hasPermissions(2))reason="仅管理员可修改设备设置。";
             else if(busy(player,c))reason="关机并关闭加入、存档窗口后可修改设置。";
         }
-        if((modes&1)==0)reason+=" "+unavailable(player,c,CabinetSyncMode.MEDIA);
-        if((modes&2)==0)reason+=" "+HomeSyncPolicy.unavailable(CabinetSyncMode.LOCAL_SYNC);
-        if((modes&4)==0)reason+=" "+unavailable(player,c,CabinetSyncMode.SERVER_MEDIA);
+        if(diagnosticsOnly(c)&&c instanceof ExternalHomeConsoleBlockEntity external) {
+            try { reason=(reason.equals("联机设置下次开机生效。")||open?"":reason+" ")+HomeSystems.applianceHooks(external.systemId()).deviceSettingsStatus(player.serverLevel(),external); }
+            catch(RuntimeException|LinkageError failure){reason="读取设备状态失败，请刷新或查看日志。";}
+        } else {
+            if((modes&1)==0)reason+=" "+unavailable(player,c,CabinetSyncMode.MEDIA);
+            if((modes&2)==0)reason+=" "+HomeSyncPolicy.unavailable(CabinetSyncMode.LOCAL_SYNC);
+            if((modes&4)==0)reason+=" "+unavailable(player,c,CabinetSyncMode.SERVER_MEDIA);
+        }
         if(reason.length()>256)reason=reason.substring(0,255)+"…";
         var setting=new HomeSyncNetwork.Setting(intent.token,intent.revision,player.serverLevel().dimension().location(),
                 c.getBlockPos(),c.hardwareId(),system,displayMode(c),modes,
-                player.hasPermissions(2)&&!busy(player,c),reason,open,c.occupancyVisible(),c.joinApprovalRequired(),c instanceof HomeConsoleBlockEntity,intent.tool!=null);
+                !diagnosticsOnly(c)&&player.hasPermissions(2)&&!busy(player,c),reason,open,c.occupancyVisible(),c.joinApprovalRequired(),c instanceof HomeConsoleBlockEntity,intent.tool!=null);
         if(!identity(player,intent))return;
         intent.lastSetting=setting;HomeSyncNetwork.send(player,setting);
     }
@@ -159,11 +165,14 @@ public final class HomeSyncSettings {
         HomeSyncNetwork.send(player,new HomeSyncNetwork.Setting(s.token(),s.revision(),s.dimension(),s.console(),s.hardware(),s.system(),s.mode(),s.supported(),
                 s.editable(),reason,false,s.occupancy(),s.approval(),s.occupancySupported(),s.debugTool()));
     }
+    private static boolean diagnosticsOnly(HomeEndpointBlockEntity console) {
+        return console instanceof ExternalHomeConsoleBlockEntity external&&HomeSystems.privateDeviceSettings(external.systemId());
+    }
     private static boolean available(HomeEndpointBlockEntity console) {
         if (console instanceof HomeConsoleBlockEntity) return true;
         if (console instanceof ExternalHomeConsoleBlockEntity external) {
             var hooks = HomeSystems.applianceHooks(external.systemId());
-            try{return hooks != null && hooks.synchronizationSettingsAvailable();}catch(RuntimeException|LinkageError failure){return false;}
+            try{return hooks != null && hooks.deviceSettingsAvailable();}catch(RuntimeException|LinkageError failure){return false;}
         }
         return false;
     }

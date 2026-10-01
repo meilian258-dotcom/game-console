@@ -1,6 +1,8 @@
 package cn.piq.gba.client;
 
 import java.util.*;
+import org.joml.Matrix4d;
+import org.joml.Vector3d;
 
 /** Actual production layout and input-to-motion checks, plus exact numbers for offline previews. */
 public final class GbaHandheldLayoutProbe {
@@ -10,6 +12,12 @@ public final class GbaHandheldLayoutProbe {
     static double distance(GbaHandheldLayout.Point a,GbaHandheldLayout.Point b){return Math.sqrt(Math.pow(a.x()-b.x(),2)+Math.pow(a.y()-b.y(),2)+Math.pow(a.z()-b.z(),2));}
     static List<Double> point(GbaHandheldLayout.Point p){return List.of(p.x(),p.y(),p.z());}
     static List<Double> pose(GbaHandheldLayout.Pose p){return List.of(p.x(),p.y(),p.z(),p.yaw(),p.pitch(),p.roll(),p.scale());}
+    // Same order as the production renderer's PoseStack: translation, X tilt, Z tilt.
+    static Vector3d moved(GbaHandheldLayout.Motion m,double x,double y,double z){
+        var p=m.pivot();return new Matrix4d().translation(p.x()+m.x(),p.y()+m.y(),p.z()+m.z())
+                .rotateX(Math.toRadians(m.pitch())).rotateZ(Math.toRadians(m.roll()))
+                .translate(-p.x(),-p.y(),-p.z()).transformPosition(new Vector3d(x,y,z));
+    }
     static String json(Object value){
         if(value instanceof Map<?,?> m)return "{"+String.join(",",m.entrySet().stream().map(e->json(e.getKey().toString())+":"+json(e.getValue())).toList())+"}";
         if(value instanceof Collection<?> c)return "["+String.join(",",c.stream().map(GbaHandheldLayoutProbe::json).toList())+"]";
@@ -35,12 +43,44 @@ public final class GbaHandheldLayoutProbe {
             }
         }
         var keys=Map.of("button_a",8,"button_b",0,"button_select",2,"button_start",3,"shoulder_l",10,"shoulder_r",11);
+        for(boolean right:new boolean[]{false,true})for(boolean two:new boolean[]{false,true}){
+            var rig=GbaHandheldLayout.first(right,two,0,0,true);
+            var low=GbaHandheldLayout.first(right,two,0,0,false);
+            check(rig.scale()>low.scale()*1.8,"Raised screen materially enlarged");
+            var points=new ArrayList<GbaHandheldLayout.Point>();
+            for(int corner=0;corner<4;corner++){
+                var p=GbaHandheldLayout.point(GbaHandheldLayout.screen(corner),GbaHandheldLayout.item(GbaHandheldLayout.View.FIRST));
+                p=GbaHandheldLayout.transform(new GbaHandheldLayout.Point(p.x()-.5,p.y()-.5,p.z()-.5),rig);points.add(p);
+                check(p.z()<-.2,"Raised display in front of camera");
+                check(Math.abs(p.y()/p.z())<Math.tan(Math.toRadians(35)),"Raised display fits vertical 70-degree bounds");
+                check(Math.abs(p.x()/p.z())<Math.tan(Math.toRadians(35))*4/3,"Raised display fits 4:3 view");
+            }
+            near(distance(points.get(0),points.get(3))/distance(points.get(0),points.get(1)),1.5);
+            check(points.get(3).x()>points.get(0).x()&&points.get(0).y()>points.get(1).y(),"Raised orientation correct");
+        }
         for(var e:keys.entrySet())for(int bit=0;bit<12;bit++){
             var move=GbaHandheldLayout.motion(e.getKey(),1<<bit);check((move.y()<0)==(bit==e.getValue()),"Exact input-to-model button "+e.getKey()+" bit"+bit);
             near(move.pitch(),0);near(move.roll(),0);
         }
         check(GbaHandheldLayout.motion("dpad",1<<4).pitch()<0,"Up presses source -Z");check(GbaHandheldLayout.motion("dpad",1<<5).pitch()>0,"Down presses source +Z");
         check(GbaHandheldLayout.motion("dpad",1<<6).roll()>0,"Left presses source -X");check(GbaHandheldLayout.motion("dpad",1<<7).roll()<0,"Right presses source +X");
+        double[][] ends={{5,1.349,6.895},{5,1.349,7.985},{4.455,1.349,7.44},{5.545,1.349,7.44}};
+        for(int bit=4;bit<=7;bit++){
+            var m=GbaHandheldLayout.motion("dpad",1<<bit);var p=m.pivot();
+            var center=moved(m,p.x(),p.y(),p.z());near(center.x(),p.x());near(center.y(),p.y());near(center.z(),p.z());
+            var pressed=ends[bit-4];var opposite=ends[(bit-4)^1];
+            check(moved(m,pressed[0],pressed[1],pressed[2]).y<pressed[1]-.05,"Pressed physical tip moves inward: "+bit);
+            check(moved(m,opposite[0],opposite[1],opposite[2]).y>opposite[1]+.05,"Opposite physical tip lifts, not whole-cross depression: "+bit);
+        }
+        for(int vertical:new int[]{4,5})for(int horizontal:new int[]{6,7}){
+            var m=GbaHandheldLayout.motion("dpad",(1<<vertical)|(1<<horizontal));
+            near(Math.hypot(m.pitch(),m.roll()),6);
+            for(int bit:new int[]{vertical,horizontal}){var e=ends[bit-4];check(moved(m,e[0],e[1],e[2]).y<e[1]-.035,"Diagonal depresses both requested ends");}
+        }
+        for(int mask:new int[]{0,(1<<4)|(1<<5),(1<<6)|(1<<7),(1<<4)|(1<<5)|(1<<6)|(1<<7),1<<8}){
+            var m=GbaHandheldLayout.motion("dpad",mask);near(m.pitch(),0);near(m.roll(),0);near(m.y(),0);
+            for(var e:ends){var actual=moved(m,e[0],e[1],e[2]);near(actual.x,e[0]);near(actual.y,e[1]);near(actual.z,e[2]);}
+        }
         for(String key:keys.keySet())near(GbaHandheldLayout.motion(key,0).y(),0);near(GbaHandheldLayout.motion("dpad",0).y(),0);
         check(GbaHandheldLayout.eligible(true,true,false,false,false,false,false),"Normal eligible");
         for(int reason=0;reason<7;reason++){boolean[] values={true,true,false,false,false,false,false};values[reason]=!values[reason];check(!GbaHandheldLayout.eligible(values[0],values[1],values[2],values[3],values[4],values[5],values[6]),"Pose eligibility guard "+reason);}

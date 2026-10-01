@@ -77,7 +77,7 @@ public final class NetplayNetwork {
     }
     public record State(ArcadeSessionPayload session,UUID ticket,boolean player,boolean jniTrial) implements CustomPacketPayload {
         public State(ArcadeSessionPayload session,UUID ticket,boolean player){this(session,ticket,player,false);}
-        public State {Objects.requireNonNull(session);Objects.requireNonNull(ticket);if(!session.active()||!session.homeRuntime()||session.playerMedia()||session.variant().isZapper()&&(jniTrial||player&&!session.computeHost()))throw new IllegalArgumentException("Netplay session");}
+        public State {Objects.requireNonNull(session);Objects.requireNonNull(ticket);if(!session.active()||!session.homeRuntime()||session.playerMedia()||session.variant().isZapper()&&player&&!session.computeHost())throw new IllegalArgumentException("Netplay session");}
         public static final Type<State> TYPE=new Type<>(id("state"));
         public static final StreamCodec<RegistryFriendlyByteBuf,State> CODEC=StreamCodec.of((b,p)->{ArcadeSessionPayload.STREAM_CODEC.encode(b,p.session);b.writeUUID(p.ticket);b.writeBoolean(p.player);b.writeBoolean(p.jniTrial);},b->new State(ArcadeSessionPayload.STREAM_CODEC.decode(b),b.readUUID(),b.readBoolean(),b.readBoolean()));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}

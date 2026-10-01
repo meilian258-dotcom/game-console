@@ -14,7 +14,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** Independent twelve-button protocol. Never serializes NES's eight-bit input payloads. */
 public final class SfcHomeNetwork {
-    public static final String CORE_BUILD = cn.piq.sfchome.core.LibretroSfcCore.BUILD;
+    public static final String CORE_BUILD = cn.piq.sfchome.core.LibretroSfcCore.BUILD+":jni-v1";
     public static final int MAX_ROM = 32 * 1024 * 1024 + 512, CHUNK = 65536;
     public static final int REFRESH=0, WRITE=1, UPLOAD_START=2, UPLOAD_CHUNK=3, UPLOAD_FINISH=4, CANCEL=5,
             SAVE_NAME=6, COVER_START=7, CLEAR_COVER=8, RESTORE_COVER=9, SET_PLAYERS=10, USE_COVER=11, SET_SAVE_MODE=12;

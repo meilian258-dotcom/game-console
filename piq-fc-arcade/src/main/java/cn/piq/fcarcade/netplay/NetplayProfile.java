@@ -5,7 +5,12 @@ import java.util.*;
 
 /** Trusted addon declaration, never constructed from a network packet or a downloaded manifest. */
 public record NetplayProfile(Class<?> owner,String resource,String sha,String contentName,
-                             Map<String,String> options,int device,int sampleRate,int maxRomBytes,int ports) {
+                             Map<String,String> options,int device,int sampleRate,int maxRomBytes,int ports,
+                             cn.piq.retro.libretro.LibretroProfile jni) {
+    public NetplayProfile(Class<?> owner,String resource,String sha,String contentName,
+                          Map<String,String> options,int device,int sampleRate,int maxRomBytes,int ports) {
+        this(owner,resource,sha,contentName,options,device,sampleRate,maxRomBytes,ports,null);
+    }
     public NetplayProfile(Class<?> owner,String resource,String sha,String contentName,
                           Map<String,String> options,int device,int sampleRate,int maxRomBytes) {
         this(owner,resource,sha,contentName,options,device,sampleRate,maxRomBytes,2);
@@ -18,6 +23,17 @@ public record NetplayProfile(Class<?> owner,String resource,String sha,String co
         options=Map.copyOf(options);
         if(options.size()>128)throw new IllegalArgumentException("Too many core options");
         for(var e:options.entrySet())if(!e.getKey().matches("[a-zA-Z0-9_-]{1,100}")||!e.getValue().matches("[a-zA-Z0-9 _().%/+-]{1,100}"))throw new IllegalArgumentException("Core option");
+        if(jni!=null) {
+            var artifact=jni.cores().get("windows-x64");
+            if(artifact==null||!artifact.resource().equals(resource)||!artifact.sha256().equalsIgnoreCase(sha)
+                    ||jni.devices().size()!=ports||!jni.options().equals(options)||jni.mesenGun()
+                    ||!contentName.endsWith("."+jni.extension())||jni.devices().stream().anyMatch(d->d!=device))
+                throw new IllegalArgumentException("JNI Netplay declaration does not match pinned core/input/options");
+        }
+    }
+    /** Trusted addon declaration; not deserialized from content or network packets. */
+    public NetplayProfile withJni(cn.piq.retro.libretro.LibretroProfile runtime){
+        return new NetplayProfile(owner,resource,sha,contentName,runtime.options(),device,sampleRate,maxRomBytes,ports,runtime);
     }
     public static boolean safeName(String name){return name!=null&&name.matches("[a-zA-Z0-9_-]{1,64}\\.(nes|sfc|smc|zip)");}
     public String config(){var out=new StringBuilder();new TreeMap<>(options).forEach((k,v)->out.append(k).append(" = \"").append(v).append("\"\n"));return out.toString();}

@@ -193,7 +193,10 @@ class SfcPrivateEngineTest {
     @Test void privateEngineHasNoPublicNetworkWatchOrSessionIntegration()throws Exception{
         String source=Files.readString(Path.of("src/main/java/cn/piq/sfchome/client/SfcPrivateEngine.java"));
         for(String forbidden:new String[]{"PacketDistributor","SfcHomeNetwork","SfcJoinClient","SfcRepairClient","SfcWatchPublisher","SfcPlayback","RomRequest","SfcRecoveryBackups"})assertFalse(source.contains(forbidden),forbidden);
-        assertTrue(source.contains("LibretroSfcCore.saveNamespace()"));assertTrue(source.contains("LibretroSfcCore::new"));
+        assertTrue(source.contains("LibretroSfcCore.saveNamespace()"));assertTrue(source.contains("new LibretroSfcCore(backend)"));
+        assertTrue(source.contains("this(localRom,saveRoot,LibretroRuntimes.Backend.JNI_TRIAL)"));
+        assertNotEquals(SfcPrivateEngine.saveNamespace(cn.piq.retro.libretro.LibretroRuntimes.Backend.PROCESS),
+                SfcPrivateEngine.saveNamespace(cn.piq.retro.libretro.LibretroRuntimes.Backend.JNI_TRIAL));
         assertTrue(source.contains("store.load(key)"));assertTrue(source.contains("store.save(key,core.saveState(),core.saveSram())"));
         assertTrue(source.contains("lease.close();stopped.complete(result)"));
     }

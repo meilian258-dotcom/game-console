@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package cn.piq.nativearcade.client;
 
-import cn.piq.nativearcade.bridge.NativeProcessSession;
+import cn.piq.nativearcade.bridge.NativeJniMediaSession;
 import cn.piq.nativearcade.events.*;
 import cn.piq.nativearcade.layout.*;
 import cn.piq.nativearcade.world.*;
@@ -40,7 +40,7 @@ import net.neoforged.neoforge.event.GameShuttingDownEvent;
 @EventBusSubscriber(modid="piq_native_arcade",value=Dist.CLIENT)
 public final class NativeArcadeClient {
     private static final ExecutorService STARTER=Executors.newSingleThreadExecutor(r->{var t=new Thread(r,"PIQ-Native-Launch");t.setDaemon(true);return t;});
-    private static NativeProcessSession session;
+    private static NativeJniMediaSession session;
     private static NativeArcadeAudio audio;
     private static BlockPos anchor;
     private static UUID identity;
@@ -50,7 +50,7 @@ public final class NativeArcadeClient {
     private static boolean configureSelection;
     private static volatile int generation;
     private static volatile boolean shuttingDown;
-    private static final AtomicReference<NativeProcessSession> PENDING=new AtomicReference<>();
+    private static final AtomicReference<NativeJniMediaSession> PENDING=new AtomicReference<>();
     private static boolean launching;
     private static boolean playing,announced;
     private static final CabinetImmersiveInput INPUT=new CabinetImmersiveInput();
@@ -123,14 +123,14 @@ public final class NativeArcadeClient {
         var mc=Minecraft.getInstance();var key=selectionKey;int token=++generation;launching=true;configureSelection=false;
         playing=true;announced=false;INPUT.reset();mc.setScreen(null);
         toast("街机启动中… 可自由移动和转动视角；右键本机结束");
-        try{STARTER.execute(()->{NativeProcessSession opened=null;
+        try{STARTER.execute(()->{NativeJniMediaSession opened=null;
             try{
                 if(shuttingDown||token!=generation)return;
                 Path rom=remember?chosen:CabinetGameSelection.load(key).orElseThrow(()->new java.io.IOException("此机柜尚未配置游戏，请 Shift 空手右键选择"));
                 CabinetGameSelection.validate(rom,Set.of(".zip"),Set.of("neogeo.zip","qsound_hle.zip"));
                 if(shuttingDown||token!=generation)return;
                 if(remember)CabinetGameSelection.remember(key,rom);
-                opened=new NativeProcessSession(dataRoot().resolve("runtime"),rom);var ready=opened;
+                opened=new NativeJniMediaSession(dataRoot().resolve("runtime"),rom);var ready=opened;
                 if(shuttingDown||token!=generation){ready.close();return;}PENDING.set(ready);
                 if(shuttingDown||token!=generation){PENDING.compareAndSet(ready,null);ready.close();return;}
                 mc.execute(()->{PENDING.compareAndSet(ready,null);if(token!=generation||!current()||!playing){ready.close();return;}
@@ -193,7 +193,7 @@ public final class NativeArcadeClient {
     }
     private static void upload(){
         syncInput();
-        if(session==null)return;NativeProcessSession.Frame f=session.pollFrame();if(f==null)return;
+        if(session==null)return;NativeJniMediaSession.Frame f=session.pollFrame();if(f==null)return;
         if(texture==null||texture.getPixels().getWidth()!=f.width()||texture.getPixels().getHeight()!=f.height()){
             if(textureId!=null)Minecraft.getInstance().getTextureManager().release(textureId);
             texture=new DynamicTexture(f.width(),f.height(),false);texture.setFilter(false,false);

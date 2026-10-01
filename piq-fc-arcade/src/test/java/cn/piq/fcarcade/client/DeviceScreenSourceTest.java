@@ -18,11 +18,13 @@ class DeviceScreenSourceTest {
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/ArcadeSaveCatalogScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/ArcadeSettingsScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/HomeSyncSettingsScreen.java",
+            "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/HomeRuntimeSettingsScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/TvRemoteSettingsScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/NetworkDiagnosticsScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/NetplaySaveScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/FcPerformanceScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/ClientCartridgeEditor.java",
+            "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/ContentCardClient.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/PrivateHomeScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/AdminTerminalScreen.java",
             "piq-fc-arcade/src/main/java/cn/piq/fcarcade/client/CartridgeSaveScreen.java",
@@ -73,7 +75,7 @@ class DeviceScreenSourceTest {
                 }
             }
         }
-        assertEquals(23, PAGES.size());
+        assertEquals(25, PAGES.size());
         assertEquals(Set.copyOf(PAGES), actual);
     }
 

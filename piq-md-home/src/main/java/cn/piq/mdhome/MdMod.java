@@ -2,6 +2,7 @@
 package cn.piq.mdhome;
 
 import cn.piq.fcarcade.home.*;
+import cn.piq.fcarcade.home.content.*;
 import cn.piq.fcarcade.registry.ModCreativeTabs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -22,17 +23,34 @@ public final class MdMod {
     public static final DeferredRegister<BlockEntityType<?>> ENTITIES=DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE,ID);
     public static final DeferredBlock<MdBlock> CONSOLE=BLOCKS.register("md2",()->new MdBlock(BlockBehaviour.Properties.of().strength(1.5f).noOcclusion()));
     public static final DeferredItem<BlockItem> CONSOLE_ITEM=ITEMS.registerSimpleBlockItem("md2",CONSOLE);
-    public static final DeferredItem<Item> CARTRIDGE=ITEMS.registerSimpleItem("md_cartridge",new Item.Properties().stacksTo(1));
+    public static final DeferredItem<Item> CARTRIDGE=ITEMS.register("md_cartridge",()->new ContentCartridgeItem(new Item.Properties().stacksTo(1),SYSTEM));
     public static final DeferredItem<Item> CONTROLLER=ITEMS.register("md_controller",()->new MdController(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<MdConsole>> ENTITY=ENTITIES.register("md2",()->BlockEntityType.Builder.of(MdConsole::new,CONSOLE.get()).build(null));
     public MdMod(IEventBus bus){
         BLOCKS.register(bus);ITEMS.register(bus);ENTITIES.register(bus);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(MdController::tossed);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(MdController::drops);
+        ContentCards.register(SYSTEM,new ContentCards.Adapter(CARTRIDGE,"MD2",java.util.Set.of("md","bin","gen"),cn.piq.mdhome.client.MdRom::validate));
+        ContentCards.features(SYSTEM,new ContentCards.Features(true,true));
+        HomeApplianceService.registerControls(SYSTEM,MdControls::pick);
         HomeSystems.register(SYSTEM,new HomeSystems.ServerHooks(){
-            public boolean onPowerOn(net.minecraft.server.level.ServerPlayer p,HomeSystems.Connection c){hint(p);return false;}
+            public boolean deviceSettingsAvailable(){return true;}
+            public String deviceSettingsStatus(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){
+                var md=(MdConsole)c;
+                return "私人单人 · "+(md.running()?"已通电 / 启动或运行中":"关机")+" · "+(md.televisionPos()==null?"未接电视":"已接电视")
+                        +"\n卡带："+md.cartridgeTitle()+"\n1P手柄："+(md.borrower()==null?"未借出":"已借出")+"；不支持公共联机或旁观。";
+            }
+            public boolean onPowerOn(net.minecraft.server.level.ServerPlayer p,HomeSystems.Connection c){return ((MdConsole)c.console()).powerOn(p,c);}
+            public void onPowerOff(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){((MdConsole)c).powerOff();}
+            public void onReset(net.minecraft.server.level.ServerPlayer p,HomeSystems.Connection c){((MdConsole)c.console()).reset(p);}
+            public void onControllerDock(net.minecraft.server.level.ServerPlayer p,ExternalHomeConsoleBlockEntity c,int port){((MdConsole)c).dock(p,port);}
+            public boolean isRunning(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){return ((MdConsole)c).running();}
+            public void onLinked(net.minecraft.server.level.ServerPlayer p,HomeSystems.Connection c){p.displayClientMessage(net.minecraft.network.chat.Component.literal("MD2 已通过 AV 线连接电视。请打开电视，并点击 MD 机身米白电源滑块启动已写入的卡带。"),false);}
+            public void onPlaybackStopped(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c,HomeSystems.StopReason why){((MdConsole)c).powerOff();}
             public void onInteract(net.minecraft.server.level.ServerPlayer p,net.minecraft.world.InteractionHand h,HomeSystems.Connection c,net.minecraft.world.phys.BlockHitResult hit){((MdConsole)c.console()).interact(p,h);}
-            public void onRemoved(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){((MdConsole)c).clearLoan();}
+            public void onRemoved(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){((MdConsole)c).powerOff();((MdConsole)c).clearLoan();}
         });
         bus.addListener((BuildCreativeModeTabContentsEvent e)->{if(e.getTabKey().equals(ModCreativeTabs.FC.getKey())){e.accept(CONSOLE_ITEM);e.accept(CARTRIDGE);}});
     }
-    static void hint(net.minecraft.server.level.ServerPlayer p){p.displayClientMessage(net.minecraft.network.chat.Component.literal("MD2 初版仅自己玩：接电视、插卡、空手右键借1P手柄；手持后输入 /gameconsole-private。JNI 在私人页确认。"),false);}
+    static void hint(net.minecraft.server.level.ServerPlayer p){p.displayClientMessage(net.minecraft.network.chat.Component.literal("MD2：卡带右键老式电脑写游戏 → 视频线连接电视 → 插卡 → 打开电视和主机电源 → 点击 1P 手柄取用。默认 JNI；当前为单人本机画面。"),false);}
 }

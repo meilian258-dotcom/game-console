@@ -43,7 +43,7 @@ public final class NetplayClient {
         if(state.jniTrial()&&!JniNetplayConsent.allowed())throw new IllegalStateException("本机已停用 FC JNI 或平台不支持；Windows x64 可用 /gameconsole-jni-netplay 恢复");
         var grant=new NetplayProcess.Grant(state.session().sessionId(),state.ticket(),state.session().computeHost(),state.player());
         java.util.concurrent.Callable<byte[]> content=()->{var rom=ClientRomLibrary.loadBySha256(sha);if(rom==null||!rom.sha256().equalsIgnoreCase(sha))throw new IllegalStateException("Netplay ROM 校验失败");return rom.bytes();};
-        var run=state.jniTrial()?new NetplayProcess(grant,content,chunk->NetplayNetwork.upstream(connection,chunk),true)
+        var run=state.jniTrial()?new NetplayProcess(grant,content,chunk->NetplayNetwork.upstream(connection,chunk),true,state.session().variant().isZapper())
                 :new NetplayProcess(grant,content,chunk->NetplayNetwork.upstream(connection,chunk),state.session().variant().isZapper()?NetplayProfile.fcZapper():NetplayProfile.fc(),Map::of);
         var old=RUNS.remove(key);if(old!=null){NetplayNetwork.unbind(connection,old);old.close();}
         NetplayNetwork.bind(connection,run);try{RUNS.put(key,run);run.start();return run;}catch(RuntimeException failure){RUNS.remove(key,run);NetplayNetwork.unbind(connection,run);run.close();throw failure;}

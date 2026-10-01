@@ -20,7 +20,7 @@ if (providers.gradleProperty('jniRuntimeDir').isPresent()) {
 def jnaInput = piqLockedInput('jna-5-14-0')
 def mesenWindowsInput = piqLockedInput('mesen-windows')
 def mesenLinuxInput = piqLockedInput('mesen-linux')
-def jniBridgeInput = piqLockedInput('libretro-jni-abi1')
+def jniBridgeInput = piqLockedInput('libretro-jni-abi2')
 def netplayInput = piqLockedInput('retroarch-netplay')
 def pinnedCoreInputs = [
         'core/nes_rust_wasm_bg.wasm': piqLockedInput('nes-wasm'),
@@ -132,7 +132,7 @@ def prepareJniRuntime = tasks.register('prepareJniRuntime', Sync) {
         def dll = new File(destinationDir, 'windows-x64/piq-libretro-jni.dll')
         if (!dll.isFile()) throw new GradleException('Build native/libretro-jni into dist first; see its README')
         def sha = java.security.MessageDigest.getInstance('SHA-256').digest(dll.bytes).encodeHex().toString()
-        new File(destinationDir, 'runtime.properties').setText("abi=1\nwindows-x64.sha256=${sha}\n", 'UTF-8')
+        new File(destinationDir, 'runtime.properties').setText("abi=2\nwindows-x64.sha256=${sha}\n", 'UTF-8')
     }
 }
 sourceSets.main.resources.srcDir layout.buildDirectory.dir('generated/jni-resources')

@@ -7,11 +7,13 @@ import java.util.*;
 public record LibretroProfile(String name, String extension, boolean fullPath, List<Integer> devices,
                               boolean mesenGun, Map<String, String> options,
                               Map<String, Artifact> cores) {
-    public record Artifact(String resource, String sha256) {
+    public record Artifact(String resource, String sha256, long maxBytes) {
+        public Artifact(String resource,String sha256){this(resource,sha256,256L*1024*1024);}
         public Artifact {
             if (resource == null || !(resource.startsWith("/core/") || resource.startsWith("/native-runtime/")) || resource.contains("..")
                     || resource.contains("\\") || resource.contains(":")) throw new IllegalArgumentException("Core resource");
             if (sha256 == null || !sha256.matches("[a-fA-F0-9]{64}")) throw new IllegalArgumentException("Core checksum");
+            if(maxBytes<1||maxBytes>512L*1024*1024)throw new IllegalArgumentException("Pinned core byte budget");
         }
     }
     public LibretroProfile {

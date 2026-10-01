@@ -8,8 +8,16 @@ import java.util.concurrent.atomic.AtomicReference;
 /** Independent test-only ABI declarations. Never package this class in the mod. */
 public class NativeLibretroBridge {
     public static native int abiVersion();
-    public static native boolean reservationHeld();
-    public static native long open(String core,String content,String system,String save,String expected,boolean path,int[] devices,String[] pins,int features)throws IOException;
+    public static native int availableSlots();
+    public static native long reserve()throws IOException;
+    public static native boolean reservationHeld(long token);
+    public static native long openReserved(long token,String core,String content,String system,String save,String expected,boolean path,int[] devices,String[] pins,int features)throws IOException;
+    static long lastReservation;
+    public static long open(String core,String content,String system,String save,String expected,boolean path,int[] devices,String[] pins,int features)throws IOException{
+        long token=reserve();lastReservation=token;
+        return openReserved(token,core,content,system,save,expected,path,devices,pins,features);
+    }
+    static boolean anyReservation(){return availableSlots()!=4;}
     public static native void metadata(long h,int[] ints,double[] numbers)throws IOException;
     public static native String coreVersion(long h)throws IOException;
     public static native int saveCapabilities(long h)throws IOException;
@@ -25,21 +33,23 @@ public class NativeLibretroBridge {
     interface Io {void run()throws Exception;}
     static void rejects(Io task,String message)throws Exception{try{task.run();throw new AssertionError("Accepted "+message);}catch(IOException expected){checks++;}}
     public static void main(String[] args)throws Exception{
-        System.load(Path.of(args[0]).toAbsolutePath().toString());check(abiVersion()==1,"ABI");
+        System.load(Path.of(args[0]).toAbsolutePath().toString());check(abiVersion()==2,"ABI");
         String core=Path.of(args[1]).toAbsolutePath().toString(),work=Path.of(args[2]).toAbsolutePath().toString();
-        check(!reservationHeld(),"no initial native reservation");
+        check(!anyReservation(),"no initial native reservation");
         if(args.length>3&&args[3].equals("startup-cleanup-failure")){
             rejects(()->open(core,work+"/mode35.bin",work,work,"PIQ mock",false,new int[]{1},new String[0],1),"startup and cleanup failure");
-            check(reservationHeld(),"failed open still holds native reservation without Java token");
-            var retained=new AtomicReference<Boolean>();Thread observer=new Thread(()->retained.set(reservationHeld()));observer.start();observer.join();check(Boolean.TRUE.equals(retained.get()),"foreign observer can see retained reservation without owner lock");
-            rejects(()->open(core,work+"/normal.bin",work,work,"PIQ mock",false,new int[]{1},new String[0],0),"startup teardown failure prevents reopen");
+            long failed=lastReservation;check(reservationHeld(failed),"failed open retains its known reservation");
+            var retained=new AtomicReference<Boolean>();Thread observer=new Thread(()->retained.set(reservationHeld(failed)));observer.start();observer.join();check(Boolean.TRUE.equals(retained.get()),"foreign observer can see retained reservation without owner lock");
+            rejects(()->close(failed),"startup teardown failure prevents retrying that slot");
+            long spare=open(core,work+"/normal.bin",work,work,"PIQ mock",false,new int[]{1},new String[0],0);
+            close(spare);check(availableSlots()==3,"startup teardown failure only quarantines its slot");
             System.out.println("JNI_STARTUP_QUARANTINE_OK checks="+checks);return;
         }
         ByteBuffer rgba=ByteBuffer.allocateDirect(2048*2048*4).order(ByteOrder.LITTLE_ENDIAN),pcm=ByteBuffer.allocateDirect(65536).order(ByteOrder.LITTLE_ENDIAN);
         int[] in={1,2,4,8,0,100,-200,3,7,-8,1,-1,0},meta=new int[11];double[] timing=new double[3];
         for(int cycle=0;cycle<10;cycle++){
             long h=open(core,work+"/normal.bin",work,work,"PIQ mock",false,new int[]{1,1,1,1},new String[]{"piq_mode","normal"},14);
-            check(reservationHeld(),"active native reservation");
+            check(reservationHeld(h),"active native reservation");
             check(coreVersion(h).equals("abi1"),"version");check(saveCapabilities(h)==3,"save capabilities");metadata(h,meta,timing);check(meta[0]==2&&meta[2]==4&&timing[2]==32040,"initial AV");
             rejects(()->open(core,work+"/normal.bin",work,work,"PIQ mock",false,new int[]{1},new String[0],0),"second active");
             var failure=new AtomicReference<Throwable>();Thread thread=new Thread(()->{try{metadata(h,new int[11],new double[3]);failure.set(new AssertionError("cross thread accepted"));}catch(IOException expected){}catch(Throwable t){failure.set(t);}});thread.start();thread.join();check(failure.get()==null,"cross thread rejected");
@@ -53,7 +63,7 @@ public class NativeLibretroBridge {
             byte[] saved=serialize(h);rejects(()->step(h,ByteBuffer.allocateDirect(4),pcm,in,new int[0],meta,timing),"short buffer");check(Arrays.equals(saved,serialize(h)),"bad input never runs core");
             int[] bad=in.clone();bad[0]=65536;rejects(()->step(h,rgba,pcm,bad,new int[0],meta,timing),"overflow pad");rejects(()->step(h,rgba,pcm,in,new int[]{1,65,0xd800,0},meta,timing),"surrogate character");
             byte[] ram=memory.clone();Arrays.fill(ram,(byte)0x5a);rejects(()->restoreMemory(h,ram,new byte[9]),"mismatched RTC");check(Arrays.equals(memory,memory(h,0)),"dual-region atomic validation");
-            restoreMemory(h,ram,new byte[8]);check(memory(h,0)[0]==0x5a,"RAM restoration");restore(h,saved);check(Arrays.equals(saved,serialize(h)),"state roundtrip");rejects(()->restore(h,new byte[63]),"wrong state size");rejects(()->memory(h,4),"bad memory id");reset(h);check(serialize(h)[0]==0,"reset");close(h);check(!reservationHeld(),"normal close releases reservation");rejects(()->close(h),"stale handle");
+            restoreMemory(h,ram,new byte[8]);check(memory(h,0)[0]==0x5a,"RAM restoration");restore(h,saved);check(Arrays.equals(saved,serialize(h)),"state roundtrip");rejects(()->restore(h,new byte[63]),"wrong state size");rejects(()->memory(h,4),"bad memory id");reset(h);check(serialize(h)[0]==0,"reset");close(h);check(!reservationHeld(h)&&!anyReservation(),"normal close releases reservation");rejects(()->close(h),"stale handle");
         }
         for(int mode:new int[]{7,8,9}){long h=open(core,work+"/mode"+mode+".bin",work,work,"PIQ mock",false,new int[]{1},new String[0],0);if(mode==9)rejects(()->memory(h,0),"oversized RAM");else rejects(()->step(h,rgba,pcm,new int[]{0,0,0,0,-1,0,0,0,0,0,0,-1,0},new int[0],meta,timing),"bad callback");close(h);}
         rejects(()->open(core,work+"/normal.bin",work,work,"wrong",false,new int[]{1},new String[0],0),"wrong name");
@@ -72,10 +82,11 @@ public class NativeLibretroBridge {
         for(int mode:new int[]{32,33}){long h=open(core,work+"/mode"+mode+".bin",work,work,"PIQ mock",false,new int[]{1},new String[0],1);step(h,rgba,pcm,new int[]{0,0,0,0,-1,0,0,0,0,0,0,-1,0},new int[0],meta,timing);check(meta[10]==1,"hardware metadata");check(rgba.getInt(0)==(mode==32?0xff0000ff:0xffff0000),"hardware row origin");close(h);}
         long brokenClose=open(core,work+"/mode34.bin",work,work,"PIQ mock",false,new int[]{1},new String[0],1);
         rejects(()->close(brokenClose),"Win32 teardown failure detected");
-        check(reservationHeld(),"failed close retains reservation");
+        check(reservationHeld(brokenClose),"failed close retains reservation");
         rejects(()->close(brokenClose),"failed teardown cannot retry into free slot");
         rejects(()->saveCapabilities(brokenClose),"failed teardown blocks all core calls");
-        rejects(()->open(core,work+"/normal.bin",work,work,"PIQ mock",false,new int[]{1},new String[0],0),"failed teardown keeps global reservation");
+        long spare=open(core,work+"/normal.bin",work,work,"PIQ mock",false,new int[]{1},new String[0],0);
+        close(spare);check(availableSlots()==3,"failed teardown only quarantines its own slot");
         System.out.println("JNI_MOCK_OK checks="+checks);
     }
 }

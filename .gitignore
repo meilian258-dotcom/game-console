@@ -2,6 +2,7 @@
 /*
 !/.gitignore
 !/.gitattributes
+!/.gitmodules
 !/GIT_WORKFLOW.md
 !/README.md
 !/source-control/

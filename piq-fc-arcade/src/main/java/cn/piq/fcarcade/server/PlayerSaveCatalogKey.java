@@ -30,6 +30,7 @@ final class PlayerSaveCatalogKey {
         else if(player.startsWith(cn.piq.fcarcade.netplay.FcNetplaySaves.prefix(false)))player=player.substring(cn.piq.fcarcade.netplay.FcNetplaySaves.prefix(false).length());
         else if(player.startsWith(cn.piq.fcarcade.netplay.FcNetplaySaves.prefix(true)))player=player.substring(cn.piq.fcarcade.netplay.FcNetplaySaves.prefix(true).length());
         else if(player.startsWith(cn.piq.fcarcade.netplay.FcNetplaySaves.jniPrefix()))player=player.substring(cn.piq.fcarcade.netplay.FcNetplaySaves.jniPrefix().length());
+        else if(player.startsWith(cn.piq.fcarcade.netplay.FcNetplaySaves.jniPrefix(true)))player=player.substring(cn.piq.fcarcade.netplay.FcNetplaySaves.jniPrefix(true).length());
 
         String[] parts = player.split("\\|", -1);
         if (parts.length < 2 || !parts[0].equals("player") || !canonicalUuid(parts[1])) return "";

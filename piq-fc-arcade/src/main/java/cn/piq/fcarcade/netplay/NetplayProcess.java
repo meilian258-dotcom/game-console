@@ -78,7 +78,7 @@ public final class NetplayProcess implements AutoCloseable {
     }
     public String saveStatus(){return jni!=null?jni.saveStatus():saveStatus;}
     public boolean canSave(){if(jni!=null)return jni.canSave();var p=persistence;return grant.host()&&ready&&!closed&&!closing&&p!=null&&p.enabled();}
-    public String saveLabel(){return (jni!=null?"FC JNI 试验 · ":"")+profile.contentName()+" · "+(grant.host()?"主持":"参与 / 旁观");}
+    public String saveLabel(){return (jni!=null?"JNI · ":"")+profile.contentName()+" · "+(grant.host()?"主持":"参与 / 旁观");}
     public CompletableFuture<Void> terminated(){return jni!=null?jni.terminated():terminated;}
     public synchronized CompletableFuture<byte[]> checkpoint(){
         if(jni!=null)return jni.checkpoint();
@@ -102,10 +102,13 @@ public final class NetplayProcess implements AutoCloseable {
     public NetplayProcess(Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender) {
         this(grant,content,sender,NetplayProfile.fc(),Map::of);
     }
-    /** FC digital pads only. Caller must obtain explicit local JNI risk consent before true. */
+    /** FC JNI route. Caller applies the local backend policy before true. */
     public NetplayProcess(Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,boolean confirmedJniTrial) {
-        this(grant,content,sender);
-        if(confirmedJniTrial)jni=new JniNetplaySession(grant,content,sender);
+        this(grant,content,sender,confirmedJniTrial,false);
+    }
+    public NetplayProcess(Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,boolean confirmedJniTrial,boolean gun) {
+        this(grant,content,sender,gun?NetplayProfile.fcZapper():NetplayProfile.fc(),Map::of);
+        if(confirmedJniTrial)jni=new JniNetplaySession(grant,content,sender,gun);
     }
     public NetplayProcess(Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,NetplayProfile profile,Callable<Map<String,byte[]>> auxiliary) {
         this(grant,content,sender,profile,auxiliary,false);
@@ -119,6 +122,9 @@ public final class NetplayProcess implements AutoCloseable {
         this.profile=Objects.requireNonNull(profile);this.gunMode=profile.isFcZapper();this.auxiliary=Objects.requireNonNull(auxiliary);
         this.cabinetAuthority=cabinetAuthority;if(cabinetAuthority&&gunMode)throw new IllegalArgumentException("Cabinet gun authority");
         if(grant.port()>=profile.ports())throw new IllegalArgumentException("Port not supported by core profile");
+        if(profile.jni()!=null) {
+            jni=new JniNetplaySession(grant,content,sender,profile,auxiliary,cabinetAuthority?cabinetInputs:null);
+        }
     }
     private boolean started;
     public synchronized void start(){if(started||closed)return;started=true;if(jni!=null){jni.start();return;}daemon("PIQ-Netplay-owner",this::run);}
@@ -142,6 +148,7 @@ public final class NetplayProcess implements AutoCloseable {
     public void cabinetCoin(int port,long sequence){if(cabinetAuthority&&grant.host()&&!closed)cabinetInputs.coin(port,sequence);}
     /** Only the computing host accepts canonical server input; gun peers are native spectators. */
     public void authoritativeGun(long revision,long sequence,int buttons,int aim){
+        if(jni!=null){jni.authoritativeGun(revision,sequence,buttons,aim);return;}
         if(!closed&&grant.host()&&gunMode)gunInputs.offer(revision,sequence,buttons,aim,System.nanoTime());
     }
     public static int retroPad(int nes){return (nes&1)<<8 | (nes&2)>>>1 | nes&252;}

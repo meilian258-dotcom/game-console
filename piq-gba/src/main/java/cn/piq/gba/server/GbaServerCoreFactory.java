@@ -3,25 +3,21 @@ package cn.piq.gba.server;
 
 import cn.piq.fcarcade.cabinet.CabinetFrame;
 import cn.piq.fcarcade.server.hosted.*;
-import cn.piq.gba.bridge.GbaProcessSession;
-import java.io.IOException;
+import cn.piq.gba.bridge.GbaJniSession;
 import java.nio.file.Path;
-import java.util.Properties;
 
 /** Single-seat hosted GBA, with SRAM owned by the immutable server/device/player context. */
 public final class GbaServerCoreFactory implements ServerCoreFactory {
     @Override public int maxPlayers(){return 1;}
     @Override public int maxConcurrentSessions(){return 1;}
-    private static Path runtime(ServerCoreContext context){return cn.piq.retro.storage.ConsoleStorage.root(context.gameRoot()).resolve("piq-gba/runtime");}
     @Override public String unavailableReason(ServerCoreContext context){
-        return ServerCoreFiles.windowsRuntimeReason(runtime(context),"mgba_libretro.dll","piq-gba-helper.jar","jna-5.14.0.jar");
+        String reason=cn.piq.retro.libretro.LibretroRuntimes.jniUnavailableReason();
+        if(!reason.isBlank())return reason;
+        return GbaJniSession.active()||cn.piq.retro.libretro.LibretroRuntimes.isJniBusy()?"GBA JNI 正在运行或等待安全释放":null;
     }
     @Override public ServerCoreHandle open(ServerCoreContext context,Path rom)throws Exception{
-        Properties lock=new Properties();try(var input=GbaServerCoreFactory.class.getResourceAsStream("/piq-gba-runtime.properties")){
-            if(input==null)throw new IOException("GBA runtime identity resource is missing");lock.load(input);
-        }
-        ServerCoreFiles.directory(runtime(context),false);ServerCoreFiles.directory(rom.toAbsolutePath().normalize().getParent(),false);
-        GbaProcessSession core=new GbaProcessSession(runtime(context),rom,context.saveDirectory("gba"),lock.getProperty("helper.sha256"));
+        ServerCoreFiles.directory(rom.toAbsolutePath().normalize().getParent(),false);
+        GbaJniSession core=new GbaJniSession(rom,context.saveDirectory("gba"));
         return new ServerCoreHandle(){
             @Override public int maxPlayers(){return 1;}
             @Override public boolean isReady(){return core.isReady();}

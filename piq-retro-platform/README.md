@@ -5,6 +5,8 @@ API identities and build outputs remain compatible. This library is not a player
 
 ## Client defaults (FC76.26, 2026-09-29)
 
+New confirmed migration target (2026-09-29): FC, SFC, GBA, native arcade, PvZ and MD must migrate their existing runtime modes to the shared JNI route, including existing light-gun support. Future emulator addons use JNI as their default integration target; Flash and Java ME are excluded from this migration. This is a development requirement, not a claim of completed adapters, multi-instance support or gun Netplay. See the [scope and acceptance plan](../piq-fc-arcade/design/JNI全面迁移-范围与验收.md). The following FC76.26 description remains the shipped baseline.
+
 User-requested JNI defaults now use `LibretroRuntimes.defaultBackend(adapted)` for existing Windows x64 client adapters, plus connection-scoped `JniClientPreference`. Explicit runtime factories and server/process constructors remain unchanged. This is not automatic save migration, silent failure fallback or support for every emulator/mode. Addons calling these new methods require FC76.26+. See [scope and install matrix](../piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md).
 
 ## Historical Runtime API v1 / opt-in JNI (FC76.22, 2026-09-29)
@@ -29,6 +31,28 @@ platform-mod installation step and no plan to require an FC addon just to play F
 The first stage preserves legacy block/item/backend IDs, frame protocols, save formats and emulator
 cores. Pure interfaces and input tests are groundwork, not proof that every old session has migrated
 or that real Xbox / PlayStation / Switch controllers have been tested.
+
+## JNI-first adapters (GC-110 development, 2026-09-29)
+
+New emulator adapters target `LibretroRuntimes` with a trusted `LibretroProfile` and
+the addon's resource-owner class; do not copy native bridge classes into an addon.
+Windows x64 is the currently implemented JNI platform, not a Linux support claim.
+ABI2 reserves up to four independent owner-thread sessions, each with a private core
+library and generation handle. A hung owner retains its reservation and files; do not
+force-unload it. `isJniBusy()` now means capacity unavailable, not "one core exists".
+Per-system limits and server authorization still apply independently.
+
+Named ZIP/BIOS content uses bounded `loadBundle` or the local-only `loadFiles` adapter:
+safe relative names, immutable copies and content identity checks remain mandatory.
+The optional trusted core artifact byte budget (maximum 512 MiB) only accommodates
+large pinned DLLs; it does not increase ROM/upload/state limits. No network-supplied
+DLL path, SHA override or core options may become a trusted profile.
+
+JNI is not a Netplay capability flag. Declare and test complete state restoration,
+all input ports, save ownership, clock, AV timing, cancellation and teardown first.
+Known FBNeo NeoGeo restore failures and the special process-isolated NeoGeo snapshot
+adapter remain unresolved. This working tree is not an installable full migration;
+see [scope and evidence](../piq-fc-arcade/design/JNI全面迁移-范围与验收.md).
 
 Build from this directory using `../piq-fc-arcade/gradlew.bat --offline check jar`.
 The resulting `piq_retro_internal` JAR is for development only: do not put it in `mods` or release bundles.

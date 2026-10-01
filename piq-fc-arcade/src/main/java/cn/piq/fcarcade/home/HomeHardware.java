@@ -121,7 +121,7 @@ public final class HomeHardware {
                 ? endpoint : null;
     }
 
-    static boolean mayUse(ServerPlayer player, BlockPos pos) {
+    public static boolean mayUse(ServerPlayer player, BlockPos pos) {
         return player.getServer().isSameThread() && player.serverLevel().hasChunkAt(pos)
                 && player.serverLevel().mayInteract(player, pos)
                 && player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) <= 64.0;

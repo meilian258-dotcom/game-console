@@ -12,7 +12,7 @@ public final class GbaHandheldModelProbe {
     private static void check(boolean value,String why){checks++;if(!value)throw new AssertionError(why);}
     public static void main(String[] args)throws Exception{
         String[] parts={"body","screen","dpad","button_a","button_b","button_select","button_start","shoulder_l","shoulder_r"};
-        int[] counts={533,1,5,16,16,9,9,73,73};
+        int[] counts={532,1,5,16,16,9,9,73,73};
         int elements=0,faces=0,rotations=0;
         Path input=Path.of(args[0]);boolean jar=Files.isRegularFile(input);
         try(ZipFile archive=jar?new ZipFile(input.toFile()):null){
@@ -35,7 +35,7 @@ public final class GbaHandheldModelProbe {
                 }
             }
         }
-        check(elements==735&&faces==4370&&rotations==451,"Complete original inventory");
+        check(elements==734&&faces==4369&&rotations==451,"Original geometry except the authorized one-face front branding decal");
         System.out.println("{\"ok\":true,\"assertions\":"+checks+",\"elements\":"+elements+",\"faces\":"+faces+",\"rotations\":"+rotations+",\"actual_minecraft_parser\":true}");
     }
 }

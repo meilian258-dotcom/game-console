@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// ABI 1, experimental Windows x64 libretro frontend. No MC/JVM/GL render-thread work.
+// ABI 2, bounded multi-instance Windows x64 frontend. No MC/JVM/render-thread work.
 // The Java resource owner verifies core provenance and SHA before calling this bridge.
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -16,22 +16,25 @@
 #include <filesystem>
 #include <fstream>
 #include <map>
+#include <memory>
 #include <mutex>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include "libretro.h"
 
 namespace {
-constexpr int ABI = 1, MAX_DIM = 2048, MAX_VIDEO = MAX_DIM * MAX_DIM * 4;
+constexpr int ABI = 2, MAX_SESSIONS = 4, MAX_DIM = 2048, MAX_VIDEO = MAX_DIM * MAX_DIM * 4;
 constexpr size_t MAX_AUDIO = 32768, MAX_STATE = 16 * 1024 * 1024, MAX_RAM = 4 * 1024 * 1024, MAX_RTC = 64 * 1024;
 constexpr int GL_COMPAT = 1, POINTER = 2, MOUSE = 4, KEYBOARD = 8, MESEN_GUN = 16, NO_GAME = 32,
               LEGACY_INLINE_OPTIONS = 64, ALL_FEATURES = 127;
-constexpr wchar_t WINDOW_CLASS[] = L"PIQGenericLibretroJniAbi1";
 using Gen = void(APIENTRY *)(GLsizei, GLuint *);
 using Bind = void(APIENTRY *)(GLenum, GLuint);
 struct Session {
     jlong token = 0;
+    size_t slot = 0;
+    std::wstring windowClass;
     DWORD owner = GetCurrentThreadId();
     int features = 0;
     HMODULE core = nullptr, gl = nullptr;
@@ -41,6 +44,7 @@ struct Session {
     GLuint fbo = 0, texture = 0, depth = 0;
     Bind bind = nullptr;
     bool ownsClass = false, initialized = false, loaded = false, contextReset = false, running = false;
+    bool moduleRegistered = false;
     bool hardware = false, shutdown = false, duplicate = true, supportsNoGame = false, cleanupFailed = false;
     std::atomic<bool> wrongThread{false};
     char failure[512]{};
@@ -68,17 +72,71 @@ struct Session {
                     DECL(retro_unserialize) DECL(retro_get_memory_data) DECL(retro_get_memory_size)
 #undef DECL
 };
-std::mutex guard;
-std::atomic<Session *> active{nullptr};
-jlong nextToken = 0;
-// Never wait on another JNI owner: its native call might be hung indefinitely.
+// libc++ in the pinned toolchain exposes shared_ptr atomic operations as free functions.
+struct SharedSession {
+    std::shared_ptr<Session> value;
+    std::shared_ptr<Session> load() const { return std::atomic_load(&value); }
+    void store(std::shared_ptr<Session> next) { std::atomic_store(&value, std::move(next)); }
+};
+struct Slot {
+    std::mutex guard;
+    SharedSession session;
+};
+std::array<Slot, MAX_SESSIONS> slots;
+std::atomic<jlong> nextToken{0};
+thread_local Session *invoking = nullptr;
+std::mutex moduleGuard;
+std::set<HMODULE> coreModules;
+// No core call holds a process-wide session lock. A hung owner only retains its own slot.
 using Lock = std::unique_lock<std::mutex>;
-Lock enter() {
-    Lock lock(guard, std::try_to_lock);
-    if (!lock.owns_lock())
-        throw std::runtime_error("JNI core is busy on its owner thread");
-    return lock;
+Lock moduleLock() {
+    // Only protects the handle set, never held while executing/loading/unloading a DLL.
+    return Lock(moduleGuard);
 }
+size_t slotIndex(jlong token) {
+    if (token <= 0 || (token & 255) >= MAX_SESSIONS)
+        throw std::runtime_error("Invalid JNI reservation");
+    return static_cast<size_t>(token & 255);
+}
+struct Access {
+    Lock lock;
+    std::shared_ptr<Session> session;
+    Session *previous;
+    explicit Access(jlong token) : lock(slots[slotIndex(token)].guard, std::try_to_lock), previous(invoking) {
+        if (!lock.owns_lock())
+            throw std::runtime_error("JNI session is busy on its owner thread");
+        session = slots[slotIndex(token)].session.load();
+        if (!session || session->token != token || session->owner != GetCurrentThreadId())
+            throw std::runtime_error("Invalid JNI session or owner thread");
+        invoking = session.get();
+    }
+    ~Access() { invoking = previous; }
+    Access(const Access &) = delete;
+};
+void release(Session &s) { slots[s.slot].session.store(nullptr); }
+// Each core receives slot-specific callbacks. Wrong-thread callbacks cannot mutate another core.
+struct CallbackScope {
+    Session *previous = invoking;
+    std::shared_ptr<Session> keep;
+    explicit CallbackScope(size_t slot) {
+        if (invoking && invoking->slot == slot && invoking->owner == GetCurrentThreadId()) return;
+        keep = slots[slot].session.load();
+        if (keep) keep->wrongThread = true;
+        invoking = nullptr;
+    }
+    ~CallbackScope() { invoking = previous; }
+};
+struct Callbacks {
+    retro_environment_t environment;
+    retro_video_refresh_t video;
+    retro_audio_sample_t sample;
+    retro_audio_sample_batch_t batch;
+    retro_input_poll_t poll;
+    retro_input_state_t input;
+    retro_hw_get_current_framebuffer_t framebuffer;
+    retro_hw_get_proc_address_t proc;
+};
+const Callbacks &callbacks(size_t slot);
 void fail(Session &s, const char *value) noexcept {
     if (!s.failure[0]) {
         size_t n = 0;
@@ -90,19 +148,21 @@ void fail(Session &s, const char *value) noexcept {
     }
 }
 Session *current() noexcept {
-    auto s = active.load();
+    auto s = invoking;
     if (s && s->owner != GetCurrentThreadId()) {
         s->wrongThread = true;
         return nullptr;
     }
     return s;
 }
-Session &require(jlong token) {
-    auto s = active.load();
+Session &require(jlong token, bool ready = true) {
+    auto s = invoking;
     if (!s || s->token != token || s->owner != GetCurrentThreadId())
         throw std::runtime_error("Invalid JNI session or owner thread");
     if (s->cleanupFailed)
         throw std::runtime_error("Native teardown failed; no further core calls allowed until JVM exit");
+    if (ready && (!s->initialized || !s->loaded))
+        throw std::runtime_error("JNI reservation has no loaded core");
     return *s;
 }
 void check(Session &s) {
@@ -243,12 +303,12 @@ void createContext(Session &s) {
     WNDCLASSW wc{};
     wc.lpfnWndProc = DefWindowProcW;
     wc.hInstance = GetModuleHandleW(nullptr);
-    wc.lpszClassName = WINDOW_CLASS;
+    wc.lpszClassName = s.windowClass.c_str();
     wc.style = CS_OWNDC;
     if (!RegisterClassW(&wc))
         throw std::runtime_error("Cannot register private WGL window");
     s.ownsClass = true;
-    s.window = CreateWindowW(WINDOW_CLASS, L"PIQ libretro JNI worker", WS_POPUP, 0, 0, 1, 1, nullptr, nullptr,
+    s.window = CreateWindowW(s.windowClass.c_str(), L"PIQ libretro JNI worker", WS_POPUP, 0, 0, 1, 1, nullptr, nullptr,
                              wc.hInstance, nullptr);
     if (!s.window)
         throw std::runtime_error("Cannot create private WGL window");
@@ -424,8 +484,8 @@ bool environment(unsigned cmd, void *data) {
             if (!(s->features & GL_COMPAT) || r->context_type != RETRO_HW_CONTEXT_OPENGL || !r->context_reset ||
                 r->version_major > 2 || (r->version_major == 2 && r->version_minor > 1) || s->hardware)
                 return false;
-            r->get_current_framebuffer = framebuffer;
-            r->get_proc_address = proc;
+            r->get_current_framebuffer = callbacks(s->slot).framebuffer;
+            r->get_proc_address = callbacks(s->slot).proc;
             s->hw = *r;
             s->hardware = true;
             return true;
@@ -652,6 +712,22 @@ bool allowedDevice(int d, int features) {
            (d == RETRO_DEVICE_POINTER && (features & POINTER)) || (d == RETRO_DEVICE_MOUSE && (features & MOUSE)) ||
            (d == RETRO_DEVICE_KEYBOARD && (features & KEYBOARD)) || (d == 262 && (features & MESEN_GUN));
 }
+template<size_t I> struct BoundCallbacks {
+    static bool env(unsigned c, void *p) { CallbackScope scope(I); return environment(c, p); }
+    static void pic(const void *p, unsigned w, unsigned h, size_t pitch) { CallbackScope scope(I); video(p,w,h,pitch); }
+    static void sound(int16_t a, int16_t b) { CallbackScope scope(I); sample(a,b); }
+    static size_t samples(const int16_t *p, size_t n) { CallbackScope scope(I); return batch(p,n); }
+    static void polling() { CallbackScope scope(I); poll(); }
+    static int16_t controls(unsigned p, unsigned d, unsigned i, unsigned b) { CallbackScope scope(I); return input(p,d,i,b); }
+    static uintptr_t fbo() { CallbackScope scope(I); return framebuffer(); }
+    static retro_proc_address_t address(const char *n) { CallbackScope scope(I); return proc(n); }
+    static constexpr Callbacks table{env,pic,sound,samples,polling,controls,fbo,address};
+};
+const Callbacks &callbacks(size_t slot) {
+    static constexpr std::array tables{BoundCallbacks<0>::table,BoundCallbacks<1>::table,
+        BoundCallbacks<2>::table,BoundCallbacks<3>::table};
+    return tables.at(slot);
+}
 void dispose(Session &s) {
     if (s.cleanupFailed)
         throw std::runtime_error("Native teardown previously failed; reservation retained until JVM exit");
@@ -671,6 +747,8 @@ void dispose(Session &s) {
         if (s.core) {
             if (!FreeLibrary(s.core))
                 throw std::runtime_error("Cannot unload native core; reservation retained");
+            if (s.moduleRegistered) { auto module = moduleLock(); coreModules.erase(s.core); }
+            s.moduleRegistered = false;
             s.core = nullptr;
         }
         if (s.context) {
@@ -689,7 +767,7 @@ void dispose(Session &s) {
             s.window = nullptr;
         }
         if (s.ownsClass) {
-            if (!UnregisterClassW(WINDOW_CLASS, GetModuleHandleW(nullptr)))
+            if (!UnregisterClassW(s.windowClass.c_str(), GetModuleHandleW(nullptr)))
                 throw std::runtime_error("Cannot unregister WGL window; reservation retained");
             s.ownsClass = false;
         }
@@ -752,20 +830,46 @@ size_t memoryLimit(int id) {
 } // namespace
 #define JNI(name) Java_cn_piq_retro_libretro_jni_NativeLibretroBridge_##name
 extern "C" JNIEXPORT jint JNICALL JNI(abiVersion)(JNIEnv *, jclass) { return ABI; }
-// May be queried by Java even when open never returned a token. Do not lock,
-// dereference the session or call core code: startup/cleanup may be wedged.
-extern "C" JNIEXPORT jboolean JNICALL JNI(reservationHeld)(JNIEnv *, jclass) {
-    return active.load(std::memory_order_acquire) != nullptr ? JNI_TRUE : JNI_FALSE;
+// Queries never acquire an owner's mutex or enter a core. A failed open retains its known token.
+extern "C" JNIEXPORT jint JNICALL JNI(availableSlots)(JNIEnv *, jclass) {
+    int free = 0;
+    for (auto &slot : slots) if (!slot.session.load()) free++;
+    return free;
 }
-extern "C" JNIEXPORT jlong JNICALL JNI(open)(JNIEnv *env, jclass, jstring dll, jstring content, jstring system,
+extern "C" JNIEXPORT jboolean JNICALL JNI(reservationHeld)(JNIEnv *, jclass, jlong token) {
+    if (token <= 0 || (token & 255) >= MAX_SESSIONS) return JNI_FALSE;
+    auto s = slots[static_cast<size_t>(token & 255)].session.load();
+    return s && s->token == token ? JNI_TRUE : JNI_FALSE;
+}
+extern "C" JNIEXPORT jlong JNICALL JNI(reserve)(JNIEnv *env, jclass) {
+    try {
+        for (size_t i = 0; i < slots.size(); i++) {
+            Lock lock(slots[i].guard, std::try_to_lock);
+            if (!lock.owns_lock() || slots[i].session.load()) continue;
+            auto s = std::make_shared<Session>();
+            auto generation = ++nextToken;
+            if (generation <= 0 || generation > INT64_MAX / 256)
+                throw std::runtime_error("JNI token space exhausted; restart required");
+            s->token = generation * 256 + static_cast<jlong>(i);
+            s->slot = i;
+            s->windowClass = L"PIQGenericLibretroJniAbi2_" + std::to_wstring(s->token);
+            slots[i].session.store(s);
+            return s->token;
+        }
+        throw std::runtime_error("JNI session limit reached (4); wait for an existing session to close");
+    } catch (const std::exception &ex) { io(env, ex.what()); return 0; }
+}
+extern "C" JNIEXPORT jlong JNICALL JNI(openReserved)(JNIEnv *env, jclass, jlong token, jstring dll, jstring content, jstring system,
                                              jstring saves, jstring expected, jboolean fullPath, jintArray ports,
                                              jobjectArray options, jint features) {
     Session *s = nullptr;
-    Lock lock;
+    std::unique_ptr<Access> access;
     try {
-        lock = enter();
-        if (active.load())
-            throw std::runtime_error("Another generic JNI session is active; use the process backend");
+        access = std::make_unique<Access>(token);
+        auto &reserved = require(token, false);
+        if (reserved.core || reserved.initialized || reserved.loaded || !reserved.corePath.empty())
+            throw std::runtime_error("JNI reservation already opened");
+        s = &reserved;
         if (features < 0 || (features & ~ALL_FEATURES))
             throw std::runtime_error("Unsupported feature flags");
         bool noGame = (features & NO_GAME) != 0;
@@ -786,9 +890,7 @@ extern "C" JNIEXPORT jlong JNICALL JNI(open)(JNIEnv *env, jclass, jstring dll, j
         if (!ports || env->GetArrayLength(ports) < 1 || env->GetArrayLength(ports) > 4 || !options ||
             env->GetArrayLength(options) > 512 || env->GetArrayLength(options) % 2)
             throw std::runtime_error("Invalid profile arrays");
-        s = new Session{};
         s->features = features;
-        s->token = ++nextToken;
         s->input[4] = -1;
         s->input[5] = s->input[6] = -32768;
         s->input[11] = -1;
@@ -837,11 +939,16 @@ extern "C" JNIEXPORT jlong JNICALL JNI(open)(JNIEnv *env, jclass, jstring dll, j
                 throw std::runtime_error("Content changed while reading");
         }
         s->audio.reserve(MAX_AUDIO);
-        active.store(s);
         s->core =
             LoadLibraryExW(core.c_str(), nullptr, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
         if (!s->core)
             throw std::runtime_error("Core DLL could not be loaded");
+        {
+            auto module = moduleLock();
+            if (!coreModules.insert(s->core).second)
+                throw std::runtime_error("Core DLL instance is already loaded; stage a private copy per session");
+            s->moduleRegistered = true;
+        }
 #define API(name)                                                                                                      \
     s->name = reinterpret_cast<decltype(s->name)>(GetProcAddress(s->core, #name));                                     \
     if (!s->name)                                                                                                      \
@@ -877,15 +984,16 @@ extern "C" JNIEXPORT jlong JNICALL JNI(open)(JNIEnv *env, jclass, jstring dll, j
         s->extended.persistent_data = true;
         if (features & GL_COMPAT)
             createContext(*s);
-        s->retro_set_environment(environment);
+        const auto &cb = callbacks(s->slot);
+        s->retro_set_environment(cb.environment);
         s->retro_init();
         s->initialized = true;
         check(*s);
-        s->retro_set_video_refresh(video);
-        s->retro_set_audio_sample(sample);
-        s->retro_set_audio_sample_batch(batch);
-        s->retro_set_input_poll(poll);
-        s->retro_set_input_state(input);
+        s->retro_set_video_refresh(cb.video);
+        s->retro_set_audio_sample(cb.sample);
+        s->retro_set_audio_sample_batch(cb.batch);
+        s->retro_set_input_poll(cb.poll);
+        s->retro_set_input_state(cb.input);
         retro_game_info game{};
         game.path = s->path.c_str();
         if (!fullPath) {
@@ -920,10 +1028,8 @@ extern "C" JNIEXPORT jlong JNICALL JNI(open)(JNIEnv *env, jclass, jstring dll, j
     } catch (const std::exception &ex) {
         if (s) {
             try {
-                active.store(s);
                 dispose(*s);
-                active.store(nullptr);
-                delete s;
+                release(*s);
             } catch (...) {
                 io(env, "Native startup cleanup failed; session remains reserved until JVM exit");
                 return 0;
@@ -934,10 +1040,8 @@ extern "C" JNIEXPORT jlong JNICALL JNI(open)(JNIEnv *env, jclass, jstring dll, j
     } catch (...) {
         if (s) {
             try {
-                active.store(s);
                 dispose(*s);
-                active.store(nullptr);
-                delete s;
+                release(*s);
             } catch (...) {
                 io(env, "Native startup cleanup failed; session remains reserved until JVM exit");
                 return 0;
@@ -950,7 +1054,7 @@ extern "C" JNIEXPORT jlong JNICALL JNI(open)(JNIEnv *env, jclass, jstring dll, j
 extern "C" JNIEXPORT void JNICALL JNI(metadata)(JNIEnv *env, jclass, jlong token, jintArray ints,
                                                 jdoubleArray doubles) {
     try {
-        auto lock = enter();
+        Access access(token);
         auto &s = require(token);
         check(s);
         metadata(env, s, ints, doubles);
@@ -960,7 +1064,7 @@ extern "C" JNIEXPORT void JNICALL JNI(metadata)(JNIEnv *env, jclass, jlong token
 }
 extern "C" JNIEXPORT jstring JNICALL JNI(coreVersion)(JNIEnv *env, jclass, jlong token) {
     try {
-        auto lock = enter();
+        Access access(token);
         auto &s = require(token);
         return env->NewStringUTF(s.version.c_str());
     } catch (const std::exception &ex) {
@@ -970,7 +1074,7 @@ extern "C" JNIEXPORT jstring JNICALL JNI(coreVersion)(JNIEnv *env, jclass, jlong
 }
 extern "C" JNIEXPORT jint JNICALL JNI(saveCapabilities)(JNIEnv *env, jclass, jlong token) {
     try {
-        auto lock = enter();
+        Access access(token);
         auto &s = require(token);
         check(s);
         size_t state = s.retro_serialize_size(), ram = s.retro_get_memory_size(0), rtc = s.retro_get_memory_size(1);
@@ -997,7 +1101,7 @@ extern "C" JNIEXPORT void JNICALL JNI(step)(JNIEnv *env, jclass, jlong token, jo
                                             jintArray controls, jintArray events, jintArray ints,
                                             jdoubleArray doubles) {
     try {
-        auto lock = enter();
+        Access access(token);
         auto &s = require(token);
         check(s);
         if (!pixels || !sound || !controls || !events || env->GetArrayLength(controls) != 13 ||
@@ -1104,7 +1208,7 @@ extern "C" JNIEXPORT void JNICALL JNI(step)(JNIEnv *env, jclass, jlong token, jo
 }
 extern "C" JNIEXPORT jbyteArray JNICALL JNI(serialize)(JNIEnv *env, jclass, jlong token) {
     try {
-        auto lock = enter();
+        Access access(token);
         auto &s = require(token);
         check(s);
         size_t n = s.retro_serialize_size();
@@ -1122,7 +1226,7 @@ extern "C" JNIEXPORT jbyteArray JNICALL JNI(serialize)(JNIEnv *env, jclass, jlon
 }
 extern "C" JNIEXPORT void JNICALL JNI(restore)(JNIEnv *env, jclass, jlong token, jbyteArray state) {
     try {
-        auto lock = enter();
+        Access access(token);
         auto &s = require(token);
         check(s);
         auto data = bytes(env, state, MAX_STATE, false);
@@ -1139,7 +1243,7 @@ extern "C" JNIEXPORT void JNICALL JNI(restore)(JNIEnv *env, jclass, jlong token,
 }
 extern "C" JNIEXPORT jbyteArray JNICALL JNI(memory)(JNIEnv *env, jclass, jlong token, jint id) {
     try {
-        auto lock = enter();
+        Access access(token);
         auto &s = require(token);
         check(s);
         auto limit = memoryLimit(id), n = s.retro_get_memory_size(id);
@@ -1157,7 +1261,7 @@ extern "C" JNIEXPORT jbyteArray JNICALL JNI(memory)(JNIEnv *env, jclass, jlong t
 }
 extern "C" JNIEXPORT void JNICALL JNI(restoreMemory)(JNIEnv *env, jclass, jlong token, jbyteArray ram, jbyteArray rtc) {
     try {
-        auto lock = enter();
+        Access access(token);
         auto &s = require(token);
         check(s);
         auto a = bytes(env, ram, MAX_RAM, true), b = bytes(env, rtc, MAX_RTC, true);
@@ -1176,7 +1280,7 @@ extern "C" JNIEXPORT void JNICALL JNI(restoreMemory)(JNIEnv *env, jclass, jlong 
 }
 extern "C" JNIEXPORT void JNICALL JNI(reset)(JNIEnv *env, jclass, jlong token) {
     try {
-        auto lock = enter();
+        Access access(token);
         auto &s = require(token);
         check(s);
         s.retro_reset();
@@ -1190,11 +1294,10 @@ extern "C" JNIEXPORT void JNICALL JNI(reset)(JNIEnv *env, jclass, jlong token) {
 }
 extern "C" JNIEXPORT void JNICALL JNI(close)(JNIEnv *env, jclass, jlong token) {
     try {
-        auto lock = enter();
-        auto &s = require(token);
+        Access access(token);
+        auto &s = require(token, false);
         dispose(s);
-        active.store(nullptr);
-        delete &s;
+        release(s);
     } catch (const std::exception &ex) {
         io(env, ex.what());
     }

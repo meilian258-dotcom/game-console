@@ -12,7 +12,8 @@ import java.util.function.*;
 import static cn.piq.fcarcade.netplay.JniNetplayCodec.*;
 
 /**
- * Explicit FC digital-pad JNI trial. Native work, rollback and serialization have one owner.
+ * FC JNI rollback with digital pads or server-authorized Zapper input.
+ * Native work, rollback and serialization have one owner.
  * The existing server relay, not a peer field, determines input lanes. No ROMs travel here.
  * A late join briefly pauses the room at a confirmed frame while transferring its seed.
  */
@@ -23,6 +24,11 @@ public final class JniNetplaySession implements AutoCloseable {
     private final Callable<byte[]> content;
     private final Consumer<NetplayChunk> sender;
     private final Supplier<LibretroRuntime> factory;
+    private final boolean gunMode;
+    private final NetplayProfile generic;
+    private final Callable<Map<String,byte[]>> auxiliary;
+    private final NetplayCabinetInputs cabinet;
+    private final NetplayGunMailbox gunInputs=new NetplayGunMailbox();
     private final ArrayBlockingQueue<Event> events=new ArrayBlockingQueue<>(512);
     private final ArrayBlockingQueue<NetplayProcess.Frame> pictures=new ArrayBlockingQueue<>(3);
     private final Map<UUID,Peer> peers=new LinkedHashMap<>();
@@ -65,17 +71,40 @@ public final class JniNetplaySession implements AutoCloseable {
         AssemblyState(Seed offer){this.offer=offer;assembly=new NetplaySaveTransfer.Assembly(offer.bytes());}
     }
     public JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender) {
-        this(grant,content,sender,()->new LibretroJniRuntime(profile(),NetplayProcess.class));
+        this(grant,content,sender,false);
+    }
+    public JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,boolean gun) {
+        this(grant,content,sender,gun,()->new LibretroJniRuntime(profile(gun),NetplayProcess.class));
     }
     /** Trusted test/core adapter injection; never supplied by network metadata. */
     JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,Supplier<LibretroRuntime> factory) {
+        this(grant,content,sender,false,factory);
+    }
+    JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,boolean gun,Supplier<LibretroRuntime> factory) {
+        this(grant,content,sender,gun,factory,null,Map::of,null);
+    }
+    public JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,NetplayProfile profile) {
+        this(grant,content,sender,profile,Map::of,null);
+    }
+    public JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,NetplayProfile profile,
+                            Callable<Map<String,byte[]>> auxiliary,NetplayCabinetInputs cabinet) {
+        this(grant,content,sender,false,()->new LibretroJniRuntime(Objects.requireNonNull(profile.jni()),profile.owner()),profile,auxiliary,cabinet);
+    }
+    JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,boolean gun,Supplier<LibretroRuntime> factory,
+                     NetplayProfile generic,Callable<Map<String,byte[]>> auxiliary,NetplayCabinetInputs cabinet) {
         this.grant=Objects.requireNonNull(grant);this.content=Objects.requireNonNull(content);
         this.sender=Objects.requireNonNull(sender);this.factory=Objects.requireNonNull(factory);
-        if(grant.port()>1)throw new IllegalArgumentException("FC JNI trial has two digital pads");
+        this.gunMode=gun;this.generic=generic;
+        this.auxiliary=Objects.requireNonNull(auxiliary);this.cabinet=cabinet;
+        if(generic!=null&&(generic.jni()==null||generic.ports()!=(cabinet==null?2:4))||gun&&cabinet!=null
+                ||grant.port()>=(cabinet==null?2:4)||gun&&!grant.host()&&grant.player())throw new IllegalArgumentException("JNI input lane/profile is not supported");
     }
     public static LibretroProfile profile() {
-        var p=cn.piq.fcarcade.core.libretro.GenericLibretroNesCore.profile(false);
-        return new LibretroProfile(p.name(),p.extension(),p.fullPath(),p.devices(),false,p.options(),
+        return profile(false);
+    }
+    public static LibretroProfile profile(boolean gun) {
+        var p=cn.piq.fcarcade.core.libretro.GenericLibretroNesCore.profile(gun);
+        return new LibretroProfile(p.name(),p.extension(),p.fullPath(),p.devices(),gun,p.options(),
                 Map.of("windows-x64",new LibretroProfile.Artifact(
                         "/core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r2.dll",
                         "591976547fa49a29ad3c20acecd96ef46eed0a7376398295a9468cfaae55c05c")));
@@ -88,7 +117,11 @@ public final class JniNetplaySession implements AutoCloseable {
         if(started||closed)return;started=true;
         var thread=new Thread(this::run,"PIQ-FC-JNI-Netplay-owner");thread.setDaemon(true);thread.start();
     }
-    public void input(int value){input=closing||closed||grant.port()<0?0:value&65535;}
+    public void input(int value){input=gunMode||cabinet!=null||closing||closed||grant.port()<0?0:value&65535;}
+    /** Called only by the existing authenticated server-input route, never by peer rollback packets. */
+    public void authoritativeGun(long revision,long sequence,int buttons,int aim) {
+        if(gunMode&&grant.host()&&!closing&&!closed)gunInputs.offer(revision,sequence,buttons,aim,System.nanoTime());
+    }
     public boolean ready(){return ready&&!closing&&!closed;}
     public String error(){var c=core;String nativeError=c==null?"":c.diagnosticError();return failure!=null?failure:nativeError.isBlank()?null:nativeError;}
     public String status(){return error()!=null?"JNI Netplay 停止："+error():closed?"已结束":phase;}
@@ -114,7 +147,7 @@ public final class JniNetplaySession implements AutoCloseable {
     }
     /** Network thread does bounded copying/enqueue only; no native work or server-side authority expansion. */
     public void receive(NetplayChunk chunk,int authorizedPort) {
-        if(closed||closing||chunk.session()!=grant.session()||authorizedPort< -1||authorizedPort>1)return;
+        if(closed||closing||chunk.session()!=grant.session()||authorizedPort< -1||authorizedPort>=(cabinet==null?2:4))return;
         if(!grant.host()&&!chunk.ticket().equals(grant.ticket()))return;
         synchronized(intakeLock) {
             if(chunk.byteLength()>2*1024*1024-intakeBytes||!events.offer(new Event(chunk,authorizedPort))) {
@@ -124,24 +157,37 @@ public final class JniNetplaySession implements AutoCloseable {
         }
     }
     @Override public synchronized void close() {
-        closing=true;input=0;
+        closing=true;input=0;gunInputs.close();
         if(!started){closed=true;terminated.complete(null);}
     }
     private void run() {
         try {
-            byte[] rom=content.call();if(rom==null||rom.length<16||rom.length>NetplayProfile.fc().maxRomBytes())throw new IOException("FC ROM 大小异常");
-            identity=FcNetplaySaves.jniIdentity(NetplaySaveState.hash(rom));
+            byte[] rom=content.call();if(rom==null||rom.length<16||rom.length>(generic==null?NetplayProfile.fc():generic).maxRomBytes())throw new IOException("ROM 大小异常");
+            var extras=new TreeMap<String,byte[]>();var hashes=new TreeMap<String,String>();
+            var supplied=Objects.requireNonNull(auxiliary.call());
+            if(supplied.size()>4||generic==null&&!supplied.isEmpty()||generic!=null&&!generic.jni().fullPath()&&!supplied.isEmpty())throw new IOException("此核心不支持该辅助文件清单");
+            long total=rom.length;var names=new HashSet<String>();
+            for(var e:supplied.entrySet()) {
+                if(!NetplayProfile.safeName(e.getKey())||e.getKey().equalsIgnoreCase(generic.contentName())
+                        ||!names.add(e.getKey().toLowerCase(Locale.ROOT))||e.getValue()==null||e.getValue().length<1||e.getValue().length>16*1024*1024)throw new IOException("辅助文件边界异常");
+                byte[] bytes=e.getValue().clone();total+=bytes.length;if(total>128L*1024*1024)throw new IOException("内容清单超过上限");
+                extras.put(e.getKey(),bytes);hashes.put(e.getKey(),NetplaySaveState.hash(bytes));
+            }
+            identity=generic==null?FcNetplaySaves.jniIdentity(gunMode,NetplaySaveState.hash(rom)):NetplaySaveState.identity(generic,NetplaySaveState.hash(rom),hashes);
             byte[] saved=null;
             if(persistence!=null){saved=persistence.load(identity);if(saved!=null)NetplaySaveState.decode(saved,identity);if(!persistence.enabled())persistence=null;}
             if(closing)return;
-            core=factory.get();var info=core.load(rom);
-            if(info.width()!=256||info.height()!=240||info.fps()<59||info.fps()>61||core.rotation()!=0
-                    ||!core.capabilities().contains(LibretroRuntime.Capability.STATE))throw new IOException("本期只支持 NTSC FC 数字手柄及可回滚核心");
+            core=factory.get();LibretroProcess.Info info;
+            if(generic!=null&&generic.jni().fullPath()){extras.put(generic.contentName(),rom);info=core.loadBundle(generic.contentName(),extras);}
+            else info=core.load(rom);
+            if((generic==null&&(info.width()!=256||info.height()!=240||core.rotation()!=0))||info.fps()<(generic==null?59:49)||info.fps()>61
+                    ||!core.capabilities().contains(LibretroRuntime.Capability.STATE)
+                    ||gunMode&&!core.capabilities().contains(LibretroRuntime.Capability.LIGHT_GUN))throw new IOException("需要可回滚核心与匹配输入设备/时序");
             // Probe before networking. Restoring a snapshot must round-trip with no side effects.
-            core.run(List.of(new LibretroProcess.Controls(new int[]{0,0},0)),0);core.reset();
+            core.run(List.of(neutral()),0);core.reset();
             // Mesen queues reset until retro_run. Drain it before restoring a room seed;
             // serializing immediately after reset can round-trip yet reset on the next frame.
-            core.run(List.of(new LibretroProcess.Controls(new int[]{0,0},0)),0);
+            core.run(List.of(neutral()),0);
             byte[] probe=core.serialize();core.restore(probe);
             if(probe.length>RollbackTimeline.MAX_STATE||!Arrays.equals(probe,core.serialize()))throw new IOException("核心不能精确恢复，未开始 JNI Netplay");
             long frame=0;
@@ -149,7 +195,7 @@ public final class JniNetplaySession implements AutoCloseable {
             timeline=newTimeline(frame);confirmed=lastHostNext=frame;
             nextSave=System.nanoTime()+TimeUnit.SECONDS.toNanos(30);
             nextPresent=System.nanoTime();
-            if(grant.host()){ready=true;phase="FC JNI Netplay（试验）";}
+            if(grant.host()){ready=true;phase=runningLabel();}
             else{remote=new Peer(grant.ticket(),grant.port());peers.put(remote.ticket,remote);control(remote,NetplayChunk.OPEN);phase="等待 JNI 主持与种子状态";}
             while(!closing) {
                 drain();expire();
@@ -161,7 +207,17 @@ public final class JniNetplaySession implements AutoCloseable {
                     if(joining==null&&!waitingJoin&&timeline.next()-confirmed<PREDICTION&&now>=nextPresent)hostFrame();
                     handleCapture();
                     if(persistence!=null&&now>=nextSave){nextSave=now+TimeUnit.SECONDS.toNanos(30);saveNow();}
-                } else if(ready){if(now>=nextPresent)peerFrame();checkDigests();}
+                } else if(ready){
+                    // Consume a bounded catch-up batch after a delayed ordered delivery.
+                    // Do not skip emulated frames or expand the authority window.
+                    for(int n=0;n<4;n++) {
+                        long before=timeline.next();
+                        if(System.nanoTime()<nextPresent&&lastHostNext-before<=4)break;
+                        peerFrame();checkDigests();
+                        if(timeline.next()==before)break;
+                    }
+                    checkDigests();
+                }
                 if(grant.host()||ready)trim();
                 confirmedVisible=confirmed;replayed=timeline.replayedFrames();
                 LockSupport.parkNanos(500_000L);
@@ -170,7 +226,7 @@ public final class JniNetplaySession implements AutoCloseable {
         } catch(Exception|LinkageError error) {
             if(failure==null)failure=error.getMessage()==null?error.getClass().getSimpleName():error.getMessage();
         } finally {
-            ready=false;closing=true;
+            ready=false;closing=true;gunInputs.close();if(cabinet!=null)cabinet.close();
             try{sender.accept(new NetplayChunk(grant.session(),grant.ticket(),NetplayChunk.CLOSE,0,new byte[0]));}catch(RuntimeException ignored){}
             synchronized(this){if(capture!=null&&!capture.isDone())capture.completeExceptionally(new IOException("JNI 运行已结束，未取得新快照"));}
             if(persistence!=null)persistence.abort();
@@ -182,17 +238,28 @@ public final class JniNetplaySession implements AutoCloseable {
     private RollbackTimeline<LibretroProcess.Output> newTimeline(long frame) {
         return new RollbackTimeline<>(new RollbackTimeline.Core<>() {
             public byte[] save(){return core.serialize();}
-            public void restore(byte[] state){core.restore(state);audioSource=audioNext=0;audioPrevious=0;}
+            public void restore(byte[] state){core.restore(state);audioSource=audioNext=0;audioPrevious=0;stereoSource=stereoNext=0;previousLeft=previousRight=0;}
             public LibretroProcess.Output step(int a,int b,boolean present){return core.run(List.of(new LibretroProcess.Controls(new int[]{a,b},0)),present?3:0);}
+            public LibretroProcess.Output step(Input frame,boolean present) {
+                validateInput(frame);
+                int[] pads=cabinet==null?new int[]{frame.p1(),frame.p2()}:new int[]{frame.p1(),frame.p2(),frame.p3(),frame.p4()};
+                return core.run(List.of(new LibretroProcess.Controls(pads,frame.gun())),present?3:0);
+            }
         },frame);
     }
+    private LibretroProcess.Controls neutral(){return new LibretroProcess.Controls(new int[cabinet==null?2:4],gunMode?65536:0);}
     private void drain() {
         for(int n=0;n<128;n++) {
+            // Backpressure on decoded Commands, not permission to accept arbitrary
+            // future frames. Let emulation consume this ordered prefix before
+            // draining the next burst from the already bounded ingress queue.
+            if(!grant.host()&&ready&&lastHostNext-timeline.next()>=8)return;
             Event event=events.poll();if(event==null)return;
             synchronized(intakeLock){intakeBytes-=event.chunk().byteLength();}
             var chunk=event.chunk();var peer=peers.get(chunk.ticket());
             if(chunk.kind()==NetplayChunk.CLOSE){if(peer!=null)drop(peer,false);continue;}
             if(grant.host()&&chunk.kind()==NetplayChunk.OPEN) {
+                if(gunMode&&event.port()!=-1){rejectedPeers++;continue;}
                 if(peer==null&&peers.size()<8&&event.port()!=0){peer=new Peer(chunk.ticket(),event.port());peers.put(peer.ticket,peer);control(peer,NetplayChunk.ACK);}continue;
             }
             if(peer==null)continue;
@@ -217,7 +284,7 @@ public final class JniNetplaySession implements AutoCloseable {
         }
         if(message instanceof Ready value&&joining==peer&&peer.seed!=null&&peer.seedOffset==peer.seed.length&&value.frame()==peer.seedFrame) {
             joining=null;peer.seed=null;peer.active=true;peer.deadline=Long.MAX_VALUE;peer.lastInput=System.nanoTime();
-            if(peer.port==1){if(remote!=null)throw new IllegalArgumentException("重复 2P 授权");remote=peer;futurePads.clear();lastP2=0;}
+            if(cabinet==null&&peer.port==1){if(remote!=null)throw new IllegalArgumentException("重复 2P 授权");remote=peer;futurePads.clear();lastP2=0;}
             nextPresent=System.nanoTime();return;
         }
         if(message instanceof Pad value&&peer.active&&peer==remote&&peer.port==1) {
@@ -244,18 +311,21 @@ public final class JniNetplaySession implements AutoCloseable {
             if(parts.frame()!=incomingSeed.offer.frame())throw new IllegalArgumentException("种子帧号不一致");
             restore(parts);timeline=newTimeline(parts.frame());confirmed=lastHostNext=parts.frame();
             incomingSeed=null;ready=true;peer.active=true;peer.deadline=Long.MAX_VALUE;
-            phase="FC JNI Netplay（试验）";send(peer,new Ready(parts.frame()));nextPresent=System.nanoTime();return;
+            phase=runningLabel();send(peer,new Ready(parts.frame()));nextPresent=System.nanoTime();return;
         }
         if(message instanceof Commands commands&&ready) {
-            if(commands.confirmed()<confirmed||commands.next()<lastHostNext||commands.next()>timeline.next()+32)throw new IllegalArgumentException("主持时间线倒退或超限");
+            if(commands.confirmed()<confirmed||commands.next()<lastHostNext||commands.next()>timeline.next()+32)
+                throw new IllegalArgumentException("主持时间线倒退或超限：confirmed="+commands.confirmed()+"/"+confirmed
+                        +" next="+commands.next()+" previous="+lastHostNext+" local="+timeline.next());
             var corrections=new ArrayList<Input>();
             for(var command:commands.inputs()) {
+                validateInput(command);
                 if(command.frame()<timeline.oldest())continue;
                 if(command.frame()<timeline.next()) {
                     var local=timeline.input(command.frame());
-                    if(grant.port()==1) {
+                    if(cabinet==null&&grant.port()==1) {
                         if((command.known()&2)!=0&&local.p2()!=command.p2())throw new IllegalArgumentException("主持更改已提交的 2P 输入");
-                        if((command.known()&2)==0)command=new Input(command.frame(),command.p1(),local.p2(),command.known()|2);
+                        if((command.known()&2)==0)command=new Input(command.frame(),command.p1(),local.p2(),command.p3(),command.p4(),command.gun(),command.known()|2);
                     }
                     corrections.add(command);
                 } else canonicalFuture.put(command.frame(),command);
@@ -274,6 +344,16 @@ public final class JniNetplaySession implements AutoCloseable {
         throw new IllegalArgumentException("JNI Netplay 接收阶段异常");
     }
     private void hostFrame() {
+        if(cabinet!=null) {
+            int[] pads=cabinet.next(System.nanoTime());
+            publish(timeline.advance(new Input(timeline.next(),pads[0],pads[1],pads[2],pads[3],0,3)));
+            confirm();broadcastCommands();pace();return;
+        }
+        if(gunMode) {
+            var sample=gunInputs.next(System.nanoTime());
+            var frame=new Input(timeline.next(),NetplayProcess.retroPad(sample.buttons()),0,0,0,sample.aim(),3);
+            publish(timeline.advance(frame));confirm();broadcastCommands();pace();return;
+        }
         Integer received=futurePads.remove(timeline.next());int known=1;
         if(remote==null){lastP2=0;known=3;}else if(received!=null){lastP2=received;known=3;}
         lastP1=input;
@@ -281,12 +361,19 @@ public final class JniNetplaySession implements AutoCloseable {
     }
     private void peerFrame() {
         long frame=timeline.next();Input canonical=canonicalFuture.get(frame);
-        if(grant.port()<0&&canonical==null||grant.port()==1&&frame>=lastHostNext+2)return;
+        boolean remotePad=cabinet==null&&grant.port()==1;
+        if(!remotePad&&canonical==null||remotePad&&frame>=lastHostNext+2)return;
         canonicalFuture.remove(frame);
-        int a=canonical==null?lastP1:canonical.p1(),b=grant.port()==1?input:canonical.p2();
+        int a=canonical==null?lastP1:canonical.p1(),b=remotePad?input:canonical.p2();
         int known=canonical==null?0:canonical.known();
-        if(grant.port()==1){if(canonical!=null&&(known&2)!=0&&canonical.p2()!=b)throw new IllegalArgumentException("2P 提交前帧已被确认");known|=2;send(remote,new Pad(frame,b));}
-        lastP1=a;lastP2=b;publish(timeline.advance(a,b,known));pace();
+        if(remotePad){if(canonical!=null&&(known&2)!=0&&canonical.p2()!=b)throw new IllegalArgumentException("2P 提交前帧已被确认");known|=2;send(remote,new Pad(frame,b));}
+        lastP1=a;lastP2=b;
+        publish(timeline.advance(new Input(frame,a,b,canonical==null?0:canonical.p3(),canonical==null?0:canonical.p4(),canonical==null?0:canonical.gun(),known)));pace();
+    }
+    private void validateInput(Input frame) {
+        if(cabinet!=null){if(frame.gun()!=0||frame.known()!=3||((frame.p1()|frame.p2()|frame.p3()|frame.p4())&~4095)!=0)throw new IllegalArgumentException("街机需要已授权四端口帧");return;}
+        if(frame.p3()!=0||frame.p4()!=0||(!gunMode&&frame.gun()!=0)
+                ||gunMode&&(frame.p2()!=0||frame.known()!=3))throw new IllegalArgumentException("输入与房间设备不匹配");
     }
     private void checkDigests() {
         while(!pendingDigests.isEmpty()&&pendingDigests.firstKey()<=timeline.next()) {
@@ -345,11 +432,34 @@ public final class JniNetplaySession implements AutoCloseable {
     private void trim() {long before=Math.max(timeline.oldest(),Math.min(confirmed,timeline.next())-RETAIN);timeline.discardBefore(before);}
     private void pace(){long now=System.nanoTime();long interval=(long)(1_000_000_000d/core.info().fps());nextPresent=Math.max(nextPresent+interval,now-interval);}
     private void publish(LibretroProcess.Output output) {
-        if(output.rgba().length!=256*240*4)throw new IllegalStateException("FC JNI 画面大小异常");
+        int width=output.info().width(),height=output.info().height();
+        if(output.rgba().length!=width*height*4||generic==null&&(width!=256||height!=240))throw new IllegalStateException("JNI 画面大小异常");
+        if(generic!=null) {
+            short[] pcm=stereoResample(output.stereo(),output.info().sampleRate(),generic.sampleRate());
+            var picture=new NetplayProcess.Frame(timeline.next(),output.rgba(),new float[0],width,height,output.info().aspect(),pcm,generic.sampleRate(),core.rotation());
+            while(!pictures.offer(picture))pictures.poll();delivered++;return;
+        }
         float[] mono=mono44100(output.stereo(),output.info().sampleRate());
         var picture=new NetplayProcess.Frame(timeline.next(),output.rgba(),mono,256,240,output.info().aspect(),new short[0],44100,0);
         while(!pictures.offer(picture))pictures.poll();delivered++;
     }
+    private double stereoSource,stereoNext;
+    private short previousLeft,previousRight;
+    private short[] stereoResample(short[] samples,double inputRate,int outputRate) {
+        if(samples.length>32768||(samples.length&1)!=0)throw new IllegalArgumentException("音频上限");
+        short[] out=new short[65536];int size=0;double ratio=inputRate/outputRate;
+        for(int i=0;i<samples.length;i+=2) {
+            while(stereoNext<=stereoSource) {
+                if(size>=out.length)throw new IllegalArgumentException("重采样音频上限");
+                double f=stereoSource==0?1:Math.clamp(stereoNext-(stereoSource-1),0,1);
+                out[size++]=(short)Math.round(previousLeft+(samples[i]-previousLeft)*f);
+                out[size++]=(short)Math.round(previousRight+(samples[i+1]-previousRight)*f);stereoNext+=ratio;
+            }
+            previousLeft=samples[i];previousRight=samples[i+1];stereoSource++;
+        }
+        return Arrays.copyOf(out,size);
+    }
+    private String runningLabel(){return (generic==null?"FC":generic.jni().name())+" JNI Netplay";}
     private float[] mono44100(short[] samples,double rate) {
         if(samples.length>32768||(samples.length&1)!=0)throw new IllegalArgumentException("音频上限");
         var buffer=new float[16384];int count=0;double step=rate/44100d;
@@ -383,7 +493,7 @@ public final class JniNetplaySession implements AutoCloseable {
             // Stop gameplay, then finish the same authorized host transaction off the MC thread.
             for(var p:List.copyOf(peers.values()))drop(p,false);
             try{commit.get(30,TimeUnit.SECONDS);}catch(ExecutionException ignored){}
-            timeline.advance(0,0,3);confirm();
+            timeline.advance(new Input(timeline.next(),0,0,0,0,gunMode?65536:0,3));confirm();
             byte[] state=checkpointAt(confirmed);persistence.save(state).get(30,TimeUnit.SECONDS);
             persistence.finish().get(10,TimeUnit.SECONDS);saveStatus="最终 JNI 试验进度已保存";
         } catch(Exception error) {saveStatus="最终保存未确认，保留最近确认版本";}

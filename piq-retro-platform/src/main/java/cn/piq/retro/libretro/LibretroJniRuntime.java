@@ -14,7 +14,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 /**
- * Opt-in in-process owner-thread runtime. Native faults can terminate the JVM. Deadlines report
+ * In-process owner-thread runtime. Native faults can terminate the JVM. Deadlines report
  * failure; they NEVER kill a native thread, unload its library or release its active slot.
  * No server/save ownership/netplay behavior is introduced here. Persistent files, when requested
  * by a trusted local adapter, must belong to that adapter's isolated trial save namespace.
@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.*;
 public final class LibretroJniRuntime implements LibretroRuntime {
     public static final int WGL_COMPAT = 1, POINTER = 2, MOUSE = 4, KEYBOARD = 8, MESEN_GUN = 16, NO_GAME = 32, LEGACY_INLINE_OPTIONS = 64;
     private static final long MIB = 1024L * 1024;
-    private static final AtomicBoolean ACTIVE = new AtomicBoolean();
     private static final ScheduledThreadPoolExecutor DEADLINES = deadlines();
     private final Thread owner = Thread.currentThread();
     private final LibretroProfile profile;
@@ -33,7 +32,7 @@ public final class LibretroJniRuntime implements LibretroRuntime {
     private FileChannel saveChannel;
     private FileLock saveLock;
     private long token;
-    private boolean closed, claimed, nativeOpenAttempted;
+    private boolean closed;
     private volatile String timeout = "";
     private LibretroProcess.Info info;
     private String version;
@@ -54,7 +53,7 @@ public final class LibretroJniRuntime implements LibretroRuntime {
             throw new IllegalArgumentException("JNI feature declaration");
         this.features = features;
     }
-    static boolean isBusy() { return ACTIVE.get(); }
+    static boolean isBusy() { return NativeLibretroBridge.atCapacity(); }
     @Override public LibretroRuntimes.Backend backend() { return LibretroRuntimes.Backend.JNI_TRIAL; }
     @Override public Set<Capability> capabilities() {
         var set = EnumSet.of(Capability.SOFTWARE_VIDEO, Capability.DIGITAL_PADS);
@@ -125,16 +124,41 @@ public final class LibretroJniRuntime implements LibretroRuntime {
         } catch (IOException | RuntimeException | LinkageError e) { throw fail(e); }
     }
     private Path prepare() throws IOException {
-        if (workspace != null || claimed) throw new IllegalStateException("JNI core already started");
+        if (workspace != null || token != 0) throw new IllegalStateException("JNI core already started");
         String reason = LibretroRuntimes.jniUnavailableReason(); if (!reason.isEmpty()) throw new IOException(reason);
-        if (!ACTIVE.compareAndSet(false, true)) throw new IOException("已有 JNI 试验运行或尚未安全退出，请切回独立进程或重启客户端");
-        claimed = true;
-        workspace = RuntimeWorkspace.create("libretro", 448 * MIB);
         NativeLibretroBridge.load();
+        token = NativeLibretroBridge.reserve();
+        if (token == 0) throw new IOException("JNI returned no reservation");
         var artifact = profile.cores().get("windows-x64");
         if (artifact == null) throw new IOException("No pinned Windows x64 core");
-        NativeLibretroBridge.extract(resourceOwner, artifact.resource(), artifact.sha256(), workspace.directory().resolve("core.dll"), 256 * MIB);
+        workspace = RuntimeWorkspace.create("libretro", artifact.maxBytes()+192*MIB);
+        NativeLibretroBridge.extract(resourceOwner, artifact.resource(), artifact.sha256(), workspace.directory().resolve("core.dll"), artifact.maxBytes());
         return Files.createDirectory(workspace.directory().resolve("content"));
+    }
+    /** Named immutable content bundle for trusted ZIP/BIOS adapters; same staging limits as loadFiles. */
+    @Override public LibretroProcess.Info loadBundle(String mainName,Map<String,byte[]> content) {
+        check();Objects.requireNonNull(mainName);Objects.requireNonNull(content);
+        if(content.isEmpty()||content.size()>16||!content.containsKey(mainName)||(features&NO_GAME)!=0)
+            throw new IllegalArgumentException("Content manifest");
+        var files=new TreeMap<String,byte[]>();var names=new HashSet<String>();long total=0;
+        for(var entry:content.entrySet()) {
+            validateRelative(entry.getKey());var bytes=Objects.requireNonNull(entry.getValue());total+=bytes.length;
+            if(!names.add(entry.getKey().toLowerCase(Locale.ROOT))||bytes.length<1||bytes.length>64*MIB||total>128*MIB)
+                throw new IllegalArgumentException("Content name/size budget");
+            files.put(entry.getKey(),bytes.clone());
+        }
+        try {
+            Path root=prepare();var hashes=new ByteArrayOutputStream();
+            try(var out=new DataOutputStream(hashes)) {
+                for(var entry:files.entrySet()) {
+                    Path path=root.resolve(entry.getKey()).normalize();
+                    if(!path.startsWith(root))throw new IOException("Content escaped staging");
+                    Files.createDirectories(path.getParent());Files.write(path,entry.getValue(),StandardOpenOption.CREATE_NEW);
+                    out.writeUTF(entry.getKey());out.write(hash(entry.getValue()));
+                }
+            }
+            return open(root.resolve(mainName),root,null,hash(hashes.toByteArray()));
+        }catch(IOException|RuntimeException|LinkageError e){throw fail(e);}
     }
     private LibretroProcess.Info open(Path content, Path system, Path saves, byte[] contentHash) throws IOException {
         Path save = saves == null ? Files.createDirectory(workspace.directory().resolve("save")) : saves.toAbsolutePath().normalize();
@@ -147,11 +171,10 @@ public final class LibretroJniRuntime implements LibretroRuntime {
         nativePin = workspace.pinNative();
         var options = new ArrayList<String>(); profile.options().forEach((k, v) -> { options.add(k); options.add(v); });
         try (var deadline = deadline(45, "初始化")) {
-            nativeOpenAttempted = true;
-            token = NativeLibretroBridge.open(workspace.directory().resolve("core.dll").toString(),
+            long opened = NativeLibretroBridge.openReserved(token, workspace.directory().resolve("core.dll").toString(),
                     content == null ? "" : content.toString(), system.toString(), save.toString(), profile.name(), profile.fullPath(),
                     profile.devices().stream().mapToInt(Integer::intValue).toArray(), options.toArray(String[]::new), features);
-            if (token == 0) throw new IOException("JNI core returned no session");
+            if (opened != token) throw new IOException("JNI core returned a different session");
             NativeLibretroBridge.metadata(token, metadata, timing); updateMetadata();
             version = NativeLibretroBridge.coreVersion(token);
             saveCapabilities = NativeLibretroBridge.saveCapabilities(token);
@@ -191,7 +214,7 @@ public final class LibretroJniRuntime implements LibretroRuntime {
         }
         return new LibretroProcess.Output(info, duplicate, rgba, pcm, memoryId < 0 ? new byte[0] : memory(memoryId));
     }
-    /** Advanced trusted local adapter input. Layout is documented in the JNI v1 guide; native validates every field. */
+    /** Advanced trusted local adapter input. Layout is documented in the JNI bridge guide; native validates every field. */
     public LibretroProcess.Output step(int[] input, int[] keyEvents, int outputMask) {
         loaded(); if ((outputMask & ~3) != 0 || input == null || input.length != 13 || keyEvents == null
                 || keyEvents.length > 512 || keyEvents.length % 4 != 0) throw new IllegalArgumentException("JNI input layout");
@@ -264,18 +287,16 @@ public final class LibretroJniRuntime implements LibretroRuntime {
     @Override public void close() {
         if (Thread.currentThread() != owner) throw new IllegalStateException("JNI close outside owner thread");
         if (closed) return;
-        // If this call hangs, the pin, save lock and ACTIVE remain held. The watchdog only reports.
+        // If this call hangs, only this token's pin/save lock/slot remain held. Never force-release it.
         try (var deadline = deadline(12, "关闭")) {
-            if (token == 0 && nativeOpenAttempted && NativeLibretroBridge.reservationHeld())
-                throw new IOException("JNI初始化清理未确认，保留试验工作区和运行名额；请重启客户端");
-            if (token != 0) { NativeLibretroBridge.close(token); token = 0; }
+            if (token != 0 && NativeLibretroBridge.reservationHeld(token)) NativeLibretroBridge.close(token);
+            token = 0;
         } catch (IOException | LinkageError e) { throw new IllegalStateException("JNI退出未确认，请保存世界后重启客户端", e); }
         closed = true;
         Exception failure = null;
         for (AutoCloseable resource : new AutoCloseable[]{saveLock, saveChannel, nativePin, workspace}) if (resource != null) {
             try { resource.close(); } catch (Exception e) { if (failure == null) failure = e; else failure.addSuppressed(e); }
         }
-        if (claimed) { ACTIVE.set(false); claimed = false; }
         if (failure != null) throw new IllegalStateException("JNI已关闭，但试验工作区清理失败", failure);
     }
     private static ScheduledThreadPoolExecutor deadlines() {

@@ -31,7 +31,7 @@ public final class GbaJniChoice {
             if(yes&&valid)preference.reset();
             mc.setScreen(valid?parent:null);
         },Component.literal("恢复 GBA 默认 JNI？"),Component.literal(
-                "影响后续启动的个人掌机和由你主持的 GBA 单席街机。原生故障可能使整个 Minecraft 崩溃；每个客户端仅一个 JNI 会话。继续使用 JNI 独立电池档，不导入或覆盖原进程档；不支持 GBA 通讯线。旁观仍接收音画，服务端托管不改。重连后按支持的平台默认 JNI；当前运行不切换。")));
+                "影响后续启动的个人掌机和由你主持的 GBA 单席街机。原生故障可能使整个 Minecraft 崩溃；公共 JNI 最多四个核心会话，GBA 本身仍限一个。继续使用 JNI 独立电池档，不导入或覆盖原进程档；不支持 GBA 通讯线。旁观仍接收音画；服务端托管也使用 JNI。重连后按支持的平台默认 JNI；当前运行不切换。")));
     }
     @SubscribeEvent public static void commands(RegisterClientCommandsEvent e){e.getDispatcher().register(Commands.literal("gameconsole-gba-jni").executes(c->{opening=true;return 1;}));}
     @SubscribeEvent public static void tick(ClientTickEvent.Post e){if(opening){opening=false;choose(null);}}

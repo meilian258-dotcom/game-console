@@ -22,6 +22,10 @@ public interface LibretroRuntime extends AutoCloseable {
     /** Nonblocking, thread-safe watchdog status; does not enter the native library. */
     default String diagnosticError() { return ""; }
     LibretroProcess.Info load(byte[] content);
+    /** Named content is optional and must be explicitly implemented by the runtime. */
+    default LibretroProcess.Info loadBundle(String mainName,java.util.Map<String,byte[]> files) {
+        throw new UnsupportedOperationException("Runtime has no named-content adapter");
+    }
     LibretroProcess.Info info();
     String coreVersion();
     LibretroProcess.Output run(List<LibretroProcess.Controls> frames, int outputMask);

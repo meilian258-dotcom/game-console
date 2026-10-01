@@ -1,0 +1,4 @@
+[submodule "piq-pvz-addon/vendor/PvZ-Portable"]
+	path = piq-pvz-addon/vendor/PvZ-Portable
+	url = https://github.com/KLuoNuoYa/PvZ-Portable.git
+	branch = libretro

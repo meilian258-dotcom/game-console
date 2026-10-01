@@ -16,13 +16,18 @@ def create():
     def mb(v,addr):w(0x13fc);w(v);l(addr)
     def ml(v,addr):w(0x23fc);l(v);l(addr)
     w(0x46fc);w(0x2700) # supervisor, interrupts masked
-    # The pinned md1va3 profile has no TMSS, and must not receive a TMSS write.
+    # Real hardware-compatible TMSS detection; MD1VA3 skips the write, newer revisions require it.
+    w(0x1039);l(0xa10001);w(0x0200);w(0x000f)
+    w(0x670a);ml(0x53454741,0xa14000)
     mw(0x100,0xa11100) # Z80 bus request
     for reg,val in [(0,4),(1,0x44),(2,0x30),(3,0x3c),(4,7),(5,0x6c),(7,0),(10,255),(11,0),(12,0x81),(13,0x3f),(15,2),(16,1)]:mw(0x8000|(reg<<8)|val,0xc00004)
     mb(0x9f,0xc00011);mb(0x81,0xc00011);mb(0x10,0xc00011);mb(0x90,0xc00011)
     mb(0x40,0xa10009);mb(0,0xa10003)
     start=len(code)
+    mb(0,0xa10003) # poll TH every iteration, including after a core state restore
     w(0x1039);l(0xa10003) # input low TH: bit4=A
+    w(0x13c0);l(0xff0000) # expose raw pad sample to diagnostics
+    w(0x5239);l(0xff0001) # loop heartbeat
     w(0x0200);w(0x10)
     w(0x6700);branch=len(code);w(0)
     ml(0xc0000000,0xc00004);mw(0x000e,0xc00000) # red
