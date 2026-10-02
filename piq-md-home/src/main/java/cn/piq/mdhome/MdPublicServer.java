@@ -118,6 +118,12 @@ public final class MdPublicServer implements WatchProvider {
     @SubscribeEvent public static void stopped(ServerStoppedEvent event){var map=SESSIONS.remove(event.getServer());if(map!=null)for(var s:map.values())PRIVATE.remove(s.connection);MdPublicSaves.stop(event.getServer());}
     private static WatchNetwork.Start display(Session s){return new WatchNetwork.Start(s.wire,s.ticket,s.watch.descriptor());}
     @Override public List<WatchSource> sources(MinecraftServer server){return sessions(server).values().stream().filter(s->s.ready&&valid(s)).map(s->s.watch).toList();}
+    @Override public List<UUID> occupancyPlayers(MinecraftServer server,WatchSource source){
+        var s=source(server,source);if(s==null)return List.of();
+        return MdOccupancy.players(s.ready&&valid(s),s.seats,(port,seat)->
+                current(seat.player)&&seat.player.connection.getConnection()==seat.connection
+                        &&s.console.authorized(seat.player,port,seat.loan,false),seat->seat.player.getUUID());
+    }
     private static Session source(MinecraftServer server,WatchSource source){return sessions(server).values().stream().filter(s->s.ready&&s.watch.equals(source)&&valid(s)).findFirst().orElse(null);}
     @Override public boolean isCurrent(MinecraftServer server,WatchSource source){return source(server,source)!=null;}
     @Override public boolean isParticipant(MinecraftServer server,UUID p){return participant(server,p);}

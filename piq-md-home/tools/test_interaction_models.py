@@ -13,7 +13,7 @@ import shutil
 import tempfile
 import unittest
 
-from interaction_models import BADGE_PREFIX, HANDS, TOP_NAME, prepare, relabel_console
+from interaction_models import BADGE_PREFIX, BADGES, HANDS, TOP_NAME, derived, prepare, relabel_console
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / 'piq-md-home/src/main/resources/assets/piq_md_home'
@@ -25,6 +25,7 @@ ORIGINAL_ELEMENT_SHA = {
     'block/md2_empty_borrowed': 'c23bcb38e6537a5f4a8d17a92ca08fe66cc2ac9f5ff64659400302deb4413c82',
     'block/md2_inserted_borrowed': '1542ef7d7a0b5c042306485002f46c3a753e42b1b29dadd26f9c961b6489c5cb',
     'item/md_controller': 'e23efe8a5c7bc6eb82932075acce5676d770f56f0b5fe57419c5f627fd6bfe81',
+    'item/md_cartridge_mesh': '69f2d366e662f06f57a816c0fcd925500794e172895dd5943a39887494018ee0',
 }
 
 
@@ -70,14 +71,17 @@ def center(element):
     return tuple((a + b) / 2 - 8 for a, b in zip(element['from'], element['to']))
 
 
-def atlas_rectangle(element, top):
+def atlas_rectangle(element, top, direction='up'):
     # Independent inverse of the production UV->world map, both axes reversed.
-    uv = top['faces']['up']['uv']
+    uv = top['faces'][direction]['uv']
     points = []
     for endpoint in ('from', 'to'):
         p = element[endpoint]
         u = uv[0] + (p[0] - top['from'][0]) / (top['to'][0] - top['from'][0]) * (uv[2] - uv[0])
-        v = uv[1] + (p[2] - top['from'][2]) / (top['to'][2] - top['from'][2]) * (uv[3] - uv[1])
+        depth = (p[2] - top['from'][2]) / (top['to'][2] - top['from'][2])
+        if direction == 'down':
+            depth = 1 - depth
+        v = uv[1] + depth * (uv[3] - uv[1])
         points.append((u * 64, v * 64))
     return (min(p[0] for p in points), min(p[1] for p in points),
             max(p[0] for p in points), max(p[1] for p in points))
@@ -140,70 +144,86 @@ class InteractionModelsTest(unittest.TestCase):
 
     def test_original_geometry_and_raster_are_unchanged(self):
         for name, expected in ORIGINAL_ELEMENT_SHA.items():
-            elements = [e for e in model(name)['elements'] if not e['name'].startswith(BADGE_PREFIX)]
+            elements = [e for e in model(name)['elements'] if not derived(e)]
             data = json.dumps(elements, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode()
             self.assertEqual(expected, hashlib.sha256(data).hexdigest(), name)
         texture = ASSETS / 'textures/item/md2_cartridge_set.png'
         self.assertEqual('4c84293960060507108acb0fbc36e1170602731eddb04eadc6fbbbf83e9bd136',
                          hashlib.sha256(texture.read_bytes()).hexdigest())
 
-    def test_logo_overlay_covers_only_g_and_leaves_neighboring_letters(self):
-        overlays = []
-        for state in STATES:
-            elements = model('block/md2_' + state)['elements']
-            top = next(e for e in elements if e['name'] == TOP_NAME)
-            badge = [e for e in elements if e['name'].startswith(BADGE_PREFIX)]
-            self.assertTrue(badge)
-            overlays.append(badge)
-            erase = next(e for e in badge if e['name'].endswith('erase_G'))
-            # JSON coordinates round at 1e-8 model units (~6e-7 atlas pixels).
-            self.assertVector(atlas_rectangle(erase, top), (262, 346, 280.5, 366), places=6)
-            # Bounds of the actual old G plus 1px safety margin; neighboring E
-            # ends at x260 and A starts at x281. Badge border is outside this.
-            x0, y0, x1, y1 = atlas_rectangle(erase, top)
-            self.assertLessEqual(x0, 262.000001)
-            self.assertGreaterEqual(x1, 280)
-            self.assertGreater(x0, 260)
-            self.assertLess(x1, 281)
-            self.assertLessEqual(y0, 346.000001)
-            self.assertGreaterEqual(y1, 365)
-            self.assertGreater(erase['from'][1], top['to'][1])
-            for face in badge:
-                self.assertEqual({'up'}, set(face['faces']))
-                self.assertEqual(face['from'][1], face['to'][1])
-                self.assertNotIn('cullface', face['faces']['up'])
-                self.assertLess(face['to'][1] - top['to'][1], .01)
-                if face is not erase:
-                    self.assertGreater(face['from'][1], erase['to'][1])
-                    rx0, ry0, rx1, ry1 = atlas_rectangle(face, top)
-                    self.assertTrue(x0 <= rx0 < rx1 <= x1)
-                    self.assertTrue(y0 <= ry0 < ry1 <= y1)
-        self.assertTrue(all(o == overlays[0] for o in overlays))
+    def badge_cases(self):
+        for name in ['block/md2_' + state for state in STATES] + ['item/md_controller']:
+            elements = model(name)['elements']
+            for label, (surface, direction, masks, glyphs, bg, ink) in BADGES.items():
+                for top in elements:
+                    if top['name'] == surface or (label == 'pad' and top['name'] in ('p1' + surface, 'p2' + surface)):
+                        prefix = (top['name'][:2] if label == 'pad' else '') + BADGE_PREFIX + label + '_'
+                        yield name, elements, top, prefix, direction, masks, glyphs, bg, ink
 
-    def test_logo_strokes_form_k_not_mirrored_g(self):
-        elements = model('block/md2_empty')['elements']
-        top = next(e for e in elements if e['name'] == TOP_NAME)
-        rects = [atlas_rectangle(e, top) for e in elements if e['name'].startswith(BADGE_PREFIX + 'K_')]
-        actual = []
-        for row in range(9):
-            cells = ''
-            for col in range(7):
-                x, y = 265 + col * 2, 348 + row * 2
-                cells += '1' if any(x0 < x < x1 and y0 < y < y1 for x0, y0, x1, y1 in rects) else '0'
-            actual.append(cells)
-        self.assertEqual(['1100011', '1100110', '1101100', '1111000', '1110000',
-                          '1111000', '1101100', '1100110', '1100011'], actual)
+    def test_logo_masks_cover_e_g_not_s_a_or_neighboring_controls(self):
+        for name, elements, top, prefix, direction, masks, *_ in self.badge_cases():
+            with self.subTest(model=name, badge=prefix):
+                badge = [e for e in elements if e['name'].startswith(prefix)]
+                self.assertEqual(33, len(badge))  # 2 covers + 16 O runs + 15 K runs.
+                for old, new, rectangle in zip(('E', 'G'), ('O', 'K'), masks):
+                    erase = next(e for e in badge if e['name'] == prefix + 'erase_' + old)
+                    self.assertVector(atlas_rectangle(erase, top, direction), rectangle, places=5)
+                    for face in [e for e in badge if e['name'].startswith(prefix + new + '_')]:
+                        x0, y0, x1, y1 = atlas_rectangle(face, top, direction)
+                        self.assertTrue(rectangle[0] - 1e-5 <= x0 < x1 <= rectangle[2] + 1e-5)
+                        self.assertTrue(rectangle[1] - 1e-5 <= y0 < y1 <= rectangle[3] + 1e-5)
+                        self.assertEqual({direction}, set(face['faces']))
+                        self.assertNotIn('cullface', face['faces'][direction])
+                        self.assertEqual(face['from'][1], face['to'][1])
+                        sign = 1 if direction == 'up' else -1
+                        self.assertGreater((face['from'][1] - erase['from'][1]) * sign, 0)
+                        self.assertLess(abs(face['from'][1] - erase['from'][1]), .01)
 
-    def test_atlas_palette_tints_match_original_badge_colors(self):
-        elements = model('block/md2_empty')['elements']
-        for suffix, palette, target in (('erase_G', (48, 50, 56), (37, 39, 44)),
-                                         ('K_0_0', (207, 204, 185), (182, 181, 172))):
-            face = next(e for e in elements if e['name'] == BADGE_PREFIX + suffix)['faces']['up']
-            color = int(face['neoforge_data']['color'], 16)
-            self.assertEqual(color >> 24, 255)
-            tint = ((color >> 16) & 255, (color >> 8) & 255, color & 255)
-            for channel, component, expected in zip(palette, tint, target):
-                self.assertLess(abs(channel * component / 255 - expected), 1)
+    def test_all_console_and_controller_letters_form_o_k_not_mirrored(self):
+        expected = [('0111110', '1100011', '1100011', '1100011', '1100011',
+                     '1100011', '1100011', '1100011', '0111110'),
+                    ('1100011', '1100110', '1101100', '1111000', '1110000',
+                     '1111000', '1101100', '1100110', '1100011')]
+        for name, elements, top, prefix, direction, _, glyphs, *_ in self.badge_cases():
+            for letter, rows, (x, y, width, height) in zip(('O', 'K'), expected, glyphs):
+                rects = [atlas_rectangle(e, top, direction) for e in elements if e['name'].startswith(prefix + letter + '_')]
+                actual = []
+                for row in range(9):
+                    cells = ''
+                    for col in range(7):
+                        px, py = x + (col + .5) * width / 7, y + (row + .5) * height / 9
+                        cells += '1' if any(x0 < px < x1 and y0 < py < y1 for x0, y0, x1, y1 in rects) else '0'
+                    actual.append(cells)
+                self.assertEqual(list(rows), actual, (name, prefix, letter))
+
+    def test_atlas_palette_tints_match_each_original_badge_colors(self):
+        for name, elements, _, prefix, direction, _, _, bg, ink in self.badge_cases():
+            for suffix, palette, target in (('erase_G', (48, 50, 56), bg), ('K_0_0', (207, 204, 185), ink)):
+                face = next(e for e in elements if e['name'] == prefix + suffix)['faces'][direction]
+                color = int(face['neoforge_data']['color'], 16)
+                self.assertEqual(color >> 24, 255)
+                tint = ((color >> 16) & 255, (color >> 8) & 255, color & 255)
+                for channel, component, expected in zip(palette, tint, target):
+                    self.assertLess(abs(channel * component / 255 - expected), 1, (name, prefix))
+
+    def test_cartridge_actual_cover_faces_player_in_four_hands_without_mirroring(self):
+        stub, mesh = model('item/md_cartridge'), model('item/md_cartridge_mesh')
+        label = next(e for e in mesh['elements'] if e['name'] == '游戏标签正面')
+        self.assertEqual({'north'}, set(label['faces']))
+        self.assertEqual(stub['display'], mesh['display'])
+        for hand in HANDS:
+            left = hand.endswith('lefthand')
+            pose = stub['display'][hand]
+            original = dict(pose, right_rotation=[0, 0, 0])
+            # Real front -Z and text-right -X must match old back +Z / right +X.
+            for source, expected in (((0, 0, -1), (0, 0, 1)), ((-1, 0, 0), (1, 0, 0)), ((0, 1, 0), (0, 1, 0))):
+                self.assertVector(unit(transform(source, pose, left, True)), unit(transform(expected, original, left, True)))
+            # Mutation control: the old pose points the real cover away.
+            self.assertLess(dot(unit(transform((0, 0, -1), original, left, True)),
+                                unit(transform((0, 0, -1), pose, left, True))), -.99)
+            self.assertEqual([0, 2, 0], pose['translation'])
+            self.assertEqual([1.2] * 3 if hand.startswith('first') else [.6] * 3, pose['scale'])
+        self.assertEqual({'rotation': [25, -35, 0], 'translation': [0, 0, 0], 'scale': [2.5] * 3}, stub['display']['gui'])
 
     def test_all_world_states_and_console_item_resolve_to_patched_models(self):
         variants = read(ASSETS / 'blockstates/md2.json')['variants']
@@ -216,9 +236,12 @@ class InteractionModelsTest(unittest.TestCase):
                         ref = variants[key]
                         self.assertEqual(rotation, ref['y'])
                         elements = model(ref['model'].split(':')[1])['elements']
-                        self.assertTrue(any(e['name'] == BADGE_PREFIX + 'erase_G' for e in elements))
+                        self.assertTrue(any(e['name'] == BADGE_PREFIX + 'top_erase_G' for e in elements))
                         self.assertEqual(not borrowed, any(e['name'].lower().startswith('p1') for e in elements))
                         self.assertEqual(not second, any(e['name'].lower().startswith('p2') for e in elements))
+                        for port, present in ((1, not borrowed), (2, not second)):
+                            self.assertEqual(33 if present else 0, sum(e['name'].startswith(f'p{port}SOKA_') for e in elements))
+                        self.assertFalse(any('SEKA_top_badge_' in e['name'] for e in elements))
         self.assertEqual('piq_md_home:block/md2_empty', model('item/md2')['parent'])
 
     def test_regeneration_is_byte_idempotent_and_import_postprocess_compatible(self):
@@ -231,7 +254,7 @@ class InteractionModelsTest(unittest.TestCase):
             for state in STATES:
                 path = assets / f'models/block/md2_{state}.json'
                 m = read(path)
-                m['elements'] = [e for e in m['elements'] if not e['name'].startswith(BADGE_PREFIX)]
+                m['elements'] = [e for e in m['elements'] if not derived(e)]
                 path.write_text(json.dumps(m), encoding='utf-8')
             shutil.copyfile(assets / 'models/item/md_cartridge_mesh.json', assets / 'models/item/md_cartridge.json')
             for _ in range(2):

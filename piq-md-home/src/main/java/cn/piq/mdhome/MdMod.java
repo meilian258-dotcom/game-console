@@ -37,6 +37,7 @@ public final class MdMod {
         HomeApplianceService.registerControls(SYSTEM,MdControls::pick);
         HomeSystems.register(SYSTEM,new HomeSystems.ServerHooks(){
             public boolean deviceSettingsAvailable(){return true;}
+            public boolean occupancyDisplaySupported(){return true;}
             public boolean synchronizationSettingsAvailable(){return true;}
             public int synchronizationSupportedModes(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){return 1;}
             public boolean synchronizationSettingsBusy(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){return ((MdConsole)c).running()||cn.piq.mdhome.save.MdPublicSaves.busy(l.getServer(),c.hardwareId());}

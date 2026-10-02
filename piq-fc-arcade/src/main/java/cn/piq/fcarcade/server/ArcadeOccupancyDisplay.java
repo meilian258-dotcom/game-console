@@ -81,6 +81,38 @@ final class ArcadeOccupancyDisplay {
             activeOwners.add(owner(dimension, target.anchor()));
             refresh(server, dimension, target.anchor(), entry.getValue());
         }
+        // Reuse the existing TV entity/layout/ownership cleanup for opted-in home providers.
+        // Only bounded active sessions are visited; never scan loaded consoles or all players.
+        for (var entry : cn.piq.fcarcade.cabinet.WatchProviders.entries().entrySet()) {
+            var provider = entry.getValue();
+            try {
+                for (var source : provider.sources(server).stream().limit(16).toList()) {
+                    var descriptor = source.descriptor();
+                    if (!entry.getKey().equals(descriptor.provider()) || !provider.isCurrent(server, source)) continue;
+                    var dimension = ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, descriptor.dimension());
+                    var level = server.getLevel(dimension);
+                    if (level == null) continue;
+                    var names = cn.piq.fcarcade.cabinet.WatchOccupancyNames.format(provider.occupancyPlayers(server, source), id -> {
+                        var player = server.getPlayerList().getPlayer(id);
+                        return player != null && !player.hasDisconnected() && player.serverLevel() == level
+                                ? player.getGameProfile().getName() : null;
+                    });
+                    for (var screen : descriptor.screens().stream().limit(4).toList()) {
+                        var link = cn.piq.fcarcade.home.HomeSystems.connectionForTv(level, screen.pos()).orElse(null);
+                        if (link == null || !link.systemId().equals(entry.getKey())
+                                || !link.console().getBlockPos().equals(descriptor.origin().pos())
+                                || !link.consoleId().equals(descriptor.origin().identity())
+                                || !link.televisionId().equals(screen.identity())
+                                || !link.linkId().equals(descriptor.link())
+                                || !cn.piq.fcarcade.home.HomePresentationSettings.occupancySupported(level, screen.pos())) continue;
+                        if (!names.isBlank()) activeOwners.add(owner(dimension, screen.pos()));
+                        refresh(server, dimension, screen.pos(), names);
+                    }
+                }
+            } catch (RuntimeException | LinkageError unavailable) {
+                // A stale/failed provider contributes no live owner; cleanup below removes its label.
+            }
+        }
         var tracked = LOADED.get(server);
         if (tracked == null) return;
         // This persistent tag also removes labels loaded after a restart/room closure.

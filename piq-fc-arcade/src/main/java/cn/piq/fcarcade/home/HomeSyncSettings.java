@@ -108,14 +108,14 @@ public final class HomeSyncSettings {
             if (!player.hasPermissions(2)) reason = "只有管理员可更改主机高级设置。";
             else if (diagnosticsOnly(c)) reason = "此设备仅提供诊断；没有可修改的公共联机设置。";
             else if (busy) reason = "请先关机并关闭加入、存档选择窗口；已借手柄无需归还。";
-            else if (request.occupancy() >= 0 && !(c instanceof HomeConsoleBlockEntity)) reason="此机型不支持使用者标牌。";
+            else if (request.occupancy() >= 0 && !HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos())) reason="此机型不支持使用者标牌。";
             else if (request.mode() >= 0 && (supported(player,intent.console)&(1<<request.mode()))==0)
                 reason = "此机型或服务器不支持所选联机方式。";
             else {
                 // Re-run protection after all provider callbacks, then check the exact live instance again.
                 if (!authorized(player,intent,hit)) return;
                 int modes=supported(player,c);boolean stillBusy=busy(player,c);
-                if(!DeviceDebugPolicy.mayEdit(player.hasPermissions(2),stillBusy,c instanceof HomeConsoleBlockEntity,
+                if(!DeviceDebugPolicy.mayEdit(player.hasPermissions(2),stillBusy,HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos()),
                         request.mode(),request.occupancy(),request.approval(),modes)||!basic(player,intent)||!player.hasPermissions(2)||!identity(player,intent))return;
                 if(request.mode()>=0){
                     if(c instanceof HomeConsoleBlockEntity fc){fc.netplayExperimental(request.mode()>=3);fc.netplayJniTrial(request.mode()==4);}
@@ -135,6 +135,8 @@ public final class HomeSyncSettings {
         var c = intent.console;
         String system = system(c);
         int modes=supported(player,c);
+        var modeReasons=new ArrayList<String>(5);
+        for(int mode=0;mode<5;mode++)modeReasons.add(HomeSyncMenuPolicy.supported(modes,mode)?"":bounded(unavailableMode(player,c,mode)));
         if(reason.equals("联机设置下次开机生效。")&&!diagnosticsOnly(c)) {
             if(!player.hasPermissions(2))reason="仅管理员可修改设备设置。";
             else if(busy(player,c))reason="关机并关闭加入、存档窗口后可修改设置。";
@@ -143,14 +145,12 @@ public final class HomeSyncSettings {
             try { reason=(reason.equals("联机设置下次开机生效。")||open?"":reason+" ")+HomeSystems.applianceHooks(external.systemId()).deviceSettingsStatus(player.serverLevel(),external); }
             catch(RuntimeException|LinkageError failure){reason="读取设备状态失败，请刷新或查看日志。";}
         } else {
-            if((modes&1)==0)reason+=" "+unavailable(player,c,CabinetSyncMode.MEDIA);
-            if((modes&2)==0)reason+=" "+HomeSyncPolicy.unavailable(CabinetSyncMode.LOCAL_SYNC);
-            if((modes&4)==0)reason+=" "+unavailable(player,c,CabinetSyncMode.SERVER_MEDIA);
+            reason=HomeSyncMenuPolicy.selectedStatus(reason,displayMode(c),modes,modeReasons.get(displayMode(c)));
         }
         if(reason.length()>256)reason=reason.substring(0,255)+"…";
         var setting=new HomeSyncNetwork.Setting(intent.token,intent.revision,player.serverLevel().dimension().location(),
                 c.getBlockPos(),c.hardwareId(),system,displayMode(c),modes,
-                !diagnosticsOnly(c)&&player.hasPermissions(2)&&!busy(player,c),reason,open,c.occupancyVisible(),c.joinApprovalRequired(),c instanceof HomeConsoleBlockEntity,intent.tool!=null);
+                !diagnosticsOnly(c)&&player.hasPermissions(2)&&!busy(player,c),reason,open,c.occupancyVisible(),c.joinApprovalRequired(),HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos()),intent.tool!=null,modeReasons);
         if(!identity(player,intent))return;
         intent.lastSetting=setting;HomeSyncNetwork.send(player,setting);
     }
@@ -163,7 +163,7 @@ public final class HomeSyncSettings {
     private static void cachedReply(ServerPlayer player,Intent intent,String reason) {
         var s=intent.lastSetting;if(s==null)return;
         HomeSyncNetwork.send(player,new HomeSyncNetwork.Setting(s.token(),s.revision(),s.dimension(),s.console(),s.hardware(),s.system(),s.mode(),s.supported(),
-                s.editable(),reason,false,s.occupancy(),s.approval(),s.occupancySupported(),s.debugTool()));
+                s.editable(),reason,false,s.occupancy(),s.approval(),s.occupancySupported(),s.debugTool(),s.modeReasons()));
     }
     private static boolean diagnosticsOnly(HomeEndpointBlockEntity console) {
         return console instanceof ExternalHomeConsoleBlockEntity external&&HomeSystems.privateDeviceSettings(external.systemId());
@@ -218,6 +218,22 @@ public final class HomeSyncSettings {
             console.setObservationRange(range);
             feedback(player,"本机旁观接收范围已设为 "+range+" 格；不改 Minecraft 区块渲染距离，下次开机使用。"); return true;
         }); } catch(RuntimeException|LinkageError rejected) { feedback(player,"旁观范围未确认，请重新选择设备。"); return true; }
+    }
+    private static String bounded(String reason){return reason==null||reason.isBlank()?"此机型尚未提供该运行方式。":reason.length()>256?reason.substring(0,255)+"…":reason;}
+    private static String unavailableMode(ServerPlayer player,HomeEndpointBlockEntity console,int selected){
+        if(console instanceof ExternalHomeConsoleBlockEntity external){
+            var hooks=HomeSystems.applianceHooks(external.systemId());
+            try {
+                int implemented=hooks!=null&&hooks.synchronizationSettingsAvailable()?hooks.synchronizationSupportedModes(player.serverLevel(),external):0;
+                if(!HomeSyncMenuPolicy.supported(implemented,selected))return selected<=3&&hooks!=null
+                        ?HomeSyncMenuPolicy.addonUnavailable(selected,mode->hooks.synchronizationUnavailableReason(player.serverLevel(),external,mode))
+                        :"此机型尚未提供该 Netplay 运行方式。";
+            }catch(RuntimeException|LinkageError failure){return "读取附属运行能力失败，请刷新或查看日志。";}
+        }
+        if(selected==0&&!cn.piq.fcarcade.cabinet.CabinetHostingConfig.playerAllowed())return HomeSyncPolicy.unavailable(CabinetSyncMode.MEDIA);
+        if((selected==1||selected>=3)&&!cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed())return "服主已禁用本地输入同步及 Netplay；请在管理终端检查同步策略。";
+        if(selected>=3)return "此机型尚未提供该 Netplay 运行方式。";
+        return unavailable(player,console,CabinetSyncMode.checked(selected));
     }
     private static String unavailable(ServerPlayer player,HomeEndpointBlockEntity console,CabinetSyncMode mode){
         if(console instanceof HomeConsoleBlockEntity&&mode==CabinetSyncMode.SERVER_MEDIA&&!cn.piq.fcarcade.cabinet.CabinetHostingConfig.enabled())

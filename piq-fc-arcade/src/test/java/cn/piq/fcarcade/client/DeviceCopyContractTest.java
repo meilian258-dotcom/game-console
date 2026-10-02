@@ -41,7 +41,8 @@ class DeviceCopyContractTest {
         assertTrue(home.contains("等待服务器确认…"));
         assertTrue(home.contains("保存未确认，请关闭后重开。"));
         assertTrue(home.contains("此机型不支持使用者标牌。"));
-        assertTrue(home.contains("已借手柄无需归还"));
+        assertTrue(home.contains("HomeSyncMenuPolicy.buttonState("));
+        assertTrue(source("home/HomeSyncMenuPolicy").contains("已借手柄无需归还"));
         String cabinet = source("client/cabinet/CabinetSyncSettingsScreen");
         assertTrue(cabinet.contains("FC 街机仅支持本地输入同步。"));
         assertTrue(cabinet.contains("本地输入同步：kof97 / mslug2，最多两席。"));

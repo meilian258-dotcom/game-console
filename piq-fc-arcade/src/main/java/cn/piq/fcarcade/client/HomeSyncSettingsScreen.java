@@ -4,6 +4,7 @@ import cn.piq.fcarcade.home.ExternalHomeConsoleBlockEntity;
 import cn.piq.fcarcade.home.HomeConsoleBlockEntity;
 import cn.piq.fcarcade.home.HomeSyncNetwork;
 import cn.piq.fcarcade.home.HomeSyncSaveHints;
+import cn.piq.fcarcade.home.HomeSyncMenuPolicy;
 import cn.piq.fcarcade.client.ui.DeviceUi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -62,10 +63,13 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         for(int mode=0;mode<5;mode++) {
             final int selected=mode;
             boolean privateOnly=diagnosticsOnly();
+            boolean external=minecraft.level!=null&&minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity;
+            if(!HomeSyncMenuPolicy.showMode(mode,external,privateOnly,setting.supported()))continue;
             String label=(setting.mode()==mode&&!privateOnly?"✓ ":"")+LABELS[mode];
             if(privateOnly&&mode==4)label="私人单人 · 本机设置…";
             else if(privateOnly)label+="（尚未接入）";
             else if((setting.supported()&(1<<mode))==0)label+="（不可用）";
+            else if(setting.mode()==mode)label+="（当前）";
             var button=Button.builder(Component.literal(label),b->{
                 if(privateOnly&&selected==4){if(ready()&&current())openLocalSettings();}
                 else if(selected==4)JniNetplayConsent.confirm(this,()->{if(current()&&setting.mode()!=4)apply(4,-1,-1);});
@@ -78,9 +82,9 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
                 ?(mode==4?"打开已可用的本机控制、运行环境与运行器设置；不会开关机或切换公共模式。"
                         :"本附属尚未接入此公共运行方式；不是权限不足，也不能通过此按钮解锁。当前仅私人单人，附近玩家不能旁观。")
                 :(setting.supported()&(1<<mode))==0
-                ?status
+                ?setting.modeReasons().get(mode)
                 :(mode==0?"由开机玩家运行游戏，向其他玩家发送音画。":mode==1?"各客户端运行游戏，同步操作数据。":mode==2?"由服务器运行游戏，向玩家发送音画。":mode==4?"FC 普通双手柄 JNI 回滚，原生崩溃可影响整个 MC。Windows x64默认允许，参与和旁观跟随房间；个人/卡带独立JNI档，不与原 Netplay 混接。":"RetroArch Netplay 同步操作与状态；Windows x64。按卡带策略保存，开机恢复；网络页可手动保存。")
-                    +"\n管理员关机后可修改；已借手柄无需归还。")));
+                    +"\n"+HomeSyncMenuPolicy.buttonState(mode,setting.mode(),setting.supported(),setting.editable(),setting.modeReasons().get(mode)))));
             addRenderableWidget(button);
         }
         int half=(panelWidth-26)/2,right=left+16+half;

@@ -45,6 +45,8 @@ public final class HomeSystems {
         default boolean synchronizationSettingsAvailable() { return false; }
         /** Read-only device diagnostics must not advertise an unsupported execution mode. */
         default boolean deviceSettingsAvailable() { return synchronizationSettingsAvailable(); }
+        /** Opt-in only when the provider publishes real, currently authorized operators. */
+        default boolean occupancyDisplaySupported() { return false; }
         default String deviceSettingsStatus(ServerLevel level, ExternalHomeConsoleBlockEntity console) {
             return "此设备未开放公共联机模式。";
         }

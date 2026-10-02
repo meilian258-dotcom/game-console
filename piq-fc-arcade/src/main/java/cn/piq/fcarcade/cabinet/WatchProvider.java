@@ -18,6 +18,9 @@ public interface WatchProvider {
     default boolean acceptsUpload() { return true; }
     /** Trusted server implementation only; clients cannot set this property in any packet. */
     default boolean serverHosted(MinecraftServer server,WatchSource source) { return false; }
+    /** Actual authorized controller seats, in port order; never include a host merely for hosting,
+     * observers, pending downloads or private sessions. Read-only presentation, not authority. */
+    default List<UUID> occupancyPlayers(MinecraftServer server, WatchSource source) { return List.of(); }
     /**
      * Number (0..2) of already-authorized remote controllers needing this host's media.
      * This does not create observation leases or input authority. Implementations must check
