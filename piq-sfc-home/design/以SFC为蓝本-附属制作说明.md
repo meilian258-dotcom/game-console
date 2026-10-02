@@ -1,14 +1,14 @@
 # 以 SFC 为蓝本：方块电玩附属制作说明 v1
 
-2026-09-30 制作入口补充：新增或补齐附属先对照[附属功能基线与现状](../../piq-fc-arcade/design/附属功能基线与现状对照-20260930.md)的 B01～B16、条件 C 项与玩家验收，再读下方历史接入蓝本。不能只移植核心而遗漏完整拷卡、AV线可见性和螺丝刀；当前SFC家用/街机、各模式保存及JNI差异单独声明。该新表仅盘点与规范，没有替MD修复功能。
+制作目标先读[机器与附属通用制作规范](../../piq-fc-arcade/design/机器制作与交互标准.md)第 1 节的完整统一流程与类型分支；实际界面、请求/权限、核心、保存、收尾及缺口查[全组件运行流程与复用接口总览](../../piq-fc-arcade/design/全组件运行流程与复用接口总览.md)。本文仅作 SFC41 的历史接入与兼容参考，不再作为新附属自行复制业务流程的模板。[旧基线 B/C 编号](../../piq-fc-arcade/design/附属功能基线与现状对照-20260930.md)供追溯已有制作记录。
 
-2026-09-29 补充：本文下方 SFC41/FC76.15 是历史制作蓝本。当前 FC76.22 / 完整 SFC43 增加 `LibretroRuntime`、显式 `PROCESS` / `JNI_TRIAL` 和私人模式试验存档隔离；默认仍为进程，不把 JNI 等同 Netplay。新增附属先看[通用 JNI 一期接入说明](../../piq-fc-arcade/design/通用JNI一期-FC76.22-使用与附属接入.md)，沿用本文行为/权限/完整打包要求。并非稳定公开 SDK。
+历史版本说明：SFC41/FC76.15 使用进程路径；FC76.22 / 完整 SFC43 的早期 JNI 试验增加 `LibretroRuntime`、显式 `PROCESS` / `JNI_TRIAL` 和隔离保存，当时默认仍为进程。这不是当前新附属的默认路线：后续模拟器附属按[公共 JNI 迁移要求](../../piq-fc-arcade/design/JNI全面迁移-范围与验收.md)适配，并依当前源码核对实际能力；JNI 不等于 Netplay，也不自动迁移旧档。[早期一期说明](../../piq-fc-arcade/design/通用JNI一期-FC76.22-使用与附属接入.md)只用于理解协议演进，不能覆盖新目标。
 
 日期：2026-09-28。面向能阅读Java/NeoForge代码、希望为方块电玩添加一个新系统的开发者。
 
 源码蓝本：`piq-sfc-home`完整SFC41，沿用`piq-sfc-arcade`核心接口/历史注册core9；公共行为核对到主模组FC76.15。运行环境基线：Minecraft 1.21.1、NeoForge 21.1.236、Java 21；当前SFC原生核心路径是Windows x64。这里只交付说明，未构建新附属、未重跑历史测试。
 
-先读[功能行为与配置规范](../../piq-fc-arcade/design/方块电玩功能行为与配置规范-v1.md)：距离、退出、菜单、管理终端、生效范围必须一致。不要只复制SFC模型和核心启动就认为附属完成。
+距离、配置归属和管理终端的补充约束查[功能行为与配置细则](../../piq-fc-arcade/design/方块电玩功能行为与配置规范-v1.md)。以下“当前”“现有”均指上述历史源码基线；不能只复制 SFC 模型和核心启动就认为附属完成。
 
 ## 1. 现有框架能帮你做什么，不能自动帮你做什么
 
@@ -121,13 +121,13 @@ SfcWatchProvider.register();
 
 物理按钮和动画同时做：[SfcApplianceControls](../src/main/java/cn/piq/sfchome/layout/SfcApplianceControls.java)负责命中，客户端硬件/手柄/线缆渲染负责表现。四向旋转、桌面摆放、电视关联、邻近设备遮挡、按钮动画与权限拒绝后的回弹都要验证。
 
-## 7. 第五步：接入核心，保持进程隔离
+## 7. 历史第五步：SFC41 进程核心接入
 
-读[LibretroSfcCore](../src/main/java/cn/piq/sfchome/core/LibretroSfcCore.java)和公共[LibretroProcess](../../piq-retro-platform/src/main/java/cn/piq/retro/libretro/LibretroProcess.java)。SFC用Mesen-S，不在Minecraft渲染线程直接调用任意DLL。
+SFC41 历史调用见下方示例。阅读当前[LibretroSfcCore](../src/main/java/cn/piq/sfchome/core/LibretroSfcCore.java)与公共[LibretroProcess](../../piq-retro-platform/src/main/java/cn/piq/retro/libretro/LibretroProcess.java)时，以实际签名及技术总览为准；不能要求所有新附属继续默认创建进程。SFC 使用 Mesen-S；无论进程还是 JNI，可信核心来源、拥有线程、生命周期和资源预算都必须遵守，不在 Minecraft 渲染线程直接调用任意 DLL。
 
 该适配器实现的是历史`cn.piq.sfcarcade.core.SfcCore`接口，ROM、帧、输入等类型也来自core9；它不是所有新附属必须实现的通用`SfcCore`标准。新系统应使用适合自己的类型，再对接公共街机/托管等接口，不能仅改类名就宣称已经与旧SFC依赖解耦。
 
-关键实际调用：
+SFC41 基线的进程调用示例（非新附属默认工厂）：
 
 ```java
 new LibretroProcess(profile(), LibretroSfcCore.class)
