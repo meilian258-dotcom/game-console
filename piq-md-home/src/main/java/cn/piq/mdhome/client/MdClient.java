@@ -22,18 +22,20 @@ public final class MdClient {
     @SubscribeEvent public static void renderers(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers e){
         e.registerBlockEntityRenderer(MdMod.ENTITY.get(),context->new MdRenderer());
     }
-    @SubscribeEvent public static void setup(FMLClientSetupEvent e){e.enqueueWork(()->{var p=new Provider();ControllerCapture.register(MdMod.SYSTEM,p);PrivateHomeClient.register(MdMod.SYSTEM,p);MdCoreChoice.register();MdPublicClient.install();ControllerPose.registerController(MdMod.CONTROLLER.get());});}
+    @SubscribeEvent public static void setup(FMLClientSetupEvent e){e.enqueueWork(()->{var p=new Provider();ControllerCapture.register(MdMod.SYSTEM,p);PrivateHomeClient.register(MdMod.SYSTEM,p);MdCoreChoice.register();MdPublicClient.install();MdControllerVisual.install();ControllerPose.registerController(MdMod.CONTROLLER.get());});}
     @SubscribeEvent public static void extensions(net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent e){
         e.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions(){
             private MdCartridgeRenderer renderer;
             public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer(){if(renderer==null)renderer=new MdCartridgeRenderer();return renderer;}
         },MdMod.CARTRIDGE.get());
         e.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions(){
+            private MdControllerRenderer renderer;
+            public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer(){if(renderer==null)renderer=new MdControllerRenderer();return renderer;}
             public net.minecraft.client.model.HumanoidModel.ArmPose getArmPose(net.minecraft.world.entity.LivingEntity entity,net.minecraft.world.InteractionHand hand,ItemStack stack){return ControllerPose.armPose(entity,hand,stack);}
             public boolean applyForgeHandTransform(com.mojang.blaze3d.vertex.PoseStack poses,net.minecraft.client.player.LocalPlayer player,net.minecraft.world.entity.HumanoidArm arm,ItemStack stack,float partial,float equip,float swing){return ControllerPose.firstTransform(poses,player,arm,stack,equip,swing);}
         },MdMod.CONTROLLER.get());
     }
-    @SubscribeEvent public static void models(net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional e){e.register(MdCartridgeRenderer.MODEL);}
+    @SubscribeEvent public static void models(net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional e){e.register(MdCartridgeRenderer.MODEL);for(var model:MdControllerRenderer.MODELS)e.register(model);}
     public static final class Provider implements PrivateHomeClient.Provider {
         public String label(){return "MD2 · "+MdProfile.profile(MdCoreChoice.selected()).name()+"（私人单人）";}
         public String storageKey(){return "md";}
@@ -70,7 +72,8 @@ public final class MdClient {
             if(!(entity instanceof MdConsole c))throw new IllegalArgumentException("MD 主机已失效");
             if(c.publicPlay())throw new IllegalStateException("公开会话必须使用已授权的公共运行器");
             if(cn.piq.fcarcade.home.content.ContentCardData.saveMode(c.cartridge())==1)throw new IllegalStateException("私人模式不能覆盖卡带归属存档");
-            return new MdEngine(rom,root,b,MdCoreChoice.selected(),cn.piq.fcarcade.home.content.ContentCardData.saveMode(c.cartridge())!=0);
+            var engine=new MdEngine(rom,root,b,MdCoreChoice.selected(),cn.piq.fcarcade.home.content.ContentCardData.saveMode(c.cartridge())!=0);
+            MdControllerVisual.privateEngine(engine,c);return engine;
         }
     }
 }

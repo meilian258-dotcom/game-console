@@ -13,7 +13,8 @@ import shutil
 import tempfile
 import unittest
 
-from interaction_models import BADGE_PREFIX, BADGES, HANDS, TOP_NAME, derived, prepare, relabel_console
+from interaction_models import (BADGE_PREFIX, BADGES, HANDS, TOP_NAME, CONTROLLER_PARTS,
+                                controller_part, derived, prepare, relabel_console)
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / 'piq-md-home/src/main/resources/assets/piq_md_home'
@@ -24,7 +25,7 @@ ORIGINAL_ELEMENT_SHA = {
     'block/md2_inserted': '9abbae957e1e9a83f997049b248a8a01bdd32942192775769a6d6c1b21ce9562',
     'block/md2_empty_borrowed': 'c23bcb38e6537a5f4a8d17a92ca08fe66cc2ac9f5ff64659400302deb4413c82',
     'block/md2_inserted_borrowed': '1542ef7d7a0b5c042306485002f46c3a753e42b1b29dadd26f9c961b6489c5cb',
-    'item/md_controller': 'e23efe8a5c7bc6eb82932075acce5676d770f56f0b5fe57419c5f627fd6bfe81',
+    'item/md_controller_mesh': 'e23efe8a5c7bc6eb82932075acce5676d770f56f0b5fe57419c5f627fd6bfe81',
     'item/md_cartridge_mesh': '69f2d366e662f06f57a816c0fcd925500794e172895dd5943a39887494018ee0',
 }
 
@@ -93,7 +94,7 @@ class InteractionModelsTest(unittest.TestCase):
             self.assertAlmostEqual(a, b, places=places)
 
     def test_four_hands_align_front_up_and_left_with_fc_rig(self):
-        pad, fc = model('item/md_controller'), read(FC)
+        pad, fc = model('item/md_controller_mesh'), read(FC)
         for hand in HANDS:
             with self.subTest(hand=hand):
                 left = hand.endswith('lefthand')
@@ -109,7 +110,7 @@ class InteractionModelsTest(unittest.TestCase):
                                       unit(transform(desired, target, left, True)))
 
     def test_actual_buttons_and_cable_are_upright_and_not_swapped(self):
-        pad, fc = model('item/md_controller'), read(FC)
+        pad, fc = model('item/md_controller_mesh'), read(FC)
         elements = {e['name']: e for e in pad['elements']}
         dpad = center(elements['p1十字键横臂_横芯'])
         a, b, c = (center(elements[f'p1{key}键_横芯']) for key in 'ABC')
@@ -152,7 +153,7 @@ class InteractionModelsTest(unittest.TestCase):
                          hashlib.sha256(texture.read_bytes()).hexdigest())
 
     def badge_cases(self):
-        for name in ['block/md2_' + state for state in STATES] + ['item/md_controller']:
+        for name in ['block/md2_' + state for state in STATES] + ['item/md_controller_mesh']:
             elements = model(name)['elements']
             for label, (surface, direction, masks, glyphs, bg, ink) in BADGES.items():
                 for top in elements:
@@ -257,6 +258,7 @@ class InteractionModelsTest(unittest.TestCase):
                 m['elements'] = [e for e in m['elements'] if not derived(e)]
                 path.write_text(json.dumps(m), encoding='utf-8')
             shutil.copyfile(assets / 'models/item/md_cartridge_mesh.json', assets / 'models/item/md_cartridge.json')
+            shutil.copyfile(assets / 'models/item/md_controller_mesh.json', assets / 'models/item/md_controller.json')
             for _ in range(2):
                 prepare(assets)
                 self.assertEqual(expected, {p.relative_to(assets): p.read_bytes() for p in paths})
@@ -267,6 +269,42 @@ class InteractionModelsTest(unittest.TestCase):
         top['faces']['up']['rotation'] = 90
         with self.assertRaises(ValueError):
             relabel_console(m)
+
+    def test_controller_parts_are_complete_disjoint_and_preserve_exact_geometry(self):
+        mesh = model('item/md_controller_mesh')
+        original = {e['name']: e for e in mesh['elements']}
+        self.assertEqual(len(original), len(mesh['elements']))
+        seen = {}
+        for part in CONTROLLER_PARTS:
+            split = model('item/md_controller_' + part)
+            self.assertEqual(mesh['textures'], split['textures'])
+            self.assertNotIn('display', split)
+            if part != 'body':
+                self.assertEqual(12 if part == 'dpad' else 1 if part == 'mode' else 6,
+                                 len(split['elements']), part)
+            for element in split['elements']:
+                self.assertEqual(part, controller_part(element))
+                self.assertNotIn(element['name'], seen)
+                self.assertEqual(original[element['name']], element)
+                seen[element['name']] = element
+        self.assertEqual(original, seen)
+        body = model('item/md_controller_body')['elements']
+        self.assertEqual(33, sum(derived(e) for e in body))
+        self.assertTrue(all(not derived(e) for p in CONTROLLER_PARTS[1:]
+                            for e in model('item/md_controller_' + p)['elements']))
+
+    def test_controller_stub_keeps_every_display_and_mode_is_real(self):
+        stub, mesh = model('item/md_controller'), model('item/md_controller_mesh')
+        self.assertEqual('builtin/entity', stub['parent'])
+        self.assertEqual('side', stub['gui_light'])
+        self.assertNotIn('elements', stub)
+        self.assertEqual(mesh['display'], stub['display'])
+        self.assertEqual({'rotation': [25, -35, 0], 'translation': [0, 0, 0],
+                          'scale': [2.5] * 3}, stub['display']['gui'])
+        mode = model('item/md_controller_mode')['elements']
+        self.assertEqual('p1MODE键', mode[0]['name'])
+        self.assertGreater(mode[0]['from'][2], 8.6)
+        self.assertLess(mode[0]['to'][1], 8.2)  # Rear edge, not a fabricated face key.
 
 
 if __name__ == '__main__':

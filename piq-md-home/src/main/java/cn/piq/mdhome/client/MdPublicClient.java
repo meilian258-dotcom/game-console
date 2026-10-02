@@ -45,6 +45,7 @@ public final class MdPublicClient implements MdPublicNetwork.Client,WatchClient.
     private static float aspect=4f/3;
     private static long demandRevision,demandExpires,inputSequence,lastInput;private static int lastMask;
     private static final long[] inputVersions={-1,-1};private static final UUID[] inputLoans=new UUID[2];
+    private static final MdControllerFrames visual=new MdControllerFrames();
     private static boolean closing,privatePreference;
     private static long privatePending;
     private MdPublicClient(){}
@@ -88,7 +89,7 @@ public final class MdPublicClient implements MdPublicNetwork.Client,WatchClient.
     @Override public void seat(MdPublicNetwork.Seat grant){
         if(seat!=null&&seat.equals(grant))return;
         if(closing||!hardware(grant.display().descriptor())||host!=null&&host.wire()!=grant.wire()||seat!=null&&!seat.loan().equals(grant.loan())||!InputOwnership.acquire(OWNER)){MdPublicNetwork.send(new MdPublicNetwork.Release(grant.wire(),grant.port(),grant.loan()));notice("MD 手柄未接入：请先结束当前本机游戏再领取。");return;}
-        connection=Minecraft.getInstance().getConnection().getConnection();seat=grant;inputSequence=0;lastInput=0;lastMask=0;
+        connection=Minecraft.getInstance().getConnection().getConnection();seat=grant;inputSequence=0;lastInput=0;lastMask=0;clearVisual();
         WatchClient.controlStarting();
         if(host==null){receiver=new WatchMediaStream(grant.display().descriptor().source(),grant.display().descriptor().hostLease(),false);audio=new WatchAudio();}
         refreshInput();
@@ -106,6 +107,10 @@ public final class MdPublicClient implements MdPublicNetwork.Client,WatchClient.
     }
     @Override public void media(MdPublicNetwork.Media value){if(connected()&&seat!=null&&host==null&&!closing&&receiver!=null&&MdPublicNetwork.belongsTo(value,seat.wire(),seat.loan(),seat.display().descriptor()))receiver.accept(value.packet());}
     @Override public void preference(MdPublicNetwork.Preference value){privatePreference=value.privatePlay();privatePending=0;}
+    @Override public void visual(MdPublicNetwork.Visual value){MdControllerVisual.accept(value);}
+    static void clearVisual(){visual.clear(0);}
+    static Object visualSession(net.minecraft.world.item.ItemStack stack){return seat!=null&&seat.loan().equals(MdController.loan(stack))&&seat.port()==MdController.port(stack)&&held()&&InputOwnership.owns(OWNER)?seat:null;}
+    static int visualInput(net.minecraft.world.item.ItemStack stack){return visualSession(stack)==null?-1:visual.present(seat.port());}
     private static WatchDescriptor descriptor(){return host!=null?host.display().descriptor():seat!=null?seat.display().descriptor():null;}
     private static boolean connected(){var c=Minecraft.getInstance().getConnection();return c!=null&&c.getConnection()==connection&&connection.isConnected();}
     private static boolean held(){
@@ -123,10 +128,11 @@ public final class MdPublicClient implements MdPublicNetwork.Client,WatchClient.
         try{var mc=Minecraft.getInstance();boolean active=!forceZero&&held()&&InputOwnership.owns(OWNER)&&mc.screen==null&&mc.isWindowActive()&&!mc.isPaused();int raw=0;
             if(active){int[][] keys=PROVIDER.keys();for(int bit=0;bit<keys.length;bit++)for(int key:keys[bit])if(key>=0&&InputConstants.isKeyDown(mc.getWindow().getWindow(),key)){raw|=1<<bit;break;}}
             int mask=forceZero?0:KeyboardInput.poll(OWNER,raw,active).mask();mask=GamepadInput.mix(OWNER,GamepadInput.ProfileKind.SFC,mask,active)&4095;
+            if(active)visual.offer(seat.port(),mask);else clearVisual();
             long now=System.nanoTime();if(forceZero||mask!=lastMask||now-lastInput>=200_000_000L){lastMask=mask;lastInput=now;MdPublicNetwork.send(new MdPublicNetwork.Input(seat.wire(),seat.port(),seat.loan(),++inputSequence,mask));}
         }finally{sendingInput=false;}
     }
-    private static void clearControls(){sendInput(true);KeyboardInput.release(OWNER);GamepadInput.release(OWNER);}
+    private static void clearControls(){sendInput(true);clearVisual();KeyboardInput.release(OWNER);GamepadInput.release(OWNER);}
     private static void demand(WatchNetwork.HostDemand demand){
         if(host==null||closing||!connected()||!host.display().descriptor().equals(demand.descriptor())||demand.revision()<demandRevision)return;
         demandRevision=demand.revision();demandExpires=demand.needed()?System.nanoTime()+5_000_000_000L:0;var p=publisher;if(p!=null)p.sending(demand.needed());

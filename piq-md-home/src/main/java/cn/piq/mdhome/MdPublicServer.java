@@ -91,6 +91,7 @@ public final class MdPublicServer implements WatchProvider {
     }
     private static void revoke(Session s,int port,String reason){
         var seat=s.seats[port];if(seat==null)return;s.seats[port]=null;
+        visual(s,port,seat,seat.visual.clear(Integer.toUnsignedLong(s.host.getServer().getTickCount())));
         if(current(s.host)&&s.host.connection.getConnection()==s.connection)MdPublicNetwork.send(s.host,new MdPublicNetwork.Input(s.wire,port,seat.loan,++seat.forwarded,0));
         if(current(seat.player)&&seat.player.connection.getConnection()==seat.connection)MdPublicNetwork.send(seat.player,new MdPublicNetwork.End(s.wire,seat.loan,false,reason));
     }
@@ -102,17 +103,33 @@ public final class MdPublicServer implements WatchProvider {
             if(accepted==MdPublicInputGate.Result.REJECT)return;if(accepted==MdPublicInputGate.Result.RATE_LIMIT){zero(s,input.port(),seat);return;}
             seat.last=now;
             int mask=s.console.authorized(p,input.port(),input.loan(),true)?input.mask():0;
-            seat.mask=mask;MdPublicNetwork.send(s.host,new MdPublicNetwork.Input(s.wire,input.port(),input.loan(),++seat.forwarded,mask));return;
+            seat.mask=mask;seat.visual.offer(mask);MdPublicNetwork.send(s.host,new MdPublicNetwork.Input(s.wire,input.port(),input.loan(),++seat.forwarded,mask));return;
         }
     }
     public static void release(ServerPlayer p,MdPublicNetwork.Release request){for(var s:sessions(p.getServer()).values())if(s.wire==request.wire()){var seat=s.seats[request.port()];if(seat!=null&&seat.player==p&&seat.connection==p.connection.getConnection()&&seat.loan.equals(request.loan()))s.console.clearLoan(request.port());return;}}
-    private static void zero(Session s,int port,SeatLease seat){if(seat.mask!=0){seat.mask=0;if(current(s.host))MdPublicNetwork.send(s.host,new MdPublicNetwork.Input(s.wire,port,seat.loan,++seat.forwarded,0));}}
+    private static void zero(Session s,int port,SeatLease seat){visual(s,port,seat,seat.visual.cancel(Integer.toUnsignedLong(s.host.getServer().getTickCount())));if(seat.mask!=0){seat.mask=0;if(current(s.host))MdPublicNetwork.send(s.host,new MdPublicNetwork.Input(s.wire,port,seat.loan,++seat.forwarded,0));}}
+    private static void visual(Session s,int port,SeatLease seat,MdVisualInputState.Sample sample){
+        if(sample==null)return;
+        var level=s.link.level();var operator=seat.player;
+        if(operator.serverLevel()!=level||level.dimension().location().toString().length()>128)return; // Dimension changes expire remotely by TTL.
+        var packet=new MdPublicNetwork.Visual(level.dimension().location(),s.console.getBlockPos(),s.console.hardwareId(),s.wire,
+                operator.getUUID(),seat.loan,port,sample.sequence(),sample.mask(),sample.pressedMask(),sample.reset());
+        int sent=0;
+        for(var viewer:level.getEntitiesOfClass(ServerPlayer.class,operator.getBoundingBox().inflate(32))){
+            if(viewer==operator||!MdVisualInputState.recipient(current(viewer),viewer.isAlive(),viewer.serverLevel()==level,
+                    !operator.isInvisibleTo(viewer)&&viewer.getChunkTrackingView().contains(operator.chunkPosition()),viewer.distanceToSqr(operator)))continue;
+            MdPublicNetwork.send(viewer,packet);if(++sent>=64)break;
+        }
+    }
     @SubscribeEvent public static void tick(ServerTickEvent.Post event){
         var server=event.getServer();PRIVATE.removeIf(c->!c.isConnected());
         for(var s:List.copyOf(sessions(server).values())){
             if(!valid(s)){stop(s.console,"MD 主持或电视连接已失效；正在结束并保存");continue;}
             if(!s.ready)continue;refreshSeats(s);
-            for(int port=0;port<2;port++){var seat=s.seats[port];if(seat!=null&&(!s.console.authorized(seat.player,port,seat.loan,true)||System.nanoTime()-seat.last>750_000_000L))zero(s,port,seat);}
+            for(int port=0;port<2;port++){var seat=s.seats[port];if(seat!=null){
+                if(!s.console.authorized(seat.player,port,seat.loan,true)||System.nanoTime()-seat.last>750_000_000L)zero(s,port,seat);
+                visual(s,port,seat,seat.visual.poll(Integer.toUnsignedLong(server.getTickCount())));
+            }}
         }
     }
     @SubscribeEvent public static void stopped(ServerStoppedEvent event){var map=SESSIONS.remove(event.getServer());if(map!=null)for(var s:map.values())PRIVATE.remove(s.connection);MdPublicSaves.stop(event.getServer());}
@@ -142,7 +159,7 @@ public final class MdPublicServer implements WatchProvider {
         }
     }
     private static final class SeatLease {
-        final ServerPlayer player;final Connection connection;final UUID loan;final MdPublicInputGate gate;long forwarded,last=System.nanoTime();int mask;
+        final ServerPlayer player;final Connection connection;final UUID loan;final MdPublicInputGate gate;final MdVisualInputState visual=new MdVisualInputState();long forwarded,last=System.nanoTime();int mask;
         SeatLease(ServerPlayer p,UUID loan,long wire,int port){player=p;connection=p.connection.getConnection();this.loan=loan;gate=new MdPublicInputGate(connection,loan,wire,port);}
     }
 }

@@ -11,6 +11,7 @@ import copy
 
 HANDS = ('firstperson_righthand', 'firstperson_lefthand',
          'thirdperson_righthand', 'thirdperson_lefthand')
+CONTROLLER_PARTS = ('body', 'dpad', 'a', 'b', 'c', 'x', 'y', 'z', 'start', 'mode')
 BADGE_PREFIX = 'SOKA_'
 LEGACY_BADGE_PREFIX = 'SEKA_top_badge_'
 TOP_NAME = '上盖窄收边_横芯'
@@ -123,6 +124,41 @@ def face_cartridge_forward(card):
         card['display'][hand] = pose
 
 
+def controller_part(element):
+    """Partition by the exporter's explicit cap names, never by nearby shell bounds."""
+    name = element.get('name', '')
+    if name.startswith('p1十字键'):
+        return 'dpad'
+    for key in 'ABCXYZ':
+        if name.startswith('p1' + key + '键_'):
+            return key.lower()
+    if name.startswith('p1开始键_'):
+        return 'start'
+    if name == 'p1MODE键':
+        return 'mode'
+    return 'body'
+
+
+def split_controller(items, pad):
+    # Keep a full neutral mesh for icons/ground/fixed and deterministic reimport.
+    # Animated models contain disjoint original elements, including original UVs,
+    # lettering and rotation origins; static SOKA stays with the body.
+    write_model(items / 'md_controller_mesh.json', pad)
+    for part in CONTROLLER_PARTS:
+        model = {key: copy.deepcopy(value) for key, value in pad.items()
+                 if key not in ('elements', 'display')}
+        model['elements'] = [copy.deepcopy(e) for e in pad['elements'] if controller_part(e) == part]
+        expected = 12 if part == 'dpad' else 1 if part == 'mode' else 6
+        if part != 'body' and len(model['elements']) != expected:
+            raise ValueError('MD controller cap group changed: ' + part)
+        write_model(items / ('md_controller_' + part + '.json'), model)
+    stub = {'parent': 'builtin/entity', 'gui_light': 'side',
+            'textures': {'particle': 'piq_md_home:item/md2_cartridge_set'},
+            'display': copy.deepcopy(pad['display'])}
+    (items / 'md_controller.json').write_text(json.dumps(stub, ensure_ascii=False, indent=2) + '\n',
+                                             encoding='utf-8', newline='\n')
+
+
 def prepare(assets):
     items = assets / 'models/item'
     card = json.loads((items / 'md_cartridge.json').read_text(encoding='utf-8'))
@@ -138,6 +174,8 @@ def prepare(assets):
         face_cartridge_forward(mesh)
         write_model(items / 'md_cartridge_mesh.json', mesh)
     pad = json.loads((items / 'md_controller.json').read_text(encoding='utf-8'))
+    if 'elements' not in pad:
+        pad = json.loads((items / 'md_controller_mesh.json').read_text(encoding='utf-8'))
     root = Path(__file__).resolve().parents[2]
     fc = json.loads((root / 'piq-fc-arcade/src/main/resources/assets/piq_fc_arcade/models/item/fc_controller.json').read_text(encoding='utf-8'))
     for hand in HANDS:
@@ -151,7 +189,7 @@ def prepare(assets):
         pose['scale'] = [round(v * 2.8, 8) for v in pose['scale']]
         pad['display'][hand] = pose
     relabel(pad, console=False)
-    write_model(items / 'md_controller.json', pad)
+    split_controller(items, pad)
     for state in ('empty', 'inserted', 'empty_borrowed', 'inserted_borrowed'):
         path = assets / f'models/block/md2_{state}.json'
         model = json.loads(path.read_text(encoding='utf-8'))

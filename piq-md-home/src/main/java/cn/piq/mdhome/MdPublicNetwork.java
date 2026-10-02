@@ -22,6 +22,7 @@ public final class MdPublicNetwork {
         void input(Input value); void media(Media value);
         void preference(Preference value);
         void privateStart(PrivateStart value);
+        default void visual(Visual value){}
     }
     private static volatile Client client;
     public static void client(Client value){client=Objects.requireNonNull(value);}
@@ -50,6 +51,22 @@ public final class MdPublicNetwork {
         public static final StreamCodec<RegistryFriendlyByteBuf,Input> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.wire);b.writeByte(p.port);b.writeUUID(p.loan);b.writeVarLong(p.sequence);b.writeVarInt(p.mask);},b->new Input(b.readVarLong(),b.readUnsignedByte(),b.readUUID(),b.readVarLong(),b.readVarInt()));
         public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
+    /** Bounded nearby public-controller presentation, not input or seat authority. */
+    public record Visual(ResourceLocation dimension,net.minecraft.core.BlockPos console,UUID hardware,long wire,
+                         UUID player,UUID loan,int port,long sequence,int mask,int pressedMask,boolean reset) implements CustomPacketPayload {
+        public Visual {
+            Objects.requireNonNull(dimension);console=Objects.requireNonNull(console).immutable();Objects.requireNonNull(hardware);
+            Objects.requireNonNull(player);Objects.requireNonNull(loan);
+            if(dimension.toString().length()>128||wire<=0||port<0||port>1||sequence<=0||(mask&~4095)!=0||(pressedMask&~4095)!=0)throw new IllegalArgumentException("MD visual");
+            if(reset&&(mask!=0||pressedMask!=0))throw new IllegalArgumentException("MD visual reset");
+        }
+        public static final Type<Visual> TYPE=new Type<>(id("visual"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,Visual> CODEC=StreamCodec.of((b,p)->{
+            b.writeUtf(p.dimension.toString(),128);b.writeBlockPos(p.console);b.writeUUID(p.hardware);b.writeVarLong(p.wire);
+            b.writeUUID(p.player);b.writeUUID(p.loan);b.writeByte(p.port);b.writeVarLong(p.sequence);b.writeVarInt(p.mask);b.writeVarInt(p.pressedMask);b.writeBoolean(p.reset);
+        },b->new Visual(ResourceLocation.parse(b.readUtf(128)),b.readBlockPos(),b.readUUID(),b.readVarLong(),b.readUUID(),b.readUUID(),b.readUnsignedByte(),b.readVarLong(),b.readVarInt(),b.readVarInt(),b.readBoolean()));
+        public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
     public record Media(long wire,UUID loan,CabinetRoomNetwork.Media media) implements CustomPacketPayload {
         public Media {if(wire<=0)throw new IllegalArgumentException("MD media");Objects.requireNonNull(loan);Objects.requireNonNull(media);}
         public static final Type<Media> TYPE=new Type<>(id("media"));
@@ -76,12 +93,13 @@ public final class MdPublicNetwork {
         public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     public static void register(RegisterPayloadHandlersEvent event){
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"md-public-1")
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"md-public-2")
             .playToClient(Start.TYPE,Start.CODEC,(p,c)->dispatch(c,h->h.start(p)))
             .playToClient(PrivateStart.TYPE,PrivateStart.CODEC,(p,c)->dispatch(c,h->h.privateStart(p)))
             .playToClient(Seat.TYPE,Seat.CODEC,(p,c)->dispatch(c,h->h.seat(p)))
             .playToClient(End.TYPE,End.CODEC,(p,c)->dispatch(c,h->h.end(p)))
             .playToClient(Media.TYPE,Media.CODEC,(p,c)->dispatch(c,h->h.media(p)))
+            .playToClient(Visual.TYPE,Visual.CODEC,(p,c)->dispatch(c,h->h.visual(p)))
             .playToServer(Release.TYPE,Release.CODEC,(p,c)->server(c,h->MdPublicServer.release(h,p)))
             .playBidirectional(Input.TYPE,Input.CODEC,(p,c)->{if(c.player() instanceof ServerPlayer)server(c,h->MdPublicServer.input(h,p));else dispatch(c,h->h.input(p));})
             .playBidirectional(Preference.TYPE,Preference.CODEC,(p,c)->{if(c.player() instanceof ServerPlayer)server(c,h->MdPublicServer.preference(h,p.privatePlay()));else dispatch(c,h->h.preference(p));});

@@ -19,6 +19,7 @@ public final class MdEngine implements PrivateEngine {
     private static final AtomicBoolean ACTIVE=new AtomicBoolean();
     private final Object controls=new Object(),media=new Object(),saveMonitor=new Object();
     private final MdPublicInputBuffer inputs;
+    private final MdControllerFrames visual=new MdControllerFrames();
     private final CompletableFuture<SaveResult> finished=new CompletableFuture<>();
     private final short[] sound=new short[32768];
     private final Thread owner;
@@ -31,7 +32,7 @@ public final class MdEngine implements PrivateEngine {
     private volatile String error,saveStatus;
     private volatile LibretroRuntime core;
     private int head,size;
-    private long revision,publicFrame,lastCheckpoint=-1,commitDeadline;
+    private long revision,visualRevision,publicFrame,lastCheckpoint=-1,commitDeadline;
     private CabinetFrame latest;
     private CompletableFuture<SaveResult> saveRequest;
     private CompletableFuture<Void> commit;
@@ -76,8 +77,11 @@ public final class MdEngine implements PrivateEngine {
     private void offerLocked(int port,int mask){
         try{inputs.offer(port,mask);}catch(IllegalStateException overflow){error=overflow.getMessage();stopAndSave();}
     }
-    public void clearInput(){synchronized(controls){inputs.clear();revision++;}}
-    public void releasePort(int port){synchronized(controls){inputs.release(port);revision++;}}
+    public void clearInput(){synchronized(controls){inputs.clear();revision++;visual.clear(++visualRevision);}}
+    public void releasePort(int port){synchronized(controls){inputs.release(port);revision++;visual.release(port,++visualRevision);}}
+    int visualInput(int port){synchronized(controls){return closing||paused||!ready?-1:visual.present(port);}}
+    boolean visualAlive(){return !closing&&error==null;}
+    void clearVisual(){synchronized(controls){visual.clear(++visualRevision);}}
     public void paused(boolean p){synchronized(controls){if(paused!=p){paused=p;clearInput();clearMedia();}}LockSupport.unpark(owner);}
     public CabinetFrame pollFrame(){
         synchronized(media){if(latest==null||closing||paused)return null;short[] pcm=new short[size];
@@ -139,10 +143,10 @@ public final class MdEngine implements PrivateEngine {
                 // RESET does not reset the public checkpoint sequence.
                 if(publicSession)handlePublicSave();
                 if(paused){due=System.nanoTime();LockSupport.parkNanos(5_000_000);continue;}
-                int[] masks;long rev;synchronized(controls){masks=inputs.next();rev=revision;}
+                int[] masks;long rev,visualRev;synchronized(controls){masks=inputs.next();rev=revision;visualRev=visualRevision;}
                 var out=core.run(List.of(new LibretroProcess.Controls(new int[]{MdProfile.input(selected,masks[0]),MdProfile.input(selected,masks[1])},0)),3);
                 check(out.info(),selected);if(publicSession)publicFrame=Math.incrementExact(publicFrame);
-                publish(out,audio,rev);long now=System.nanoTime();
+                publish(out,audio,rev,visualRev,masks);long now=System.nanoTime();
                 if(now>=saveDue){if(publicSession&&publicSaving)requestSave();else if(!publicSession&&saving)savePrivate(store,key);saveDue=now+30_000_000_000L;}
                 long frame=(long)(1e9/out.info().fps());due+=frame;if(due<now-4*frame)due=now;if(due>now)LockSupport.parkNanos(due-now);
             }
@@ -207,12 +211,13 @@ public final class MdEngine implements PrivateEngine {
         if(i.width()<1||i.height()<1||i.width()>720||i.height()>576||!Double.isFinite(i.fps())||i.fps()<49||i.fps()>61||!rate
                 ||!Float.isFinite(i.aspect())||i.aspect()<=0||i.aspect()>4)throw new IllegalStateException("MD AV 格式不匹配");
     }
-    private void publish(LibretroProcess.Output out,MdAudio audio,long rev){
+    private void publish(LibretroProcess.Output out,MdAudio audio,long rev,long visualRev,int[] masks){
         var i=out.info();byte[] rgba=out.rgba();if(rgba.length!=i.width()*i.height()*4)throw new IllegalArgumentException("MD frame bounds");
         int[] pixels=new int[i.width()*i.height()];for(int p=0;p<pixels.length;p++){int n=p*4;pixels[p]=0xff000000|(rgba[n]&255)|((rgba[n+1]&255)<<8)|((rgba[n+2]&255)<<16);}
         short[] pcm=audio.convert(out.stereo(),(int)i.sampleRate());
         synchronized(controls){
             if(closing||paused||rev!=revision)return;
+            visual.complete(visualRev,masks[0],masks[1]);
             synchronized(media){latest=new CabinetFrame(i.width(),i.height(),pixels,i.aspect(),0,new short[0]);for(short sample:pcm){if(size==sound.length){head=(head+2)%sound.length;size-=2;}sound[(head+size++)%sound.length]=sample;}}
         }
         // Tap must be non-blocking and bound to the exact public generation; local arrays remain independent.
