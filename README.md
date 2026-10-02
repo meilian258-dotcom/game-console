@@ -6,11 +6,13 @@
 
 ## 从哪里开始
 
-当前 JNI 默认候选的范围、配套版本和保存边界见 [FC76.26 / GBA12 / 电脑11](piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md)；不是所有机型的所有模式都已接入 JNI。
+制作目标以[机器与附属通用制作规范](piq-fc-arcade/design/机器制作与交互标准.md)为准：第 1 节规定完整统一流程及各设备类型分支。实际源码入口、界面、API、保存与缺口查[全组件运行流程与复用接口总览](piq-fc-arcade/design/全组件运行流程与复用接口总览.md)。规范不是已实现声明，历史版本指南不覆盖当前流程目标。
+
+2026-10-03 本次仅同步规范与审计文档，不包含维护工作区尚未上传的 MD7～9 实现。技术总览中的本地源码快照不能当作本分支已具备的功能或 API；使用前核对所检出源码及各组件版本。
 
 - 玩家：[主模组与当前版本说明](piq-fc-arcade/README.md)。按配套指南安装，不把各目录的最大版本号任意混搭。
 - 开发者：[Git 工作流](GIT_WORKFLOW.md)、[固定输入与构建](source-control/BUILDING.md)、[协作规范](piq-fc-arcade/AGENTS.md)。
-- 附属作者：[以 SFC 为蓝本的制作说明](piq-sfc-home/design/以SFC为蓝本-附属制作说明.md)、[公共层边界](piq-retro-platform/README.md)。
+- 附属作者：先对照上述通用规范与技术总览，再查[公共层边界](piq-retro-platform/README.md)；[SFC 历史接入蓝本](piq-sfc-home/design/以SFC为蓝本-附属制作说明.md)仅作源码演进与兼容参考，不照搬其早期进程默认和独立业务链。
 - 名称与交付：[Game Console 命名规范](source-control/BRANDING.md)。中文品牌“方块电玩”，正式英文品牌“Game Console”。
 
 ## 组件
@@ -21,7 +23,7 @@
 | Game Console: SFC | [piq-sfc-home](piq-sfc-home) | 使用包含 SFC 核心的完整交付包；薄包不是完整安装包 |
 | Game Console: Arcade | [piq-native-arcade](piq-native-arcade) | 原生街机附属，各运行模式能力不同 |
 | Game Console: GBA | [piq-gba](piq-gba) | 掌机及单席机柜；不代表支持 GBA 通讯联机 |
-| Game Console: MD | [piq-md-home](piq-md-home) | 当前为私人单人试验 |
+| Game Console: MD | [piq-md-home](piq-md-home) | 本分支能力以组件源码为准；本地后续候选的公开功能见审计，相关实现未随本次规范上传 |
 | Game Console: Computer | [piq-computer](piq-computer) | 可组装电脑与程序接入 |
 | Game Console: PvZ | [piq-pvz-addon](piq-pvz-addon) | 自备游戏资源的运行适配 |
 | Game Console: Flash Box | [piq-flash-box](piq-flash-box) | 历史播放盒，有独立版本限制，不与当前主包随意混装 |
