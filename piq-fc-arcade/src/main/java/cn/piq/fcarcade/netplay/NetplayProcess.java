@@ -140,6 +140,11 @@ public final class NetplayProcess implements AutoCloseable {
     private synchronized void fail(String reason){if(!closed&&error==null)error=reason;}
     public long framesReceived(){return jni!=null?jni.framesReceived():framesReceived;}
     public Grant grant(){return grant;}
+    /** PNP7's libretro CCW metadata becomes CW once, before any public frame consumer. */
+    static int legacyClockwiseRotation(int counterClockwise){
+        if(counterClockwise<0||counterClockwise>3)throw new IllegalArgumentException("Legacy rotation");
+        return (4-counterClockwise)&3;
+    }
     public Frame poll(){return jni!=null?jni.poll():frames.poll();}
     public void input(int nes){if(jni!=null){jni.input(retroPad(nes));return;}if(!gunMode)input=grant.player()||grant.host()?retroPad(nes):0;}
     public void inputRetroPad(int mask){if(jni!=null){jni.input(mask);return;}if(!gunMode)input=grant.player()||grant.host()?mask&65535:0;}
@@ -278,7 +283,8 @@ public final class NetplayProcess implements AutoCloseable {
                     int at=i*4;short l=(short)((pcm[at]&255)|(pcm[at+1]<<8)),r=(short)((pcm[at+2]&255)|(pcm[at+3]<<8));mono[i]=(l+r)/65536f;
                     stereo[i*2]=l;stereo[i*2+1]=r;
                 }
-                Frame frame=new Frame(number,bgra,mono,width,height,aspect/100000f,stereo,rate,rotation);
+                // PNP7 keeps libretro's CCW rotation; its bridge already supplies unrotated DAR.
+                Frame frame=new Frame(number,bgra,mono,width,height,aspect/100000f,stereo,rate,legacyClockwiseRotation(rotation));
                 synchronized(this){if(closed)break;while(!frames.offer(frame))frames.poll();framesReceived++;ready=true;phase="音画已就绪";}
                 if(persistence!=null&&!closing&&System.nanoTime()>=nextSaveNanos){nextSaveNanos=System.nanoTime()+TimeUnit.SECONDS.toNanos(30);saveNow();}
             }

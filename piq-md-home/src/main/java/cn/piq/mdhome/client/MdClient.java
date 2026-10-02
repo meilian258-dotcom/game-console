@@ -43,7 +43,7 @@ public final class MdClient {
         public boolean independentCartridgePower(){return true;}
         public UUID cartridgeSession(Player p,BlockEntity entity){
             return p!=null&&p.isAlive()&&!p.isSpectator()&&entity instanceof MdConsole c&&!c.isRemoved()&&c.getLevel()==p.level()
-                    &&c.running()&&!c.publicPlay()&&c.hasInsertedCartridge()&&p.getUUID().equals(c.powerHost())?c.powerSession():null;
+                    &&!c.publicPlay()&&c.powerSession()!=null&&c.hasInsertedCartridge()&&p.getUUID().equals(c.powerHost())?c.powerSession():null;
         }
         public boolean acceptsFile(String name){return MdRom.accepts(name);}
         public String fileHint(){return ".md / .bin / .gen（普通卡带，非CD/32X）";}
@@ -72,7 +72,8 @@ public final class MdClient {
             if(!(entity instanceof MdConsole c))throw new IllegalArgumentException("MD 主机已失效");
             if(c.publicPlay())throw new IllegalStateException("公开会话必须使用已授权的公共运行器");
             if(cn.piq.fcarcade.home.content.ContentCardData.saveMode(c.cartridge())==1)throw new IllegalStateException("私人模式不能覆盖卡带归属存档");
-            var engine=new MdEngine(rom,root,b,MdCoreChoice.selected(),cn.piq.fcarcade.home.content.ContentCardData.saveMode(c.cartridge())!=0);
+            var engine=new MdEngine(rom,root,b,MdCoreChoice.selected(),cn.piq.fcarcade.home.content.ContentCardData.saveMode(c.cartridge())!=0,true);
+            MdPublicClient.privateEngine(engine,c.powerSession());
             MdControllerVisual.privateEngine(engine,c);return engine;
         }
     }

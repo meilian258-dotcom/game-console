@@ -436,7 +436,9 @@ public final class JniNetplaySession implements AutoCloseable {
         if(output.rgba().length!=width*height*4||generic==null&&(width!=256||height!=240))throw new IllegalStateException("JNI 画面大小异常");
         if(generic!=null) {
             short[] pcm=stereoResample(output.stereo(),output.info().sampleRate(),generic.sampleRate());
-            var picture=new NetplayProcess.Frame(timeline.next(),output.rgba(),new float[0],width,height,output.info().aspect(),pcm,generic.sampleRate(),core.rotation());
+            int clockwiseRotation=core.rotation(); // JNI has already converted libretro CCW to the public CW convention.
+            var picture=new NetplayProcess.Frame(timeline.next(),output.rgba(),new float[0],width,height,
+                    generic.rawJniAspect(output.info().aspect(),clockwiseRotation),pcm,generic.sampleRate(),clockwiseRotation);
             while(!pictures.offer(picture))pictures.poll();delivered++;return;
         }
         float[] mono=mono44100(output.stereo(),output.info().sampleRate());

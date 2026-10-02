@@ -74,6 +74,14 @@ public class MdNativeProbe {
         check(!LibretroRuntimes.isJniBusy(),"engine slot freed");
         // Exercise the public engine lifecycle used by physical reset and the explicit no-save preference.
         var oldFiles=fence(out.resolve("saves"));
+        var gated=new MdEngine(out.resolve("diagnostic.md"),out.resolve("saves"),backend,selected,true,true);
+        awaitReady(gated);gated.paused(false);gated.offerInput(1,0);Thread.sleep(120);
+        check(gated.pollFrame()==null&&!gated.requestReset(),"private loaded state remains gated before authority READY");
+        check(!gated.stopAndSave().get(15,TimeUnit.SECONDS).saved()&&oldFiles.equals(fence(out.resolve("saves"))),"cancel private restored launch preserves every old progress byte");
+        var gatedRun=new MdEngine(out.resolve("diagnostic.md"),out.resolve("saves"),backend,selected,true,true);
+        awaitReady(gatedRun);gatedRun.activate();gatedRun.offerInput(0,0);Thread.sleep(150);
+        check(gatedRun.pollFrame()!=null&&gatedRun.stopAndSave().get(15,TimeUnit.SECONDS).saved(),"private explicit activation opens gameplay and normal local save");
+        oldFiles=fence(out.resolve("saves"));
         var noSave=new MdEngine(out.resolve("diagnostic.md"),out.resolve("saves"),backend,selected,false);
         awaitReady(noSave);check(noSave.isReady(),"no-save can start beside existing saved progress");
         noSave.offerInput(0,0);Thread.sleep(180);var neutral=noSave.pollFrame();

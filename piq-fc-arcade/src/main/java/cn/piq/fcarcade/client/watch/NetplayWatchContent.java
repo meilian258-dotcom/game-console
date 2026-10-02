@@ -9,7 +9,9 @@ import java.util.concurrent.Callable;
 
 /** Main-thread capture, bounded worker IO, explicit cancellation; no input or save ownership. */
 public final class NetplayWatchContent {
-    public record Preparation(Callable<CabinetBackend.NetplayContent> load,Runnable cancel) {
+    public record Preparation(Callable<CabinetBackend.NetplayContent> load,Runnable cancel,boolean cabinetTopology) {
+        /** Existing home-console observers retain the two-port timeline. */
+        public Preparation(Callable<CabinetBackend.NetplayContent> load,Runnable cancel){this(load,cancel,false);}
         public Preparation{Objects.requireNonNull(load);Objects.requireNonNull(cancel);}
     }
     @FunctionalInterface public interface Provider {Preparation prepare(WatchNetwork.NetplayStart start,Connection connection)throws Exception;}

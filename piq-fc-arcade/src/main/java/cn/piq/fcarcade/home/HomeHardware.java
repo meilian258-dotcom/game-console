@@ -147,6 +147,9 @@ public final class HomeHardware {
         if (player.isShiftKeyDown()) return InteractionResult.PASS;
         ItemStack held = player.getItemInHand(hand);
         if (!FcCartridgeData.isPlayable(held) || held.getCount() != 1) return InteractionResult.PASS;
+        if(cn.piq.fcarcade.server.ServerArcadeSessions.homeConfigurationBusy(player.serverLevel(),console)){
+            player.displayClientMessage(net.minecraft.network.chat.Component.literal("主机正在准备、运行或保存，请正常关机并等待完成后插卡。"),true);return InteractionResult.CONSUME;
+        }
         if (console.hasCartridge()) return message(player, "card_present");
         if (!FcCartridgeData.romSha(held).matches("[0-9a-f]{64}")) return message(player, "blank_card");
         try {
@@ -183,6 +186,9 @@ public final class HomeHardware {
             var button = HomeApplianceService.tryButton(player,pos,InteractionHand.MAIN_HAND,hit);
             if (button != InteractionResult.PASS) return button;
             if (!console.hasCartridge()) return message(player, "no_card");
+            if(cn.piq.fcarcade.server.ServerArcadeSessions.homeConfigurationBusy(player.serverLevel(),console)){
+                player.displayClientMessage(net.minecraft.network.chat.Component.literal("请先正常关机；准备、运行或保存中不能拔卡。"),true);return InteractionResult.CONSUME;
+            }
             stopEndpoint(console);
             giveOrDrop(player, console.takeCartridge());
             HomeInteractionSounds.play(player.serverLevel(),console.getBlockPos(),HomeInteractionSounds.Action.CARTRIDGE_EJECT);

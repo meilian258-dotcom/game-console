@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 public final class ContentCardDirectories {
     public static Path roms(Path instance,ResourceLocation system){return path(instance,system,"content-cards");}
     public static Path covers(Path instance,ResourceLocation system){return path(instance,system,"content-card-covers");}
+    public static Path metadata(Path instance,ResourceLocation system){return path(instance,system,"content-card-metadata");}
     private static Path path(Path instance,ResourceLocation system,String purpose){
         Path root=ConsoleStorage.location(instance).resolve(purpose).resolve(system.getNamespace()).toAbsolutePath().normalize();
         Path result=root.resolve(system.getPath()).normalize();

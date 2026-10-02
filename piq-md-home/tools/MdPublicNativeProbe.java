@@ -18,7 +18,8 @@ public class MdPublicNativeProbe {
     static final LibretroRuntimes.Backend JNI=LibretroRuntimes.Backend.JNI_TRIAL;
     static void check(boolean b,String why){checks++;if(!b)throw new AssertionError(why);System.out.println("OK "+why);}
     static void waitFor(BooleanSupplier ready,String why)throws Exception{long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(20);while(!ready.getAsBoolean()&&System.nanoTime()<end)Thread.sleep(5);check(ready.getAsBoolean(),why);}
-    static void ready(MdEngine e)throws Exception{waitFor(()->e.isReady()||e.error()!=null,"startup resolves");check(e.isReady(),"engine ready: "+e.error());}
+    static void boot(MdEngine e)throws Exception{waitFor(()->e.isReady()||e.error()!=null,"startup resolves");check(e.isReady(),"engine ready: "+e.error());}
+    static void ready(MdEngine e)throws Exception{boot(e);e.activate();}
     static void free(){check(!MdEngine.active()&&NativeLibretroBridge.availableSlots()==slots,"owner and JNI slot released");}
     static final class Disk {volatile byte[] bytes;Disk(byte[] b){bytes=b;}}
     static final class Pending {final byte[] bytes;final CompletableFuture<Void> ack=new CompletableFuture<>();Pending(byte[] b){bytes=b.clone();}}
@@ -51,7 +52,11 @@ public class MdPublicNativeProbe {
             check(hashes.size()==4,"real six-button ports have four independent visual states");var ram=core.saveMemory().ram();
             check(ram[1]==0x5a&&ram[3]==(byte)0xa5,"both ports wrote separate battery locations");byte[] state=core.serialize();core.run(List.of(new LibretroProcess.Controls(new int[]{0,0},0)),0);core.restore(state);check(Arrays.equals(state,core.serialize()),"real GX state byte restore");
         }slots=NativeLibretroBridge.availableSlots();free();
-        Disk disk=new Disk(null);Channel c=new Channel(disk,true);c.automatic=false;c.gateFinish=true;Sink sink=new Sink();MdEngine e=start(c,sink,true);ready(e);
+        Disk disk=new Disk(null);
+        Channel beforeReady=new Channel(disk,true);Sink beforeSink=new Sink();MdEngine before=start(beforeReady,beforeSink,true);boot(before);before.paused(false);before.offerInput(1,1);Thread.sleep(100);
+        check(beforeSink.frames.get()==0&&!before.canSave()&&!before.requestReset(),"native bootstrap does not open gameplay/input/reset/save before authority ready");
+        check(!before.stopAndSave().get(8,TimeUnit.SECONDS).saved()&&beforeReady.pending.isEmpty()&&beforeReady.finishes.get()==0&&disk.bytes==null,"cancel after restore but before authority ready never overwrites progress");free();
+        Channel c=new Channel(disk,true);c.automatic=false;c.gateFinish=true;Sink sink=new Sink();MdEngine e=start(c,sink,true);ready(e);
         check(e.maxPlayers()==2&&e.canSave(),"public two-player save capability");
         Channel duplicate=new Channel(new Disk(null),true);boolean refused=false;try{start(duplicate,new Sink(),true);}catch(IllegalStateException expected){refused=true;}
         check(refused&&duplicate.aborts.get()==1,"busy engine aborts only the unused new persistence channel");

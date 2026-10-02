@@ -62,7 +62,7 @@ public final class ContentCards {
     private static State state(ServerPlayer p){return STATES.computeIfAbsent(p.getServer(),s->new State());}
     // New content-card storage has no legacy directory to migrate. Resolve only here;
     // directory creation, validation and file reads belong to the bounded IO worker.
-    private static ContentCardStore store(ServerPlayer p,ResourceLocation system){var a=ADAPTERS.get(system);return new ContentCardStore(ContentCardDirectories.roms(p.getServer().getServerDirectory(),system),a.extensions,a.validator,a.maxBytes);}
+    private static ContentCardStore store(ServerPlayer p,ResourceLocation system){var a=ADAPTERS.get(system);return new ContentCardStore(ContentCardDirectories.roms(p.getServer().getServerDirectory(),system),a.extensions,a.validator,a.maxBytes,ContentCardDirectories.metadata(p.getServer().getServerDirectory(),system));}
     private static boolean online(ServerPlayer p,Object connection){return p!=null&&p.getServer()!=null&&p.getServer().isSameThread()&&!p.hasDisconnected()&&p.connection.getConnection()==connection&&p.getServer().getPlayerList().getPlayer(p.getUUID())==p&&p.isAlive()&&!p.isSpectator();}
     public static void open(ServerPlayer p,InteractionHand hand,BlockPos pos,ResourceLocation system){
         var a=ADAPTERS.get(system);if(a==null||!PlayerContentAccess.canBrowse(p)) {say(p,"没有游戏库访问权，请联系管理员。");return;}
@@ -163,7 +163,7 @@ public final class ContentCards {
             else if(m.op()==WRITE&&e.upload==null){
                 if(!PlayerContentAccess.canUseServerRom(p))throw new IllegalArgumentException("没有使用服务器 ROM 的权限");
                 var selected=e.catalog.stream().filter(v->v.hash().equals(m.hash())).findFirst().orElseThrow();
-                String title=ContentCardWorkbench.title(m.name().isBlank()?selected.name():m.name());
+                String title=ContentCardWorkbench.title(m.name().isBlank()?selected.displayName():m.name());
                 job(p,s,e,()->{e.store.read(selected);return selected;},entry->{
                     if(!PlayerContentAccess.canUseServerRom(p))throw new IllegalArgumentException("服务器 ROM 权限已撤销");write(p,e,entry,title);
                 });
@@ -197,7 +197,7 @@ public final class ContentCards {
         job(p,s,e,e.store::scan,scan->{var entries=scan.entries();e.catalog=entries;logFailures(e,scan);var result=ContentCardWorkbench.page(entries,query,page);
             send(p,new Message(LIST,e.system,e.token,e.pos,"",scan.summary("服务器游戏")+(result.total()==0&&!entries.isEmpty()?"；没有匹配搜索结果":""),result.total(),result.index(),scan.diagnostics(),result.entries()));});
     }
-    private static void logFailures(Edit e,ContentCardStore.Scan scan){for(var failure:scan.failures())cn.piq.fcarcade.FcArcadeMod.LOGGER.warn("[ContentCard {}] 扫描拒绝 {}",e.system,failure);}
+    private static void logFailures(Edit e,ContentCardStore.Scan scan){for(var failure:scan.failures())cn.piq.fcarcade.FcArcadeMod.LOGGER.warn("[ContentCard {}] 扫描拒绝 {}",e.system,failure);for(var warning:scan.warnings())cn.piq.fcarcade.FcArcadeMod.LOGGER.warn("[ContentCard {}] 名称警告 {}",e.system,warning);}
     private static void card(ServerPlayer p,Edit e){
         var entry=ContentCardData.read(e.stack,e.system);
         send(p,new Message(CARD,e.system,e.token,e.pos,entry==null?"":entry.hash(),ContentCardData.title(e.stack),

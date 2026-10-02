@@ -38,6 +38,7 @@ public final class MdPublicClient implements MdPublicNetwork.Client,WatchClient.
     private static MdPublicNetwork.Start host;
     private static MdPublicNetwork.Seat seat;
     private static MdEngine engine;
+    private static MdEngine privateOwner;private static UUID privateContent,privateStopping;private static Connection privateConnection;private static ContentCardNetwork.Message privateMessage;
     private static volatile WatchMediaStream publisher;
     private static WatchMediaStream receiver;
     private static WatchAudio audio;
@@ -54,7 +55,7 @@ public final class MdPublicClient implements MdPublicNetwork.Client,WatchClient.
         ContentCardClient.registerRuntime(MdMod.SYSTEM,new ContentCardClient.Runtime(){
             public boolean accept(ContentCardNetwork.Message m){var lane=route(m);return lane==MdContentRouting.Lane.PRIVATE||lane==MdContentRouting.Lane.PUBLIC&&same(m)&&host.rom().equals(m.hash());}
             public String start(ContentCardNetwork.Message m,Path path){
-                if(route(m)==MdContentRouting.Lane.PRIVATE)return PrivateHomeClient.startCartridge(m.system(),m.pos(),path);
+                if(route(m)==MdContentRouting.Lane.PRIVATE){privateContent=m.token();privateMessage=m;privateConnection=Minecraft.getInstance().getConnection().getConnection();return PrivateHomeClient.startCartridge(m.system(),m.pos(),path);}
                 if(!same(m)||!connected()||closing)return "MD 公共开机授权已失效";
                 try{var stream=new WatchMediaStream(host.display().descriptor().source(),host.display().descriptor().hostLease(),true);publisher=stream;
                     engine=new MdEngine(path,LibretroRuntimes.Backend.JNI_TRIAL,NetplaySaveClient.open(connection,host.wire(),host.ticket()),new NetplaySaveState.Identity(host.profile(),host.rom()),host.resume(),stream::offer);
@@ -62,12 +63,12 @@ public final class MdPublicClient implements MdPublicNetwork.Client,WatchClient.
                 }catch(RuntimeException|LinkageError failure){notice("MD 启动失败："+failure.getMessage());shutdown("MD 启动失败");return "MD 公共核心启动失败";}
             }
             public int state(ContentCardNetwork.Message m){return route(m)==MdContentRouting.Lane.PRIVATE?PrivateHomeClient.cartridgeState(m.system(),m.pos()):!same(m)||engine==null||engine.error()!=null||closing?-1:engine.isReady()?1:0;}
-            public void stop(ContentCardNetwork.Message m){var lane=route(m);if(same(m))shutdown("MD 关机，等待最终存档确认");else if(lane==MdContentRouting.Lane.PRIVATE)PrivateHomeClient.stopCartridge(m.system(),m.pos());var c=Minecraft.getInstance().getConnection();if(c!=null)ROUTING.retire(c.getConnection(),m.token());}
+            public void stop(ContentCardNetwork.Message m){var lane=route(m);if(same(m))shutdown("MD 关机，等待最终存档确认");else if(lane==MdContentRouting.Lane.PRIVATE)stopPrivate(m);var c=Minecraft.getInstance().getConnection();if(c!=null)ROUTING.retire(c.getConnection(),m.token());}
             public void reset(ContentCardNetwork.Message m){if(same(m)&&engine!=null){engine.clearInput();engine.requestReset();}else if(route(m)==MdContentRouting.Lane.PRIVATE)PrivateHomeClient.resetCartridge(m.system(),m.pos());}
         });
         ControllerCapture.registerRuntime(MdPublicClient::refreshInput);
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e)->tick());
-        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e)->{shutdown("连接已断开");ROUTING.clear();privatePreference=false;privatePending=0;});
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e)->{shutdown("连接已断开");ROUTING.clear();privatePreference=false;privatePending=0;privateOwner=null;privateContent=null;privateConnection=null;privateStopping=null;privateMessage=null;});
         NeoForge.EVENT_BUS.addListener((RenderLevelStageEvent e)->{if(e.getStage()==RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES){pump();sendInput(false);renderOwn(e);}});
         HomeSyncSettingsScreen.registerDeviceActions(MdMod.SYSTEM,new HomeSyncSettingsScreen.DeviceActions(){
             public void open(Screen parent,net.minecraft.core.BlockPos pos){Minecraft.getInstance().setScreen(new Options(parent));}
@@ -84,8 +85,26 @@ public final class MdPublicClient implements MdPublicNetwork.Client,WatchClient.
         if(!ROUTING.grant(connection,grant.content(),MdContentRouting.Lane.PUBLIC,true)){host=null;InputOwnership.release(OWNER);rejectUnused(grant);notice("MD 仍有前一份下载授权，拒绝新会话。");}
         else WatchClient.controlStarting();
     }
-    private static void rejectUnused(MdPublicNetwork.Start grant){var c=Minecraft.getInstance().getConnection();if(c!=null)try{NetplaySaveClient.open(c.getConnection(),grant.wire(),grant.ticket()).abort();}catch(RuntimeException ignored){}}
-    @Override public void privateStart(MdPublicNetwork.PrivateStart value){var c=Minecraft.getInstance().getConnection();if(c==null)return;if(!value.start()){ROUTING.retire(c.getConnection(),value.content());return;}ROUTING.grant(c.getConnection(),value.content(),MdContentRouting.Lane.PRIVATE,host==null&&seat==null&&!closing&&!MdEngine.active()&&!PrivateHomeClient.isActiveOrClosing());}
+    private static void rejectUnused(MdPublicNetwork.Start grant){var c=Minecraft.getInstance().getConnection();if(c!=null){try{NetplaySaveClient.open(c.getConnection(),grant.wire(),grant.ticket()).abort();}catch(RuntimeException ignored){}MdPublicNetwork.send(new MdPublicNetwork.Closed(grant.wire(),true));}}
+    @Override public void privateStart(MdPublicNetwork.PrivateStart value){var c=Minecraft.getInstance().getConnection();if(c==null)return;var origin=c.getConnection();
+        if(!value.start()){
+            if(ROUTING.route(origin,value.content())==MdContentRouting.Lane.PRIVATE){
+                if(value.content().equals(privateStopping)){/* The original stop future owns this reply. */}
+                else if(value.content().equals(privateContent)&&privateOwner!=null&&privateMessage!=null)stopPrivate(privateMessage);
+                else MdPublicNetwork.send(new MdPublicNetwork.PrivateFinished(value.content(),true,false)); // Grant revoked before owner/download creation.
+            }
+            ROUTING.retire(origin,value.content());return;
+        }
+        if(!ROUTING.grant(origin,value.content(),MdContentRouting.Lane.PRIVATE,host==null&&seat==null&&!closing&&!MdEngine.active()&&!PrivateHomeClient.isActiveOrClosing()))MdPublicNetwork.send(new MdPublicNetwork.PrivateFinished(value.content(),true,false));
+    }
+    @Override public void activate(MdPublicNetwork.Activated value){if(connected()&&!closing&&host!=null&&host.wire()==value.wire()&&engine!=null)engine.activate();}
+    static void privateEngine(MdEngine owner,UUID generation){privateOwner=owner;}
+    @Override public void privateActivate(MdPublicNetwork.PrivateActivated value){if(sameConnection(privateConnection)&&value.content().equals(privateContent)&&privateOwner!=null)privateOwner.activate();}
+    private static void stopPrivate(ContentCardNetwork.Message message){var c=Minecraft.getInstance().getConnection();if(c==null||message.token().equals(privateStopping))return;var origin=c.getConnection();privateStopping=message.token();if(message.token().equals(privateContent))privateOwner=null;
+        PrivateHomeClient.stopCartridgeAndSave(message.system(),message.pos()).whenComplete((result,error)->{
+            boolean closed=error==null&&!MdEngine.active();Minecraft.getInstance().execute(()->{if(sameConnection(origin)){MdPublicNetwork.send(new MdPublicNetwork.PrivateFinished(message.token(),closed,error==null&&result!=null&&result.saved()));if(message.token().equals(privateStopping))privateStopping=null;}});
+        });
+    }
     @Override public void seat(MdPublicNetwork.Seat grant){
         if(seat!=null&&seat.equals(grant))return;
         if(closing||!hardware(grant.display().descriptor())||host!=null&&host.wire()!=grant.wire()||seat!=null&&!seat.loan().equals(grant.loan())||!InputOwnership.acquire(OWNER)){MdPublicNetwork.send(new MdPublicNetwork.Release(grant.wire(),grant.port(),grant.loan()));notice("MD 手柄未接入：请先结束当前本机游戏再领取。");return;}
@@ -166,10 +185,11 @@ public final class MdPublicClient implements MdPublicNetwork.Client,WatchClient.
         if(closing)return;clearControls();seat=null;var previous=host;host=null;InputOwnership.release(OWNER);
         if(previous!=null)ROUTING.retire(connection,previous.content());
         if(publisher!=null){publisher.close();publisher=null;}if(receiver!=null){receiver.close();receiver=null;}if(audio!=null){audio.close();audio=null;}dropTexture();
-        var origin=connection;var stopping=engine;engine=null;if(stopping!=null){closing=true;stopping.stopAndSave().whenComplete((result,failure)->Minecraft.getInstance().execute(()->{closing=false;if(sameConnection(origin))notice(failure!=null?"MD 保存失败；旧档保留":result.message());}));}
+        var origin=connection;var stopping=engine;engine=null;if(stopping!=null){closing=true;stopping.stopAndSave().whenComplete((result,failure)->{boolean closed=failure==null&&!MdEngine.active();Minecraft.getInstance().execute(()->{closing=false;if(sameConnection(origin)){if(previous!=null)MdPublicNetwork.send(new MdPublicNetwork.Closed(previous.wire(),closed));notice(failure!=null?"MD 保存失败；旧档保留":result.message());}});});}
         else if(previous!=null&&connection!=null&&connection.isConnected()){
             // No owner was created: explicitly release the unused authorized channel, not a normal final-save path.
             try{NetplaySaveClient.open(connection,previous.wire(),previous.ticket()).abort();}catch(RuntimeException ignored){}
+            if(sameConnection(origin))MdPublicNetwork.send(new MdPublicNetwork.Closed(previous.wire(),true));
         }
         connection=null;
     }

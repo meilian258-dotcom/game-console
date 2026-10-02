@@ -118,7 +118,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
                     try{
                         if(content.profile().sampleRate()!=48000)throw new IllegalArgumentException("Observer audio requires 48 kHz");
                         netplay=new NetplayProcess(new NetplayProcess.Grant(grant.wire(),grant.ticket(),false,false),content::rom,
-                                chunk->NetplayNetwork.upstream(exact,chunk),content.profile(),content::auxiliary);
+                                chunk->NetplayNetwork.upstream(exact,chunk),content.profile(),content::auxiliary,captured.cabinetTopology());
                         NetplayNetwork.bind(exact,netplay);netplay.start();audio=new WatchAudio();
                     }catch(Exception|LinkageError bad){nativeFailure(bad);}
                 });

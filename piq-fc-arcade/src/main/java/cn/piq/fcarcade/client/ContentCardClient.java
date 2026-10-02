@@ -1,6 +1,7 @@
 package cn.piq.fcarcade.client;
 
 import cn.piq.fcarcade.home.content.*;
+import cn.piq.fcarcade.home.content.ContentCardCatalog.Choice;
 import cn.piq.fcarcade.client.rom.LocalRomPickerScreen;
 import cn.piq.fcarcade.client.ui.DeviceScreen;
 import cn.piq.fcarcade.client.ui.DeviceUi;
@@ -141,7 +142,6 @@ public final class ContentCardClient {
         List<Choice> locals=List.of();int searchTicks=-1;
         cn.piq.fcarcade.client.ui.DeviceLayout.Browser layout;
         cn.piq.fcarcade.client.ui.CartridgeWorkbenchLayout bar;
-        private record Choice(String name,int size,String hash,Path path){}
         Writer(Message open){super(Component.literal("游戏卡带 · 老式电脑"));this.open=open;connection=Minecraft.getInstance().getConnection();status=open.name();gamesCatalog.beginServer(System.nanoTime());}
         void refreshWidgets(){if(minecraft!=null&&minecraft.screen==this)rebuildWidgets();}
         void button(String text,int x,int y,int w,Runnable action,boolean enabled){addRenderableWidget(DeviceUi.button(font,text,x,y,w,20,action,enabled,DeviceUi.Tone.NORMAL));}
@@ -156,11 +156,9 @@ public final class ContentCardClient {
         Path romDirectory(){return ContentCardDirectories.roms(minecraft.gameDirectory.toPath(),open.system());}
         Path coverDirectory(){return ContentCardDirectories.covers(minecraft.gameDirectory.toPath(),open.system());}
         List<Choice> shown(){
-            var local=locals.stream().filter(c->c.name.toLowerCase(Locale.ROOT).contains(query.strip().toLowerCase(Locale.ROOT))).toList();
-            if(localMode)return local;
-            var server=entries.stream().map(e->new Choice(e.name(),e.size(),e.hash(),null)).toList();
-            if(!features().covers()||page!=0)return server;
-            var all=new ArrayList<Choice>(server);all.addAll(local);return List.copyOf(all);
+            if(localMode)return ContentCardCatalog.page(List.of(),locals,query,true,false);
+            boolean useServer=has(coversTab?cn.piq.fcarcade.access.PlayerContentPolicy.SERVER_COVER_USE:cn.piq.fcarcade.access.PlayerContentPolicy.SERVER_ROM_USE);
+            return ContentCardCatalog.page(entries,locals,query,features().covers()&&page==0,useServer);
         }
         @Override protected void init(){
             DeviceUi.prepare();
@@ -190,9 +188,9 @@ public final class ContentCardClient {
             button("刷新",bar.refresh(),()->{view=0;scanLocal();if(!localMode)requestPage(0);},ready());
             var list=shown();int rows=layout.rows();view=Math.min(view,Math.max(0,(list.size()-1)/rows));int from=view*rows;
             for(int i=0;i<Math.min(rows,list.size()-from);i++){var c=list.get(from+i);var r=layout.row(i);
-                addRenderableWidget(DeviceUi.row(font,c.name,c.path!=null?"本地":"服务器",r.x(),r.y(),r.width(),r.height(),()->{
-                    selected=c;if(!coversTab)draft=c.name.replaceFirst("(?i)\\.[^.]+$","");status="已选中，尚未写入；确认名称和来源后点击写入。";refreshWidgets();
-                },c.equals(selected),coversTab?cover.equals(c.hash):current!=null&&current.hash().equals(c.hash),ready()));}
+                addRenderableWidget(DeviceUi.row(font,c.name(),c.source(),r.x(),r.y(),r.width(),r.height(),()->{
+                    selected=c;if(!coversTab)draft=c.name().replaceFirst("(?i)\\.[^.]+$","");status="已选中，尚未写入；确认名称和来源后点击写入。";refreshWidgets();
+                },c.equals(selected),coversTab?cover.equals(c.hash()):current!=null&&current.hash().equals(c.hash()),ready()));}
             button("ROM目录",bar.romFolder(),()->openDirectory(romDirectory()),ready());
             button(features().covers()?"封面目录":"选择文件…",bar.coverFolder(),features().covers()?()->openDirectory(coverDirectory()):this::local,ready());
             button("上一页",bar.previous(),()->{if(view>0){view--;refreshWidgets();}else requestPage(page-1);},ready()&&(view>0||!localMode&&!catalog().serverPending()&&page>0));
@@ -206,9 +204,9 @@ public final class ContentCardClient {
                 var r=bar.restoreCover();var b=DeviceUi.button(font,"存档库",r.x(),r.y(),r.width(),r.height(),this::saveLibrary,writable()&&current!=null&&features().publicSaves(),DeviceUi.Tone.NORMAL);
                 b.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal(features().publicSaves()?"查看当前游戏的真实服务器进度；不显示或上传私人本机档。":"此版本只有本机个人进度；服务器个人/卡带存档库尚未接入。")));addRenderableWidget(b);
             }
-            boolean permitted=selected!=null&&has(coversTab?(selected.path==null?cn.piq.fcarcade.access.PlayerContentPolicy.SERVER_COVER_USE:cn.piq.fcarcade.access.PlayerContentPolicy.COVER_UPLOAD)
-                    :selected.path==null?cn.piq.fcarcade.access.PlayerContentPolicy.SERVER_ROM_USE:cn.piq.fcarcade.access.PlayerContentPolicy.ROM_UPLOAD);
-            button(coversTab?(selected!=null&&selected.path!=null?"上传并应用封面":"应用服务器封面"):selected!=null&&selected.path!=null?"上传并写入卡带":"写入卡带",layout.primary(),this::confirm,writable()&&permitted);
+            boolean permitted=selected!=null&&has(coversTab?(selected.path()==null?cn.piq.fcarcade.access.PlayerContentPolicy.SERVER_COVER_USE:cn.piq.fcarcade.access.PlayerContentPolicy.COVER_UPLOAD)
+                    :selected.path()==null?cn.piq.fcarcade.access.PlayerContentPolicy.SERVER_ROM_USE:cn.piq.fcarcade.access.PlayerContentPolicy.ROM_UPLOAD);
+            button(coversTab?(selected!=null&&selected.path()!=null?"上传并应用封面":"应用服务器封面"):selected!=null&&selected.path()!=null?"上传并写入卡带":"写入卡带",layout.primary(),this::confirm,writable()&&permitted);
         }
         private void tab(boolean covers){
             coversTab=covers;query="";selected=null;view=0;var previous=covers?coverPage:gamePage;
@@ -244,11 +242,11 @@ public final class ContentCardClient {
                     if(closed||writer!=this||minecraft.getConnection()!=connection)return;
                     if(failure!=null)state.localFailure(failure);
                     else{
-                        var found=scan.entries().stream().map(e->new Choice(e.name(),e.size(),e.hash(),dir.resolve(e.name()))).toList();
+                        var found=scan.entries().stream().map(e->new Choice(e.displayName(),e.size(),e.hash(),dir.resolve(e.name()))).toList();
                         if(coverScan)localCovers=found;else localGames=found;
-                        state.localSuccess(scan.summary("本地"),scan.failures().stream().map(Object::toString).collect(java.util.stream.Collectors.joining("\n")));
+                        state.localSuccess(scan.summary("本地"),new String(scan.diagnostics(),java.nio.charset.StandardCharsets.UTF_8));
                         for(var rejected:scan.failures())cn.piq.fcarcade.FcArcadeMod.LOGGER.warn("[ContentCard {} 本地] 扫描拒绝 {}",open.system(),rejected);
-                        if(coverScan==coversTab){locals=found;view=0;if(selected!=null&&selected.path!=null&&!locals.contains(selected))selected=null;}
+                        if(coverScan==coversTab){locals=found;view=0;if(selected!=null&&selected.path()!=null&&!locals.contains(selected))selected=null;}
                     }
                     refreshWidgets();});
             });}catch(RejectedExecutionException full){state.localFailure("读取队列繁忙，请重试");refreshWidgets();}
@@ -266,7 +264,7 @@ public final class ContentCardClient {
             var a=ContentCards.adapter(open.system());if(a==null)return;
             minecraft.setScreen(new LocalRomPickerScreen(Component.literal("选择游戏（尚未上传或写卡）"),directory(),a.extensions(),Set.of(),"返回工作台确认后才上传；需要管理终端授予上传权限",path->{
                 if(closed||writer!=this||Minecraft.getInstance().getConnection()!=connection)return;
-                selected=new Choice(path.getFileName().toString(),0,"",path);draft=selected.name.replaceFirst("(?i)\\.[^.]+$","");
+                selected=new Choice(path.getFileName().toString(),0,"",path);draft=selected.name().replaceFirst("(?i)\\.[^.]+$","");
                 status="已选本地文件，尚未上传；点击上传并写入卡带确认。";minecraft.setScreen(this);
             },()->{if(!closed&&writer==this&&Minecraft.getInstance().getConnection()==connection)minecraft.setScreen(this);else minecraft.setScreen(null);}));
         }
@@ -275,11 +273,11 @@ public final class ContentCardClient {
             if(coversTab){confirmCover();return;}
             final String title;try{title=ContentCardWorkbench.title(draft);}catch(IllegalArgumentException error){status=error.getMessage();return;}
             var choice=selected;
-            if(choice.path==null){
+            if(choice.path()==null){
                 loading=true;last=System.nanoTime();status="正在校验并写卡…";
-                send(msg(WRITE,open.system(),open.token(),open.pos(),choice.hash,title,0,0,new byte[0]));refreshWidgets();return;
+                send(msg(WRITE,open.system(),open.token(),open.pos(),choice.hash(),title,0,0,new byte[0]));refreshWidgets();return;
             }
-            Path path=choice.path,dir=directory();var a=ContentCards.adapter(open.system());
+            Path path=choice.path(),dir=directory();var a=ContentCards.adapter(open.system());
             loading=true;last=System.nanoTime();status="确认上传：读取并校验本地游戏…";refreshWidgets();
                 try{IO.execute(()->{byte[] data=null;String error=null;String digest=null;try{data=new ContentCardStore(dir,a.extensions(),a.validator(),a.maxBytes()).readPath(path);digest=ContentCardStore.hash(data);new ContentCardStore.Entry(digest,path.getFileName().toString(),data.length);}catch(Exception failure){error=failure.getMessage();}
                     var bytes=data;var failure=error;var hash=digest;minecraft.execute(()->{
@@ -290,12 +288,12 @@ public final class ContentCardClient {
                 });}catch(RejectedExecutionException full){loading=false;status="读取队列繁忙";rebuildWidgets();}
         }
         private void confirmCover(){
-            var choice=selected;if(choice.path==null){applyCover(choice.hash);return;}
+            var choice=selected;if(choice.path()==null){applyCover(choice.hash());return;}
             loading=true;last=System.nanoTime();status="校验并上传封面…";refreshWidgets();
             try{IO.execute(()->{
                 byte[] bytes=null;String failure=null;
                 try{
-                    bytes=cn.piq.fcarcade.home.CartridgeCoverCodec.prepare(localCoverStore(coverDirectory()).readPath(choice.path));
+                    bytes=cn.piq.fcarcade.home.CartridgeCoverCodec.prepare(localCoverStore(coverDirectory()).readPath(choice.path()));
                 }catch(Exception error){failure=error.getMessage();}
                 var png=bytes;var error=failure;minecraft.execute(()->{
                     if(closed||writer!=this||minecraft.getConnection()!=connection)return;
@@ -336,7 +334,7 @@ public final class ContentCardClient {
             var list=layout.list();var detail=layout.details();
             DeviceUi.section(g,list.x(),list.y(),list.width(),list.height());DeviceUi.section(g,detail.x(),detail.y(),detail.width(),detail.height());
             if(shown().isEmpty())DeviceUi.text(g,font,catalog().localPending()||catalog().serverPending()?"正在读取；本地与服务器独立扫描…":catalog().hasFailure()?"扫描存在失败；点击底部状态栏查看原因":query.isBlank()?(coversTab?"目录暂无封面":"目录暂无游戏"):"没有匹配名称",list.x()+6,list.y()+8,list.width()-12,DeviceUi.MUTED);
-            String info=selected==null?(coversTab?"选择封面后应用":"选择游戏后预览")+"\n点击写入才修改卡带":"待写入："+selected.name+"\n来源："+(selected.path==null?"服务器（无需上传）":"本地（确认后上传）")+"\n"+(selected.size>1?selected.size+" 字节":"将检查文件大小");
+            String info=selected==null?(coversTab?"选择封面后应用":"选择游戏后预览")+"\n点击写入才修改卡带":"待写入："+selected.name()+"\n来源："+selected.source()+(selected.path()==null?"（无需上传）":"（确认后上传）")+"\n"+(selected.size()>1?selected.size()+" 字节":"将检查文件大小")+"\n内容 ID："+selected.hash();
             var lines=font.split(Component.literal(info),detail.width()-12);
             int detailBottom=features().covers()?bar.clearCover().y():layout.primary().y();
             for(int i=0;i<Math.min(lines.size(),Math.max(0,(detailBottom-detail.y()-8)/10));i++)g.drawString(font,lines.get(i),detail.x()+6,detail.y()+5+i*10,DeviceUi.TEXT,false);

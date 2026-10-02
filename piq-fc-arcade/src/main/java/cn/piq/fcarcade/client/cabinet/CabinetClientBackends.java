@@ -85,11 +85,16 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         var factory=provider.prepareNetplayFactory();
         var key=CabinetGameSelection.key(target.dimension(),target.identity(),start.backend()).orElseThrow();
         var request=new CabinetNetwork.Launch(target,start.backend(),start.watch().lease());
+        // Match the host timeline shape, not its authority: WatchClient still grants port -1 and host/player=false.
+        boolean cabinetTopology=PgmServicePolicy.supportsBackend(start.backend().toString())
+                ||CabinetCoinPolicy.supported(start.backend().toString())
+                &&mc.level.getBlockEntity(target.anchor()) instanceof cn.piq.fcarcade.world.LegacyFcArcadeBlockEntity cabinet
+                &&cabinet.coinRequired();
         return new cn.piq.fcarcade.client.watch.NetplayWatchContent.Preparation(()->{
             Path path=CabinetSharedGames.resolve(request,null,false,provider,key,connection);
             if(!start.romHash().equals(CabinetSharedGames.resolvedHash(request.lease())))throw new IllegalStateException("旁观游戏已改变");
             return factory.open(path);
-        },()->CabinetSharedGames.cancel(request.lease()));
+        },()->CabinetSharedGames.cancel(request.lease()),cabinetTopology);
     }
     static boolean configure(CabinetNetwork.Menu menu,ResourceLocation selected){
         var mc=Minecraft.getInstance();

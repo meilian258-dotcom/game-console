@@ -4,6 +4,7 @@ package cn.piq.mdhome;
 import cn.piq.fcarcade.cabinet.*;
 import cn.piq.fcarcade.home.*;
 import cn.piq.fcarcade.home.content.*;
+import cn.piq.fcarcade.home.flow.HomeLaunchServer;
 import cn.piq.fcarcade.netplay.*;
 import cn.piq.mdhome.save.MdPublicSaves;
 import java.util.*;
@@ -34,28 +35,29 @@ public final class MdPublicServer implements WatchProvider {
     private static Map<UUID,Session> sessions(MinecraftServer s){return SESSIONS.computeIfAbsent(s,k->new HashMap<>());}
     private static Session session(MdConsole c){return c.getLevel() instanceof net.minecraft.server.level.ServerLevel l?sessions(l.getServer()).get(c.hardwareId()):null;}
     public static boolean running(MdConsole c){return session(c)!=null;}
-    public static boolean allowedPort(MdConsole c,int port){var s=session(c);return s==null||port==0||s.plan.multiplayer();}
+    public static boolean allowedPort(MdConsole c,int port){var s=session(c);return s==null||!s.closing&&(port==0||s.plan.allowSecondPort());}
     public static boolean start(ServerPlayer p,MdConsole c,HomeSystems.Connection link,ContentCardStore.Entry entry){
         if(!CabinetHostingConfig.playerAllowed()||c.synchronizationMode()!=CabinetSyncMode.MEDIA||c.netplayExperimental()){say(p,"MD 公开游玩仅支持玩家串流；该模式未启用，请检查服务器设置。");return false;}
         if(!current(p)||c.running()||sessions(p.getServer()).size()>=16||participant(p.getServer(),p.getUUID())){say(p,"已有 MD 会话或会话已满，请先结束原会话。");return false;}
-        MdPublicSaves.choose(p,c,link,entry,plan->begin(p,c,link,entry,plan));
-        return c.running();
+        MdPublicSaves.choose(p,c,link,entry,(plan,flow)->begin(p,c,link,entry,plan,flow));return c.running();
     }
-    private static void begin(ServerPlayer p,MdConsole c,HomeSystems.Connection link,ContentCardStore.Entry entry,MdPublicSaves.SavePlan plan){
-        if(!current(p)||!CabinetHostingConfig.playerAllowed()||c.synchronizationMode()!=CabinetSyncMode.MEDIA||c.netplayExperimental()||c.running()||sessions(p.getServer()).size()>=16||!HomeSystems.isCurrent(link)||!link.television().powered()||!c.usable(p)||participant(p.getServer(),p.getUUID())){MdPublicSaves.cancel(p.getServer(),c.hardwareId());return;}
-        long wire=NetplayNetwork.nextAddonId();var s=new Session(p,c,link,entry,plan,wire);
+    private static void begin(ServerPlayer p,MdConsole c,HomeSystems.Connection link,ContentCardStore.Entry entry,MdPublicSaves.SavePlan plan,HomeLaunchServer.Handle flow){
+        if(!current(p)||!CabinetHostingConfig.playerAllowed()||c.synchronizationMode()!=CabinetSyncMode.MEDIA||c.netplayExperimental()||c.running()||sessions(p.getServer()).size()>=16||!HomeSystems.isCurrent(link)||!link.television().powered()||!c.usable(p)||participant(p.getServer(),p.getUUID())){flow.fail("开局条件已变化，原进度保留");return;}
+        long wire=NetplayNetwork.nextAddonId();var s=new Session(p,c,link,entry,plan,wire,flow);
         try{MdPublicSaves.attach(p.getServer(),wire,s.connection,s.ticket,plan);}
-        catch(RuntimeException error){MdPublicSaves.cancel(p.getServer(),c.hardwareId());say(p,"MD 存档尚未准备好："+error.getMessage());return;}
-        sessions(p.getServer()).put(c.hardwareId(),s);c.publicPower(s.source,p.getUUID());
+        catch(RuntimeException error){flow.fail("MD 存档尚未准备好："+error.getMessage());return;}
+        sessions(p.getServer()).put(c.hardwareId(),s);c.publicPreparing(s.source,p.getUUID());
         s.content=ContentCards.play(p,MdMod.SYSTEM,c.getBlockPos(),entry,()->valid(s),ready->{
             if(session(c)!=s)return;
-            if(!ready)stop(c,"主持端停止或启动失败");else{s.ready=true;refreshSeats(s);}
+            if(!ready)stop(c,"主持端停止或启动失败");else if(!s.closing&&flow.ready()){
+                if(plan.enabled()&&!NetplaySaveServer.activate(p.getServer(),wire,s.connection)){stop(c,"存档写入授权未确认；开局取消，旧档保留");return;}
+                c.publicPower(s.source,p.getUUID());s.ready=true;MdPublicNetwork.send(p,new MdPublicNetwork.Activated(wire));refreshSeats(s);HomeInteractionSounds.play(p.serverLevel(),c.getBlockPos(),HomeInteractionSounds.Action.POWER_ON);
+            }else if(!s.closing)stop(c,"开局确认已失效");
         });
         if(s.content==null){stop(c,"MD 内容下载服务忙，请稍后重试");return;}
         MdPublicNetwork.send(p,new MdPublicNetwork.Start(wire,s.ticket,s.content,display(s),plan.enabled(),plan.resume(),plan.identity().profile(),plan.identity().content()));
-        if(!plan.multiplayer())c.clearLoan(1);
-        HomeInteractionSounds.play(p.serverLevel(),c.getBlockPos(),HomeInteractionSounds.Action.POWER_ON);
-        say(p,plan.multiplayer()?"正在启动 MD 公开双人串流；点击机身两只手柄取用。":"正在启动 MD 公开单人串流；附近玩家可旁观。");
+        if(!plan.allowSecondPort())c.clearLoan(1);
+        say(p,plan.allowSecondPort()?"正在启动 MD 公开双人串流；就绪后可取两只手柄。":"正在启动 MD 公开单人串流；就绪后附近玩家可旁观。");
     }
     private static boolean valid(Session s){
         return session(s.console)==s&&CabinetHostingConfig.playerAllowed()&&current(s.host)&&s.host.connection.getConnection()==s.connection&&s.host.serverLevel()==s.link.level()
@@ -65,25 +67,33 @@ public final class MdPublicServer implements WatchProvider {
             &&s.host.serverLevel().getWorldBorder().isWithinBounds(s.console.getBlockPos())&&s.host.serverLevel().getWorldBorder().isWithinBounds(s.link.television().getBlockPos());
     }
     static boolean cardUnchanged(ItemStack physical,ItemStack snapshot,ItemStack current){return current==physical&&current.getCount()==1&&ItemStack.isSameItemSameComponents(snapshot,current);}
+    public static void cancelStart(MdConsole c,String reason){var s=session(c);if(s!=null)stop(c,reason);}
     public static void stop(MdConsole c,String reason){
-        var s=session(c);if(c.getLevel() instanceof net.minecraft.server.level.ServerLevel l)MdPublicSaves.cancel(l.getServer(),c.hardwareId());
-        if(s==null)return;
-        sessions(s.host.getServer()).remove(c.hardwareId());c.publicStopped();
-        NetplaySaveServer.retire(s.host.getServer(),s.wire);
+        var s=session(c);if(s==null){if(c.getLevel() instanceof net.minecraft.server.level.ServerLevel l)MdPublicSaves.cancel(l.getServer(),c.hardwareId());return;}
+        if(s.closing)return;boolean wasReady=s.ready;s.closing=true;s.ready=false;s.closeDeadline=Integer.toUnsignedLong(s.host.getServer().getTickCount())+1600;s.flow.beginStopping();
+        if(wasReady)NetplaySaveServer.retire(s.host.getServer(),s.wire);else NetplaySaveServer.abort(s.host.getServer(),s.wire,s.connection,"MD 开局尚未就绪；撤销写入，旧档保留");
         for(int port=0;port<2;port++)revoke(s,port,reason);
+        boolean awaiting=wasReady&&s.plan.enabled()&&NetplaySaveServer.awaitFinish(s.host.getServer(),s.wire,s.connection,result->{s.saveDone=true;s.saveSuccess=result.clean()&&result.persisted();s.finishReason=result.reason();maybeFinish(s);});
         if(current(s.host)&&s.host.connection.getConnection()==s.connection){
             MdPublicNetwork.send(s.host,new MdPublicNetwork.End(s.wire,ZERO,true,reason));
             if(s.content!=null)ContentCards.stop(s.host,s.content);
         }
+        if(!awaiting){s.saveDone=true;s.saveSuccess=!s.plan.enabled()||!wasReady;s.finishReason=!wasReady?"MD 开局已取消，原进度保留":!s.plan.enabled()?"MD 已关闭；本局不保存，旧档保留":"MD 最终保存通道不可用；最近确认进度保留";}
+        if(s.content==null)s.runtimeDone=true;maybeFinish(s);
     }
-    public static void reset(ServerPlayer p,MdConsole c){var s=session(c);if(s!=null&&s.host==p&&valid(s)&&s.content!=null)ContentCards.reset(p,s.content);else say(p,"仅当前开机玩家可重置此公共游戏。");}
+    public static void closed(ServerPlayer player,MdPublicNetwork.Closed reply){for(var s:List.copyOf(sessions(player.getServer()).values()))if(s.wire==reply.wire()&&s.host==player&&s.connection==player.connection.getConnection()){
+        if(!s.closing)stop(s.console,"MD 主持核心已结束");if(session(s.console)!=s)return;s.runtimeDone=true;s.runtimeClosed=reply.closed();maybeFinish(s);return;
+    }}
+    private static void maybeFinish(Session s){if(s.saveDone&&s.runtimeDone)finish(s,s.saveSuccess&&s.runtimeClosed,s.runtimeClosed?s.finishReason:"MD 核心关闭未确认；已落盘版本保留，请正常重启客户端");}
+    private static void finish(Session s,boolean success,String reason){if(session(s.console)!=s)return;sessions(s.host.getServer()).remove(s.console.hardwareId());s.console.publicStopped();s.flow.finished(success,reason);}
+    public static void reset(ServerPlayer p,MdConsole c){var s=session(c);if(s!=null&&s.ready&&!s.closing&&s.host==p&&valid(s)&&s.content!=null)ContentCards.reset(p,s.content);else say(p,"仅当前开机玩家可重置已就绪的公共游戏。");}
     public static void loanChanged(MdConsole c){var s=session(c);if(s!=null&&s.ready)refreshSeats(s);}
     private static boolean participant(MinecraftServer server,UUID player){return sessions(server).values().stream().anyMatch(s->s.host.getUUID().equals(player)||Arrays.stream(s.seats).anyMatch(a->a!=null&&a.player.getUUID().equals(player)));}
     private static void refreshSeats(Session s){
         for(int port=0;port<2;port++){
             UUID loan=s.console.loan(port),borrower=s.console.borrower(port);var old=s.seats[port];
             var p=borrower==null?null:s.host.getServer().getPlayerList().getPlayer(borrower);
-            boolean allowed=(port==0||s.plan.multiplayer())&&p!=null&&s.console.authorized(p,port,loan,false)
+            boolean allowed=!s.closing&&(port==0||s.plan.allowSecondPort())&&p!=null&&s.console.authorized(p,port,loan,false)
                 &&(p==s.host||!sessions(p.getServer()).values().stream().anyMatch(other->other!=s&&(other.host==p||Arrays.stream(other.seats).anyMatch(a->a!=null&&a.player==p))));
             if(old!=null&&(!allowed||old.player!=p||old.connection!=p.connection.getConnection()||!old.loan.equals(loan)))revoke(s,port,"手柄授权已撤销");
             if(allowed&&s.seats[port]==null){var seat=new SeatLease(p,loan,s.wire,port);s.seats[port]=seat;MdPublicNetwork.send(p,new MdPublicNetwork.Seat(s.wire,display(s),port,loan));}
@@ -124,6 +134,7 @@ public final class MdPublicServer implements WatchProvider {
     @SubscribeEvent public static void tick(ServerTickEvent.Post event){
         var server=event.getServer();PRIVATE.removeIf(c->!c.isConnected());
         for(var s:List.copyOf(sessions(server).values())){
+            if(s.closing){if(Integer.toUnsignedLong(server.getTickCount())>=s.closeDeadline)finish(s,false,"MD 结束等待超时；最后进度或核心关闭未确认，旧档保留");continue;}
             if(!valid(s)){stop(s.console,"MD 主持或电视连接已失效；正在结束并保存");continue;}
             if(!s.ready)continue;refreshSeats(s);
             for(int port=0;port<2;port++){var seat=s.seats[port];if(seat!=null){
@@ -152,8 +163,9 @@ public final class MdPublicServer implements WatchProvider {
     private static final class Session {
         final ServerPlayer host;final Connection connection;final MdConsole console;final HomeSystems.Connection link;final ContentCardStore.Entry entry;
         final ItemStack card,cardSnapshot;final MdPublicSaves.SavePlan plan;final long wire;final UUID ticket=UUID.randomUUID(),source=UUID.randomUUID(),hostLease=UUID.randomUUID();
-        final WatchSource watch;final SeatLease[] seats=new SeatLease[2];UUID content;boolean ready;
-        Session(ServerPlayer p,MdConsole c,HomeSystems.Connection link,ContentCardStore.Entry entry,MdPublicSaves.SavePlan plan,long wire){
+        final HomeLaunchServer.Handle flow;final WatchSource watch;final SeatLease[] seats=new SeatLease[2];UUID content;boolean ready,closing,saveDone,saveSuccess,runtimeDone,runtimeClosed=true;long closeDeadline;String finishReason="";
+        Session(ServerPlayer p,MdConsole c,HomeSystems.Connection link,ContentCardStore.Entry entry,MdPublicSaves.SavePlan plan,long wire,HomeLaunchServer.Handle flow){
+            this.flow=flow;
             host=p;connection=p.connection.getConnection();console=c;this.link=link;this.entry=entry;card=c.cartridge();cardSnapshot=card.copy();this.plan=plan;this.wire=wire;
             watch=new WatchSource(new WatchDescriptor(MdMod.SYSTEM,source,hostLease,link.level().dimension().location(),new WatchAnchor(c.getBlockPos(),c.hardwareId()),c.linkId(),List.of(new WatchAnchor(link.television().getBlockPos(),link.television().hardwareId()))),p.getUUID());
         }

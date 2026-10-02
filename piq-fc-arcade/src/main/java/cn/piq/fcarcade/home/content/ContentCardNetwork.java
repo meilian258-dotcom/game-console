@@ -29,19 +29,19 @@ public final class ContentCardNetwork {
         public static final StreamCodec<RegistryFriendlyByteBuf,Message> CODEC=StreamCodec.of((b,m)->{
             b.writeByte(m.op);b.writeResourceLocation(m.system);b.writeUUID(m.token);b.writeBlockPos(m.pos);b.writeUtf(m.hash,64);b.writeUtf(m.name,256);
             b.writeVarInt(m.size);b.writeVarInt(m.offset);b.writeByteArray(m.data);b.writeVarInt(m.entries.size());
-            for(var e:m.entries){b.writeUtf(e.hash(),64);b.writeUtf(e.name(),128);b.writeVarInt(e.size());}
+            for(var e:m.entries){b.writeUtf(e.hash(),64);b.writeUtf(e.name(),128);b.writeVarInt(e.size());b.writeUtf(e.displayName(),128);}
         },b->{
             int op=b.readUnsignedByte();var system=b.readResourceLocation();var token=b.readUUID();var pos=b.readBlockPos();
             var hash=b.readUtf(64);var name=b.readUtf(256);int size=b.readVarInt(),offset=b.readVarInt();var data=b.readByteArray(ContentCardStore.CHUNK);
             int n=b.readVarInt();if(n<0||n>8)throw new IllegalArgumentException("Card page too large");
-            var list=new ArrayList<ContentCardStore.Entry>();for(int i=0;i<n;i++)list.add(new ContentCardStore.Entry(b.readUtf(64),b.readUtf(128),b.readVarInt()));
+            var list=new ArrayList<ContentCardStore.Entry>();for(int i=0;i<n;i++)list.add(new ContentCardStore.Entry(b.readUtf(64),b.readUtf(128),b.readVarInt(),b.readUtf(128)));
             return new Message(op,system,token,pos,hash,name,size,offset,data,list);
         });
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     public static Message msg(int op,ResourceLocation system,UUID token,BlockPos pos,String hash,String name,int size,int offset,byte[] data){return new Message(op,system,token,pos,hash,name,size,offset,data,List.of());}
     public static void register(RegisterPayloadHandlersEvent event){
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"content-card-4").playBidirectional(Message.TYPE,Message.CODEC,
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"content-card-5").playBidirectional(Message.TYPE,Message.CODEC,
             (m,c)->c.enqueueWork(()->{
                 if(c.flow().isClientbound())Client.receive(m,c.connection());
                 else if(c.player() instanceof ServerPlayer p)ContentCards.handle(p,m);

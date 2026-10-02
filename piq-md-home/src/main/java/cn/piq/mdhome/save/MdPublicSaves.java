@@ -3,6 +3,7 @@ package cn.piq.mdhome.save;
 
 import cn.piq.fcarcade.home.*;
 import cn.piq.fcarcade.home.content.*;
+import cn.piq.fcarcade.home.flow.*;
 import cn.piq.fcarcade.netplay.*;
 import cn.piq.mdhome.*;
 import cn.piq.retro.storage.ConsoleStorage;
@@ -24,26 +25,27 @@ import static cn.piq.fcarcade.home.CartridgeSaveNetwork.*;
 
 /** Server-thread capabilities and bounded metadata IO. This is not a Netplay emulator. */
 public final class MdPublicSaves {
-    public record SavePlan(NetplaySaveState.Identity identity,boolean enabled,boolean resume,boolean multiplayer,
-                           String ownerKey,String name,int slot,String expectedVersion,Path root){}
+    public record SavePlan(NetplaySaveState.Identity identity,boolean enabled,boolean resume,int savePlayers,boolean allowSecondPort,
+                           String ownerKey,String name,int slot,String expectedVersion,Path root){
+        public SavePlan withJoin(boolean allowed){return new SavePlan(identity,enabled,resume,savePlayers,allowed,ownerKey,name,slot,expectedVersion,root);}
+    }
     private static final Map<MinecraftServer,State> STATES=new WeakHashMap<>();
     private static final MdSaveTransactions TRANSACTIONS=new MdSaveTransactions();
     private static final ThreadPoolExecutor IO=new ThreadPoolExecutor(1,1,0,TimeUnit.SECONDS,new ArrayBlockingQueue<>(16),r->{var t=new Thread(r,"GameConsole-MD-save-catalog");t.setDaemon(true);return t;},new ThreadPoolExecutor.AbortPolicy());
     private static boolean installed;
     private static final class State {
-        final Map<UUID,Pending> pending=new HashMap<>();final Map<UUID,Library> libraries=new HashMap<>();final Map<UUID,String> retiringOwners=new HashMap<>();boolean closed;
+        final Map<UUID,Pending> pending=new HashMap<>();final Map<UUID,HomeLaunchServer.Key> launches=new HashMap<>();final Map<UUID,Library> libraries=new HashMap<>();final Map<UUID,String> retiringOwners=new HashMap<>();boolean closed;
     }
     private static final class Pending {
         final ServerPlayer player;final Connection connection;final MdConsole console;final HomeSystems.Connection link;
-        final ContentCardStore.Entry entry;final ItemStack snapshot;final UUID card,playerId,token=UUID.randomUUID();final int mode,maxPlayers;
-        final Consumer<SavePlan> chosen;final long deadline;List<MdSaveNetwork.Slot> rows=List.of();boolean loading;
-        Pending(ServerPlayer p,MdConsole c,HomeSystems.Connection l,ContentCardStore.Entry e,Consumer<SavePlan> callback){
+        final ContentCardStore.Entry entry;final ItemStack snapshot;final UUID card,playerId;final int mode,maxPlayers;
+        Pending(ServerPlayer p,MdConsole c,HomeSystems.Connection l,ContentCardStore.Entry e){
             player=p;playerId=p.getUUID();connection=p.connection.getConnection();console=c;link=l;entry=e;card=ContentCardData.ensureId(c.cartridge());
-            c.setChanged();snapshot=c.cartridge().copy();mode=ContentCardData.saveMode(snapshot);maxPlayers=Math.min(2,ContentCardData.players(snapshot));chosen=callback;deadline=tick(p.getServer())+1200;
+            c.setChanged();snapshot=c.cartridge().copy();mode=ContentCardData.saveMode(snapshot);maxPlayers=Math.min(2,ContentCardData.players(snapshot));
         }
-        boolean valid(){return online(player,connection)&&tick(player.getServer())<deadline&&player.serverLevel()==link.level()
+        boolean valid(){return online(player,connection)&&player.serverLevel()==link.level()
                 &&!console.isRemoved()&&!console.running()&&HomeSystems.isCurrent(link)&&link.television().powered()
-                &&player.distanceToSqr(console.getBlockPos().getCenter())<=64&&HomeHardware.mayUse(player,console.getBlockPos())
+                &&console.usable(player)&&HomeHardware.mayUse(player,console.getBlockPos())
                 &&HomeHardware.mayUse(player,link.television().getBlockPos())&&ItemStack.isSameItemSameComponents(snapshot,console.cartridge())
                 &&console.cartridge().getCount()==1&&card.equals(ContentCardData.id(console.cartridge()));}
     }
@@ -72,59 +74,52 @@ public final class MdPublicSaves {
     private static State state(MinecraftServer server){return STATES.computeIfAbsent(server,s->new State());}
     private static boolean online(ServerPlayer p,Connection c){return p.getServer()!=null&&!p.hasDisconnected()&&p.isAlive()&&!p.isSpectator()&&p.connection.getConnection()==c&&p.getServer().getPlayerList().getPlayer(p.getUUID())==p;}
     private static void say(ServerPlayer p,String message){if(!p.hasDisconnected())p.displayClientMessage(Component.literal(message),true);}
-    public static boolean pending(MinecraftServer server,UUID console){var s=STATES.get(server);return s!=null&&s.pending.containsKey(console);}
-    public static boolean busy(MinecraftServer server,UUID console){var s=STATES.get(server);if(s==null)return false;String key=s.retiringOwners.get(console);return s.pending.containsKey(console)||key!=null&&(NetplaySaveServer.busy(server,key)||TRANSACTIONS.busy(key));}
-    public static boolean choose(ServerPlayer p,MdConsole console,HomeSystems.Connection link,ContentCardStore.Entry entry,Consumer<SavePlan> chosen){
+    public static boolean pending(MinecraftServer server,UUID console){var s=STATES.get(server);var key=s==null?null:s.launches.get(console);return key!=null&&HomeLaunchServer.pending(server,key);}
+    public static boolean busy(MinecraftServer server,UUID console){var s=STATES.get(server);if(s==null)return false;String key=s.retiringOwners.get(console);var launch=s.launches.get(console);return launch!=null&&HomeLaunchServer.busy(server,launch)||key!=null&&(NetplaySaveServer.busy(server,key)||TRANSACTIONS.busy(key));}
+    public static HomeLaunchServer.Key key(MdConsole console){return new HomeLaunchServer.Key(MdMod.SYSTEM,console.getLevel().dimension().location(),console.getBlockPos(),console.hardwareId());}
+    public static boolean choose(ServerPlayer p,MdConsole console,HomeSystems.Connection link,ContentCardStore.Entry entry,BiConsumer<SavePlan,HomeLaunchServer.Handle> chosen){
         var server=p.getServer();if(server==null||!server.isSameThread()||entry==null||!Objects.equals(ContentCardData.read(console.cartridge(),MdMod.SYSTEM),entry))return false;
         var s=state(server);if(s.pending.size()>=16||s.pending.containsKey(console.hardwareId()))return false;
         // One choice UI per connection, never silently replace another console's pending choice.
         if(s.pending.values().stream().anyMatch(x->x.connection==p.connection.getConnection())){say(p,"请先完成或取消上一台 MD 的开机选择。");return false;}
-        final Pending q;try{q=new Pending(p,console,link,entry,chosen);}catch(RuntimeException invalid){return false;}
+        final Pending q;try{q=new Pending(p,console,link,entry);}catch(RuntimeException invalid){return false;}
         if(!q.valid())return false;s.pending.put(console.hardwareId(),q);
-        if(q.mode==0){if(q.maxPlayers==1)complete(s,q,new SavePlan(identity(entry.hash()),false,false,false,"","",1,"",root(server)));else show(q,"此局不保存进度；选择是否允许 2P 加入",false);return true;}
-        q.loading=true;var catalog=new MdSaveCatalog(root(server));return work(server,s,()->{
-            var rows=new ArrayList<MdSaveNetwork.Slot>();
-            for(int slot=1;slot<=(q.mode==1?1:3);slot++){var row=catalog.read(owner(q,slot));rows.add(slot(slot,row,q));}return rows;
-        },rows->{q.loading=false;if(!current(s,q))return;q.rows=List.copyOf(rows);show(q,q.mode==2?"MD 个人总共 3 槽；选择后开始游戏":"进度跟随这张卡带；选择后开始游戏",false);},error->{q.loading=false;cancel(server,console.hardwareId());say(p,"读取 MD 存档失败，原档未改动："+error);});
+        var catalog=new MdSaveCatalog(root(server));s.launches.put(console.hardwareId(),key(console));var handle=HomeLaunchServer.start(p,key(console),new HomeLaunchServer.Adapter<SavePlan>(){
+            public HomeLaunchServer.Definition definition(){String title=ContentCardData.title(q.snapshot);return new HomeLaunchServer.Definition("MD",title.isBlank()?entry.displayName():title,q.maxPlayers,q.mode,false,q.mode==2?"MD 个人总共 3 槽；选择后独立确认本局加入许可":"进度跟随这张实体卡；选择后独立确认本局加入许可");}
+            public boolean valid(){return !s.closed&&q.valid();}
+            public void list(Consumer<List<HomeLaunchNetwork.Row>> success,Consumer<String> failure){work(server,s,()->{
+                var rows=new ArrayList<HomeLaunchNetwork.Row>();for(int slot=1;slot<=(q.mode==1?1:3);slot++){var r=slot(slot,catalog.read(owner(q,slot)),q);rows.add(new HomeLaunchNetwork.Row(r.slot(),r.version(),r.name(),r.rom(),r.players(),r.modified(),r.compatible()));}return rows;
+            },success,failure);}
+            public void select(HomeLaunchNetwork.Choice choice,Consumer<SavePlan> success,Consumer<String> failure){
+                if(q.mode==0){success.accept(new SavePlan(identity(entry.hash()),false,false,1,false,"","",1,"",root(server)));return;}
+                if(choice==null||choice.slot()>(q.mode==1?1:3)||choice.savePlayers()>q.maxPlayers){failure.accept("存档选择无效");return;}
+                final String name;try{name=MdSaveCatalog.name(choice.name());}catch(IllegalArgumentException bad){failure.accept(bad.getMessage());return;}
+                String owner=owner(q,choice.slot());if(NetplaySaveServer.busy(server,catalog.lockKey(owner))||TRANSACTIONS.busy(catalog.lockKey(owner))){failure.accept("此存档正在使用或保存，请稍后重试");return;}
+                work(server,s,()->catalog.read(owner),row->{
+                    if(!Objects.equals(choice.version(),row==null?"":row.version())||choice.resume()&&(row==null||!row.identity().equals(identity(entry.hash())))){failure.accept("存档已变化，请重新开机选择");return;}
+                    success.accept(new SavePlan(identity(entry.hash()),true,choice.resume(),choice.savePlayers(),false,owner,name,choice.slot(),choice.version(),root(server)));
+                },failure);
+            }
+            public void load(HomeLaunchServer.Launch<SavePlan> launch,HomeLaunchServer.Handle handle){s.pending.remove(console.hardwareId(),q);var plan=launch.save().withJoin(launch.allowSecondPort());if(plan.enabled())s.retiringOwners.put(console.hardwareId(),catalog.lockKey(plan.ownerKey()));chosen.accept(plan,handle);}
+            public void cancelled(String reason){s.pending.remove(console.hardwareId(),q);MdPublicServer.cancelStart(console,reason);}
+        });
+        if(handle==null){s.pending.remove(console.hardwareId(),q);s.launches.remove(console.hardwareId());return false;}return true;
     }
     private static String owner(Pending q,int slot){return q.mode==1?MdSaveCatalog.cartridge(q.card):MdSaveCatalog.personal(q.playerId,slot);}
     private static MdSaveNetwork.Slot slot(int slot,MdSaveCatalog.Row row,Pending q){return row==null?new MdSaveNetwork.Slot(slot,"","Save "+slot,"",1,0,true):new MdSaveNetwork.Slot(slot,row.version(),row.name(),row.identity().content(),Math.min(q.maxPlayers,row.players()),row.modified(),row.identity().equals(identity(q.entry.hash())));}
-    private static boolean current(State s,Pending q){return !s.closed&&s.pending.get(q.console.hardwareId())==q&&q.valid();}
-    private static void show(Pending q,String message,boolean closed){
-        if(q.player.hasDisconnected())return;var rows=q.rows;
-        if(rows.size()!=(q.mode==0?0:q.mode==1?1:3)){var blanks=new ArrayList<MdSaveNetwork.Slot>();for(int i=1;i<=(q.mode==0?0:q.mode==1?1:3);i++)blanks.add(slot(i,null,q));rows=blanks;}
-        MdSaveNetwork.send(q.player,new MdSaveNetwork.Selection(q.token,q.entry.hash(),q.entry.name(),q.mode,q.maxPlayers,rows,message,closed));
-    }
-    public static void action(ServerPlayer p,MdSaveNetwork.Action a){
-        var server=p.getServer();var s=STATES.get(server);if(s==null)return;
-        var q=s.pending.values().stream().filter(v->v.token.equals(a.token())&&v.player==p&&v.connection==p.connection.getConnection()).findFirst().orElse(null);
-        if(q==null)return;if(a.cancel()){cancel(server,q.console.hardwareId());return;}if(!current(s,q)){cancel(server,q.console.hardwareId());return;}
-        if(q.loading||a.players()>q.maxPlayers||a.slot()>(q.mode==2?3:1))return;
-        if(q.mode==0){if(a.resume()||!a.version().isEmpty())return;complete(s,q,new SavePlan(identity(q.entry.hash()),false,false,a.players()==2,"","",1,"",root(server)));return;}
-        var shown=q.rows.get(a.slot()-1);if(!shown.version().equals(a.version())||a.resume()&&(!shown.occupied()||!shown.compatible())){show(q,"选择已失效，请关闭后重新开机",false);return;}
-        final String name;try{name=MdSaveCatalog.name(a.name());}catch(IllegalArgumentException invalid){show(q,invalid.getMessage(),false);return;}
-        var catalog=new MdSaveCatalog(root(server));String owner=owner(q,a.slot());
-        if(NetplaySaveServer.busy(server,catalog.lockKey(owner))||TRANSACTIONS.busy(catalog.lockKey(owner))){show(q,"这个存档仍在游戏、保存或管理中，请稍后重试",false);return;}
-        q.loading=true;work(server,s,()->catalog.read(owner),row->{
-            q.loading=false;if(!current(s,q))return;
-            if(!Objects.equals(a.version(),row==null?"":row.version())||a.resume()&&(row==null||!row.identity().equals(identity(q.entry.hash())))){cancel(server,q.console.hardwareId());say(p,"存档已变化，请重新开机选择；原档保留。");return;}
-            complete(s,q,new SavePlan(identity(q.entry.hash()),true,a.resume(),a.players()==2,owner,name,a.slot(),a.version(),root(server)));
-        },error->{q.loading=false;if(current(s,q))show(q,"存档检查失败，原档未改动："+error,false);});
-    }
-    private static void complete(State s,Pending q,SavePlan plan){if(!current(s,q))return;s.pending.remove(q.console.hardwareId(),q);
-        if(plan.enabled())s.retiringOwners.put(q.console.hardwareId(),new MdSaveCatalog(plan.root()).lockKey(plan.ownerKey()));
-        try{q.chosen.accept(plan);}catch(RuntimeException failure){say(q.player,"MD 开机失败，原存档保留："+message(failure));}
-    }
+    /** Retained packet registration for explicit rejection of stale addon callers; no old UI authority. */
+    public static void action(ServerPlayer p,MdSaveNetwork.Action a){}
     public static void attach(MinecraftServer server,long wire,Connection host,UUID ticket,SavePlan plan){
         var catalog=new MdSaveCatalog(plan.root());
         String key=plan.enabled()?catalog.lockKey(plan.ownerKey()):"md-no-save|"+wire;
-        TRANSACTIONS.start(key,()->NetplaySaveServer.open(server,wire,host,ticket,plan.identity(),key,
-                plan.enabled()?()->catalog.lease(plan.ownerKey(),plan.identity(),plan.expectedVersion(),plan.name(),plan.multiplayer()?2:1,plan.resume()):null));
+        TRANSACTIONS.start(key,()->NetplaySaveServer.openPrepared(server,wire,host,ticket,plan.identity(),key,
+                plan.enabled()?()->catalog.lease(plan.ownerKey(),plan.identity(),plan.expectedVersion(),plan.name(),plan.savePlayers(),plan.resume()):null));
     }
-    public static void cancel(MinecraftServer server,UUID console){var s=STATES.get(server);if(s!=null){var q=s.pending.remove(console);if(q!=null)show(q,"开机选择已取消",true);}}
+    public static void cancel(MinecraftServer server,UUID console){var s=STATES.get(server);if(s!=null){s.pending.remove(console);var key=s.launches.get(console);if(key!=null)HomeLaunchServer.cancel(server,key,"开机选择已取消");}}
     public static void stop(MinecraftServer server){var s=STATES.remove(server);if(s==null)return;s.closed=true;s.pending.clear();for(var l:s.libraries.values()){forgetRoute(l.token);if(l.mutation!=null)l.mutation.revoke();}s.libraries.clear();}
     private static void maintenance(MinecraftServer server){var s=STATES.get(server);if(s==null)return;
         s.retiringOwners.values().removeIf(key->!NetplaySaveServer.busy(server,key)&&!TRANSACTIONS.busy(key));
+        s.launches.values().removeIf(key->!HomeLaunchServer.busy(server,key));
         for(var q:List.copyOf(s.pending.values()))if(!q.valid())cancel(server,q.console.hardwareId());
         if(tick(server)%10==0)for(var l:List.copyOf(s.libraries.values()))if(!l.valid())close(s,l,"存档管理授权已失效，请重新打开老式电脑");
     }

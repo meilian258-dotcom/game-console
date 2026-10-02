@@ -17,6 +17,10 @@ class ContentCardDirectoriesTest {
         assertEquals(root.resolve("game-console/content-card-covers/piq_md_home/md"),covers);
         assertNotEquals(covers,ContentCardDirectories.covers(root,gba));assertFalse(covers.startsWith(roms));
         assertFalse(java.nio.file.Files.exists(roms));assertFalse(java.nio.file.Files.exists(covers));
+        var metadata=ContentCardDirectories.metadata(root,md);
+        assertEquals(root.resolve("game-console/content-card-metadata/piq_md_home/md"),metadata);
+        assertFalse(metadata.startsWith(roms));assertFalse(metadata.startsWith(covers));assertFalse(java.nio.file.Files.exists(metadata));
+        assertNotEquals(metadata,ContentCardDirectories.metadata(root,gba));
     }
     @Test void systemPathCannotEscapeItsNamespace(){
         assertThrows(IllegalArgumentException.class,()->ContentCardDirectories.covers(root,ResourceLocation.fromNamespaceAndPath("piq_md_home","../../outside")));

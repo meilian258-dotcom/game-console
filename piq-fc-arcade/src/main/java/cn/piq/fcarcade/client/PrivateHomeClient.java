@@ -61,6 +61,7 @@ public final class PrivateHomeClient {
     private static LibretroRuntimes.Backend cartridgeBackend;
     private static boolean installed, opening, sampling, closing;
     private static java.util.concurrent.CompletableFuture<PrivateEngine.SaveResult> pendingSave;
+    private static Target savingTarget;
     private static String notice = "请先接好电视，借出并手持实体手柄；公开主机须处于关机状态。";
     private static final class Run {
         final Target target; final Object owner; final PrivateEngine engine; final boolean trial;
@@ -195,7 +196,15 @@ public final class PrivateHomeClient {
     public static int cartridgeState(ResourceLocation system,BlockPos pos){
         var r=current;return r==null||r.target.provider!=PROVIDERS.get(system)||!r.target.console.getBlockPos().equals(pos)?-1:r.engine.isReady()?1:0;
     }
-    public static void stopCartridge(ResourceLocation system,BlockPos pos){if(cartridgeState(system,pos)>=0)stop("实体主机关机，正在保存");}
+    public static void stopCartridge(ResourceLocation system,BlockPos pos){stopCartridgeAndSave(system,pos);}
+    /** Completion concerns only this local target; it is not evidence of a server save. */
+    public static java.util.concurrent.CompletableFuture<PrivateEngine.SaveResult> stopCartridgeAndSave(ResourceLocation system,BlockPos pos){
+        if(cartridgeState(system,pos)>=0)stop("实体主机关机，正在保存");
+        var t=savingTarget;
+        if(t!=null&&t.provider==PROVIDERS.get(system)&&t.console.getBlockPos().equals(pos)
+                &&t.connection==Minecraft.getInstance().getConnection()&&pendingSave!=null)return pendingSave;
+        return java.util.concurrent.CompletableFuture.completedFuture(new PrivateEngine.SaveResult(false,"没有匹配的本机保存会话，未确认保存"));
+    }
     public static void resetCartridge(ResourceLocation system,BlockPos pos){
         var r=current;if(r!=null&&r.target.provider==PROVIDERS.get(system)&&r.target.console.getBlockPos().equals(pos)&&valid(r.target)){
             releaseKeys(r);r.engine.requestReset();
@@ -252,6 +261,7 @@ public final class PrivateHomeClient {
         if(!CabinetClientOwner.acquire(reservation))return "请先退出正在操作的公开游戏或街机。";
         try {
             Run run=new Run(target,reservation,rom,root,backend);
+            savingTarget=null;pendingSave=null;
             current=run;notice=(run.trial?"JNI 私人试验（独立试验档）":"私人模式")+"正在本机启动；不上传游戏数据。";
             refreshKeyboard();return null;
         }catch(RuntimeException|LinkageError failure){return "本机启动失败："+failure.getMessage();}
@@ -344,9 +354,11 @@ public final class PrivateHomeClient {
         KeyboardInput.release(r.owner);GamepadInput.release(r.owner);r.engine.clearInput();
         CabinetClientOwner.release(r.owner);
         if(r.audio!=null)r.audio.close();if(r.textureId!=null)Minecraft.getInstance().getTextureManager().release(r.textureId);
-        pendingSave=r.engine.stopAndSave();
+        savingTarget=r.target;
+        try{pendingSave=r.engine.stopAndSave();}
+        catch(RuntimeException error){pendingSave=java.util.concurrent.CompletableFuture.failedFuture(error);}
         pendingSave.whenComplete((saved,error)->Minecraft.getInstance().execute(()->{
-            closing=false;notice=reason+"；"+(error!=null?"本地保存失败，未确认保存成功。":saved.message());
+            closing=false;notice=reason+"；"+(error!=null||saved==null?"本地保存失败，未确认保存成功。":saved.message());
             var mc=Minecraft.getInstance();if(mc.player!=null&&mc.getConnection()==r.target.connection)mc.player.displayClientMessage(Component.literal(notice),false);
         }));
     }
@@ -362,7 +374,11 @@ public final class PrivateHomeClient {
             if(own){
                 var eye=mc.player.getEyePosition();var control=HomeApplianceService.controlAt(mc.level,pos,eye,
                         eye.add(mc.player.getLookAngle().scale(Math.min(6,mc.player.blockInteractionRange()))));
-                if(control.port()>=0&&holding){stop("归还实体手柄");return;}
+                if(control.port()>=0&&holding){
+                    if(r.target.provider.independentCartridgePower())releaseKeys(r);
+                    else stop("归还实体手柄");
+                    return;
+                }
                 if(control==HomeApplianceControl.POWER||control==HomeApplianceControl.RESET){
                     if(r.target.provider.cartridgePower())return; // Server owns this power transition.
                     event.setCanceled(true);event.setSwingHand(false);stop("已结束私人游戏，未改变公共设备电源");return;

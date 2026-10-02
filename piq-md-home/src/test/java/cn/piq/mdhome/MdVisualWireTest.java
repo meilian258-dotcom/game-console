@@ -41,7 +41,10 @@ class MdVisualWireTest {
     @Test void visualRegisteredOnlyServerToClientAndAfterAuthorityGate() throws Exception {
         var root=java.nio.file.Path.of("src/main/java/cn/piq/mdhome");
         String network=java.nio.file.Files.readString(root.resolve("MdPublicNetwork.java"));
-        assertTrue(network.contains("create(event,\"md-public-2\")"));assertTrue(network.contains(".playToClient(Visual.TYPE,Visual.CODEC"));
+        assertTrue(network.contains("create(event,\"md-public-3\")"));assertFalse(network.contains("create(event,\"md-public-2\")"));assertTrue(network.contains(".playToClient(Visual.TYPE,Visual.CODEC"));
+        assertTrue(network.contains(".playToClient(Activated.TYPE,Activated.CODEC"));assertTrue(network.contains(".playToClient(PrivateActivated.TYPE,PrivateActivated.CODEC"));
+        assertTrue(network.contains(".playToServer(Closed.TYPE,Closed.CODEC"));assertTrue(network.contains(".playToServer(PrivateFinished.TYPE,PrivateFinished.CODEC"));
+        assertFalse(network.contains(".playToServer(Activated.TYPE"));assertFalse(network.contains(".playToServer(PrivateActivated.TYPE"));
         assertFalse(network.contains(".playToServer(Visual.TYPE"));assertFalse(network.contains(".playBidirectional(Visual.TYPE"));
         String server=java.nio.file.Files.readString(root.resolve("MdPublicServer.java"));
         assertTrue(server.indexOf("if(accepted==MdPublicInputGate.Result.REJECT)")<server.indexOf("seat.visual.offer(mask)"));

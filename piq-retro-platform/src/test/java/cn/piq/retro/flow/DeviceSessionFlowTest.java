@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+package cn.piq.retro.flow;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import static cn.piq.retro.flow.DeviceSessionFlow.Stage.*;
+
+class DeviceSessionFlowTest {
+    @Test void noSaveStillRequiresIndependentSecondPlayerConsent(){var flow=new DeviceSessionFlow(2,false,false);flow.prepared();assertEquals(VALIDATING,flow.stage());flow.selected();assertEquals(JOIN_CONFIRM,flow.stage());assertThrows(IllegalStateException.class,flow::ready);flow.join(true);assertEquals(LOADING,flow.stage());assertEquals(1,flow.savePlayers());assertTrue(flow.allowSecondPort());flow.ready();assertEquals(READY,flow.stage());}
+    @Test void saveLabelAndLiveJoinPermissionAreIndependent(){var flow=new DeviceSessionFlow(2,true,false);flow.prepared();flow.select(2);flow.selected();flow.join(false);assertEquals(2,flow.savePlayers());assertFalse(flow.allowSecondPort());flow.ready();flow.stopping();flow.finished(true);assertEquals(CLOSED,flow.stage());}
+    @Test void soloSaveMayAllowTwoPlayersWithoutRelabelling(){var flow=new DeviceSessionFlow(2,true,false);flow.prepared();flow.select(1);flow.selected();flow.join(true);assertTrue(flow.allowSecondPort());assertEquals(1,flow.savePlayers());}
+    @Test void contentMaxOneCannotForgeSaveLabelOrJoin(){var flow=new DeviceSessionFlow(1,true,false);flow.prepared();assertThrows(IllegalArgumentException.class,()->flow.select(2));flow.select(1);flow.selected();assertEquals(LOADING,flow.stage());assertThrows(IllegalStateException.class,()->flow.join(true));}
+    @Test void privateSkipsPublicJoinEvenIfContentHasTwoPorts(){var flow=new DeviceSessionFlow(2,false,true);flow.prepared();flow.selected();assertEquals(LOADING,flow.stage());assertFalse(flow.allowSecondPort());}
+    @Test void oldAndDuplicateCallbackRevisionsCannotAdvance(){var flow=new DeviceSessionFlow(2,true,false);long original=flow.revision();flow.prepared();assertFalse(flow.accepts(original));flow.select(1);long selected=flow.revision();assertTrue(flow.accepts(selected));flow.selected();assertFalse(flow.accepts(selected));long join=flow.revision();flow.join(true);assertFalse(flow.accepts(join));assertThrows(IllegalStateException.class,()->flow.join(true));}
+    @Test void allPreparationStagesCanCancelAndNeverBecomeReady(){for(int step=0;step<5;step++){var flow=new DeviceSessionFlow(2,true,false);if(step>0)flow.prepared();if(step>1)flow.select(1);if(step>2)flow.selected();if(step>3)flow.join(true);long revision=flow.revision();flow.cancel();assertEquals(CANCELLED,flow.stage());assertFalse(flow.accepts(revision));assertFalse(flow.allowSecondPort());assertThrows(IllegalStateException.class,flow::ready);}}
+    @Test void backAndValidationFailureReturnToActualSaveSelection(){var flow=new DeviceSessionFlow(2,true,false);flow.prepared();flow.select(2);flow.invalidSelection();assertEquals(SAVE_SELECTION,flow.stage());flow.select(1);flow.selected();flow.back();assertEquals(SAVE_SELECTION,flow.stage());assertFalse(flow.allowSecondPort());}
+    @Test void readyNeedsDurableCloseRatherThanCancel(){var flow=new DeviceSessionFlow(1,false,false);flow.prepared();flow.selected();flow.ready();assertThrows(IllegalStateException.class,flow::cancel);flow.stopping();assertFalse(flow.terminal());assertThrows(IllegalStateException.class,flow::ready);flow.finished(false);assertEquals(FAILED,flow.stage());assertTrue(flow.terminal());}
+    @Test void loadingStopFinishesTerminalWithoutReady(){var flow=new DeviceSessionFlow(1,false,false);flow.prepared();flow.selected();flow.stopping();flow.finished(true);assertEquals(CLOSED,flow.stage());assertThrows(IllegalStateException.class,flow::ready);}
+}

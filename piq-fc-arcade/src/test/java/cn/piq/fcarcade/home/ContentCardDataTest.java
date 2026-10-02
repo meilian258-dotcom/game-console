@@ -38,6 +38,19 @@ class ContentCardDataTest {
         stack.setCount(2);assertThrows(IllegalArgumentException.class,()->ContentCardData.write(stack,SYSTEM,GAME,"新卡"));
         assertEquals("原卡",ContentCardData.title(stack));assertEquals(GAME,ContentCardData.read(stack,SYSTEM));
     }
+    @Test void cardRenameNeverChangesDurableSharedLibraryName(@org.junit.jupiter.api.io.TempDir java.nio.file.Path root)throws Exception{
+        var bytes=new byte[1024];bytes[512]=5;
+        var store=new ContentCardStore(root.resolve("roms"),Set.of("md"),b->{},1024,root.resolve("names"));
+        var entry=store.store("上传的原始游戏名.md",ContentCardStore.hash(bytes),bytes);
+        var stack=new ItemStack(Items.PAPER);ContentCardData.write(stack,SYSTEM,entry,"我自己的卡带标题");
+        ContentCardData.write(stack,SYSTEM,ContentCardData.read(stack,SYSTEM),ContentCardWorkbench.title("再次修改卡带标题"));
+        assertEquals("再次修改卡带标题",ContentCardData.title(stack));
+        assertEquals(entry,ContentCardData.read(stack,SYSTEM));
+        assertEquals(entry.name(),ContentCardData.read(stack,SYSTEM).name());
+        assertEquals("上传的原始游戏名.md",store.list().getFirst().displayName());
+        assertArrayEquals(bytes,store.read(ContentCardData.read(stack,SYSTEM)));
+        assertEquals("上传的原始游戏名.md",java.nio.file.Files.readString(root.resolve("names").resolve(entry.hash()+".name")));
+    }
     @Test void coverAndSavePreferenceSurviveRenameAndReplacingRom(){
         var stack=new ItemStack(Items.PAPER);assertEquals(2,ContentCardData.saveMode(stack));
         ContentCardData.cover(stack,"b".repeat(64));ContentCardData.saveMode(stack,0);

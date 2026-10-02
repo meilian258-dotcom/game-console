@@ -24,6 +24,9 @@ class HomeHostedConfigurationBusy39Test {
     }
     @Test void finalSnapshotIsCollectedAndSavedBeforeClosingBusyEntryIsRemoved() throws Exception {
         String reap=section(source(),"privatevoidtick(MinecraftServerserver)","HomeControllerService.tick(server)");
-        assertTrue(reap.contains("for(varstopped:List.copyOf(closingHosted))if(stopped.hosted.terminated()){collectHostedSnapshot(server,stopped);if(stopped.hostedFinalPersist)saveState(server,stopped);closingHosted.remove(stopped);}"),"Reap only exact terminated workers; commit permitted final snapshot before releasing hardware busy state");
+        assertTrue(reap.contains("for(varstopped:List.copyOf(closingHosted))if(stopped.hosted.terminated()){collectHostedSnapshot(server,stopped);"));
+        assertTrue(reap.contains("booleanclean=stopped.hosted.error()==null;booleansaved=clean&&stopped.saveMode==RomSaveMode.NONE;"),"A failed final capture must not report clean even if an earlier periodic snapshot exists");
+        int save=reap.indexOf("if(stopped.hostedFinalPersist&&clean)saved=saveState(server,stopped)||saved;"),result=reap.indexOf("stopped.homeLaunch.finished(saved,"),remove=reap.indexOf("closingHosted.remove(stopped)");
+        assertTrue(save>0&&result>save&&remove>result,"Commit permitted final snapshot and report actual result before releasing hardware busy state");
     }
 }

@@ -23,11 +23,11 @@ public final class MdEngine implements PrivateEngine {
     private final CompletableFuture<SaveResult> finished=new CompletableFuture<>();
     private final short[] sound=new short[32768];
     private final Thread owner;
-    private final boolean saving,publicSession,resume;
+    private final boolean saving,publicSession,resume,authorityGate;
     private final NetplayProcess.Persistence persistence;
     private final NetplaySaveState.Identity identity;
     private final Consumer<RetroFrame> mediaTap;
-    private volatile boolean closing,paused,ready,initialized,publicSaving;
+    private volatile boolean closing,paused,ready,initialized,publicSaving,runtimeStarted;
     private final AtomicBoolean resetRequested=new AtomicBoolean();
     private volatile String error,saveStatus;
     private volatile LibretroRuntime core;
@@ -40,19 +40,23 @@ public final class MdEngine implements PrivateEngine {
     public static boolean active(){return ACTIVE.get();}
     public MdEngine(Path rom,Path root,LibretroRuntimes.Backend backend,MdProfile.Core selected){this(rom,root,backend,selected,true);}
     public MdEngine(Path rom,Path root,LibretroRuntimes.Backend backend,MdProfile.Core selected,boolean saving){
-        this(rom,Objects.requireNonNull(root),backend,selected,saving,null,null,true,null);
+        this(rom,root,backend,selected,saving,false);
+    }
+    public MdEngine(Path rom,Path root,LibretroRuntimes.Backend backend,MdProfile.Core selected,boolean saving,boolean waitForAuthority){
+        this(rom,Objects.requireNonNull(root),backend,selected,saving,null,null,true,null,waitForAuthority);
     }
     /** Public player-hosted streaming only; not Netplay. Public identity currently pins GX/JNI. */
     public MdEngine(Path rom,LibretroRuntimes.Backend backend,NetplayProcess.Persistence persistence,
                     NetplaySaveState.Identity identity,boolean resume,Consumer<RetroFrame> mediaTap){
         this(rom,null,backend,MdProfile.Core.GENESIS_PLUS_GX,false,Objects.requireNonNull(persistence),
-                Objects.requireNonNull(identity),resume,Objects.requireNonNull(mediaTap));
+                Objects.requireNonNull(identity),resume,Objects.requireNonNull(mediaTap),true);
     }
     private MdEngine(Path rom,Path root,LibretroRuntimes.Backend backend,MdProfile.Core selected,boolean saving,
-                     NetplayProcess.Persistence persistence,NetplaySaveState.Identity identity,boolean resume,Consumer<RetroFrame> mediaTap){
+                     NetplayProcess.Persistence persistence,NetplaySaveState.Identity identity,boolean resume,Consumer<RetroFrame> mediaTap,boolean waitForAuthority){
         Objects.requireNonNull(rom);Objects.requireNonNull(backend);Objects.requireNonNull(selected);
         this.saving=saving;this.persistence=persistence;this.identity=identity;this.resume=resume;this.mediaTap=mediaTap;
         publicSession=persistence!=null;
+        authorityGate=waitForAuthority;runtimeStarted=!authorityGate;paused=authorityGate;
         if(publicSession&&backend!=LibretroRuntimes.Backend.JNI_TRIAL){persistence.abort();throw new IllegalArgumentException("MD 公开串流当前仅支持 Genesis Plus GX / JNI");}
         inputs=new MdPublicInputBuffer(publicSession?2:1);
         saveStatus=publicSession?"等待服务器存档":saving?"私人本机存档":"不存档";
@@ -62,9 +66,11 @@ public final class MdEngine implements PrivateEngine {
     }
     public int maxPlayers(){return publicSession?2:1;}
     public boolean isReady(){return ready&&!closing;}
+    /** Native boot/restore may complete first, but gameplay waits for the server's exact launch generation. */
+    public void activate(){synchronized(controls){if(!authorityGate||!ready||closing)return;runtimeStarted=true;paused=false;}LockSupport.unpark(owner);}
     public String error(){var c=core;String d=c==null?"":c.diagnosticError();return error!=null?error:d.isBlank()?null:d;}
     public String saveStatus(){return saveStatus;}
-    public boolean canSave(){return publicSession&&publicSaving&&isReady();}
+    public boolean canSave(){return publicSession&&runtimeStarted&&publicSaving&&isReady();}
     public void offerInput(int p1,int p2){
         if((p1&~4095)!=0||(p2&~4095)!=0||(!publicSession&&p2!=0))throw new IllegalArgumentException("MD input capabilities");
         synchronized(controls){if(closing||paused)return;offerLocked(0,p1);if(publicSession)offerLocked(1,p2);}
@@ -82,7 +88,7 @@ public final class MdEngine implements PrivateEngine {
     int visualInput(int port){synchronized(controls){return closing||paused||!ready?-1:visual.present(port);}}
     boolean visualAlive(){return !closing&&error==null;}
     void clearVisual(){synchronized(controls){visual.clear(++visualRevision);}}
-    public void paused(boolean p){synchronized(controls){if(paused!=p){paused=p;clearInput();clearMedia();}}LockSupport.unpark(owner);}
+    public void paused(boolean p){synchronized(controls){p=p||authorityGate&&!runtimeStarted;if(paused!=p){paused=p;clearInput();clearMedia();}}LockSupport.unpark(owner);}
     public CabinetFrame pollFrame(){
         synchronized(media){if(latest==null||closing||paused)return null;short[] pcm=new short[size];
             for(int i=0;i<size;i++)pcm[i]=sound[(head+i)%sound.length];
@@ -92,13 +98,13 @@ public final class MdEngine implements PrivateEngine {
     private void clearMedia(){synchronized(media){latest=null;head=size=0;}}
     public CompletableFuture<SaveResult> stopAndSave(){
         boolean cancelStartup;
-        synchronized(controls){closing=true;ready=false;cancelStartup=!initialized;clearInput();clearMedia();}
+        synchronized(controls){closing=true;ready=false;cancelStartup=!initialized||!runtimeStarted;clearInput();clearMedia();}
         // Cancel a pending startup load, but keep a running game's channel for its final durable ACK.
         if(publicSession&&cancelStartup)persistence.abort();
         if(owner!=null)LockSupport.unpark(owner);return finished;
     }
     public void close(){stopAndSave();}
-    public boolean requestReset(){if(!isReady())return false;resetRequested.set(true);clearInput();LockSupport.unpark(owner);return true;}
+    public boolean requestReset(){if(!isReady()||!runtimeStarted)return false;resetRequested.set(true);clearInput();LockSupport.unpark(owner);return true;}
     public CompletableFuture<SaveResult> requestSave(){
         synchronized(saveMonitor){
             if(!canSave())return CompletableFuture.completedFuture(new SaveResult(false,publicSession&&!publicSaving?"本局不存档":"MD 主持尚未就绪"));
@@ -154,11 +160,12 @@ public final class MdEngine implements PrivateEngine {
         finally{
             closing=true;ready=false;clearInput();clearMedia();
             if(error()!=null)result=new SaveResult(false,error()+"；原保存保留");
-            else if(initialized&&publicSession){
+            else if(initialized&&publicSession&&runtimeStarted){
                 if(!publicSaving)result=new SaveResult(false,"本局不存档；未读取或写入进度，旧档保留");
                 else try{finishPublicSave();result=new SaveResult(true,"MD 进度已保存到服务器");}
                 catch(Exception e){result=new SaveResult(false,"MD 最终保存未确认："+detail(e)+"；保留最近确认版本");}
-            }else if(initialized&&!saving)result=new SaveResult(false,"本卡设置为不存档；未读取或写入进度，旧档保留");
+            }else if(publicSession||!runtimeStarted)result=new SaveResult(false,"开局尚未就绪已取消；旧进度保留");
+            else if(initialized&&!saving)result=new SaveResult(false,"本卡设置为不存档；未读取或写入进度，旧档保留");
             else if(initialized){try{savePrivate(store,key);result=new SaveResult(true,"MD 私人进度已保存到本机（当前后端独立档）");}
                 catch(Exception e){result=new SaveResult(false,"MD 保存失败："+detail(e)+"；原件保留");}}
             try{if(core!=null)core.close();}

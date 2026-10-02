@@ -21,6 +21,7 @@ class NetplaySaveSessionTest {
     final class Harness {
         final long id=(1L<<50)+77;final UUID ticket=UUID.randomUUID();UUID tx=UUID.randomUUID();
         final ArrayDeque<Runnable> io=new ArrayDeque<>(),main=new ArrayDeque<>();final List<Message> replies=new ArrayList<>();
+        final List<NetplaySaveSession.Finish> finishes=new ArrayList<>();
         long now=10_000_000_000L;boolean live=true,released,failWrite;int writes;byte[] saved;
         final NetplaySaveSession session;
         Harness(boolean enabled,Path directory){
@@ -31,7 +32,8 @@ class NetplaySaveSessionTest {
                     public void write(byte[] b)throws Exception{if(failWrite)throw new IOException("disk unavailable");store.write(b);writes++;saved=b;}
                     public void close()throws Exception{store.close();}
                 };
-            }:null,io::add,main::add,m->replies.add(wire(m)),()->live,()->now,()->released=true);
+            }:null,io::add,main::add,m->replies.add(wire(m)),()->live,()->now,()->released=true,
+                result->{assertTrue(released);finishes.add(result);});
         }
         Message message(int kind,int value,int at,byte[] b,String text){return new Message(id,ticket,tx,kind,value,at,b,text);}
         void send(int kind,int value,int at,byte[] b,String text){session.receive(wire(message(kind,value,at,b,text)));}
@@ -67,6 +69,30 @@ class NetplaySaveSessionTest {
         h.send(UPLOAD,0,0,packed,"");h.flush();assertEquals(1,h.writes);
     }
     @Test void disabledDoesNotTouchFilesystem(){var h=new Harness(false,root.resolve("none"));h.read();assertEquals(DISABLED,h.last().kind());assertTrue(h.released);assertFalse(Files.exists(root.resolve("none")));}
+    @Test void deviceCompletionWaitsForDurableFinishAndLeaseRelease()throws Exception{
+        var h=new Harness(true,root.resolve("completion"));h.read();h.upload(state(1,40));h.flush();
+        assertTrue(h.finishes.isEmpty()); // Periodic SAVED does not authorize card/device mutation.
+        h.session.retire();h.upload(state(2,41));h.flush();h.small(FINISH);
+        assertTrue(h.finishes.isEmpty());assertFalse(h.released);
+        h.io.remove().run();assertTrue(h.released);assertTrue(h.finishes.isEmpty());
+        h.flush();assertEquals(1,h.finishes.size());assertTrue(h.finishes.getFirst().clean());assertTrue(h.finishes.getFirst().persisted());
+        h.small(FINISH);h.session.tick();h.flush();assertEquals(1,h.finishes.size());
+    }
+    @Test void oldCheckpointOrUnconfirmedFinishNeverLooksLikeSuccessfulShutdown()throws Exception{
+        var h=new Harness(true,root.resolve("completion-failure"));h.read();h.upload(state(1,40));h.flush();
+        h.session.retire();h.failWrite=true;h.upload(state(2,41));h.flush();
+        assertEquals(1,h.finishes.size());assertTrue(h.finishes.getFirst().persisted());assertFalse(h.finishes.getFirst().clean());
+        var empty=new Harness(true,root.resolve("empty-finish"));empty.read();empty.small(FINISH);empty.flush();
+        assertFalse(empty.finishes.getFirst().clean());assertFalse(empty.finishes.getFirst().persisted());
+        var expired=new Harness(true,root.resolve("completion-expired"));expired.read();expired.session.retire();expired.now+=71_000_000_000L;expired.session.tick();expired.flush();
+        assertFalse(expired.finishes.getFirst().clean());assertTrue(expired.finishes.getFirst().reason().contains("超时"));
+        var periodicOnly=new Harness(true,root.resolve("periodic-is-not-final"));periodicOnly.read();periodicOnly.upload(state(5,42));periodicOnly.flush();
+        periodicOnly.session.retire();periodicOnly.small(FINISH);periodicOnly.flush();
+        assertTrue(periodicOnly.finishes.getFirst().persisted());assertFalse(periodicOnly.finishes.getFirst().clean());
+        var inflight=new Harness(true,root.resolve("inflight-final"));inflight.read();inflight.upload(state(6,43));
+        inflight.session.retire();inflight.flush();inflight.small(FINISH);inflight.flush();
+        assertTrue(inflight.finishes.getFirst().clean());
+    }
     @Test void mismatchedContentAndCorruptDiskFailWithoutStartingFresh()throws Exception{
         var h=new Harness(true,root.resolve("bad"));h.send(READ,0,0,new byte[0],"wrong");h.flush();assertEquals(ERROR,h.last().kind());assertFalse(Files.exists(root.resolve("bad")));
         Files.createDirectories(root.resolve("bad"));Files.write(root.resolve("bad/checkpoint.bin"),new byte[]{42});
@@ -90,6 +116,19 @@ class NetplaySaveSessionTest {
         var h=new Harness(true,root.resolve("cancel"));h.read();h.upload(state(1,30));h.small(CANCEL);assertFalse(h.released);h.flush();assertEquals(0,h.writes);assertTrue(h.released);
         var disconnected=new Harness(true,root.resolve("disconnect"));disconnected.read();disconnected.live=false;disconnected.session.tick();disconnected.flush();assertTrue(disconnected.released);
         try(var reopened=new NetplaySaveStore(root.resolve("disconnect"),identity)){assertNull(reopened.read());}
+    }
+    @Test void preparationCannotCommitAndAbortRejectsLateFinalSave()throws Exception{
+        var prepared=new Harness(true,root.resolve("prepared"));prepared.session.commitsAllowed=false;
+        prepared.read();assertEquals(EMPTY,prepared.last().kind());
+        prepared.send(BEGIN,20,0,new byte[0],"");prepared.flush();assertEquals(ERROR,prepared.last().kind());assertEquals(0,prepared.writes);
+        var old=new Harness(true,root.resolve("cancel-before-ready"));old.read();byte[] original=state(1,40);old.upload(original);old.flush();old.small(FINISH);old.flush();
+        var loading=new Harness(true,root.resolve("cancel-before-ready"));assertArrayEquals(original,loading.download());
+        loading.upload(state(2,41));loading.session.abort("取消开局");assertFalse(loading.released);
+        loading.small(FINISH);loading.flush();assertEquals(0,loading.writes);assertFalse(loading.finishes.getFirst().clean());
+        assertArrayEquals(original,Files.readAllBytes(root.resolve("cancel-before-ready/checkpoint.bin")));
+        loading.send(BEGIN,20,0,new byte[0],"");loading.small(FINISH);loading.flush();assertEquals(0,loading.writes);assertEquals(1,loading.finishes.size());
+        var activated=new Harness(true,root.resolve("activated"));activated.session.commitsAllowed=false;activated.read();
+        activated.session.commitsAllowed=true;activated.upload(state(3,42));activated.flush();assertEquals(SAVED,activated.last().kind());assertEquals(1,activated.writes);
     }
     @Test void transferTimesOutAndNoUnboundedFloodIsAccepted()throws Exception{
         var h=new Harness(true,root.resolve("timeout"));h.read();h.send(BEGIN,100,0,new byte[0],"");h.now+=41_000_000_000L;h.session.tick();h.flush();assertEquals(ERROR,h.last().kind());assertTrue(h.released);

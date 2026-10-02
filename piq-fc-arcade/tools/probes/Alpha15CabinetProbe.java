@@ -63,8 +63,8 @@ public final class Alpha15CabinetProbe {
             check(uvs.equals(Set.of("0.0:0.0","0.0:1.0","1.0:0.0","1.0:1.0")));
             check(frame==CabinetVideoGeometry.frame(dual,facing,raw,rotation));
         }
-        float[][][] expected={{{0,1},{1,1},{1,0},{0,0}},{{0,0},{0,1},{1,1},{1,0}},
-                {{1,0},{0,0},{0,1},{1,1}},{{1,1},{1,0},{0,0},{0,1}}};
+        float[][][] expected={{{0,1},{1,1},{1,0},{0,0}},{{1,1},{1,0},{0,0},{0,1}},
+                {{1,0},{0,0},{0,1},{1,1}},{{0,0},{0,1},{1,1},{1,0}}};
         for(int rotation=0;rotation<4;rotation++){
             var frame=CabinetVideoGeometry.frame(true,0,4.0/3,rotation);
             for(int i=0;i<4;i++){near(frame.vertices().get(i).u(),expected[rotation][i][0]);near(frame.vertices().get(i).v(),expected[rotation][i][1]);}

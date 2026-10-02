@@ -22,6 +22,8 @@ public final class MdPublicNetwork {
         void input(Input value); void media(Media value);
         void preference(Preference value);
         void privateStart(PrivateStart value);
+        default void privateActivate(PrivateActivated value){}
+        default void activate(Activated value){}
         default void visual(Visual value){}
     }
     private static volatile Client client;
@@ -86,6 +88,31 @@ public final class MdPublicNetwork {
         public static final StreamCodec<RegistryFriendlyByteBuf,PrivateStart> CODEC=StreamCodec.of((b,p)->{b.writeUUID(p.content);b.writeBoolean(p.start);},b->new PrivateStart(b.readUUID(),b.readBoolean()));
         public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
+    public record Activated(long wire) implements CustomPacketPayload {
+        public Activated{if(wire<=0)throw new IllegalArgumentException("MD activation");}
+        public static final Type<Activated> TYPE=new Type<>(id("activated"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,Activated> CODEC=StreamCodec.of((b,p)->b.writeVarLong(p.wire),b->new Activated(b.readVarLong()));
+        public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
+    public record PrivateActivated(UUID content) implements CustomPacketPayload {
+        public PrivateActivated{Objects.requireNonNull(content);}
+        public static final Type<PrivateActivated> TYPE=new Type<>(id("private_activated"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,PrivateActivated> CODEC=StreamCodec.of((b,p)->b.writeUUID(p.content),b->new PrivateActivated(b.readUUID()));
+        public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
+    public record PrivateFinished(UUID content,boolean closed,boolean saved) implements CustomPacketPayload {
+        public PrivateFinished{Objects.requireNonNull(content);}
+        public static final Type<PrivateFinished> TYPE=new Type<>(id("private_finished"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,PrivateFinished> CODEC=StreamCodec.of((b,p)->{b.writeUUID(p.content);b.writeBoolean(p.closed);b.writeBoolean(p.saved);},b->new PrivateFinished(b.readUUID(),b.readBoolean(),b.readBoolean()));
+        public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
+    /** Local native teardown only; never accepted as proof of server persistence. */
+    public record Closed(long wire,boolean closed) implements CustomPacketPayload {
+        public Closed{if(wire<=0)throw new IllegalArgumentException("MD close");}
+        public static final Type<Closed> TYPE=new Type<>(id("closed"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,Closed> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.wire);b.writeBoolean(p.closed);},b->new Closed(b.readVarLong(),b.readBoolean()));
+        public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
     public record Release(long wire,int port,UUID loan) implements CustomPacketPayload {
         public Release {if(wire<=0||port<0||port>1)throw new IllegalArgumentException("MD release");Objects.requireNonNull(loan);}
         public static final Type<Release> TYPE=new Type<>(id("release"));
@@ -93,14 +120,18 @@ public final class MdPublicNetwork {
         public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     public static void register(RegisterPayloadHandlersEvent event){
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"md-public-2")
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"md-public-3")
             .playToClient(Start.TYPE,Start.CODEC,(p,c)->dispatch(c,h->h.start(p)))
             .playToClient(PrivateStart.TYPE,PrivateStart.CODEC,(p,c)->dispatch(c,h->h.privateStart(p)))
+            .playToClient(Activated.TYPE,Activated.CODEC,(p,c)->dispatch(c,h->h.activate(p)))
+            .playToClient(PrivateActivated.TYPE,PrivateActivated.CODEC,(p,c)->dispatch(c,h->h.privateActivate(p)))
             .playToClient(Seat.TYPE,Seat.CODEC,(p,c)->dispatch(c,h->h.seat(p)))
             .playToClient(End.TYPE,End.CODEC,(p,c)->dispatch(c,h->h.end(p)))
             .playToClient(Media.TYPE,Media.CODEC,(p,c)->dispatch(c,h->h.media(p)))
             .playToClient(Visual.TYPE,Visual.CODEC,(p,c)->dispatch(c,h->h.visual(p)))
             .playToServer(Release.TYPE,Release.CODEC,(p,c)->server(c,h->MdPublicServer.release(h,p)))
+            .playToServer(Closed.TYPE,Closed.CODEC,(p,c)->server(c,h->MdPublicServer.closed(h,p)))
+            .playToServer(PrivateFinished.TYPE,PrivateFinished.CODEC,(p,c)->server(c,h->MdPrivateServer.finished(h,p)))
             .playBidirectional(Input.TYPE,Input.CODEC,(p,c)->{if(c.player() instanceof ServerPlayer)server(c,h->MdPublicServer.input(h,p));else dispatch(c,h->h.input(p));})
             .playBidirectional(Preference.TYPE,Preference.CODEC,(p,c)->{if(c.player() instanceof ServerPlayer)server(c,h->MdPublicServer.preference(h,p.privatePlay()));else dispatch(c,h->h.preference(p));});
     }

@@ -243,10 +243,11 @@ public final class HomeApplianceService {
                 } else if (control == HomeApplianceControl.POWER && player.isShiftKeyDown()
                         && source instanceof HomeConsoleBlockEntity subor && subor.getBlockState().getBlock() instanceof SuborConsoleBlock) {
                     HomeConsoleRuntime.reset(player,subor);
-                } else if (control == HomeApplianceControl.POWER && (running(level,source) || emptyPowered(level,source))) {
+                } else if (control == HomeApplianceControl.POWER && (running(level,source) || emptyPowered(level,source) || preparing(player,source))) {
                     stop(level,source);
                     if (!running(level,source)) HomeInteractionSounds.play(level,source.getBlockPos(),HomeInteractionSounds.Action.POWER_OFF);
-                    HomeFeedback.show(player,"appliance_console_off");
+                    if(running(level,source))player.displayClientMessage(net.minecraft.network.chat.Component.literal("正在停止并保存；完成前请勿插拔卡带。"),true);
+                    else HomeFeedback.show(player,"appliance_console_off");
                 } else {
                     if (tv == null || !tv.powered()) { HomeFeedback.show(player,"appliance_need_tv"); return InteractionResult.CONSUME; }
                     if (control == HomeApplianceControl.POWER && source != null && !hasCartridge(source)) {
@@ -294,6 +295,11 @@ public final class HomeApplianceService {
             var hooks = HomeSystems.applianceHooks(external.systemId());
             if (hooks != null) hooks.onPowerOff(level,external);
         }
+    }
+    private static boolean preparing(ServerPlayer player,HomeEndpointBlockEntity source){
+        if(source instanceof HomeConsoleBlockEntity fc)return HomeConsoleRuntime.pendingSave(player,fc);
+        if(source instanceof ExternalHomeConsoleBlockEntity external){var hooks=HomeSystems.applianceHooks(external.systemId());return hooks!=null&&hooks.pendingStart(player.serverLevel(),external);}
+        return false;
     }
     private static boolean facts(ServerPlayer player, BlockPos clicked, HomeEndpointBlockEntity expected, Vec3 eye, Vec3 end) {
         var level = player.serverLevel();

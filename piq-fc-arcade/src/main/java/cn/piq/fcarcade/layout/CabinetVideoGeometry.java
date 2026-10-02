@@ -26,14 +26,14 @@ public final class CabinetVideoGeometry {
         return result;
     }
 
-    /** libretro reports counter-clockwise content rotation: displayed top-left UV -> original texture UV. */
+    /** Public frames use clockwise turns; inverse sampling maps displayed UV to the unrotated texture. */
     public static Uv textureUv(float u,float v,int rotation) {
         if(!Float.isFinite(u)||!Float.isFinite(v)||u<0||u>1||v<0||v>1)
             throw new IllegalArgumentException("UV outside complete source");
         return switch(Math.floorMod(rotation,4)) {
-            case 1 -> new Uv(1-v,u);
+            case 1 -> new Uv(v,1-u);
             case 2 -> new Uv(1-u,1-v);
-            case 3 -> new Uv(v,1-u);
+            case 3 -> new Uv(1-v,u);
             default -> new Uv(u,v);
         };
     }

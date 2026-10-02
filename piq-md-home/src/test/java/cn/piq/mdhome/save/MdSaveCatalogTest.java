@@ -15,6 +15,7 @@ class MdSaveCatalogTest {
     static final String ROM="a".repeat(64),OTHER="b".repeat(64);
     static final UUID PLAYER=UUID.fromString("aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa"),CARD=UUID.fromString("bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb");
     MdSaveCatalog catalog(){return new MdSaveCatalog(root);}
+    @Test void liveSecondPortDecisionNeverChangesSaveOwnershipOrLabel(){var original=new MdPublicSaves.SavePlan(MdSaveCatalog.identity(ROM),true,true,1,false,"physical-owner","中文存档",2,"old-version",root);var joined=original.withJoin(true);assertEquals(1,joined.savePlayers());assertTrue(joined.allowSecondPort());assertEquals(original.ownerKey(),joined.ownerKey());assertEquals(original.name(),joined.name());assertEquals(original.expectedVersion(),joined.expectedVersion());assertEquals(original.identity(),joined.identity());assertEquals(original,joined.withJoin(false));}
     String owner(){return MdSaveCatalog.personal(PLAYER,1);}
     byte[] bytes(String rom,long frame){return NetplaySaveState.encode(new NetplaySaveState.Parts(MdSaveCatalog.identity(rom),frame,new byte[]{1,2,3},new byte[]{4,5},new byte[0]));}
     MdSaveCatalog.Row write(String owner,String rom,String name)throws Exception{
