@@ -29,6 +29,17 @@ public abstract class ExternalHomeConsoleBlockEntity extends HomeEndpointBlockEn
     public boolean netplayExperimental(){return false;}
     public void netplayExperimental(boolean value){if(value)throw new UnsupportedOperationException("Netplay not supported");}
 
+    /** Addon migration for a formerly unavailable mode; never changes an existing supported choice.
+     * This is not a player permission bypass or a way to enable a server-disabled runtime. */
+    protected final boolean useSupportedSynchronizationFallback(cn.piq.fcarcade.cabinet.CabinetSyncMode fallback) {
+        if(!(level instanceof ServerLevel server)||!server.getServer().isSameThread()||isRemoved())return false;
+        var hooks=HomeSystems.applianceHooks(systemId);
+        if(hooks==null||!hooks.synchronizationSettingsAvailable()||hooks.isRunning(server,this)||hooks.pendingStart(server,this))return false;
+        int supported=hooks.synchronizationSupportedModes(server,this);
+        if((supported&(1<<synchronizationMode().ordinal()))!=0||(supported&(1<<fallback.ordinal()))==0||netplayExperimental())return false;
+        synchronizationMode(fallback);return true;
+    }
+
     /** Call after the addon's own cartridge transaction; does not grant link mutation. */
     public final void notifyHardwareChanged() {
         if (level instanceof ServerLevel serverLevel && serverLevel.getServer().isSameThread() && !isRemoved()

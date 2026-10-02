@@ -6,6 +6,7 @@ The top badge changes only G to K, using native model faces and atlas swatches.
 """
 from pathlib import Path
 import json
+import copy
 
 
 HANDS = ('firstperson_righthand', 'firstperson_lefthand',
@@ -97,6 +98,23 @@ def prepare(assets):
         model = json.loads(path.read_text(encoding='utf-8'))
         relabel_console(model)
         write_model(path, model)
+    # Derive the second controller independently; never duplicate/hide the other port.
+    for state in ('empty', 'inserted'):
+        for first in (False, True):
+            stem = state + ('_borrowed' if first else '')
+            model = json.loads((assets / f'models/block/md2_{stem}.json').read_text(encoding='utf-8'))
+            model['elements'] = [e for e in model['elements'] if not e.get('name', '').lower().startswith('p2')]
+            write_model(assets / f'models/block/md2_{stem}_borrowed_two.json', model)
+    variants = {}
+    for facing, turn in (('north', 0), ('east', 90), ('south', 180), ('west', 270)):
+        for inserted in (False, True):
+            for first in (False, True):
+                for second in (False, True):
+                    key = f'facing={facing},inserted={str(inserted).lower()},borrowed={str(first).lower()},borrowed_two={str(second).lower()}'
+                    stem = ('inserted' if inserted else 'empty') + ('_borrowed' if first else '') + ('_borrowed_two' if second else '')
+                    variants[key] = {'model': 'piq_md_home:block/md2_' + stem, 'y': turn}
+    (assets / 'blockstates').mkdir(parents=True, exist_ok=True)
+    write_model(assets / 'blockstates/md2.json', {'variants': variants})
 
 
 if __name__ == '__main__':

@@ -64,6 +64,7 @@ public final class ContentCardClient {
         if(m.op()==CARD){w.current=m.entries().isEmpty()?null:m.entries().getFirst();w.cardTitle=m.name();w.permissions=m.size();w.saveMode=m.offset();
             String cover=new String(m.data(),java.nio.charset.StandardCharsets.US_ASCII);w.cover=cn.piq.fcarcade.home.CartridgeLimits.validHash(cover)?cover:"";
             if(w.originalCover==null)w.originalCover=w.cover;if(w.draft.isBlank())w.draft=m.name();w.refreshWidgets();return;}
+        if(m.op()==CARD_OPTIONS){w.players=Math.clamp(m.offset(),1,w.features().maxPlayers());w.refreshWidgets();return;}
         if(m.op()==CANCEL){w.upload=null;w.closed=true;writer=null;if(mc.screen==w)mc.setScreen(null);notice(m.name());return;}
         if(m.op()==LIST||m.op()==COVER_LIST){
             if((m.op()==COVER_LIST)!=w.coversTab)return;
@@ -132,7 +133,7 @@ public final class ContentCardClient {
     private static final class Writer extends DeviceScreen {
         final Message open;final Object connection;List<ContentCardStore.Entry> entries=List.of();String status;int page,offset,total,permissions,view;byte[] upload;boolean loading,closed,localMode;long last=System.nanoTime();
         ContentCardStore.Entry current;String cardTitle="",draft="",query="";Choice selected;
-        String cover="",originalCover;int saveMode=2;boolean coversTab,saveSettings;
+        String cover="",originalCover;int saveMode=2,players=1;boolean coversTab,saveSettings;
         final ContentCardCatalogState gamesCatalog=new ContentCardCatalogState(),coversCatalog=new ContentCardCatalogState();
         List<Choice> localGames=List.of(),localCovers=List.of();boolean directoryOpening;
         private record ServerPage(List<ContentCardStore.Entry> entries,int index,int total){}
@@ -167,14 +168,15 @@ public final class ContentCardClient {
             if(!layout.supported()){button("返回（请降低 GUI 缩放）",10,height-32,width-20,this::onClose,true);return;}
             if(saveSettings){
                 var saves=new cn.piq.fcarcade.client.ui.CartridgeSaveSettingsLayout(layout.panel());
-                String[] labels={"不存档","卡带存档（尚未接入）","个人存档（当前仅本机）"};
-                for(int i=0;i<3;i++){final int mode=i;button(labels[i]+(saveMode==i?" · 当前":""),saves.choice(i),()->setSaveMode(mode),writable()&&i!=1&&i!=saveMode);}
+                String[] labels=features().publicSaves()?new String[]{"不存档","卡带存档（公开会话）","个人存档（公开会话）"}
+                        :new String[]{"不存档","卡带存档（尚未接入）","个人存档（当前仅本机）"};
+                for(int i=0;i<3;i++){final int mode=i;button(labels[i]+(saveMode==i?" · 当前":""),saves.choice(i),()->setSaveMode(mode),writable()&&features().allowsSaveMode(i)&&i!=saveMode);}
                 button("返回卡带工作台",saves.back(),()->{saveSettings=false;refreshWidgets();},true);return;
             }
             var name=bar.name();var edit=new net.minecraft.client.gui.components.EditBox(font,name.x(),name.y(),name.width(),name.height(),Component.literal("卡带名称"));
             edit.setMaxLength(128);edit.setValue(draft);edit.setResponder(v->draft=v);edit.setEditable(ready());addRenderableWidget(edit);
             button("保存名称",bar.saveName(),this::rename,writable()&&current!=null);
-            button("人数：单人",bar.players(),()->{},false);
+            button("人数："+(players==1?"单人":players==2?"双人":players+" 人"),bar.players(),this::setPlayers,writable()&&features().maxPlayers()>1);
             if(features().covers()){
                 button(coversTab?"游戏库":"> 游戏库",bar.gamesTab(),()->tab(false),writable()&&coversTab);
                 button(coversTab?"> 封面":"封面",bar.coversTab(),()->tab(true),writable()&&!coversTab);
@@ -201,8 +203,8 @@ public final class ContentCardClient {
                 button("恢复",bar.restoreCover(),()->applyCover(originalCover),writable()&&originalCover!=null&&!originalCover.isEmpty()&&!cover.equals(originalCover));
             }else if(features().localSaveSettings()){
                 button("存档设置",bar.clearCover(),()->{saveSettings=true;refreshWidgets();},ready());
-                var r=bar.restoreCover();var b=DeviceUi.button(font,"存档库",r.x(),r.y(),r.width(),r.height(),()->{},false,DeviceUi.Tone.NORMAL);
-                b.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal("此版本只有本机个人进度；服务器个人/卡带存档库尚未接入。")));addRenderableWidget(b);
+                var r=bar.restoreCover();var b=DeviceUi.button(font,"存档库",r.x(),r.y(),r.width(),r.height(),this::saveLibrary,writable()&&current!=null&&features().publicSaves(),DeviceUi.Tone.NORMAL);
+                b.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal(features().publicSaves()?"查看当前游戏的真实服务器进度；不显示或上传私人本机档。":"此版本只有本机个人进度；服务器个人/卡带存档库尚未接入。")));addRenderableWidget(b);
             }
             boolean permitted=selected!=null&&has(coversTab?(selected.path==null?cn.piq.fcarcade.access.PlayerContentPolicy.SERVER_COVER_USE:cn.piq.fcarcade.access.PlayerContentPolicy.COVER_UPLOAD)
                     :selected.path==null?cn.piq.fcarcade.access.PlayerContentPolicy.SERVER_ROM_USE:cn.piq.fcarcade.access.PlayerContentPolicy.ROM_UPLOAD);
@@ -213,6 +215,12 @@ public final class ContentCardClient {
             entries=previous.entries();page=previous.index();total=previous.total();locals=covers?localCovers:localGames;scanLocal();requestPage(0);
         }
         private void setSaveMode(int mode){if(!writable())return;loading=true;last=System.nanoTime();send(msg(SAVE_MODE,open.system(),open.token(),open.pos(),"","",0,mode,new byte[0]));refreshWidgets();}
+        private void setPlayers(){if(!writable())return;loading=true;last=System.nanoTime();send(msg(PLAYERS,open.system(),open.token(),open.pos(),"","",0,players%features().maxPlayers()+1,new byte[0]));refreshWidgets();}
+        private void saveLibrary(){
+            if(!writable()||current==null||!features().publicSaves())return;
+            if(!CartridgeSaveScreen.expectOpen(open.system().toString(),open.token(),current.hash()))return;
+            send(msg(SAVE_LIBRARY,open.system(),open.token(),open.pos(),"","",0,0,new byte[0]));
+        }
         private void applyCover(String hash){if(!writable())return;loading=true;last=System.nanoTime();send(msg(COVER_WRITE,open.system(),open.token(),open.pos(),hash,"",0,0,new byte[0]));refreshWidgets();}
         private void requestPage(int target){
             if(serverExpired()){status="服务器目录请求超时，请关闭后重新打开；本次会话不能重试、上传或写卡";refreshWidgets();return;}
@@ -320,7 +328,8 @@ public final class ContentCardClient {
             if(!layout.supported()){super.render(g,mx,my,partial);return;}
             if(saveSettings){
                 var saves=new cn.piq.fcarcade.client.ui.CartridgeSaveSettingsLayout(p);
-                String[] descriptions={"每次从头开始；不读取、不写入进度，旧档保留。","进度跟随卡带：本版服务器保存尚未接入，不可选择。","按玩家、本服务器、核心和游戏保存在本机；不是服务器个人档。"};
+                String[] descriptions=features().publicSaves()?new String[]{"每次从头开始；不读取、不写入进度，旧档保留。","公开会话：进度归这张卡带，转交或换机器可继续；不自动搬到其他服务器。","公开会话：使用玩家自己的服务器进度；私人本机档独立保留，不迁移。"}
+                        :new String[]{"每次从头开始；不读取、不写入进度，旧档保留。","进度跟随卡带：本版服务器保存尚未接入，不可选择。","按玩家、本服务器、核心和游戏保存在本机；不是服务器个人档。"};
                 for(int i=0;i<3;i++)DeviceUi.text(g,font,descriptions[i],p.x()+10,saves.descriptionY(i),p.width()-20,DeviceUi.MUTED);
                 var r=saves.status();DeviceUi.status(g,font,status,r.x(),r.y(),r.width(),loading);super.render(g,mx,my,partial);return;
             }
@@ -332,7 +341,9 @@ public final class ContentCardClient {
             int detailBottom=features().covers()?bar.clearCover().y():layout.primary().y();
             for(int i=0;i<Math.min(lines.size(),Math.max(0,(detailBottom-detail.y()-8)/10));i++)g.drawString(font,lines.get(i),detail.x()+6,detail.y()+5+i*10,DeviceUi.TEXT,false);
             var r=layout.status();DeviceUi.status(g,font,loading?status:catalog().summary()+" · "+status,r.x(),r.y(),r.width(),loading||catalog().localPending()||catalog().serverPending());super.render(g,mx,my,partial);
-            if(mx>=detail.x()&&mx<detail.right()&&my>=detail.y()&&my<bar.clearCover().y())g.renderTooltip(font,Component.literal(info+"\n当前仅私人 1P；保存方式："+(saveMode==0?"不存档":"个人本机")+"。服务器卡带档尚未接入。"),mx,my);
+            if(mx>=detail.x()&&mx<detail.right()&&my>=detail.y()&&my<bar.clearCover().y())g.renderTooltip(font,Component.literal(info+"\n"+(features().publicSaves()
+                    ?"公开会话保存："+(saveMode==0?"不存档":saveMode==1?"卡带":"个人")+"；私人本机进度不迁移。人数标签不会改变游戏本身。"
+                    :"当前仅私人 1P；保存方式："+(saveMode==0?"不存档":"个人本机")+"。服务器卡带档尚未接入。")),mx,my);
             else if(mx>=r.x()&&mx<r.right()&&my>=r.y()&&my<r.bottom()){
                 String details=scanDetails();if(details.length()>1400)details=details.substring(0,1400)+"\n更多失败请点击状态栏复制诊断或查看日志。";
                 g.renderTooltip(font,Component.literal(details),mx,my);

@@ -273,7 +273,8 @@ public final class HomeApplianceService {
                         if (control == HomeApplianceControl.POWER) {
                             boolean started = hooks.onPowerOn(player,connection.get());
                             if (started) HomeInteractionSounds.play(level,external.getBlockPos(),HomeInteractionSounds.Action.POWER_ON);
-                            HomeFeedback.show(player,started ? "appliance_console_on" : "appliance_power_failed");
+                            HomeFeedback.show(player,started ? "appliance_console_on" : hooks.pendingStart(level,external)
+                                    ? "appliance_choose_save" : "appliance_power_failed");
                         }
                         else if (control == HomeApplianceControl.RESET) hooks.onReset(player,connection.get());
                     }

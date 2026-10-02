@@ -18,11 +18,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 
 public final class MdBlock extends HorizontalDirectionalBlock implements EntityBlock {
-    public static final BooleanProperty INSERTED=BooleanProperty.create("inserted"),BORROWED=BooleanProperty.create("borrowed");
+    public static final BooleanProperty INSERTED=BooleanProperty.create("inserted"),BORROWED=BooleanProperty.create("borrowed"),BORROWED_TWO=BooleanProperty.create("borrowed_two");
     public static final MapCodec<MdBlock> CODEC=simpleCodec(MdBlock::new);
-    public MdBlock(Properties p){super(p);registerDefaultState(stateDefinition.any().setValue(FACING,Direction.NORTH).setValue(INSERTED,false).setValue(BORROWED,false));}
+    public MdBlock(Properties p){super(p);registerDefaultState(stateDefinition.any().setValue(FACING,Direction.NORTH).setValue(INSERTED,false).setValue(BORROWED,false).setValue(BORROWED_TWO,false));}
     protected MapCodec<? extends HorizontalDirectionalBlock> codec(){return CODEC;}
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState>b){b.add(FACING,INSERTED,BORROWED);}
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState>b){b.add(FACING,INSERTED,BORROWED,BORROWED_TWO);}
     public BlockState getStateForPlacement(BlockPlaceContext c){return defaultBlockState().setValue(FACING,c.getHorizontalDirection().getOpposite());}
     protected BlockState rotate(BlockState s,Rotation r){return s.setValue(FACING,r.rotate(s.getValue(FACING)));}
     protected BlockState mirror(BlockState s,Mirror m){return rotate(s,m.getRotation(s.getValue(FACING)));}

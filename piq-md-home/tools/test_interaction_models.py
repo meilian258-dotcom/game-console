@@ -207,15 +207,18 @@ class InteractionModelsTest(unittest.TestCase):
 
     def test_all_world_states_and_console_item_resolve_to_patched_models(self):
         variants = read(ASSETS / 'blockstates/md2.json')['variants']
-        self.assertEqual(16, len(variants))
+        self.assertEqual(32, len(variants))
         for facing, rotation in (('north', 0), ('east', 90), ('south', 180), ('west', 270)):
             for inserted in (False, True):
                 for borrowed in (False, True):
-                    key = f'facing={facing},inserted={str(inserted).lower()},borrowed={str(borrowed).lower()}'
-                    ref = variants[key]
-                    self.assertEqual(rotation, ref['y'])
-                    elements = model(ref['model'].split(':')[1])['elements']
-                    self.assertTrue(any(e['name'] == BADGE_PREFIX + 'erase_G' for e in elements))
+                    for second in (False, True):
+                        key = f'facing={facing},inserted={str(inserted).lower()},borrowed={str(borrowed).lower()},borrowed_two={str(second).lower()}'
+                        ref = variants[key]
+                        self.assertEqual(rotation, ref['y'])
+                        elements = model(ref['model'].split(':')[1])['elements']
+                        self.assertTrue(any(e['name'] == BADGE_PREFIX + 'erase_G' for e in elements))
+                        self.assertEqual(not borrowed, any(e['name'].lower().startswith('p1') for e in elements))
+                        self.assertEqual(not second, any(e['name'].lower().startswith('p2') for e in elements))
         self.assertEqual('piq_md_home:block/md2_empty', model('item/md2')['parent'])
 
     def test_regeneration_is_byte_idempotent_and_import_postprocess_compatible(self):

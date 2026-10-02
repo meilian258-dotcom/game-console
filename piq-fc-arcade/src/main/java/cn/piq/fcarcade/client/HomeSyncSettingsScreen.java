@@ -19,6 +19,16 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 /** Vanilla settings page; opening or closing never powers off or returns a controller. */
 public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
+    /** Small per-device actions; the common settings layout and server mode authority remain shared. */
+    public interface DeviceActions {
+        void open(net.minecraft.client.gui.screens.Screen parent,net.minecraft.core.BlockPos console);
+        String footer(net.minecraft.core.BlockPos console);
+        default boolean choosesSecondPortAtStartup(){return false;}
+    }
+    private static final java.util.Map<net.minecraft.resources.ResourceLocation,DeviceActions> ACTIONS=new java.util.HashMap<>();
+    public static void registerDeviceActions(net.minecraft.resources.ResourceLocation system,DeviceActions actions){if(ACTIONS.putIfAbsent(system,java.util.Objects.requireNonNull(actions))!=null)throw new IllegalArgumentException("Duplicate device settings actions");}
+    public static void openRuntimeSettings(net.minecraft.client.gui.screens.Screen parent,net.minecraft.resources.ResourceLocation system,String label){Minecraft.getInstance().setScreen(new HomeRuntimeSettingsScreen(parent,system,label));}
+    private DeviceActions actions(){return ACTIONS.get(deviceSystem());}
     private final Connection connection;
     private HomeSyncNetwork.Setting setting;
     private String status;
@@ -81,10 +91,11 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
             ?"需 OP2；显示或隐藏使用者标牌，不影响游戏画面。":"此机型不支持使用者标牌。")));
         addRenderableWidget(occupancy);
         boolean fc=minecraft.level==null||!(minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity);
-        var approval=Button.builder(Component.literal(diagnosticsOnly()?"2P：尚未接入":fc?"2P：开局选择":"加入需同意："+(setting.approval()?"开":"关")),
+        boolean startupSecond=fc||actions()!=null&&actions().choosesSecondPortAtStartup();
+        var approval=Button.builder(Component.literal(diagnosticsOnly()?"2P：尚未接入":startupSecond?"2P：开局选择":"加入需同意："+(setting.approval()?"开":"关")),
             b->apply(-1,-1,setting.approval()?0:1)).bounds(right,top+HomeSyncSettingsLayout.ADVANCED_ROW,half,20).build();
-        approval.active=!diagnosticsOnly()&&!fc&&ready()&&setting.editable();
-        approval.setTooltip(Tooltip.create(Component.literal(diagnosticsOnly()?"此附属尚未接入公共多席位；不会借出无法操作的 2P 手柄。":fc?"开机玩家决定是否允许 2P；本局不再弹出申请。":"需 OP2；加入仍受席位、游戏人数和交互权限限制。")));
+        approval.active=!diagnosticsOnly()&&!startupSecond&&ready()&&setting.editable();
+        approval.setTooltip(Tooltip.create(Component.literal(diagnosticsOnly()?"此附属尚未接入公共多席位；不会借出无法操作的 2P 手柄。":startupSecond?"开机玩家决定是否允许 2P；本局不再弹出申请。":"需 OP2；加入仍受席位、游戏人数和交互权限限制。")));
         addRenderableWidget(approval);
         int footer=(panelWidth-44)/5;
         var refresh=Button.builder(Component.literal("刷新"),b->apply(-1,-1,-1))
@@ -96,7 +107,7 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         var network=Button.builder(Component.literal("网络"),b->NetworkDiagnosticsScreen.open(this)).bounds(left+22+2*footer,top+HomeSyncSettingsLayout.FOOTER_ROW,footer,20).build();
         network.active=ready();addRenderableWidget(network);
         addRenderableWidget(Button.builder(Component.literal(diagnosticsOnly()?"本机设置":"私人模式"),b->{
-            if(diagnosticsOnly())openLocalSettings();else PrivateHomeClient.open();
+            if(actions()!=null)actions().open(this,setting.console());else if(diagnosticsOnly())openLocalSettings();else PrivateHomeClient.open();
         }).bounds(left+28+3*footer,top+HomeSyncSettingsLayout.FOOTER_ROW,footer,20).build());
         addRenderableWidget(Button.builder(Component.literal("关闭"),b->onClose()).bounds(left+34+4*footer,top+HomeSyncSettingsLayout.FOOTER_ROW,footer,20).build());
     }
@@ -150,6 +161,6 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         else if(mx>=left+8&&mx<left+panelWidth-8&&my>=top+HomeSyncSettingsLayout.HINT_ROW&&my<top+HomeSyncSettingsLayout.FOOTER_ROW)
             g.renderTooltip(font,Component.literal(footerHint()),mx,my);
     }
-    private String footerHint(){return diagnosticsOnly()?PrivateHomeClient.cartridgeRuntimeLabel(deviceSystem(),setting.console())
+    private String footerHint(){if(actions()!=null)return actions().footer(setting.console());return diagnosticsOnly()?PrivateHomeClient.cartridgeRuntimeLabel(deviceSystem(),setting.console())
             +" · 本机个人进度；尚无服务器卡带档/公共旁观。":HomeSyncSaveHints.footer(setting.system(),setting.mode());}
 }

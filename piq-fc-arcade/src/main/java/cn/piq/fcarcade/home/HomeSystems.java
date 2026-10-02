@@ -39,6 +39,8 @@ public final class HomeSystems {
             connection(player.serverLevel(), console.getBlockPos()).ifPresent(link -> onController(player, link, port));
         }
         default boolean isRunning(ServerLevel level, ExternalHomeConsoleBlockEntity console) { return false; }
+        /** A validated asynchronous startup/slot-choice, not a running or failed native core. */
+        default boolean pendingStart(ServerLevel level, ExternalHomeConsoleBlockEntity console) { return false; }
         /** Opt-in: unadapted addons cannot advertise a configurable execution lane. */
         default boolean synchronizationSettingsAvailable() { return false; }
         /** Read-only device diagnostics must not advertise an unsupported execution mode. */

@@ -21,7 +21,10 @@ public class ContentCartridgeItem extends Item {
         lines.add(Component.literal(entry==null?"空卡：手持右键老式电脑写入游戏":ContentCardData.title(stack)));
         if(ContentCards.features(system).localSaveSettings()){
             lines.add(Component.literal("右键主机插卡；右键老式电脑编辑 / 封面 / 保存方式"));
-            lines.add(Component.literal(ContentCardData.saveMode(stack)==0?"【不存档】":"【个人本机存档；服务器存档尚未接入】"));
+            int mode=ContentCardData.saveMode(stack);
+            lines.add(Component.literal(mode==0?"【不存档】":ContentCards.features(system).publicSaves()
+                    ?mode==1?"【公开卡带存档】":"【公开个人存档；私人本机档独立】":"【个人本机存档；服务器存档尚未接入】"));
+            if(ContentCards.features(system).maxPlayers()>1)lines.add(Component.literal("人数标签："+ContentCardData.players(stack)+" 人（不改变游戏自身能力）"));
             if(entry!=null&&flag.isAdvanced())lines.add(Component.literal("游戏 ROM · "+entry.hash().substring(0,12)));
         }
         lines.add(Component.literal("写卡沿用管理终端的游戏库权限；卡带不包含游戏文件"));

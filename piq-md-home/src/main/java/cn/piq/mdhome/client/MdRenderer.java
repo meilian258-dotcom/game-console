@@ -27,9 +27,9 @@ public final class MdRenderer implements BlockEntityRenderer<MdConsole> {
                     6.045/16,2.5/16,9.955/16,4.22/16,11.782/16);
         }finally{poses.popPose();}
         ControllerCableRenderer.render(c,turn,ControllerCableGeometry.Style.SUBOR,
-                new ControllerCableRenderer.Lease(c.borrower(),c.loan()),null,
-                (stack,port,lease)->port==0&&lease.equals(MdController.loan(stack)),
-                new Point(9.85/16,.88/16,6.45/16),null,partial,poses,buffers,light,overlay);
+                new ControllerCableRenderer.Lease(c.borrower(0),c.loan(0)),new ControllerCableRenderer.Lease(c.borrower(1),c.loan(1)),
+                (stack,port,lease)->port==MdController.port(stack)&&lease.equals(MdController.loan(stack)),
+                new Point(9.85/16,.88/16,6.45/16),new Point(6.15/16,.88/16,6.45/16),partial,poses,buffers,light,overlay);
     }
     public boolean shouldRenderOffScreen(MdConsole c){return true;}
     public AABB getRenderBoundingBox(MdConsole c){return av.getRenderBoundingBox(c).minmax(ControllerCableRenderer.bounds(c));}

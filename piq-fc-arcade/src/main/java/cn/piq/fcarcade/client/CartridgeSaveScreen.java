@@ -46,11 +46,16 @@ public final class CartridgeSaveScreen extends cn.piq.fcarcade.client.ui.DeviceS
         super(Component.literal("卡带 · 存档管理"));this.data=data;this.connection=connection;status=data.message();
     }
     public static void open(String system,UUID editorToken,UUID cardId,int hand,int slot,String rom){
-        var mc=Minecraft.getInstance();if(mc.getConnection()==null||mc.screen==null||rom==null||rom.isEmpty())return;
-        var source=mc.getConnection().getConnection();if(!source.isConnected())return;
-        if(opening!=null&&opening.parent==mc.screen&&opening.connection==source&&System.nanoTime()-opening.at<15_000_000_000L)return;
-        opening=new Opening(mc.screen,source,system,rom,editorToken,System.nanoTime());
+        if(!expectOpen(system,editorToken,rom))return;
         CartridgeSaveNetwork.send(new CartridgeSaveNetwork.Open(system,editorToken,cardId,hand,slot));
+    }
+    /** An authorized content workbench sends its own SAVE_LIBRARY action after arming this receiver. */
+    public static boolean expectOpen(String system,UUID editorToken,String rom){
+        var mc=Minecraft.getInstance();if(mc.getConnection()==null||mc.screen==null||rom==null||rom.isEmpty())return false;
+        var source=mc.getConnection().getConnection();if(!source.isConnected())return false;
+        if(opening!=null&&opening.parent==mc.screen&&opening.connection==source&&System.nanoTime()-opening.at<15_000_000_000L)return false;
+        opening=new Opening(mc.screen,source,system,rom,editorToken,System.nanoTime());
+        return true;
     }
     private static void receive(CartridgeSaveNetwork.Reply reply){
         var mc=Minecraft.getInstance();if(mc.getConnection()==null)return;Connection source=mc.getConnection().getConnection();
@@ -128,9 +133,14 @@ public final class CartridgeSaveScreen extends cn.piq.fcarcade.client.ui.DeviceS
             CartridgeSaveNetwork.send(new CartridgeSaveNetwork.Request(data.token(),CartridgeSaveNetwork.CLOSE,"","","",null));
     }
     private static String details(CartridgeSaveNetwork.Entry e){return e.name()+"\n归属："+e.owner()+"\n来源："+e.source()+"\n更新时间："+DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(e.modified()))+"\n大小："+e.bytes()+" 字节"+(e.active()?"\n正在使用，不能修改":"");}
+    private static String systemLabel(String system){
+        if(system.indexOf(':')<0)return system.toUpperCase(java.util.Locale.ROOT);
+        var id=net.minecraft.resources.ResourceLocation.tryParse(system);var adapter=id==null?null:cn.piq.fcarcade.home.content.ContentCards.adapter(id);
+        return adapter==null?(id==null?system:id.getPath().toUpperCase(java.util.Locale.ROOT)):adapter.label();
+    }
     @Override public void render(GuiGraphics g,int mx,int my,float dt){
         g.fill(0,0,width,height,DeviceUi.BG);if(layout==null)return;var p=layout.panel();
-        DeviceUi.panel(g,font,p.x(),p.y(),p.width(),p.height(),title.getString(),data.system().toUpperCase(java.util.Locale.ROOT)+" · 当前卡带的服务器存档");
+        DeviceUi.panel(g,font,p.x(),p.y(),p.width(),p.height(),title.getString(),systemLabel(data.system())+" · 当前卡带的服务器存档");
         if(!layout.supported()){DeviceUi.text(g,font,"请放大窗口或降低 GUI 缩放；Esc 关闭",p.x()+10,p.y()+45,p.width()-20,DeviceUi.MUTED);super.render(g,mx,my,dt);return;}
         if(confirming){
             var row=data.entries().stream().filter(e->e.id().equals(data.pendingId())).findFirst().orElse(null);

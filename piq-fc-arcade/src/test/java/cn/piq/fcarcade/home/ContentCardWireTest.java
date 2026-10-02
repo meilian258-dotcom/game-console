@@ -41,14 +41,14 @@ class ContentCardWireTest {
         }
     }
     @Test void newCoverPreferenceAndResetOperationsRoundTripWithoutIncreasingBounds(){
-        for(int op:new int[]{ContentCardNetwork.RESET,ContentCardNetwork.COVER_WRITE,ContentCardNetwork.COVER_UPLOAD,ContentCardNetwork.SAVE_MODE}){
+        for(int op:new int[]{ContentCardNetwork.RESET,ContentCardNetwork.COVER_WRITE,ContentCardNetwork.COVER_UPLOAD,ContentCardNetwork.SAVE_MODE,ContentCardNetwork.PLAYERS,ContentCardNetwork.CARD_OPTIONS,ContentCardNetwork.SAVE_LIBRARY}){
             var message=ContentCardNetwork.msg(op,system,UUID.randomUUID(),BlockPos.ZERO,"a".repeat(64),"",32,2,new byte[0]);
             var b=new RegistryFriendlyByteBuf(Unpooled.buffer(),RegistryAccess.EMPTY);
             try{ContentCardNetwork.Message.CODEC.encode(b,message);assertTrue(b.readableBytes()<256);
                 var actual=ContentCardNetwork.Message.CODEC.decode(b);assertEquals(op,actual.op());assertEquals(2,actual.offset());assertEquals(message.token(),actual.token());
             }finally{b.release();}
         }
-        assertThrows(IllegalArgumentException.class,()->ContentCardNetwork.msg(ContentCardNetwork.SAVE_MODE+1,system,UUID.randomUUID(),BlockPos.ZERO,"","",0,0,new byte[0]));
+        assertThrows(IllegalArgumentException.class,()->ContentCardNetwork.msg(ContentCardNetwork.SAVE_LIBRARY+1,system,UUID.randomUUID(),BlockPos.ZERO,"","",0,0,new byte[0]));
     }
     @Test void partialScanDiagnosticsFitExistingListWireAlongsideMaximumPage(){
         var entries=java.util.stream.IntStream.range(0,8).mapToObj(i->new ContentCardStore.Entry("a".repeat(64),"游".repeat(120)+".md",ContentCardStore.MAX_BYTES)).toList();

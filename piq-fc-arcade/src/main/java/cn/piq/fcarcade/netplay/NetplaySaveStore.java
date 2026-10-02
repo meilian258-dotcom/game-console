@@ -33,6 +33,20 @@ public final class NetplaySaveStore implements AutoCloseable {
         try{NetplaySaveState.decode(bytes,identity);}catch(IllegalArgumentException invalid){throw new IOException(invalid.getMessage(),invalid);}
         return bytes;
     }
+    /** Bounded metadata/catalog inspection. Does not acquire a writer or create missing directories. */
+    public static byte[] readOnly(Path directory,NetplaySaveState.Identity expected)throws IOException{
+        Path absolute=directory.toAbsolutePath().normalize();
+        if(!Files.exists(absolute,LinkOption.NOFOLLOW_LINKS))return null;
+        // Inspect each existing ancestor without safeDirectory's directory-creation side effect.
+        Path cursor=absolute.getRoot();for(Path part:absolute){cursor=cursor.resolve(part);
+            var a=Files.readAttributes(cursor,BasicFileAttributes.class,LinkOption.NOFOLLOW_LINKS);
+            if(!a.isDirectory()||a.isSymbolicLink()||a.isOther()||!cursor.toRealPath().equals(cursor))throw new IOException("存档目录被重定向");
+        }
+        Path target=absolute.resolve("checkpoint.bin");if(!Files.exists(target,LinkOption.NOFOLLOW_LINKS))return null;
+        byte[] bytes=readFile(target);
+        try{NetplaySaveState.decode(bytes,expected);}catch(IllegalArgumentException invalid){throw new IOException(invalid.getMessage(),invalid);}
+        return bytes;
+    }
     public synchronized void write(byte[] bytes)throws IOException{
         check();NetplaySaveState.decode(bytes,identity);
         byte[] old=read();regular(previous);

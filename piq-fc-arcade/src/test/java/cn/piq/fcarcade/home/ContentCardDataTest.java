@@ -51,14 +51,62 @@ class ContentCardDataTest {
         assertEquals(2,ContentCardData.saveMode(stack));assertEquals("",ContentCardData.cover(stack));
         assertEquals(second,ContentCardData.read(stack,SYSTEM));
     }
-    @Test void unsupportedCardSaveModeOrBadCoverCannotMutateExistingMetadata(){
+    @Test void invalidSaveModeOrBadCoverCannotMutateExistingMetadata(){
         var stack=new ItemStack(Items.PAPER);ContentCardData.write(stack,SYSTEM,GAME,"旧卡");var before=stack.copy();
-        for(int mode:new int[]{-1,1,3,Integer.MAX_VALUE})assertThrows(IllegalArgumentException.class,()->ContentCardData.saveMode(stack,mode));
+        for(int mode:new int[]{-1,3,Integer.MAX_VALUE})assertThrows(IllegalArgumentException.class,()->ContentCardData.saveMode(stack,mode));
         assertThrows(IllegalArgumentException.class,()->ContentCardData.cover(stack,"../wrong"));
         assertTrue(ItemStack.matches(before,stack));
         var nbt=stack.get(DataComponents.CUSTOM_DATA).copyTag();var card=nbt.getCompound("GameConsoleContentCard");
         card.remove("SaveMode");card.putString("Cover","malformed");stack.set(DataComponents.CUSTOM_DATA,CustomData.of(nbt));
         assertEquals(2,ContentCardData.saveMode(stack));assertEquals("",ContentCardData.cover(stack));
         assertEquals(GAME,ContentCardData.read(stack,SYSTEM));
+    }
+    @Test void legacyCardIdentityIsLazyAndAllEditsPreserveIt(){
+        var stack=new ItemStack(Items.PAPER);ContentCardData.write(stack,SYSTEM,GAME,"旧卡");
+        assertNull(ContentCardData.id(stack));assertEquals(1,ContentCardData.players(stack));assertEquals(2,ContentCardData.saveMode(stack));
+        var id=ContentCardData.ensureId(stack);assertNotEquals(new UUID(0,0),id);assertEquals(id,ContentCardData.ensureId(stack));
+        ContentCardData.players(stack,2);ContentCardData.saveMode(stack,1);ContentCardData.cover(stack,"b".repeat(64));
+        ContentCardData.write(stack,SYSTEM,GAME,"改名");
+        ContentCardData.write(stack,SYSTEM,new ContentCardStore.Entry("c".repeat(64),"next.md",1024),"换游戏");
+        assertEquals(id,ContentCardData.id(stack));assertEquals(2,ContentCardData.players(stack));
+        assertEquals(1,ContentCardData.saveMode(stack));assertEquals("b".repeat(64),ContentCardData.cover(stack));
+        assertEquals(id,ContentCardData.id(stack.copy()));
+    }
+    @Test void invalidPlayerMetadataAndStackedIdentityCannotMutate(){
+        var stack=new ItemStack(Items.PAPER);ContentCardData.write(stack,SYSTEM,GAME,"旧卡");var before=stack.copy();
+        for(int count:new int[]{-1,0,5,Integer.MAX_VALUE})assertThrows(IllegalArgumentException.class,()->ContentCardData.players(stack,count));
+        assertTrue(ItemStack.matches(before,stack));stack.setCount(2);
+        assertThrows(IllegalArgumentException.class,()->ContentCardData.ensureId(stack));assertNull(ContentCardData.id(stack));
+    }
+    @Test void capabilitiesKeepLegacyProvidersPrivateAndOnlyOptedInCardsAllowCartridgeSaves(){
+        var old=new ContentCards.Features(true,true);assertFalse(old.publicSaves());assertEquals(1,old.maxPlayers());
+        assertTrue(old.allowsSaveMode(0));assertFalse(old.allowsSaveMode(1));assertTrue(old.allowsSaveMode(2));
+        var shared=new ContentCards.Features(true,true,true,2);assertTrue(shared.allowsSaveMode(1));
+        assertFalse(shared.allowsSaveMode(3));assertFalse(shared.allowsSaveMode(-1));
+        assertThrows(IllegalArgumentException.class,()->new ContentCards.Features(true,false,true,2));
+        assertThrows(IllegalArgumentException.class,()->new ContentCards.Features(true,true,true,5));
+    }
+    @Test void editorGrantNeverExposesTheLiveOrStoredCartridgeSnapshot(){
+        var stack=new ItemStack(Items.PAPER);ContentCardData.write(stack,SYSTEM,GAME,"授权时名称");
+        UUID card=ContentCardData.ensureId(stack),token=UUID.randomUUID();
+        var pos=new net.minecraft.core.BlockPos.MutableBlockPos(1,2,3);
+        var alive=new java.util.concurrent.atomic.AtomicBoolean(true);
+        var grant=new ContentCards.EditorGrant(SYSTEM,token,pos,card,GAME,2,1,stack,alive::get);
+        pos.set(8,9,10);ContentCardData.write(stack,SYSTEM,GAME,"实际物品后来被修改");
+        assertEquals(new net.minecraft.core.BlockPos(1,2,3),grant.computerPos());
+        assertEquals("授权时名称",ContentCardData.title(grant.snapshot()));
+        var exposed=grant.snapshot();ContentCardData.write(exposed,SYSTEM,GAME,"调用者修改副本");
+        assertEquals("授权时名称",ContentCardData.title(grant.snapshot()));
+        assertEquals(card,ContentCardData.id(grant.snapshot()));assertEquals(token,grant.token());
+        assertTrue(grant.valid().getAsBoolean());alive.set(false);assertFalse(grant.valid().getAsBoolean());
+    }
+    @Test void malformedLegacyIdentityAndPlayersAreNotTrusted(){
+        var stack=new ItemStack(Items.PAPER);ContentCardData.write(stack,SYSTEM,GAME,"旧卡");
+        var data=stack.get(DataComponents.CUSTOM_DATA).copyTag();var tag=data.getCompound("GameConsoleContentCard");
+        tag.putUUID("CardId",new UUID(0,0));tag.putInt("Players",Integer.MAX_VALUE);
+        stack.set(DataComponents.CUSTOM_DATA,CustomData.of(data));
+        assertNull(ContentCardData.id(stack));assertEquals(1,ContentCardData.players(stack));
+        UUID identity=ContentCardData.ensureId(stack);assertNotEquals(new UUID(0,0),identity);
+        assertEquals(GAME,ContentCardData.read(stack,SYSTEM));assertEquals("旧卡",ContentCardData.title(stack));
     }
 }

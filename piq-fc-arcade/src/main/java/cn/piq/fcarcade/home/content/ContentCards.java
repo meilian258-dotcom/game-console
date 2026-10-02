@@ -26,10 +26,26 @@ public final class ContentCards {
         public Adapter{Objects.requireNonNull(item);Objects.requireNonNull(label);extensions=Set.copyOf(extensions);Objects.requireNonNull(validator);if(maxBytes<1||maxBytes>ContentCardStore.MAX_BYTES)throw new IllegalArgumentException("Card size budget");}
     }
     private static final Map<ResourceLocation,Adapter> ADAPTERS=new ConcurrentHashMap<>();
-    public record Features(boolean covers,boolean localSaveSettings){}
+    public record Features(boolean covers,boolean localSaveSettings,boolean publicSaves,int maxPlayers){
+        public Features(boolean covers,boolean localSaveSettings){this(covers,localSaveSettings,false,1);}
+        public Features{if(maxPlayers<1||maxPlayers>4||publicSaves&&!localSaveSettings)throw new IllegalArgumentException("Content-card capabilities");}
+        public boolean allowsSaveMode(int mode){return localSaveSettings&&mode>=0&&mode<=2&&(mode!=1||publicSaves);}
+    }
     private static final Map<ResourceLocation,Features> FEATURES=new ConcurrentHashMap<>();
     public static void features(ResourceLocation id,Features features){if(!ADAPTERS.containsKey(id)||FEATURES.putIfAbsent(id,features)!=null)throw new IllegalArgumentException("Content-card features");}
     public static Features features(ResourceLocation id){return FEATURES.getOrDefault(id,new Features(false,false));}
+    /** An independent, short-lived capability: no file path, client-selected owner or live stack escapes. */
+    public record EditorGrant(ResourceLocation system,UUID token,BlockPos computerPos,UUID cardId,
+                              ContentCardStore.Entry entry,int saveMode,int players,ItemStack snapshot,BooleanSupplier valid){
+        public EditorGrant{computerPos=computerPos.immutable();snapshot=snapshot.copy();Objects.requireNonNull(valid);}
+        @Override public ItemStack snapshot(){return snapshot.copy();}
+    }
+    private static final Map<ResourceLocation,BiConsumer<ServerPlayer,EditorGrant>> SAVE_LIBRARIES=new ConcurrentHashMap<>();
+    public static void saveLibrary(ResourceLocation system,BiConsumer<ServerPlayer,EditorGrant> opener){
+        if(!features(system).publicSaves()||SAVE_LIBRARIES.putIfAbsent(system,Objects.requireNonNull(opener))!=null)
+            throw new IllegalArgumentException("Content-card save library registration");
+    }
+    private static final ThreadLocal<Boolean> PROTECTING=ThreadLocal.withInitial(()->false);
     private static cn.piq.fcarcade.home.CartridgeCoverRepository covers(ServerPlayer p){
         return new cn.piq.fcarcade.home.CartridgeCoverRepository(cn.piq.fcarcade.storage.FcStoragePaths.prepareUnchecked(
                 p.getServer().getServerDirectory(),cn.piq.fcarcade.storage.FcStoragePaths.Area.SHARED_COVERS));
@@ -56,16 +72,43 @@ public final class ContentCards {
         var s=state(p);var old=s.edits.get(p.getUUID());
         if(old!=null&&System.nanoTime()-old.opened<500_000_000L)return;
         if(old==null&&s.edits.size()>=4){say(p,"写卡服务繁忙，请稍后重试。");return;}
+        if(features(system).publicSaves()){ContentCardData.ensureId(stack);p.inventoryMenu.broadcastChanges();}
         var e=new Edit(p,hand,pos,computer,system,stack);s.edits.put(p.getUUID(),e);
         e.originalCover=ContentCardData.cover(stack);
         reply(p,e,OPEN,a.label+"：选择游戏后明确写入卡带",0,List.of());card(p,e);list(p,s,e,0,"");
     }
-    private static boolean valid(ServerPlayer p,State s,Edit e){return !s.closed&&s.edits.get(p.getUUID())==e&&online(p,e.connection)&&p.serverLevel()==e.level&&e.level.hasChunkAt(e.pos)
+    private static boolean valid(ServerPlayer p,State s,Edit e){return !s.closed&&s.edits.get(p.getUUID())==e&&facts(p,e,e.snapshot)
+            &&System.nanoTime()-e.opened<300_000_000_000L;}
+    private static boolean facts(ServerPlayer p,Edit e,ItemStack snapshot){return online(p,e.connection)&&p.serverLevel()==e.level&&e.level.hasChunkAt(e.pos)
+            &&!e.computer.isRemoved()&&e.level.getWorldBorder().isWithinBounds(e.pos)&&p.containerMenu==p.inventoryMenu
             &&e.binding.permits(e.computer.computerId(),p.serverLevel().dimension().location().toString(),e.level.getBlockEntity(e.pos)==e.computer,
                     e.level.hasChunkAt(e.pos),p.isAlive()&&!p.isSpectator(),PlayerContentAccess.canBrowse(p),e.level.mayInteract(p,e.pos),p.distanceToSqr(e.pos.getCenter()))
             &&p.getItemInHand(e.hand)==e.stack&&(e.hand==InteractionHand.OFF_HAND||p.getInventory().selected==e.slot)
-            &&ItemStack.matches(e.stack,e.snapshot)&&p.distanceToSqr(e.pos.getCenter())<=25&&e.level.mayInteract(p,e.pos)&&PlayerContentAccess.canBrowse(p)
-            &&System.nanoTime()-e.opened<300_000_000_000L;}
+            &&e.stack.getCount()==1&&ItemStack.matches(e.stack,snapshot)&&p.distanceToSqr(e.pos.getCenter())<=25&&e.level.mayInteract(p,e.pos)&&PlayerContentAccess.canBrowse(p);}
+    private static boolean uniqueCard(ServerPlayer p,UUID id){
+        Set<ItemStack> seen=Collections.newSetFromMap(new IdentityHashMap<>());
+        for(int i=0;i<p.getInventory().getContainerSize();i++)seen.add(p.getInventory().getItem(i));
+        for(var slot:p.inventoryMenu.slots)seen.add(slot.getItem());seen.add(p.containerMenu.getCarried());
+        int copies=0;for(var stack:seen)if(id.equals(ContentCardData.id(stack)))copies+=stack.getCount();return copies==1;
+    }
+    private static boolean permitted(ServerPlayer p,Edit e,ItemStack snapshot,UUID id){
+        if(PROTECTING.get()||!facts(p,e,snapshot)||!uniqueCard(p,id))return false;
+        PROTECTING.set(true);try{
+            var hit=new net.minecraft.world.phys.BlockHitResult(e.pos.getCenter(),net.minecraft.core.Direction.UP,e.pos,false);
+            var event=NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock(p,e.hand,e.pos,hit));
+            return !event.isCanceled()&&event.getUseBlock()!=net.neoforged.neoforge.common.util.TriState.FALSE
+                    &&event.getUseItem()!=net.neoforged.neoforge.common.util.TriState.FALSE&&facts(p,e,snapshot)&&uniqueCard(p,id);
+        }finally{PROTECTING.remove();}
+    }
+    public static EditorGrant authorizeEditor(ServerPlayer p,ResourceLocation system,UUID token){
+        var s=STATES.get(p.getServer());var e=s==null?null:s.edits.get(p.getUUID());
+        if(e==null||!e.token.equals(token)||!e.system.equals(system)||!features(system).publicSaves()||e.busy||e.upload!=null||!valid(p,s,e))return null;
+        var entry=ContentCardData.read(e.stack,system);UUID id=ContentCardData.id(e.stack);var snapshot=e.stack.copy();
+        if(entry==null||id==null||!permitted(p,e,snapshot,id))return null;
+        long until=System.nanoTime()+60_000_000_000L;
+        return new EditorGrant(system,e.token,e.pos,id,entry,ContentCardData.saveMode(e.stack),ContentCardData.players(e.stack),snapshot,
+                ()->System.nanoTime()<until&&permitted(p,e,snapshot,id));
+    }
     public static void handle(ServerPlayer p,Message m){
         var s=STATES.get(p.getServer());if(s==null)return;
         var play=s.plays.get(p.getUUID());
@@ -76,7 +119,7 @@ public final class ContentCards {
         if(e.busy)return;
         try{
             if(e.upload!=null&&m.op()!=PART)return;
-            if(m.op()==RENAME||m.op()==WRITE||m.op()==UPLOAD||m.op()==COVER_WRITE||m.op()==COVER_UPLOAD||m.op()==SAVE_MODE){
+            if(m.op()==RENAME||m.op()==WRITE||m.op()==UPLOAD||m.op()==COVER_WRITE||m.op()==COVER_UPLOAD||m.op()==SAVE_MODE||m.op()==PLAYERS||m.op()==SAVE_LIBRARY){
                 long now=System.nanoTime();if(now-e.lastMutation<250_000_000L){reply(p,e,STATUS,"操作过快，请稍后重试",0,List.of());return;}e.lastMutation=now;
             }
             if(m.op()==COVER_LIST){
@@ -97,8 +140,16 @@ public final class ContentCards {
                     job(p,s,e,()->covers(p).read(m.hash()),bytes->{if(!PlayerContentAccess.canUseServerCover(p))throw new IllegalArgumentException("封面权限已撤销");applyCover(p,e,m.hash());});
                 }
             }else if(m.op()==SAVE_MODE){
-                if(!features(e.system).localSaveSettings())throw new IllegalArgumentException("此机型未接入保存设置");
+                if(!features(e.system).allowsSaveMode(m.offset()))throw new IllegalArgumentException("此机型尚未接入所选保存方式");
                 ContentCardData.saveMode(e.stack,m.offset());e.snapshot=e.stack.copy();p.inventoryMenu.broadcastChanges();card(p,e);reply(p,e,STATUS,"保存方式已设置；已有存档保留，下次开机生效",0,List.of());
+            }else if(m.op()==PLAYERS){
+                if(m.offset()<1||m.offset()>features(e.system).maxPlayers())throw new IllegalArgumentException("人数超过此机型已接入的端口能力");
+                ContentCardData.players(e.stack,m.offset());e.snapshot=e.stack.copy();p.inventoryMenu.broadcastChanges();card(p,e);
+                reply(p,e,STATUS,"人数标签已设置；只用于加入限制，不会把单人游戏变成双人",0,List.of());
+            }else if(m.op()==SAVE_LIBRARY){
+                var library=SAVE_LIBRARIES.get(e.system);var grant=authorizeEditor(p,e.system,e.token);
+                if(library==null||grant==null)throw new IllegalArgumentException("存档库未接入或电脑／卡带授权失效，请重新打开");
+                library.accept(p,grant);
             }else if(m.op()==COVER_UPLOAD){
                 if(!features(e.system).covers()||!PlayerContentAccess.canUploadCover(p))throw new IllegalArgumentException("管理员未允许上传封面");
                 if(m.size()<1||m.size()>cn.piq.fcarcade.home.CartridgeLimits.MAX_COVER_BYTES||reserved(s)+m.size()>64L*1024*1024)throw new IllegalArgumentException("封面超出传输预算");
@@ -151,6 +202,7 @@ public final class ContentCards {
         var entry=ContentCardData.read(e.stack,e.system);
         send(p,new Message(CARD,e.system,e.token,e.pos,entry==null?"":entry.hash(),ContentCardData.title(e.stack),
                 PlayerContentAccess.capabilities(p),ContentCardData.saveMode(e.stack),ContentCardData.cover(e.stack).getBytes(java.nio.charset.StandardCharsets.US_ASCII),entry==null?List.of():List.of(entry)));
+        send(p,msg(CARD_OPTIONS,e.system,e.token,e.pos,"","",0,ContentCardData.players(e.stack),new byte[0]));
     }
     private static void applyCover(ServerPlayer p,Edit e,String hash){ContentCardData.cover(e.stack,hash);e.snapshot=e.stack.copy();p.inventoryMenu.broadcastChanges();card(p,e);reply(p,e,STATUS,"卡带封面已更新",0,List.of());}
     private static void write(ServerPlayer p,Edit e,ContentCardStore.Entry entry,String title){
