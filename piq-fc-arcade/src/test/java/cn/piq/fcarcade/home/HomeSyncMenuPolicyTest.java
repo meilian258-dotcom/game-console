@@ -35,6 +35,7 @@ class HomeSyncMenuPolicyTest {
     @Test void externalDeviceHasNoFcJniRowUnlessExplicitlyCapable(){
         assertFalse(HomeSyncMenuPolicy.showMode(4,true,false,1));
         assertFalse(HomeSyncMenuPolicy.showMode(4,true,false,15));
+        assertTrue(HomeSyncMenuPolicy.showMode(4,true,false,17));
         assertTrue(HomeSyncMenuPolicy.showMode(4,false,false,31));
         assertTrue(HomeSyncMenuPolicy.showMode(4,true,true,0));
         for(int mode=0;mode<4;mode++)assertTrue(HomeSyncMenuPolicy.showMode(mode,true,false,1));
@@ -42,5 +43,15 @@ class HomeSyncMenuPolicyTest {
     @Test void masksNeverGrantInvalidModes(){
         for(int mask=0;mask<32;mask++)for(int mode=-1;mode<=5;mode++)
             assertEquals(mode>=0&&mode<5&&(mask&(1<<mode))!=0,HomeSyncMenuPolicy.supported(mask,mode));
+    }
+    @Test void externalJniRequiresExplicitDeclarationAndServerPolicy(){
+        for(int declared=0;declared<64;declared++)for(boolean local:new boolean[]{false,true})for(boolean jni:new boolean[]{false,true}){
+            int policy=local?7:5;int actual=HomeSyncMenuPolicy.externalModes(declared,policy,local,jni);
+            assertEquals(declared&(policy|(local?(jni?24:8):0))&31,actual);
+            assertEquals(local&&jni&&(declared&16)!=0,(actual&16)!=0);
+            assertEquals(local&&(declared&8)!=0,(actual&8)!=0);
+        }
+        assertEquals(15,HomeSyncMenuPolicy.externalModes(15,7,true,false)); // Existing SFC.
+        assertEquals(1,HomeSyncMenuPolicy.externalModes(1,7,true,true)); // An opt-in is not a mode claim.
     }
 }

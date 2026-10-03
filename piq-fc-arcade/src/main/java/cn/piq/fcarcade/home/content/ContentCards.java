@@ -217,19 +217,31 @@ public final class ContentCards {
     }
     /** Caller supplies a live world/lease/power grant. Callback false means shutdown, never native success. */
     public static UUID play(ServerPlayer p,ResourceLocation system,BlockPos pos,ContentCardStore.Entry entry,BooleanSupplier authorized,Consumer<Boolean> status){
+        return transfer(p,system,UUID.randomUUID(),pos,entry,authorized,status,false);
+    }
+    /** A server-validated seat/watch grant; the request UUID correlates a client expectation, never grants access.
+     * Status true means verified bytes were received, NOT that a core started. No runtime/heartbeat is created. */
+    public static UUID downloadOnly(ServerPlayer p,ResourceLocation system,UUID request,BlockPos pos,ContentCardStore.Entry entry,
+                                    BooleanSupplier authorized,Consumer<Boolean> status){
+        Objects.requireNonNull(request);Objects.requireNonNull(authorized);Objects.requireNonNull(status);
+        if(p==null||!online(p,p.connection.getConnection()))return null;
+        return transfer(p,system,request,pos,entry,authorized,status,true);
+    }
+    private static UUID transfer(ServerPlayer p,ResourceLocation system,UUID request,BlockPos pos,ContentCardStore.Entry entry,
+                                 BooleanSupplier authorized,Consumer<Boolean> status,boolean downloadOnly){
         var s=state(p);var adapter=ADAPTERS.get(system);
         if(adapter==null||entry.size()>adapter.maxBytes||reserved(s)+entry.size()>64L*1024*1024||s.closed||s.plays.containsKey(p.getUUID())||s.plays.size()>=4||!authorized.getAsBoolean())return null;
-        var play=new Play(p,system,pos,entry,authorized,status);s.plays.put(p.getUUID(),play);var server=p.getServer();var files=store(p,system);
+        var play=new Play(p,system,request,pos,entry,authorized,status,downloadOnly);s.plays.put(p.getUUID(),play);var server=p.getServer();var files=store(p,system);
         try{IO.execute(()->{byte[] data=null;Exception error=null;try{data=files.read(entry);}catch(Exception ex){error=ex;}var bytes=data;var failure=error;
             server.execute(()->{if(!valid(p,s,play))return;if(failure!=null){say(p,"卡带启动失败："+clean(failure));stop(p,s,play);return;}
-                play.bytes=bytes;send(p,msg(DOWNLOAD,system,play.token,pos,entry.hash(),entry.name(),entry.size(),0,new byte[0]));});
+                play.bytes=bytes;send(p,msg(downloadOnly?DOWNLOAD_ONLY:DOWNLOAD,system,play.token,pos,entry.hash(),entry.name(),entry.size(),0,new byte[0]));});
         });}catch(RejectedExecutionException full){stop(p,s,play);return null;}return play.token;
     }
     private static boolean valid(ServerPlayer p,State s,Play play){return !s.closed&&s.plays.get(p.getUUID())==play&&online(p,play.connection)&&play.authorized.getAsBoolean();}
     /** Server world action only; clients cannot send this opcode to gain reset authority. */
     public static boolean reset(ServerPlayer p,UUID token){
         var s=STATES.get(p.getServer());var play=s==null?null:s.plays.get(p.getUUID());
-        if(play==null||!play.token.equals(token)||!play.started||!valid(p,s,play))return false;
+        if(play==null||play.downloadOnly||!play.token.equals(token)||!play.started||!valid(p,s,play))return false;
         send(p,msg(RESET,play.system,play.token,play.pos,"","",0,0,new byte[0]));return true;
     }
     private static long reserved(State s){
@@ -243,7 +255,11 @@ public final class ContentCards {
             int end=Math.min(play.offset+ContentCardStore.CHUNK,play.bytes.length);byte[] part=Arrays.copyOfRange(play.bytes,play.offset,end);
             send(p,msg(DATA,play.system,play.token,play.pos,play.entry.hash(),play.entry.name(),play.entry.size(),play.offset,part));play.offset=end;
             if(end==play.bytes.length)play.bytes=null;
-        }else if(m.op()==STARTED&&play.offset==play.entry.size()&&!play.started){play.started=true;play.last=System.nanoTime();play.status.accept(true);}
+        }else if(m.op()==STARTED&&play.offset==play.entry.size()&&!play.started){
+            play.started=true;play.last=System.nanoTime();
+            if(play.downloadOnly){s.plays.remove(p.getUUID(),play);play.bytes=null;}
+            play.status.accept(true);
+        }else if(play.downloadOnly){stop(p,s,play);return;}
         if(m.op()==HEARTBEAT&&play.started)play.last=System.nanoTime();
     }
     public static void stop(ServerPlayer p,UUID token){var s=STATES.get(p.getServer());if(s==null)return;var play=s.plays.get(p.getUUID());if(play!=null&&play.token.equals(token))stop(p,s,play);}
@@ -270,9 +286,9 @@ public final class ContentCards {
         Edit(ServerPlayer p,InteractionHand h,BlockPos pos,CartridgeComputerBlockEntity c,ResourceLocation system,ItemStack stack){connection=p.connection.getConnection();level=p.serverLevel();this.pos=pos.immutable();computer=c;computerId=c.computerId();binding=new CartridgeComputerBinding(computerId,level.dimension().location().toString(),pos.getX(),pos.getY(),pos.getZ());this.system=system;store=store(p,system);hand=h;slot=p.getInventory().selected;this.stack=stack;snapshot=stack.copy();}
     }
     private static final class Play{
-        final UUID token=UUID.randomUUID();final Object connection;final ResourceLocation system;final BlockPos pos;final ContentCardStore.Entry entry;final BooleanSupplier authorized;final Consumer<Boolean> status;
+        final UUID token;final Object connection;final ResourceLocation system;final BlockPos pos;final ContentCardStore.Entry entry;final BooleanSupplier authorized;final Consumer<Boolean> status;final boolean downloadOnly;
         long last=System.nanoTime();int offset;byte[] bytes;boolean started;
-        Play(ServerPlayer p,ResourceLocation system,BlockPos pos,ContentCardStore.Entry entry,BooleanSupplier auth,Consumer<Boolean> status){connection=p.connection.getConnection();this.system=system;this.pos=pos.immutable();this.entry=entry;authorized=auth;this.status=status;}
+        Play(ServerPlayer p,ResourceLocation system,UUID token,BlockPos pos,ContentCardStore.Entry entry,BooleanSupplier auth,Consumer<Boolean> status,boolean downloadOnly){connection=p.connection.getConnection();this.system=system;this.token=token;this.pos=pos.immutable();this.entry=entry;authorized=auth;this.status=status;this.downloadOnly=downloadOnly;}
     }
     private ContentCards(){}
 }

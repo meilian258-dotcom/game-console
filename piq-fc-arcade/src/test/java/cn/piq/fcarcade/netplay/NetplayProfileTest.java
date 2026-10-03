@@ -38,6 +38,11 @@ class NetplayProfileTest {
     }
     NetplayProfile p(String name,Map<String,String> options,int size){return new NetplayProfile(getClass(),"/core.dll","a".repeat(64),name,options,1,48000,size);}
     @Test void namesCannotEscapePrivateDirectory(){for(String n:List.of("../x.zip","a/b.nes","a\\b.nes","x.cfg","x.zip\n",".zip"))assertThrows(IllegalArgumentException.class,()->p(n,Map.of(),1024));}
+    @Test void mdContentNamesHaveTheSameBoundedRelativeNameContract(){
+        assertEquals("content.md",p("content.md",Map.of(),1024).contentName());
+        for(String name:List.of("../content.md","C:\\content.md","a/content.md","file.md.exe","file.md\n",".md","a".repeat(65)+".md"))
+            assertFalse(NetplayProfile.safeName(name));
+    }
     @Test void profileRejectsConfigInjection(){assertThrows(IllegalArgumentException.class,()->p("a.zip",Map.of("x","true\nother = false"),1024));assertThrows(IllegalArgumentException.class,()->p("a.zip",Map.of("x\n","a"),1024));}
     @Test void romAllocationBounded(){assertThrows(IllegalArgumentException.class,()->p("a.zip",Map.of(),64*1024*1024+1));assertThrows(IllegalArgumentException.class,()->p("a.zip",Map.of(),0));}
     @Test void oldFcProfileUnchanged(){var p=NetplayProfile.fc();assertEquals(44100,p.sampleRate());assertEquals("content.nes",p.contentName());assertEquals("NTSC",p.options().get("mesen_region"));assertEquals("2b3fbe286995c80ebbc85239fd28c8fa07b1011cc69c7f9021816429e3473885",p.sha());}

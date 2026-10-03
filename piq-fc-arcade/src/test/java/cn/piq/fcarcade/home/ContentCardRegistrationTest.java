@@ -37,7 +37,7 @@ class ContentCardRegistrationTest {
     @Test void registersExactlyOnceForBothDirections(){
         int count=registrations.size();ContentCardNetwork.register(new RegisterPayloadHandlersEvent());
         var r=registrations.get(Message.TYPE.id());assertEquals(count+1,registrations.size());
-        assertEquals("content-card-5",r.version());assertFalse(r.optional());assertTrue(r.flow().isEmpty());
+        assertEquals("content-card-6",r.version());assertFalse(r.optional());assertTrue(r.flow().isEmpty());
         for(var flow:PacketFlow.values())assertSame(Message.CODEC,NetworkRegistry.getCodec(Message.TYPE.id(),ConnectionProtocol.PLAY,flow));
         assertThrows(UnsupportedOperationException.class,()->ContentCardNetwork.register(new RegisterPayloadHandlersEvent()));
     }
@@ -52,5 +52,30 @@ class ContentCardRegistrationTest {
         var message=ContentCardNetwork.msg(ContentCardNetwork.STOP,ResourceLocation.parse("example:console"),UUID.randomUUID(),BlockPos.ZERO,"","",0,0,new byte[0]);
         ((PayloadRegistration<Message>)registrations.get(Message.TYPE.id())).handler().handle(message,context);
         assertEquals(1,queue.size());assertDoesNotThrow(queue.removeFirst()::run);
+    }
+    @Test @SuppressWarnings("unchecked") void wrongDirectionIsRejectedBeforeAnyClientOrServerHandler() {
+        ContentCardNetwork.register(new RegisterPayloadHandlersEvent());
+        for(var flow:PacketFlow.values())for(int op=0;op<=ContentCardNetwork.DOWNLOAD_ONLY;op++){
+            boolean permitted=flow==PacketFlow.CLIENTBOUND?ContentCardNetwork.clientbound(op):ContentCardNetwork.serverbound(op);
+            if(permitted)continue;
+            var queue=new ArrayList<Runnable>();
+            var context=(IPayloadContext)Proxy.newProxyInstance(IPayloadContext.class.getClassLoader(),new Class<?>[]{IPayloadContext.class},
+                    (proxy,method,args)->switch(method.getName()){
+                        case "flow"->flow;
+                        // NeoForge always wraps the registered handler in its main-thread handoff.
+                        case "enqueueWork"->{queue.add((Runnable)args[0]);yield CompletableFuture.completedFuture(null);}
+                        default->throw new AssertionError("Wrong direction reached "+method.getName());
+                    });
+            var message=ContentCardNetwork.msg(op,ResourceLocation.parse("example:console"),UUID.randomUUID(),BlockPos.ZERO,"","",0,0,new byte[0]);
+            assertDoesNotThrow(()->((PayloadRegistration<Message>)registrations.get(Message.TYPE.id())).handler().handle(message,context));
+            assertEquals(1,queue.size());assertDoesNotThrow(queue.removeFirst()::run);
+            assertTrue(queue.isEmpty(),"Rejected opcode must not schedule the business/client handler");
+        }
+        assertTrue(ContentCardNetwork.clientbound(ContentCardNetwork.DOWNLOAD_ONLY));
+        assertFalse(ContentCardNetwork.serverbound(ContentCardNetwork.DOWNLOAD_ONLY));
+        assertTrue(ContentCardNetwork.serverbound(ContentCardNetwork.GET));
+        assertFalse(ContentCardNetwork.clientbound(ContentCardNetwork.GET));
+        assertTrue(ContentCardNetwork.serverbound(ContentCardNetwork.STARTED));
+        assertFalse(ContentCardNetwork.clientbound(ContentCardNetwork.STARTED));
     }
 }

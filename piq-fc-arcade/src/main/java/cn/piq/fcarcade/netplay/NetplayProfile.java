@@ -55,7 +55,7 @@ public record NetplayProfile(Class<?> owner,String resource,String sha,String co
         if(!Float.isFinite(raw)||raw<=0)throw new IllegalArgumentException("JNI raw aspect");
         return raw;
     }
-    public static boolean safeName(String name){return name!=null&&name.matches("[a-zA-Z0-9_-]{1,64}\\.(nes|sfc|smc|zip)");}
+    public static boolean safeName(String name){return name!=null&&name.matches("[a-zA-Z0-9_-]{1,64}\\.(nes|sfc|smc|zip|md)");}
     public String config(){var out=new StringBuilder();new TreeMap<>(options).forEach((k,v)->out.append(k).append(" = \"").append(v).append("\"\n"));return out.toString();}
     public static NetplayProfile fc(){return new NetplayProfile(NetplayProcess.class,"/core/libretro/windows-x64/mesen_libretro.dll",
         "2b3fbe286995c80ebbc85239fd28c8fa07b1011cc69c7f9021816429e3473885","content.nes",

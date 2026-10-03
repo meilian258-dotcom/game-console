@@ -142,14 +142,17 @@ public final class MdConsole extends ExternalHomeConsoleBlockEntity {
         for(int port=0;port<2;port++){if(loan(port)==null)continue;var p=((ServerLevel)level).getServer().getPlayerList().getPlayer(borrower(port));if(p==null||!authorized(p,port,loan(port),false))clearLoan(port);}
     }
     public void dropCartridge(){if(!cartridge.isEmpty()){Containers.dropItemStack(level,worldPosition.getX()+.5,worldPosition.getY()+.3,worldPosition.getZ()+.5,cartridge);cartridge=ItemStack.EMPTY;}}
-    public void onLoad(){super.onLoad();if(level instanceof ServerLevel){java.util.Arrays.fill(borrowers,null);java.util.Arrays.fill(loans,null);java.util.Arrays.fill(loanConnections,null);running=false;publicPlay=false;powerToken=null;powerSession=null;powerHost=null;useSupportedSynchronizationFallback(cn.piq.fcarcade.cabinet.CabinetSyncMode.MEDIA);sync();}}
+    private boolean jniNetplay;
+    @Override public boolean netplayJniTrial(){return jniNetplay;}
+    @Override public void netplayJniTrial(boolean value){if(jniNetplay!=value){jniNetplay=value;setChanged();sync();}}
+    public void onLoad(){super.onLoad();if(level instanceof ServerLevel){java.util.Arrays.fill(borrowers,null);java.util.Arrays.fill(loans,null);java.util.Arrays.fill(loanConnections,null);running=false;publicPlay=false;powerToken=null;powerSession=null;powerHost=null;if(!jniNetplay)useSupportedSynchronizationFallback(cn.piq.fcarcade.cabinet.CabinetSyncMode.MEDIA);sync();}}
     protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){
-        super.saveAdditional(t,r);t.putBoolean("MdRunning",running);t.putBoolean("MdPublic",publicPlay);if(!cartridge.isEmpty())t.put("MdCartridge",cartridge.save(r));
+        super.saveAdditional(t,r);t.putBoolean("MdJniNetplay",jniNetplay);t.putBoolean("MdRunning",running);t.putBoolean("MdPublic",publicPlay);if(!cartridge.isEmpty())t.put("MdCartridge",cartridge.save(r));
         for(int port=0;port<2;port++)if(loan(port)!=null&&borrower(port)!=null){t.putUUID(port==0?"MdLoan":"MdLoan2",loan(port));t.putUUID(port==0?"MdBorrower":"MdBorrower2",borrower(port));}
         if(powerSession!=null&&powerHost!=null){t.putUUID("MdPowerSession",powerSession);t.putUUID("MdPowerHost",powerHost);}
     }
     protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){
-        super.loadAdditional(t,r);running=t.getBoolean("MdRunning");publicPlay=t.getBoolean("MdPublic");cartridge=t.contains("MdCartridge")?ItemStack.parseOptional(r,t.getCompound("MdCartridge")):ItemStack.EMPTY;
+        super.loadAdditional(t,r);jniNetplay=t.getBoolean("MdJniNetplay");running=t.getBoolean("MdRunning");publicPlay=t.getBoolean("MdPublic");cartridge=t.contains("MdCartridge")?ItemStack.parseOptional(r,t.getCompound("MdCartridge")):ItemStack.EMPTY;
         if(!cartridge.isEmpty()&&(!cartridge.is(MdMod.CARTRIDGE.get())||cartridge.getCount()!=1))cartridge=ItemStack.EMPTY;
         for(int port=0;port<2;port++){String lk=port==0?"MdLoan":"MdLoan2",bk=port==0?"MdBorrower":"MdBorrower2";loans[port]=t.hasUUID(lk)?t.getUUID(lk):null;borrowers[port]=t.hasUUID(bk)?t.getUUID(bk):null;}
         powerSession=t.hasUUID("MdPowerSession")?t.getUUID("MdPowerSession"):null;powerHost=t.hasUUID("MdPowerHost")?t.getUUID("MdPowerHost"):null;

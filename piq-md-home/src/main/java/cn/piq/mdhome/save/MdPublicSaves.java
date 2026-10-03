@@ -38,24 +38,29 @@ public final class MdPublicSaves {
     }
     private static final class Pending {
         final ServerPlayer player;final Connection connection;final MdConsole console;final HomeSystems.Connection link;
-        final ContentCardStore.Entry entry;final ItemStack snapshot;final UUID card,playerId;final int mode,maxPlayers;
+        final ContentCardStore.Entry entry;final ItemStack snapshot;final UUID card,playerId;final int mode,maxPlayers;final boolean netplay;
         Pending(ServerPlayer p,MdConsole c,HomeSystems.Connection l,ContentCardStore.Entry e){
             player=p;playerId=p.getUUID();connection=p.connection.getConnection();console=c;link=l;entry=e;card=ContentCardData.ensureId(c.cartridge());
-            c.setChanged();snapshot=c.cartridge().copy();mode=ContentCardData.saveMode(snapshot);maxPlayers=Math.min(2,ContentCardData.players(snapshot));
+            c.setChanged();snapshot=c.cartridge().copy();mode=ContentCardData.saveMode(snapshot);maxPlayers=Math.min(2,ContentCardData.players(snapshot));netplay=c.netplayJniTrial();
         }
         boolean valid(){return online(player,connection)&&player.serverLevel()==link.level()
-                &&!console.isRemoved()&&!console.running()&&HomeSystems.isCurrent(link)&&link.television().powered()
+                &&!console.isRemoved()&&!console.running()&&console.netplayJniTrial()==netplay&&HomeSystems.isCurrent(link)&&link.television().powered()
                 &&console.usable(player)&&HomeHardware.mayUse(player,console.getBlockPos())
                 &&HomeHardware.mayUse(player,link.television().getBlockPos())&&ItemStack.isSameItemSameComponents(snapshot,console.cartridge())
                 &&console.cartridge().getCount()==1&&card.equals(ContentCardData.id(console.cartridge()));}
     }
     private static final class Library {
         final UUID token=UUID.randomUUID();final ServerPlayer player;final Connection connection;final ContentCards.EditorGrant grant;
-        final MdSaveCatalog catalog;final long deadline;Map<String,MdSaveCatalog.Row> shown=Map.of();boolean loading,displayed;
-        UUID confirmation;MdSaveCatalog.Row deleting;long confirmUntil,lastAction=-100;MdSaveTransactions.Reservation mutation;
-        Library(ServerPlayer p,ContentCards.EditorGrant g){player=p;connection=p.connection.getConnection();grant=g;catalog=new MdSaveCatalog(root(p.getServer()));deadline=tick(p.getServer())+1200;}
+        final MdSaveCatalog catalog,netplayCatalog;final long deadline;Map<String,Managed> shown=Map.of();boolean loading,displayed;
+        UUID confirmation;Managed deleting;long confirmUntil,lastAction=-100;MdSaveTransactions.Reservation mutation;
+        Library(ServerPlayer p,ContentCards.EditorGrant g){player=p;connection=p.connection.getConnection();grant=g;catalog=new MdSaveCatalog(root(p.getServer()));netplayCatalog=new MdSaveCatalog(root(p.getServer(),true));deadline=tick(p.getServer())+1200;}
         boolean valid(){return online(player,connection)&&tick(player.getServer())<deadline&&grant.valid().getAsBoolean();}
     }
+    private record Managed(MdSaveCatalog catalog,MdSaveCatalog.Row row,boolean netplay){
+        String id(){return (netplay?"netplay-":"media-")+row.id();}
+        String version(){return row.version();}String owner(){return row.owner();}
+    }
+    private record Listing(List<Managed> rows,boolean truncated){}
     private MdPublicSaves(){}
     /** Call after ContentCards Features registration during common setup. */
     public static synchronized void install(){if(installed)return;installed=true;
@@ -69,7 +74,9 @@ public final class MdPublicSaves {
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedOutEvent e)->{if(e.getEntity() instanceof ServerPlayer p)logout(p);});
     }
     public static NetplaySaveState.Identity identity(String rom){return MdSaveCatalog.identity(rom);}
+    public static NetplaySaveState.Identity identity(String rom,boolean netplay){return netplay?MdNetplayProfile.identity(rom):identity(rom);}
     private static Path root(MinecraftServer server){return ConsoleStorage.root(server.getWorldPath(LevelResource.ROOT)).resolve("md-public-saves").resolve("v1");}
+    private static Path root(MinecraftServer server,boolean netplay){return netplay?ConsoleStorage.root(server.getWorldPath(LevelResource.ROOT)).resolve("md-netplay-saves").resolve("v1"):root(server);}
     private static long tick(MinecraftServer server){return Integer.toUnsignedLong(server.getTickCount());}
     private static State state(MinecraftServer server){return STATES.computeIfAbsent(server,s->new State());}
     private static boolean online(ServerPlayer p,Connection c){return p.getServer()!=null&&!p.hasDisconnected()&&p.isAlive()&&!p.isSpectator()&&p.connection.getConnection()==c&&p.getServer().getPlayerList().getPlayer(p.getUUID())==p;}
@@ -84,20 +91,20 @@ public final class MdPublicSaves {
         if(s.pending.values().stream().anyMatch(x->x.connection==p.connection.getConnection())){say(p,"请先完成或取消上一台 MD 的开机选择。");return false;}
         final Pending q;try{q=new Pending(p,console,link,entry);}catch(RuntimeException invalid){return false;}
         if(!q.valid())return false;s.pending.put(console.hardwareId(),q);
-        var catalog=new MdSaveCatalog(root(server));s.launches.put(console.hardwareId(),key(console));var handle=HomeLaunchServer.start(p,key(console),new HomeLaunchServer.Adapter<SavePlan>(){
-            public HomeLaunchServer.Definition definition(){String title=ContentCardData.title(q.snapshot);return new HomeLaunchServer.Definition("MD",title.isBlank()?entry.displayName():title,q.maxPlayers,q.mode,false,q.mode==2?"MD 个人总共 3 槽；选择后独立确认本局加入许可":"进度跟随这张实体卡；选择后独立确认本局加入许可");}
+        var saveRoot=root(server,q.netplay);var saveIdentity=identity(entry.hash(),q.netplay);var catalog=new MdSaveCatalog(saveRoot);s.launches.put(console.hardwareId(),key(console));var handle=HomeLaunchServer.start(p,key(console),new HomeLaunchServer.Adapter<SavePlan>(){
+            public HomeLaunchServer.Definition definition(){String title=ContentCardData.title(q.snapshot);String hint=q.mode==0?"本局不保存，旧档保留":q.mode==2?"个人总共 3 槽；选择后独立确认本局加入许可":"进度跟随这张实体卡；选择后独立确认本局加入许可";return new HomeLaunchServer.Definition("MD",title.isBlank()?entry.displayName():title,q.maxPlayers,q.mode,false,(q.netplay?"JNI Netplay 独立档，不迁移串流进度；":"JNI 串流；")+hint);}
             public boolean valid(){return !s.closed&&q.valid();}
             public void list(Consumer<List<HomeLaunchNetwork.Row>> success,Consumer<String> failure){work(server,s,()->{
                 var rows=new ArrayList<HomeLaunchNetwork.Row>();for(int slot=1;slot<=(q.mode==1?1:3);slot++){var r=slot(slot,catalog.read(owner(q,slot)),q);rows.add(new HomeLaunchNetwork.Row(r.slot(),r.version(),r.name(),r.rom(),r.players(),r.modified(),r.compatible()));}return rows;
             },success,failure);}
             public void select(HomeLaunchNetwork.Choice choice,Consumer<SavePlan> success,Consumer<String> failure){
-                if(q.mode==0){success.accept(new SavePlan(identity(entry.hash()),false,false,1,false,"","",1,"",root(server)));return;}
+                if(q.mode==0){success.accept(new SavePlan(saveIdentity,false,false,1,false,"","",1,"",saveRoot));return;}
                 if(choice==null||choice.slot()>(q.mode==1?1:3)||choice.savePlayers()>q.maxPlayers){failure.accept("存档选择无效");return;}
                 final String name;try{name=MdSaveCatalog.name(choice.name());}catch(IllegalArgumentException bad){failure.accept(bad.getMessage());return;}
                 String owner=owner(q,choice.slot());if(NetplaySaveServer.busy(server,catalog.lockKey(owner))||TRANSACTIONS.busy(catalog.lockKey(owner))){failure.accept("此存档正在使用或保存，请稍后重试");return;}
                 work(server,s,()->catalog.read(owner),row->{
-                    if(!Objects.equals(choice.version(),row==null?"":row.version())||choice.resume()&&(row==null||!row.identity().equals(identity(entry.hash())))){failure.accept("存档已变化，请重新开机选择");return;}
-                    success.accept(new SavePlan(identity(entry.hash()),true,choice.resume(),choice.savePlayers(),false,owner,name,choice.slot(),choice.version(),root(server)));
+                    if(!Objects.equals(choice.version(),row==null?"":row.version())||choice.resume()&&(row==null||!row.identity().equals(saveIdentity))){failure.accept("存档已变化，请重新开机选择");return;}
+                    success.accept(new SavePlan(saveIdentity,true,choice.resume(),choice.savePlayers(),false,owner,name,choice.slot(),choice.version(),saveRoot));
                 },failure);
             }
             public void load(HomeLaunchServer.Launch<SavePlan> launch,HomeLaunchServer.Handle handle){s.pending.remove(console.hardwareId(),q);var plan=launch.save().withJoin(launch.allowSecondPort());if(plan.enabled())s.retiringOwners.put(console.hardwareId(),catalog.lockKey(plan.ownerKey()));chosen.accept(plan,handle);}
@@ -106,7 +113,7 @@ public final class MdPublicSaves {
         if(handle==null){s.pending.remove(console.hardwareId(),q);s.launches.remove(console.hardwareId());return false;}return true;
     }
     private static String owner(Pending q,int slot){return q.mode==1?MdSaveCatalog.cartridge(q.card):MdSaveCatalog.personal(q.playerId,slot);}
-    private static MdSaveNetwork.Slot slot(int slot,MdSaveCatalog.Row row,Pending q){return row==null?new MdSaveNetwork.Slot(slot,"","Save "+slot,"",1,0,true):new MdSaveNetwork.Slot(slot,row.version(),row.name(),row.identity().content(),Math.min(q.maxPlayers,row.players()),row.modified(),row.identity().equals(identity(q.entry.hash())));}
+    private static MdSaveNetwork.Slot slot(int slot,MdSaveCatalog.Row row,Pending q){return row==null?new MdSaveNetwork.Slot(slot,"","Save "+slot,"",1,0,true):new MdSaveNetwork.Slot(slot,row.version(),row.name(),row.identity().content(),Math.min(q.maxPlayers,row.players()),row.modified(),row.identity().equals(identity(q.entry.hash(),q.netplay)));}
     /** Retained packet registration for explicit rejection of stale addon callers; no old UI authority. */
     public static void action(ServerPlayer p,MdSaveNetwork.Action a){}
     public static void attach(MinecraftServer server,long wire,Connection host,UUID ticket,SavePlan plan){
@@ -134,14 +141,17 @@ public final class MdPublicSaves {
     }
     private static boolean current(State s,Library l){return !s.closed&&s.libraries.get(l.token)==l&&l.valid();}
     private static void refresh(State s,Library l,String message){if(l.loading||!current(s,l))return;l.loading=true;
-        boolean op=l.player.hasPermissions(2);UUID playerId=l.player.getUUID();work(l.player.getServer(),s,()->l.catalog.list(l.grant.entry().hash(),playerId,l.grant.cardId(),op),listing->{
-            l.loading=false;if(!current(s,l))return;var rows=new LinkedHashMap<String,MdSaveCatalog.Row>();for(var row:listing.rows())rows.put(row.id(),row);l.shown=Map.copyOf(rows);l.confirmation=null;l.deleting=null;
+        boolean op=l.player.hasPermissions(2);UUID playerId=l.player.getUUID();work(l.player.getServer(),s,()->{
+            var media=l.catalog.list(l.grant.entry().hash(),playerId,l.grant.cardId(),op);var netplay=l.netplayCatalog.list(identity(l.grant.entry().hash(),true).content(),playerId,l.grant.cardId(),op);
+            var all=new ArrayList<Managed>();for(var row:media.rows())all.add(new Managed(l.catalog,row,false));for(var row:netplay.rows())all.add(new Managed(l.netplayCatalog,row,true));all.sort(Comparator.comparingLong((Managed x)->x.row().modified()).reversed());boolean truncated=all.size()>MAX_ENTRIES;if(truncated)all.subList(MAX_ENTRIES,all.size()).clear();return new Listing(List.copyOf(all),truncated||media.truncated()||netplay.truncated());
+        },listing->{
+            l.loading=false;if(!current(s,l))return;var rows=new LinkedHashMap<String,Managed>();for(var row:listing.rows())rows.put(row.id(),row);l.shown=Map.copyOf(rows);l.confirmation=null;l.deleting=null;
             reply(l,message+(listing.truncated()?" 部分记录未列出或损坏；原文件保留。":""));
         },error->{l.loading=false;if(current(s,l))reply(l,"读取失败，原档保留："+error);});
     }
-    private static boolean editable(Library l,MdSaveCatalog.Row row){return row.identity().content().equals(l.grant.entry().hash())&&(l.player.hasPermissions(2)||MdSaveCatalog.owned(row.owner(),l.player.getUUID(),l.grant.cardId()));}
+    private static boolean editable(Library l,Managed value){var row=value.row();return row.identity().content().equals(identity(l.grant.entry().hash(),value.netplay()).content())&&(l.player.hasPermissions(2)||MdSaveCatalog.owned(row.owner(),l.player.getUUID(),l.grant.cardId()));}
     private static void reply(Library l,String message){var entries=new ArrayList<CartridgeSaveNetwork.Entry>();
-        for(var row:l.shown.values()){String key=l.catalog.lockKey(row.owner());boolean active=NetplaySaveServer.busy(l.player.getServer(),key)||TRANSACTIONS.busy(key);entries.add(new CartridgeSaveNetwork.Entry(row.id(),row.version(),row.name(),MdSaveCatalog.card(row.owner())?"卡带 "+row.owner().substring(5):"个人 "+row.owner().substring(9),"MD · JNI 公共服务器存档",row.modified(),row.bytes(),active,editable(l,row)&&!active));}
+        for(var managed:l.shown.values()){var row=managed.row();String key=managed.catalog().lockKey(row.owner());boolean active=NetplaySaveServer.busy(l.player.getServer(),key)||TRANSACTIONS.busy(key);entries.add(new CartridgeSaveNetwork.Entry(managed.id(),row.version(),row.name(),MdSaveCatalog.card(row.owner())?"卡带 "+row.owner().substring(5):"个人 "+row.owner().substring(9),managed.netplay()?"MD · JNI Netplay · 独立服务器档":"MD · JNI 串流服务器档",row.modified(),row.bytes(),active,editable(l,managed)&&!active));}
         entries.sort(Comparator.comparingLong(CartridgeSaveNetwork.Entry::modified).reversed());
         l.displayed=true;CartridgeSaveNetwork.reply(l.player,new Reply(l.token,MdMod.SYSTEM.toString(),l.grant.entry().hash(),cut(message,240),entries,l.deleting==null?"":l.deleting.id(),l.deleting==null?"":l.deleting.version(),l.confirmation,false,l.grant.token()));
     }
@@ -154,12 +164,12 @@ public final class MdPublicSaves {
         long now=tick(p.getServer());if(l.loading||now-l.lastAction<10)return;l.lastAction=now;
         if(request.operation()==REFRESH){refresh(s,l,"");return;}
         var row=l.shown.get(request.id());if(row==null||!row.version().equals(request.version())||!editable(l,row)){reply(l,"存档或管理权限已变化，请刷新");return;}
-        if(NetplaySaveServer.busy(p.getServer(),l.catalog.lockKey(row.owner()))||TRANSACTIONS.busy(l.catalog.lockKey(row.owner()))){reply(l,"此存档正在游戏、保存或管理，暂不能修改");return;}
+        if(NetplaySaveServer.busy(p.getServer(),row.catalog().lockKey(row.owner()))||TRANSACTIONS.busy(row.catalog().lockKey(row.owner()))){reply(l,"此存档正在游戏、保存或管理，暂不能修改");return;}
         if(request.operation()==PREPARE_DELETE){l.deleting=row;l.confirmation=UUID.randomUUID();l.confirmUntil=now+200;reply(l,"确认删除所选存档？旧记录将保留为服务器恢复备份。");return;}
         if(request.operation()==CONFIRM_DELETE&&(l.deleting==null||!row.id().equals(l.deleting.id())||!row.version().equals(l.deleting.version())||!Objects.equals(l.confirmation,request.confirmation())||now>=l.confirmUntil)){reply(l,"删除确认已失效，请重新选择");return;}
         if(request.operation()!=RENAME&&request.operation()!=CONFIRM_DELETE)return;
         final String name;try{name=request.operation()==RENAME?MdSaveCatalog.name(request.name()):"";}catch(IllegalArgumentException invalid){reply(l,invalid.getMessage());return;}
-        final MdSaveTransactions.Reservation reservation;String key=l.catalog.lockKey(row.owner());
+        final MdSaveTransactions.Reservation reservation;String key=row.catalog().lockKey(row.owner());
         try{reservation=TRANSACTIONS.reserve(key,()->!NetplaySaveServer.busy(p.getServer(),key));}catch(IllegalStateException busy){reply(l,busy.getMessage());return;}
         l.loading=true;l.mutation=reservation;
         // A queued IO task asks the owning server thread again immediately before committing.
@@ -172,7 +182,7 @@ public final class MdPublicSaves {
                     if(allowed){l.confirmation=null;l.deleting=null;}else reservation.revoke();approval.complete(allowed);
                 });
                 if(!approval.get(5,TimeUnit.SECONDS)||!reservation.allowed())throw new IllegalStateException("存档管理授权或确认已撤销");
-                if(request.operation()==RENAME)l.catalog.rename(row,name,reservation::allowed);else l.catalog.delete(row,reservation::allowed);return true;
+                if(request.operation()==RENAME)row.catalog().rename(row.row(),name,reservation::allowed);else row.catalog().delete(row.row(),reservation::allowed);return true;
             }
         },done->{l.loading=false;l.mutation=null;if(current(s,l))refresh(s,l,request.operation()==RENAME?"已重命名":"已移入恢复备份");},error->{l.loading=false;l.mutation=null;if(current(s,l))refresh(s,l,"未修改存档："+error);});
         if(!accepted)reservation.close();

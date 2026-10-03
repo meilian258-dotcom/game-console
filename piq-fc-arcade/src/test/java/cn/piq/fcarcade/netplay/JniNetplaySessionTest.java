@@ -71,14 +71,18 @@ class JniNetplaySessionTest {
                 public CompletableFuture<Void> save(byte[] bytes){NetplaySaveState.decode(bytes,FcNetplaySaves.jniIdentity(gun,NetplaySaveState.hash(ROM)));saved.set(bytes);commits.incrementAndGet();return CompletableFuture.completedFuture(null);}
             });
             runs.put(hostKey,host);
-            wire.scheduleAtFixedRate(()->relay.renew(Set.copyOf(runs.keySet())),0,100,TimeUnit.MILLISECONDS);
+            wire.scheduleAtFixedRate(()->{synchronized(runs){relay.renew(Set.copyOf(runs.keySet()));}},0,100,TimeUnit.MILLISECONDS);
             host.start();
         }
         JniNetplaySession join(int port){
+            // Model the server's atomic registration before authority renewal.
+            // Otherwise the test's timer can revoke a valid grant between grant() and runs.put().
+            synchronized(runs){
             Object key=new Object();var ticket=relay.grant(key,port);
             var run=new JniNetplaySession(new NetplayProcess.Grant(700,ticket.id(),false,port>=0,port),()->ROM,
                     packet->wire.schedule(()->relay.receive(key,packet),delay,TimeUnit.MILLISECONDS),gun,()->new Core(gun));
             runs.put(key,run);run.start();return run;
+            }
         }
         void disconnect(JniNetplaySession run){
             Object key=runs.entrySet().stream().filter(e->e.getValue()==run).findFirst().orElseThrow().getKey();

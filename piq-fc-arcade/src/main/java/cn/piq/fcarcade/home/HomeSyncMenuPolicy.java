@@ -2,6 +2,10 @@ package cn.piq.fcarcade.home;
 
 /** Presentation decisions only; never grants server authority or changes a stored mode. */
 public final class HomeSyncMenuPolicy {
+    /** A mask alone cannot opt an older addon into a new JNI room implementation. */
+    public static int externalModes(int declared,int policyMask,boolean localAllowed,boolean jniDeclared) {
+        return declared & ((policyMask & (localAllowed ? 7 : 5)) | (localAllowed ? (jniDeclared ? 24 : 8) : 0)) & 31;
+    }
     private HomeSyncMenuPolicy() {}
     // Existing addon hooks may already filter policy from their supported mask.
     // RetroArch uses the local-sync lane in that contract; do not infer "unimplemented".

@@ -28,6 +28,9 @@ public abstract class ExternalHomeConsoleBlockEntity extends HomeEndpointBlockEn
     /** Explicit opt-in by adapted addons; old addons remain unable to select Netplay. */
     public boolean netplayExperimental(){return false;}
     public void netplayExperimental(boolean value){if(value)throw new UnsupportedOperationException("Netplay not supported");}
+    /** Separate from the RetroArch lane. Adapted addons must persist this choice themselves. */
+    public boolean netplayJniTrial(){return false;}
+    public void netplayJniTrial(boolean value){if(value)throw new UnsupportedOperationException("JNI Netplay not supported");}
 
     /** Addon migration for a formerly unavailable mode; never changes an existing supported choice.
      * This is not a player permission bypass or a way to enable a server-disabled runtime. */
@@ -36,7 +39,7 @@ public abstract class ExternalHomeConsoleBlockEntity extends HomeEndpointBlockEn
         var hooks=HomeSystems.applianceHooks(systemId);
         if(hooks==null||!hooks.synchronizationSettingsAvailable()||hooks.isRunning(server,this)||hooks.pendingStart(server,this))return false;
         int supported=hooks.synchronizationSupportedModes(server,this);
-        if((supported&(1<<synchronizationMode().ordinal()))!=0||(supported&(1<<fallback.ordinal()))==0||netplayExperimental())return false;
+        if((supported&(1<<synchronizationMode().ordinal()))!=0||(supported&(1<<fallback.ordinal()))==0||netplayExperimental()||netplayJniTrial())return false;
         synchronizationMode(fallback);return true;
     }
 

@@ -33,17 +33,17 @@ public final class JniNetplayConsent {
             if(yes&&valid)preference.reset();
             mc.setScreen(valid?parent:null);
             if(yes&&valid)accepted.run();
-        },Component.literal("恢复本机 FC JNI Netplay？"),Component.literal(
-                "仅 Windows x64，支持双手柄及由服务器授权的光枪输入。JNI 原生故障可能使整个 Minecraft 崩溃；请先备份世界。个人/卡带归属不变，继续使用 JNI 独立档，不导入原 RetroArch 进度。参与和旁观自动跟随房间；公共 JNI 最多四个核心会话。只影响后续启动，不改变正在运行的游戏。")));
+        },Component.literal("恢复本机 JNI Netplay？"),Component.literal(
+                "仅对当前机型已验证的 JNI 核心开放，输入设备由机型声明。JNI 原生故障可能使整个 Minecraft 崩溃；请先备份世界。个人/卡带归属不变，存档按核心身份隔离，不导入原 RetroArch 进度。参与和只读旁观自动跟随房间；公共 JNI 最多四个核心会话。只影响后续启动，不改变正在运行的游戏。")));
     }
     @SubscribeEvent public static void commands(RegisterClientCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("gameconsole-jni-netplay").executes(context->{opening=true;return 1;})
                 .then(Commands.literal("off").executes(context->{preference.decline(current());opening=false;
-                    var p=Minecraft.getInstance().player;if(p!=null)p.displayClientMessage(Component.literal("本次连接不再启动新的 FC JNI 会话；当前游戏不变。重新输入 /gameconsole-jni-netplay 可恢复。"),false);return 1;})));
+                    var p=Minecraft.getInstance().player;if(p!=null)p.displayClientMessage(Component.literal("本次连接不再启动新的 JNI Netplay 会话；当前游戏不变。重新输入 /gameconsole-jni-netplay 可恢复。"),false);return 1;})));
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
         if(opening){opening=false;var mc=Minecraft.getInstance();if(mc.level!=null&&current()!=null)confirm(null,()->{
-            if(mc.player!=null)mc.player.displayClientMessage(Component.literal("本机 FC JNI 已启用，参与和旁观会自动跟随 JNI 房间；当前游戏不切换。"),false);
+            if(mc.player!=null)mc.player.displayClientMessage(Component.literal("本机 JNI Netplay 已启用，参与和只读旁观会跟随已支持的 JNI 房间；当前游戏不切换。"),false);
         });}
     }
     @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut event){preference.reset();opening=false;}

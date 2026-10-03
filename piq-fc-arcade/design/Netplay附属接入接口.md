@@ -1,4 +1,35 @@
-# Netplay 附属接入接口（FC69/70 实验）
+# Netplay 附属接入接口
+
+## FC76.35：公共 JNI 准备、激活及授权内容下载（试验接口）
+
+2026-10-03。JNI Netplay 为适用模拟器机型的优先适配目标，见[通用制作规范 1.8](机器制作与交互标准.md)；不是把所有设备强制改为一种核心。以下是本轮公共接口，实际核心门禁与交付状态见 [MD 接入记录](../../piq-md-home/design/MD-JNI-Netplay-20261003.md)。不能把接口存在当作新机型已完成验收。旧 FC/SFC/街机调用未显式启用新选项时保持原有语义。
+
+### 运行与权限
+
+- 可信附属提供独立 `NetplayProfile` / `LibretroProfile`，固定所属模块、核心资源、SHA、选项、真实端口与输出采样率。`withJni` 才走共享 `JniNetplaySession`；不能把运行器 JNI 或 `NetplaySaveClient` 的名称当作联机模式。核心状态/SRAM/音频/动态画面元数据必须真实验证；不接受服务器指定 DLL 路径。
+- 服务器权威输入可声明实际 1～4 个端口，未使用端口保持零。客户端的物理手柄租约仍由机型服务验证；只读模拟副本可以呈现其操作者的输入，但原生只读 ticket 本身不授予手柄或保存权。只有主持接收经过服务器复核的 `cabinetInput/cabinetRelease`；不能让旁观端自行变为操作者。
+- 新增 `NetplayProcess(grant, content, sender, profile, auxiliary, cabinetAuthority, paid, waitForActivation)`。最后一项仅适用于 JNI 主持；旧构造默认 `false`。准备模式下 `ready()` 表示内容、原生核心和所选进度已准备好，尚未公开运行；上层须经过公共开局 `ready`、服务器写入授权，再对**原会话**调用 `activate()`。准备阶段不呈现游戏帧、不接收玩家操作、不周期/最终写档；取消只撤销准备。
+- `NetplayNetwork.bind` 给主持安装已注册的公共 persistence factory，须在 `start` 前调用，不能再重复 `NetplaySaveClient.open`。`terminated()` 只在清理路径处理后完成；上层仍须独立等待服务器最终持久化结果，不把本机关闭或旧周期检查点当成最终保存成功。
+- 客端下载、恢复种子期间也须保持输入归零；远端完成 `ready` 后由现有物理租约路径确认可操作，不能只检查主持全局已开机。取消、换连接、迟到 READY、旁观转操作者及旧 ticket 清理均按原连接/代次处理。
+
+### 只取内容，不另开普通播放引擎
+
+`content-card-6` 新增 `DOWNLOAD_ONLY=24`；沿既有授权、GET/DATA 分片、文件上限、完整 SHA 和适配器校验，不是新的任意文件接口。
+
+1. MC 客户端主线程先调用 `ContentCardClient.expectDownload(system, requestUUID, pos, hash, size)`，捕获当前真实连接并得到 `CompletableFuture<byte[]>`。`size=0` 可用于只含哈希的旁观授权，但仍受机型大小上限约束。
+2. 机型通过自身获准请求向服务端申请。服务端复核当前席位或只读观看授权，调用 `ContentCards.downloadOnly(player, system, requestUUID, pos, entry, stillAuthorized, completed)`。返回实际传输 UUID 或繁忙时的 `null`；后续 GET 和完成确认仍重新检查授权。
+3. 工作线程只能读取/校验内容，不能接触世界或授予席位。完成回主线程复核请求、连接和取消状态后，future 才交出内容；`STARTED` 在此 lane 仅为**内容校验完成 ACK**，绝不是核心 READY。
+4. `ContentCardClient.cancelDownload(requestUUID)` 可从 worker 请求取消；主线程调用会立即释放该请求槽位，旧回调不能清除后来的请求。当前客户端只接受一个内容下载，冲突明确报繁忙；普通播放下载与只取内容互斥，不悄悄覆盖。
+
+附近 Netplay 旁观仍使用原 `WatchProvider.netplay`、`WatchNetplay` 和 `NetplayWatchContent.Preparation`。prepare 时核对传入连接，cancel 回收当前下载，读完内容不能绕过观看范围或自动取得写存档权。
+
+### 共用设置页
+
+`HomeSystems.ServerHooks.jniNetplaySettingsAvailable()` 默认 `false`；须同时声明支持 mask 的 bit 4（数值 16），附属实体实现持久化的 `netplayJniTrial`，且服主允许本地核心同步，才开放 JNI 选项。它与 bit 3 的 RetroArch 实验标志分开；未声明的旧附属不会自动出现 JNI 功能。
+
+逐项禁用原因通过 `synchronizationUnavailableReason(level, console, int menuMode)` 返回。关机、没有待确认开局/保存、原操作权限仍需服务端复核。只支持某一联机方式不应假造其余方式；本机 opt-out、平台不支持、服务器禁用、未适配和当前忙碌须分别说明。
+
+## 历史 FC69/70 记录
 
 > 历史接口笔记，保留当时版本的限制与协议说明。后续四人、投币及原生协议已有变化，文中“两人 / 免费模式 / PNP3”等不能视为 FC76.15 当前上限。新接入先读[功能行为与配置规范](方块电玩功能行为与配置规范-v1.md)及[SFC附属蓝本](../../piq-sfc-home/design/以SFC为蓝本-附属制作说明.md)，按目标版本源码、能力声明与测试确定支持范围；本页不是稳定 SDK 合约。[制作流程规范](方块电玩模组制作规范-v1.md)作为辅助材料。
 

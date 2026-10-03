@@ -28,6 +28,7 @@ public final class JniNetplaySession implements AutoCloseable {
     private final NetplayProfile generic;
     private final Callable<Map<String,byte[]>> auxiliary;
     private final NetplayCabinetInputs cabinet;
+    private final int ports;
     private final NetplayGunMailbox gunInputs=new NetplayGunMailbox();
     private final ArrayBlockingQueue<Event> events=new ArrayBlockingQueue<>(512);
     private final ArrayBlockingQueue<NetplayProcess.Frame> pictures=new ArrayBlockingQueue<>(3);
@@ -40,6 +41,7 @@ public final class JniNetplaySession implements AutoCloseable {
     private final Object intakeLock=new Object();
     private int intakeBytes;
     private volatile boolean started,closing,closed,ready;
+    private volatile boolean activated;
     private volatile int input;
     private volatile long delivered,replayed,confirmedVisible,rejectedPeers;
     private volatile String failure,phase="准备 FC JNI Netplay",saveStatus="不保存进度";
@@ -88,16 +90,25 @@ public final class JniNetplaySession implements AutoCloseable {
     }
     public JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,NetplayProfile profile,
                             Callable<Map<String,byte[]>> auxiliary,NetplayCabinetInputs cabinet) {
-        this(grant,content,sender,false,()->new LibretroJniRuntime(Objects.requireNonNull(profile.jni()),profile.owner()),profile,auxiliary,cabinet);
+        this(grant,content,sender,profile,auxiliary,cabinet,false);
+    }
+    public JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,NetplayProfile profile,
+                            Callable<Map<String,byte[]>> auxiliary,NetplayCabinetInputs cabinet,boolean waitForActivation) {
+        this(grant,content,sender,false,()->new LibretroJniRuntime(Objects.requireNonNull(profile.jni()),profile.owner()),profile,auxiliary,cabinet,waitForActivation);
     }
     JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,boolean gun,Supplier<LibretroRuntime> factory,
                      NetplayProfile generic,Callable<Map<String,byte[]>> auxiliary,NetplayCabinetInputs cabinet) {
+        this(grant,content,sender,gun,factory,generic,auxiliary,cabinet,false);
+    }
+    JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,boolean gun,Supplier<LibretroRuntime> factory,
+                     NetplayProfile generic,Callable<Map<String,byte[]>> auxiliary,NetplayCabinetInputs cabinet,boolean waitForActivation) {
         this.grant=Objects.requireNonNull(grant);this.content=Objects.requireNonNull(content);
         this.sender=Objects.requireNonNull(sender);this.factory=Objects.requireNonNull(factory);
         this.gunMode=gun;this.generic=generic;
         this.auxiliary=Objects.requireNonNull(auxiliary);this.cabinet=cabinet;
-        if(generic!=null&&(generic.jni()==null||generic.ports()!=(cabinet==null?2:4))||gun&&cabinet!=null
-                ||grant.port()>=(cabinet==null?2:4)||gun&&!grant.host()&&grant.player())throw new IllegalArgumentException("JNI input lane/profile is not supported");
+        ports=generic==null?2:generic.ports();activated=!waitForActivation;
+        if(generic!=null&&(generic.jni()==null||cabinet==null&&ports!=2)||gun&&cabinet!=null
+                ||grant.port()>=ports||gun&&!grant.host()&&grant.player()||waitForActivation&&!grant.host())throw new IllegalArgumentException("JNI input lane/profile is not supported");
     }
     public static LibretroProfile profile() {
         return profile(false);
@@ -117,23 +128,28 @@ public final class JniNetplaySession implements AutoCloseable {
         if(started||closed)return;started=true;
         var thread=new Thread(this::run,"PIQ-FC-JNI-Netplay-owner");thread.setDaemon(true);thread.start();
     }
-    public void input(int value){input=gunMode||cabinet!=null||closing||closed||grant.port()<0?0:value&65535;}
+    public void input(int value){input=!activated||gunMode||cabinet!=null||closing||closed||grant.port()<0?0:value&65535;}
     /** Called only by the existing authenticated server-input route, never by peer rollback packets. */
     public void authoritativeGun(long revision,long sequence,int buttons,int aim) {
-        if(gunMode&&grant.host()&&!closing&&!closed)gunInputs.offer(revision,sequence,buttons,aim,System.nanoTime());
+        if(activated&&gunMode&&grant.host()&&!closing&&!closed)gunInputs.offer(revision,sequence,buttons,aim,System.nanoTime());
     }
     public boolean ready(){return ready&&!closing&&!closed;}
+    public boolean active(){return activated&&!closing&&!closed;}
+    public synchronized void activate(){
+        if(!grant.host()||!ready())throw new IllegalStateException("JNI 主持尚未准备就绪");
+        activated=true;phase=runningLabel();
+    }
     public String error(){var c=core;String nativeError=c==null?"":c.diagnosticError();return failure!=null?failure:nativeError.isBlank()?null:nativeError;}
     public String status(){return error()!=null?"JNI Netplay 停止："+error():closed?"已结束":phase;}
     public long framesReceived(){return delivered;}
     public long replayedFrames(){return replayed;}
     public NetplayProcess.Frame poll(){return pictures.poll();}
     public String saveStatus(){return saveStatus;}
-    public boolean canSave(){return grant.host()&&ready()&&persistence!=null&&persistence.enabled();}
+    public boolean canSave(){return grant.host()&&active()&&ready()&&persistence!=null&&persistence.enabled();}
     public CompletableFuture<Void> terminated(){return terminated;}
     public String diagnostic(){return status()+"\nJNI 试验；确认帧："+confirmedVisible+"；呈现帧："+delivered+"；重演帧："+replayed+"；拒绝异常连接："+rejectedPeers+"\n存档："+saveStatus;}
     public synchronized CompletableFuture<byte[]> checkpoint() {
-        if(!grant.host()||!ready||closed)return CompletableFuture.failedFuture(new IllegalStateException("JNI 主持未就绪"));
+        if(!grant.host()||!active()||!ready())return CompletableFuture.failedFuture(new IllegalStateException("JNI 主持未就绪或尚未激活"));
         if(capture==null||capture.isDone())capture=new CompletableFuture<byte[]>().orTimeout(15,TimeUnit.SECONDS);
         return capture;
     }
@@ -147,7 +163,7 @@ public final class JniNetplaySession implements AutoCloseable {
     }
     /** Network thread does bounded copying/enqueue only; no native work or server-side authority expansion. */
     public void receive(NetplayChunk chunk,int authorizedPort) {
-        if(closed||closing||chunk.session()!=grant.session()||authorizedPort< -1||authorizedPort>=(cabinet==null?2:4))return;
+        if(closed||closing||chunk.session()!=grant.session()||authorizedPort< -1||authorizedPort>=ports)return;
         if(!grant.host()&&!chunk.ticket().equals(grant.ticket()))return;
         synchronized(intakeLock) {
             if(chunk.byteLength()>2*1024*1024-intakeBytes||!events.offer(new Event(chunk,authorizedPort))) {
@@ -157,8 +173,14 @@ public final class JniNetplaySession implements AutoCloseable {
         }
     }
     @Override public synchronized void close() {
+        if(closing||closed)return;
         closing=true;input=0;gunInputs.close();
-        if(!started){closed=true;terminated.complete(null);}
+        if(!started){
+            if(cabinet!=null)cabinet.close();
+            try{if(persistence!=null)persistence.abort();terminated.complete(null);}
+            catch(RuntimeException|LinkageError error){failure="JNI 存档准备撤销未确认";terminated.completeExceptionally(error);}
+            finally{closed=true;}
+        }
     }
     private void run() {
         try {
@@ -195,9 +217,10 @@ public final class JniNetplaySession implements AutoCloseable {
             timeline=newTimeline(frame);confirmed=lastHostNext=frame;
             nextSave=System.nanoTime()+TimeUnit.SECONDS.toNanos(30);
             nextPresent=System.nanoTime();
-            if(grant.host()){ready=true;phase=runningLabel();}
+            if(grant.host()){ready=true;phase=activated?runningLabel():"JNI 已准备就绪，等待开局授权";}
             else{remote=new Peer(grant.ticket(),grant.port());peers.put(remote.ticket,remote);control(remote,NetplayChunk.OPEN);phase="等待 JNI 主持与种子状态";}
             while(!closing) {
+                if(!activated){LockSupport.parkNanos(500_000L);continue;}
                 drain();expire();
                 if(error()!=null)throw new IOException(error());
                 long now=System.nanoTime();
@@ -222,16 +245,21 @@ public final class JniNetplaySession implements AutoCloseable {
                 confirmedVisible=confirmed;replayed=timeline.replayedFrames();
                 LockSupport.parkNanos(500_000L);
             }
-            if(grant.host()&&failure==null&&ready&&persistence!=null)finishSave();
+            if(grant.host()&&activated&&failure==null&&ready&&persistence!=null)finishSave();
         } catch(Exception|LinkageError error) {
             if(failure==null)failure=error.getMessage()==null?error.getClass().getSimpleName():error.getMessage();
         } finally {
             ready=false;closing=true;gunInputs.close();if(cabinet!=null)cabinet.close();
             try{sender.accept(new NetplayChunk(grant.session(),grant.ticket(),NetplayChunk.CLOSE,0,new byte[0]));}catch(RuntimeException ignored){}
             synchronized(this){if(capture!=null&&!capture.isDone())capture.completeExceptionally(new IOException("JNI 运行已结束，未取得新快照"));}
-            if(persistence!=null)persistence.abort();
-            try{if(core!=null)core.close();closed=true;terminated.complete(null);}
-            catch(RuntimeException|LinkageError error){failure="JNI 核心关闭未确认；须正常重启客户端";terminated.completeExceptionally(error);}
+            // A faulty persistence adapter must never strand the native owner/slot.
+            Throwable cleanupFailure=null;
+            try{if(persistence!=null)persistence.abort();}
+            catch(RuntimeException|LinkageError error){cleanupFailure=error;failure="JNI 存档通道撤销未确认；原进度保留";}
+            try{if(core!=null)core.close();}
+            catch(RuntimeException|LinkageError error){if(cleanupFailure!=null)error.addSuppressed(cleanupFailure);cleanupFailure=error;failure="JNI 核心关闭未确认；须正常重启客户端";}
+            closed=true;
+            if(cleanupFailure==null)terminated.complete(null);else terminated.completeExceptionally(cleanupFailure);
             pictures.clear();events.clear();
         }
     }
@@ -242,12 +270,12 @@ public final class JniNetplaySession implements AutoCloseable {
             public LibretroProcess.Output step(int a,int b,boolean present){return core.run(List.of(new LibretroProcess.Controls(new int[]{a,b},0)),present?3:0);}
             public LibretroProcess.Output step(Input frame,boolean present) {
                 validateInput(frame);
-                int[] pads=cabinet==null?new int[]{frame.p1(),frame.p2()}:new int[]{frame.p1(),frame.p2(),frame.p3(),frame.p4()};
+                int[] pads=Arrays.copyOf(new int[]{frame.p1(),frame.p2(),frame.p3(),frame.p4()},ports);
                 return core.run(List.of(new LibretroProcess.Controls(pads,frame.gun())),present?3:0);
             }
         },frame);
     }
-    private LibretroProcess.Controls neutral(){return new LibretroProcess.Controls(new int[cabinet==null?2:4],gunMode?65536:0);}
+    private LibretroProcess.Controls neutral(){return new LibretroProcess.Controls(new int[ports],gunMode?65536:0);}
     private void drain() {
         for(int n=0;n<128;n++) {
             // Backpressure on decoded Commands, not permission to accept arbitrary
@@ -346,6 +374,7 @@ public final class JniNetplaySession implements AutoCloseable {
     private void hostFrame() {
         if(cabinet!=null) {
             int[] pads=cabinet.next(System.nanoTime());
+            Arrays.fill(pads,ports,pads.length,0);
             publish(timeline.advance(new Input(timeline.next(),pads[0],pads[1],pads[2],pads[3],0,3)));
             confirm();broadcastCommands();pace();return;
         }
@@ -371,7 +400,12 @@ public final class JniNetplaySession implements AutoCloseable {
         publish(timeline.advance(new Input(frame,a,b,canonical==null?0:canonical.p3(),canonical==null?0:canonical.p4(),canonical==null?0:canonical.gun(),known)));pace();
     }
     private void validateInput(Input frame) {
-        if(cabinet!=null){if(frame.gun()!=0||frame.known()!=3||((frame.p1()|frame.p2()|frame.p3()|frame.p4())&~4095)!=0)throw new IllegalArgumentException("街机需要已授权四端口帧");return;}
+        if(cabinet!=null){
+            int[] pads={frame.p1(),frame.p2(),frame.p3(),frame.p4()};
+            if(frame.gun()!=0||frame.known()!=3||((frame.p1()|frame.p2()|frame.p3()|frame.p4())&~4095)!=0)throw new IllegalArgumentException("需要服务器已授权的端口帧");
+            for(int p=ports;p<pads.length;p++)if(pads[p]!=0)throw new IllegalArgumentException("输入超过核心真实端口数");
+            return;
+        }
         if(frame.p3()!=0||frame.p4()!=0||(!gunMode&&frame.gun()!=0)
                 ||gunMode&&(frame.p2()!=0||frame.known()!=3))throw new IllegalArgumentException("输入与房间设备不匹配");
     }

@@ -36,7 +36,7 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
     private boolean pending,timedOut;
     private int waiting,age,cooldown,left,top,panelWidth;
     private HomeSyncSettingsLayout layout;
-    private static final String[] LABELS = { "玩家音画串流", "本地输入同步", "服务端托管音画", "RetroArch Netplay（实验）", "FC JNI Netplay（试验 / 本机确认）" };
+    private static final String[] LABELS = { "玩家音画串流", "本地输入同步", "服务端托管音画", "RetroArch Netplay（实验）", "JNI Netplay（试验 / 本机确认）" };
     private HomeSyncSettingsScreen(HomeSyncNetwork.Setting value,Connection source) {
         super(Component.literal("设备设置 · "+value.system()));setting = value;connection = source;status = value.reason();
     }
@@ -64,7 +64,7 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
             final int selected=mode;
             boolean privateOnly=diagnosticsOnly();
             boolean external=minecraft.level!=null&&minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity;
-            if(!HomeSyncMenuPolicy.showMode(mode,external,privateOnly,setting.supported()))continue;
+            if(!HomeSyncMenuPolicy.showMode(mode,external,privateOnly,setting.supported())&&setting.mode()!=mode)continue;
             String label=(setting.mode()==mode&&!privateOnly?"✓ ":"")+LABELS[mode];
             if(privateOnly&&mode==4)label="私人单人 · 本机设置…";
             else if(privateOnly)label+="（尚未接入）";
@@ -83,7 +83,7 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
                         :"本附属尚未接入此公共运行方式；不是权限不足，也不能通过此按钮解锁。当前仅私人单人，附近玩家不能旁观。")
                 :(setting.supported()&(1<<mode))==0
                 ?setting.modeReasons().get(mode)
-                :(mode==0?"由开机玩家运行游戏，向其他玩家发送音画。":mode==1?"各客户端运行游戏，同步操作数据。":mode==2?"由服务器运行游戏，向玩家发送音画。":mode==4?"FC 普通双手柄 JNI 回滚，原生崩溃可影响整个 MC。Windows x64默认允许，参与和旁观跟随房间；个人/卡带独立JNI档，不与原 Netplay 混接。":"RetroArch Netplay 同步操作与状态；Windows x64。按卡带策略保存，开机恢复；网络页可手动保存。")
+                :(mode==0?"由开机玩家运行游戏，向其他玩家发送音画。":mode==1?"各客户端运行游戏，同步操作数据。":mode==2?"由服务器运行游戏，向玩家发送音画。":mode==4?"使用机型声明的 JNI 核心同步输入与状态，原生崩溃可影响整个 MC。参与和只读旁观跟随房间；保存按开局策略和核心身份隔离，不与 RetroArch 进度混接。":"RetroArch Netplay 同步操作与状态；Windows x64。按卡带策略保存，开机恢复；网络页可手动保存。")
                     +"\n"+HomeSyncMenuPolicy.buttonState(mode,setting.mode(),setting.supported(),setting.editable(),setting.modeReasons().get(mode)))));
             addRenderableWidget(button);
         }

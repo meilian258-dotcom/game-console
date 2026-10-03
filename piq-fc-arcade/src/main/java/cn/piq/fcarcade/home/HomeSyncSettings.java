@@ -119,7 +119,7 @@ public final class HomeSyncSettings {
                         request.mode(),request.occupancy(),request.approval(),modes)||!basic(player,intent)||!player.hasPermissions(2)||!identity(player,intent))return;
                 if(request.mode()>=0){
                     if(c instanceof HomeConsoleBlockEntity fc){fc.netplayExperimental(request.mode()>=3);fc.netplayJniTrial(request.mode()==4);}
-                    if(c instanceof ExternalHomeConsoleBlockEntity external)external.netplayExperimental(request.mode()==3);
+                    if(c instanceof ExternalHomeConsoleBlockEntity external){external.netplayExperimental(request.mode()==3);external.netplayJniTrial(request.mode()==4);}
                     c.synchronizationMode(request.mode()>=3?CabinetSyncMode.LOCAL_SYNC:CabinetSyncMode.checked(request.mode()));
                 }
                 else if(request.occupancy()>=0)c.occupancyVisible(request.occupancy()!=0);
@@ -158,7 +158,7 @@ public final class HomeSyncSettings {
         return console instanceof ExternalHomeConsoleBlockEntity external ? external.systemId().getPath().toUpperCase(java.util.Locale.ROOT)
                 : console.getBlockState().getBlock() instanceof SuborConsoleBlock ? "小霸王学习机（SB-926）" : "FC";
     }
-    private static int displayMode(HomeEndpointBlockEntity c){if(c instanceof HomeConsoleBlockEntity fc&&fc.netplayJniTrial())return 4;return c instanceof HomeConsoleBlockEntity fc&&fc.netplayExperimental()||c instanceof ExternalHomeConsoleBlockEntity external&&external.netplayExperimental()?3:c.synchronizationMode().ordinal();}
+    private static int displayMode(HomeEndpointBlockEntity c){if(c instanceof HomeConsoleBlockEntity fc&&fc.netplayJniTrial()||c instanceof ExternalHomeConsoleBlockEntity external&&external.netplayJniTrial())return 4;return c instanceof HomeConsoleBlockEntity fc&&fc.netplayExperimental()||c instanceof ExternalHomeConsoleBlockEntity external&&external.netplayExperimental()?3:c.synchronizationMode().ordinal();}
     /** A rate-limit rejection must not invoke shapes, addon hooks or protection callbacks again. */
     private static void cachedReply(ServerPlayer player,Intent intent,String reason) {
         var s=intent.lastSetting;if(s==null)return;
@@ -183,7 +183,8 @@ public final class HomeSyncSettings {
         int policyMask=cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed()?7:5;
         if(!cn.piq.fcarcade.cabinet.CabinetHostingConfig.playerAllowed())policyMask&=~1;
         if(console instanceof ExternalHomeConsoleBlockEntity external){var hooks=HomeSystems.applianceHooks(external.systemId());
-            try{return hooks==null||!hooks.synchronizationSettingsAvailable()?0:hooks.synchronizationSupportedModes(level,external)&(policyMask|(cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed()?8:0));}catch(RuntimeException|LinkageError failure){return 0;}}
+            try{return hooks==null||!hooks.synchronizationSettingsAvailable()?0:HomeSyncMenuPolicy.externalModes(hooks.synchronizationSupportedModes(level,external),policyMask,
+                    cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed(),hooks.jniNetplaySettingsAvailable());}catch(RuntimeException|LinkageError failure){return 0;}}
         if(!cn.piq.fcarcade.cabinet.CabinetHostingConfig.enabled()||cn.piq.fcarcade.core.libretro.LibretroNesCore.unavailableReason()!=null)policyMask&=~4;
         return (HomeSyncPolicy.supportedMask()&policyMask)|(cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed()?24:0);
     }
@@ -225,8 +226,9 @@ public final class HomeSyncSettings {
             var hooks=HomeSystems.applianceHooks(external.systemId());
             try {
                 int implemented=hooks!=null&&hooks.synchronizationSettingsAvailable()?hooks.synchronizationSupportedModes(player.serverLevel(),external):0;
-                if(!HomeSyncMenuPolicy.supported(implemented,selected))return selected<=3&&hooks!=null
-                        ?HomeSyncMenuPolicy.addonUnavailable(selected,mode->hooks.synchronizationUnavailableReason(player.serverLevel(),external,mode))
+                if(selected==4&&(hooks==null||!hooks.jniNetplaySettingsAvailable()))implemented&=~16;
+                if(!HomeSyncMenuPolicy.supported(implemented,selected))return hooks!=null
+                        ?hooks.synchronizationUnavailableReason(player.serverLevel(),external,selected)
                         :"此机型尚未提供该 Netplay 运行方式。";
             }catch(RuntimeException|LinkageError failure){return "读取附属运行能力失败，请刷新或查看日志。";}
         }

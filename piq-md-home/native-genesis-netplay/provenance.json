@@ -1,0 +1,16 @@
+{
+  "upstream": "https://github.com/libretro/Genesis-Plus-GX",
+  "commit": "c2838c7dc4236fc2fe94e5dbd08b41486067918e",
+  "archive_sha256": "dd4f5ef7ad3bae410854da8d0d7b99c99f13caa1df77f4ef1f2b8f59be3b6977",
+  "license": "Retain all original notices. Genesis Plus GX and Nuked OPN2/OPLL require non-commercial use and complete corresponding source distribution; bundled blip_buf is LGPL-2.1-or-later. Not an MIT/GPL relicensing.",
+  "distribution": "Ship genesis-plus-gx-piqnp1-source.zip with this independent DLL. Never replace the original MEDIA/private core or migrate its saves implicitly.",
+  "reference_audit": [
+    "https://docs.libretro.com/development/retroarch/netplay/",
+    "https://docs.libretro.com/library/genesis_plus_gx/",
+    "https://github.com/birdybro/Genesis-Plus-GX-GUI/tree/93e8991a1bf92baf976d68056b0f2640a3a13c09"
+  ],
+  "reference_use": "The GUI fork rollback system was a field-completeness checklist only. Its memcpy(m68k) includes memory maps/callbacks/jmp_buf and was NOT copied into cross-instance snapshots. The PIQ extension explicitly serializes semantic scalar/array domains and rebuilds derived pointers using locked upstream loader behavior.",
+  "schema": "PIQGXNP version 1; Windows x64 same pinned artifact; fixed 1560608 bytes; distinct library identity Genesis Plus GX PIQ Netplay",
+  "domains": ["68K semantic registers, prefetch and refresh timing", "upstream VDP/Z80/cart state", "YM2612 derived-pointer canonical form", "fixed 64KiB SRAM", "I2C/SPI/Microwire protocol state", "two six-button pad handshake state", "FM pending samples and cycles", "full stereo blip history and phase", "EQ/low-pass history", "libretro viewport and overclock-delay state"],
+  "scope": "Mega Drive hardware, two digital six-button controllers, no SMS/CD input or media capability claim. Automated original-ROM gates are not a claim every retail mapper/game has been validated. No ROM downloads or commercial ROMs in source archive."
+}

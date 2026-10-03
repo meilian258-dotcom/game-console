@@ -25,20 +25,23 @@ public final class MdPublicNetwork {
         default void privateActivate(PrivateActivated value){}
         default void activate(Activated value){}
         default void visual(Visual value){}
+        default void downloadDenied(DownloadDenied value){}
     }
     private static volatile Client client;
     public static void client(Client value){client=Objects.requireNonNull(value);}
     private static ResourceLocation id(String value){return ResourceLocation.fromNamespaceAndPath(MdMod.ID,"public_"+value);}
-    public record Start(long wire,UUID ticket,UUID content,WatchNetwork.Start display,boolean save,boolean resume,String profile,String rom) implements CustomPacketPayload {
-        public Start {if(wire<=0||profile.length()!=64||rom.length()!=64)throw new IllegalArgumentException("MD start");}
+    public record Start(long wire,UUID ticket,UUID content,WatchNetwork.Start display,boolean save,boolean resume,String profile,String rom,String saveContent,boolean netplay) implements CustomPacketPayload {
+        public Start {if(wire<=0||!digest(profile)||!digest(rom)||!digest(saveContent))throw new IllegalArgumentException("MD start");}
+        public Start(long wire,UUID ticket,UUID content,WatchNetwork.Start display,boolean save,boolean resume,String profile,String rom){this(wire,ticket,content,display,save,resume,profile,rom,rom,false);}
         public static final Type<Start> TYPE=new Type<>(id("start"));
-        public static final StreamCodec<RegistryFriendlyByteBuf,Start> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.wire);b.writeUUID(p.ticket);b.writeUUID(p.content);WatchNetwork.Start.CODEC.encode(b,p.display);b.writeBoolean(p.save);b.writeBoolean(p.resume);b.writeUtf(p.profile,64);b.writeUtf(p.rom,64);},b->new Start(b.readVarLong(),b.readUUID(),b.readUUID(),WatchNetwork.Start.CODEC.decode(b),b.readBoolean(),b.readBoolean(),b.readUtf(64),b.readUtf(64)));
+        public static final StreamCodec<RegistryFriendlyByteBuf,Start> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.wire);b.writeUUID(p.ticket);b.writeUUID(p.content);WatchNetwork.Start.CODEC.encode(b,p.display);b.writeBoolean(p.save);b.writeBoolean(p.resume);b.writeUtf(p.profile,64);b.writeUtf(p.rom,64);b.writeUtf(p.saveContent,64);b.writeBoolean(p.netplay);},b->new Start(b.readVarLong(),b.readUUID(),b.readUUID(),WatchNetwork.Start.CODEC.decode(b),b.readBoolean(),b.readBoolean(),b.readUtf(64),b.readUtf(64),b.readUtf(64),b.readBoolean()));
         public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
-    public record Seat(long wire,WatchNetwork.Start display,int port,UUID loan) implements CustomPacketPayload {
-        public Seat {if(wire<=0||port<0||port>1)throw new IllegalArgumentException("MD seat");}
+    public record Seat(long wire,WatchNetwork.Start display,int port,UUID loan,UUID ticket,String rom,int bytes,boolean netplay) implements CustomPacketPayload {
+        public Seat {if(wire<=0||port<0||port>1||netplay&&(!digest(rom)||bytes<512||bytes>cn.piq.mdhome.client.MdRom.MAX))throw new IllegalArgumentException("MD seat");Objects.requireNonNull(ticket);}
+        public Seat(long wire,WatchNetwork.Start display,int port,UUID loan){this(wire,display,port,loan,new UUID(0,0),"",0,false);}
         public static final Type<Seat> TYPE=new Type<>(id("seat"));
-        public static final StreamCodec<RegistryFriendlyByteBuf,Seat> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.wire);WatchNetwork.Start.CODEC.encode(b,p.display);b.writeByte(p.port);b.writeUUID(p.loan);},b->new Seat(b.readVarLong(),WatchNetwork.Start.CODEC.decode(b),b.readUnsignedByte(),b.readUUID()));
+        public static final StreamCodec<RegistryFriendlyByteBuf,Seat> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.wire);WatchNetwork.Start.CODEC.encode(b,p.display);b.writeByte(p.port);b.writeUUID(p.loan);b.writeUUID(p.ticket);b.writeUtf(p.rom,64);b.writeVarInt(p.bytes);b.writeBoolean(p.netplay);},b->new Seat(b.readVarLong(),WatchNetwork.Start.CODEC.decode(b),b.readUnsignedByte(),b.readUUID(),b.readUUID(),b.readUtf(64),b.readVarInt(),b.readBoolean()));
         public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     public record End(long wire,UUID loan,boolean shutdown,String reason) implements CustomPacketPayload {
@@ -119,8 +122,29 @@ public final class MdPublicNetwork {
         public static final StreamCodec<RegistryFriendlyByteBuf,Release> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.wire);b.writeByte(p.port);b.writeUUID(p.loan);},b->new Release(b.readVarLong(),b.readUnsignedByte(),b.readUUID()));
         public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
+    /** Correlation nonce only: server independently revalidates the seat/watch authorization. */
+    public record Download(long wire,UUID request,String rom) implements CustomPacketPayload {
+        public Download{if(wire<=0||!digest(rom))throw new IllegalArgumentException("MD download");Objects.requireNonNull(request);}
+        public static final Type<Download> TYPE=new Type<>(id("download"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,Download> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.wire);b.writeUUID(p.request);b.writeUtf(p.rom,64);},b->new Download(b.readVarLong(),b.readUUID(),b.readUtf(64)));
+        public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
+    public record DownloadDenied(UUID request) implements CustomPacketPayload {
+        public DownloadDenied{Objects.requireNonNull(request);}
+        public static final Type<DownloadDenied> TYPE=new Type<>(id("download_denied"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,DownloadDenied> CODEC=StreamCodec.of((b,p)->b.writeUUID(p.request),b->new DownloadDenied(b.readUUID()));
+        public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
+    /** A remote replica has restored its seed; grants only its already leased physical input port. */
+    public record SeatReady(long wire,int port,UUID loan) implements CustomPacketPayload {
+        public SeatReady{if(wire<=0||port<0||port>1)throw new IllegalArgumentException("MD seat ready");Objects.requireNonNull(loan);}
+        public static final Type<SeatReady> TYPE=new Type<>(id("seat_ready"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,SeatReady> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.wire);b.writeByte(p.port);b.writeUUID(p.loan);},b->new SeatReady(b.readVarLong(),b.readUnsignedByte(),b.readUUID()));
+        public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
+    private static boolean digest(String value){return value!=null&&value.matches("[0-9a-f]{64}");}
     public static void register(RegisterPayloadHandlersEvent event){
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"md-public-3")
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"md-public-4")
             .playToClient(Start.TYPE,Start.CODEC,(p,c)->dispatch(c,h->h.start(p)))
             .playToClient(PrivateStart.TYPE,PrivateStart.CODEC,(p,c)->dispatch(c,h->h.privateStart(p)))
             .playToClient(Activated.TYPE,Activated.CODEC,(p,c)->dispatch(c,h->h.activate(p)))
@@ -129,7 +153,10 @@ public final class MdPublicNetwork {
             .playToClient(End.TYPE,End.CODEC,(p,c)->dispatch(c,h->h.end(p)))
             .playToClient(Media.TYPE,Media.CODEC,(p,c)->dispatch(c,h->h.media(p)))
             .playToClient(Visual.TYPE,Visual.CODEC,(p,c)->dispatch(c,h->h.visual(p)))
+            .playToClient(DownloadDenied.TYPE,DownloadDenied.CODEC,(p,c)->dispatch(c,h->h.downloadDenied(p)))
             .playToServer(Release.TYPE,Release.CODEC,(p,c)->server(c,h->MdPublicServer.release(h,p)))
+            .playToServer(Download.TYPE,Download.CODEC,(p,c)->server(c,h->MdPublicServer.download(h,p)))
+            .playToServer(SeatReady.TYPE,SeatReady.CODEC,(p,c)->server(c,h->MdPublicServer.seatReady(h,p)))
             .playToServer(Closed.TYPE,Closed.CODEC,(p,c)->server(c,h->MdPublicServer.closed(h,p)))
             .playToServer(PrivateFinished.TYPE,PrivateFinished.CODEC,(p,c)->server(c,h->MdPrivateServer.finished(h,p)))
             .playBidirectional(Input.TYPE,Input.CODEC,(p,c)->{if(c.player() instanceof ServerPlayer)server(c,h->MdPublicServer.input(h,p));else dispatch(c,h->h.input(p));})
