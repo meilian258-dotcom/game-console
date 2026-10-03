@@ -18,7 +18,8 @@ public final class WatchService {
         final Connection connection;boolean enabled=true;int capacity=1;long nextChange;
         final Map<WatchLedger.Source,Long> blocked=new HashMap<>();
         final Map<UUID,Long> nextHeartbeat=new HashMap<>();
-        Control(Connection connection){this.connection=connection;}
+        final WatchPreferenceState preferences=new WatchPreferenceState();
+        Control(Connection connection){this.connection=connection;preferences.connection(connection);}
         boolean available(WatchNetwork.Available packet,long now){
             // Reductions are immediate, while increases cannot manufacture rapid assignments.
             if(packet.enabled()&&enabled&&packet.capacity()>capacity&&now<nextChange)return false;
@@ -66,6 +67,24 @@ public final class WatchService {
         if(!current(player))return;var server=player.getServer();var state=STATES.get(server);if(state==null)return;long now=now(server);
         var lease=state.ledger.release(player.getUUID(),player.connection.getConnection(),packet.lease(),packet.revision(),now);
         if(lease!=null){control(state,player).block(lease.source(),now+40);stop(server,state,lease,"已停止旁观");demands(server,state,now);}
+    }
+    static void preference(ServerPlayer player,WatchNetwork.Preference packet){
+        if(!current(player))return;var server=player.getServer();var state=STATES.get(server);if(state==null)return;
+        var c=control(state,player);long now=now(server);var live=state.sources.get(packet.source().source());
+        var lease=state.ledger.authorized(player.getUUID(),c.connection,packet.lease(),packet.revision(),now);
+        boolean authorized=live!=null&&WatchPreferenceState.Source.of(live.source.descriptor()).equals(packet.source())
+                &&lease!=null&&lease.source().equals(live.key())&&validSource(server,live);
+        var result=c.preferences.change(c.connection,packet.sequence(),packet.source(),packet.paused(),authorized);
+        if(result==WatchPreferenceState.Result.APPLIED&&packet.paused()&&live!=null
+                &&WatchPreferenceState.Source.of(live.source.descriptor()).equals(packet.source())){
+            for(var existing:state.ledger.all(player.getUUID()))if(existing.connection()==c.connection
+                    &&existing.source().id().equals(packet.source().source())&&existing.source().hostLease().equals(packet.source().hostLease()))
+                stop(server,state,state.ledger.remove(existing),"本连接已暂停这一局旁观");
+            demands(server,state,now);
+        }
+        String reason=switch(result){case APPLIED->packet.paused()?"已暂停本连接对这一局的自动旁观":"已恢复这一局自动旁观；仍须符合距离与权限";
+            case STALE->"旁观偏好回复已过期";case FULL->"本连接暂停记录已满，请先恢复部分来源";case UNAUTHORIZED->"原旁观关系已结束；本机仍暂停，若再次授权会重试";};
+        send(player,new WatchNetwork.PreferenceResult(packet.sequence(),packet.source(),packet.paused(),result==WatchPreferenceState.Result.APPLIED,reason));
     }
     /** Home host upload route; existing cabinet rooms never accept uploads through this route. */
     static void media(ServerPlayer player,WatchNetwork.Media payload){
@@ -152,7 +171,7 @@ public final class WatchService {
     }
     private static boolean eligible(MinecraftServer server,State state,ServerPlayer player,Live live,boolean netplay,long now){
         if(!current(player)||!player.isAlive())return false;var c=control(state,player);
-        if(!c.enabled||!c.allows(live.key(),now))return false;
+        if(!c.enabled||!c.allows(live.key(),now)||c.preferences.paused(WatchPreferenceState.Source.of(live.source.descriptor())))return false;
         if(netplay){
             if(c.capacity==0||live.source.hostPlayer().equals(player.getUUID()))return false;
             try{return !live.provider.isParticipant(server,live.source,player.getUUID());}catch(RuntimeException|LinkageError failure){return false;}
@@ -196,7 +215,8 @@ public final class WatchService {
             var offers=new HashMap<WatchLedger.Source,WatchNetplay.Offer>();var netplay=new HashSet<WatchLedger.Source>();
             c.blocked.entrySet().removeIf(e->now>=e.getValue()||!state.sources.containsKey(e.getKey().id())
                     ||!state.sources.get(e.getKey().id()).key().equals(e.getKey()));
-            if(c.enabled&&current(player)&&player.isAlive())for(var live:state.sources.values())if(c.allows(live.key(),now)&&canSee(player,live)){
+            if(c.enabled&&current(player)&&player.isAlive())for(var live:state.sources.values())if(c.allows(live.key(),now)
+                    &&!c.preferences.paused(WatchPreferenceState.Source.of(live.source.descriptor()))&&canSee(player,live)){
                 try{
                     var offer=live.provider.netplay(player,live.source);
                     if(!eligible(server,state,player,live,offer!=null,now))continue;

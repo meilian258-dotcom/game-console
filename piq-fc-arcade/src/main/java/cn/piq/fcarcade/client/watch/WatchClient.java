@@ -50,6 +50,14 @@ public final class WatchClient implements WatchNetwork.ClientSink {
     // Deliberately retained across disconnect: unbind/cancel is not proof that a native slot is free.
     private static final List<Receiver> CLOSING = new ArrayList<>();
     private static final WatchLeaseState HISTORY = new WatchLeaseState();
+    private static final WatchManagementState MANAGEMENT=new WatchManagementState();
+    private record PausedDisplay(WatchDescriptor descriptor,String mode) {}
+    private static final Map<WatchPreferenceState.Source,PausedDisplay> PAUSED_DISPLAYS=new HashMap<>();
+    public record ManagedWatch(WatchManagementState.Handle handle,WatchDescriptor descriptor,String mode,String state,
+                               boolean paused,boolean nativeHeld,boolean actionable) {}
+    public record ManagementView(List<ManagedWatch> watches,int nativeFree,int closing,int pending,String status) {
+        public ManagementView{watches=List.copyOf(watches);}
+    }
     private static final long TIMEOUT = 6_000_000_000L;
     private static Connection connection;
     private static int ticks;
@@ -62,6 +70,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         final WatchNetwork.NetplayStart grant;
         final Connection connection;
         final Source source;
+        final long managementEpoch;
         long expiresAt=System.nanoTime()+TIMEOUT;
         WatchMediaStream media;
         WatchAudio audio;
@@ -77,9 +86,9 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         boolean closed,audible;
         final WatchMonoResampler mono=new WatchMonoResampler();
         Receiver(WatchNetwork.Start start,WatchNetwork.NetplayStart grant,Connection connection){
-            this.start=start;this.grant=grant;this.connection=connection;source=Source.of(start.descriptor());
+            this.start=start;this.grant=grant;this.connection=connection;source=Source.of(start.descriptor());managementEpoch=MANAGEMENT.epoch();
         }
-        boolean released(){return (task==null||task.done())&&(netplay==null||netplay.terminated().isDone());}
+        boolean released(){return WatchManagementState.released(task==null||task.done(),netplay==null||netplay.terminated().isDone(),netplay!=null&&netplay.nativeSlotHeld());}
         boolean nativeClaim(){return grant!=null&&!Boolean.FALSE.equals(nativeMode);}
     }
     private WatchClient() {}
@@ -123,7 +132,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
     private static void syncConnection() {
         Connection next=liveConnection();
         if(next==connection)return;
-        closeAll(false);clearDemands();connection=next;HISTORY.connection(next);available=null;ticks=0;
+        closeAll(false);clearDemands();connection=next;HISTORY.connection(next);MANAGEMENT.connection(next);PAUSED_DISPLAYS.clear();available=null;ticks=0;
     }
     @Override public boolean acceptsConnection(Connection source){return source!=null&&source==liveConnection();}
     private static Receiver admit(WatchNetwork.Start start,WatchNetwork.NetplayStart grant){
@@ -133,6 +142,12 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         if(!HISTORY.begin(source,start.revision(),start.lease()))return null;
         for(var old:List.copyOf(RECEIVERS.values()))if(old.source.equals(source))close(old,false);
         var r=new Receiver(start,grant,connection);
+        if(MANAGEMENT.paused(WatchPreferenceState.Source.of(start.descriptor()))){
+            if(MANAGEMENT.resumePending(WatchPreferenceState.Source.of(start.descriptor())))release(r);
+            else MANAGEMENT.granted(handle(r));
+            PAUSED_DISPLAYS.put(WatchPreferenceState.Source.of(start.descriptor()),new PausedDisplay(start.descriptor(),mode(r)));
+            HISTORY.retire(start.lease());return null; // Preference authenticates this lease before releasing it.
+        }
         // MEDIA and historical process Netplay keep their single-source policy; never silently downgrade JNI.
         boolean incompatible=grant==null?!RECEIVERS.isEmpty():RECEIVERS.values().stream().anyMatch(v->v.grant==null||Boolean.FALSE.equals(v.nativeMode));
         if(incompatible||grant!=null&&RECEIVERS.size()>=capacity()){
@@ -191,6 +206,51 @@ public final class WatchClient implements WatchNetwork.ClientSink {
     public static boolean hasNetplayWatch(){return RECEIVERS.values().stream().anyMatch(r->r.grant!=null);}
     public static boolean hasNetplayWatch(long wire){return RECEIVERS.values().stream().anyMatch(r->r.grant!=null&&r.grant.wire()==wire);}
     public static boolean hasNetplayWatch(WatchDescriptor d){return d!=null&&RECEIVERS.values().stream().anyMatch(r->r.grant!=null&&r.source.equals(Source.of(d)));}
+    private static WatchManagementState.Handle handle(Receiver r){return new WatchManagementState.Handle(r.managementEpoch,
+            WatchPreferenceState.Source.of(r.start.descriptor()),r.start.revision(),r.start.lease());}
+    private static String mode(Receiver r){return r.grant==null?"音画串流旁观":r.nativeMode==null?"Netplay（核心待确认）":r.nativeMode?"JNI Netplay":"独立进程 Netplay";}
+    private static String phase(Receiver r){
+        if(r.closed)return r.released()?"已关闭":"关闭中，仍在释放资源";
+        if(r.grant==null)return r.textureId==null?"等待音画":"正在旁观";
+        if(r.task==null)return "排队准备";
+        if(!r.task.done())return "准备游戏内容";
+        if(r.netplay==null)return "准备核心";
+        return r.netplay.ready()?"正在旁观":r.netplay.status();
+    }
+    /** Main-thread snapshot. Includes closing owners; a closed window is not a freed native slot. */
+    public static ManagementView managementView(){
+        syncConnection();var rows=new LinkedHashMap<WatchManagementState.Handle,ManagedWatch>();
+        for(var r:RECEIVERS.values())managementRow(rows,r);
+        for(var r:CLOSING)if(!r.released())managementRow(rows,r);
+        for(var h:MANAGEMENT.paused())if(!rows.containsKey(h)){
+            var info=PAUSED_DISPLAYS.get(h.source());if(info!=null)rows.put(h,new ManagedWatch(h,info.descriptor(),info.mode(),
+                    MANAGEMENT.resumePending(h.source())?"等待恢复确认（本机仍暂停）":"已暂停这一局自动旁观",true,false,true));
+        }
+        return new ManagementView(List.copyOf(rows.values()),NativeLibretroBridge.freeSlotsIfLoaded(),
+                (int)CLOSING.stream().filter(r->!r.released()).count(),MANAGEMENT.pending(),MANAGEMENT.status());
+    }
+    private static void managementRow(Map<WatchManagementState.Handle,ManagedWatch> rows,Receiver r){
+        var h=handle(r);boolean current=r.connection==connection&&MANAGEMENT.current(h);
+        boolean paused=current&&MANAGEMENT.paused(h.source());
+        rows.put(h,new ManagedWatch(h,r.start.descriptor(),mode(r),phase(r)+(current?"":"（上次连接）"),
+                paused,r.netplay!=null&&r.netplay.nativeSlotHeld(),current&&(!paused||MANAGEMENT.canResume(h))));
+    }
+    /** A UI handle can only affect its captured connection/source/lease generation. */
+    public static boolean pauseWatch(WatchManagementState.Handle h){
+        syncConnection();if(!MANAGEMENT.current(h))return false;
+        Receiver selected=RECEIVERS.get(h.lease());
+        if(selected==null)selected=CLOSING.stream().filter(r->handle(r).equals(h)).findFirst().orElse(null);
+        if(selected==null||selected.connection!=connection||!handle(selected).equals(h)||!MANAGEMENT.change(h,true))return false;
+        PAUSED_DISPLAYS.put(h.source(),new PausedDisplay(selected.start.descriptor(),mode(selected)));
+        close(selected,false);return true; // Server Preference, not the 40-tick Release backoff, owns unsubscribe.
+    }
+    public static boolean resumeWatch(WatchManagementState.Handle h){
+        syncConnection();if(!MANAGEMENT.change(h,false))return false;
+        return true;
+    }
+    public static void resumeAllWatches(){syncConnection();for(var h:MANAGEMENT.paused())resumeWatch(h);}
+    @Override public void preference(WatchNetwork.PreferenceResult response){syncConnection();MANAGEMENT.acknowledge(response);
+        PAUSED_DISPLAYS.keySet().removeIf(source->!MANAGEMENT.paused(source));}
     @Override public void stop(WatchNetwork.Stop value){
         syncConnection();var r=RECEIVERS.get(value.lease());
         if(HISTORY.stop(value.revision(),value.lease())&&r!=null&&r.start.revision()==value.revision())close(r,false);
@@ -294,6 +354,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         syncConnection();CLOSING.removeIf(Receiver::released);
         if(shuttingDown||connection==null||!connection.isConnected())return;
         ticks++;
+        var preference=MANAGEMENT.next(ticks);if(preference!=null)try{WatchNetwork.send(preference);}catch(RuntimeException|LinkageError ignored){/* Bounded ACK timeout retains the local negative preference. */}
         boolean enabled=availableNow();var next=new WatchNetwork.Available(enabled,enabled?capacity():0);
         if(!next.equals(available)||ticks%40==0){available=next;WatchNetwork.send(next);}
         long now=System.nanoTime();

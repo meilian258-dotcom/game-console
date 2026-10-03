@@ -12,7 +12,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-/** Read-only observation protocol: no target chosen by clients, no controller or ROM authority. */
+/** Read-only observation protocol: clients may decline sources, never grant controller or ROM authority. */
 public final class WatchNetwork {
     private WatchNetwork() {}
     public interface ClientSink {
@@ -23,6 +23,7 @@ public final class WatchNetwork {
         void heartbeat(Heartbeat value);
         void hostDemand(HostDemand value);
         void stream(Stream value);
+        default void preference(PreferenceResult value) {}
     }
     private static volatile ClientSink clientSink;
     public static void setClientSink(ClientSink sink){clientSink=Objects.requireNonNull(sink);}
@@ -33,9 +34,10 @@ public final class WatchNetwork {
     static int heartbeatBytes(long revision){int bytes=17;while((revision>>>=7)!=0)bytes++;return bytes;}
     public static void register(RegisterPayloadHandlersEvent event){
         CabinetRooms.registerWatchProvider();
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"watch-3")
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"watch-4")
             .playToServer(Available.TYPE,Available.CODEC,(p,c)->server(c,s->WatchService.available(s,p)))
             .playToServer(Release.TYPE,Release.CODEC,(p,c)->server(c,s->WatchService.release(s,p)))
+            .playToServer(Preference.TYPE,Preference.CODEC,(p,c)->server(c,s->WatchService.preference(s,p)))
             .playToServer(Media.TYPE,Media.CODEC,(p,c)->server(c,s->WatchService.media(s,p)))
             .playBidirectional(Heartbeat.TYPE,Heartbeat.CODEC,(p,c)->{
                 if(c.player() instanceof ServerPlayer)server(c,s->{
@@ -48,6 +50,7 @@ public final class WatchNetwork {
             .playToClient(Start.TYPE,Start.CODEC,(p,c)->dispatch(c,s->s.start(p)))
             .playToClient(NetplayStart.TYPE,NetplayStart.CODEC,(p,c)->dispatch(c,s->s.netplay(p)))
             .playToClient(Stop.TYPE,Stop.CODEC,(p,c)->dispatch(c,s->s.stop(p)))
+            .playToClient(PreferenceResult.TYPE,PreferenceResult.CODEC,(p,c)->dispatch(c,s->s.preference(p)))
             .playToClient(HostDemand.TYPE,HostDemand.CODEC,(p,c)->dispatch(c,s->s.hostDemand(p)))
             .playToClient(Stream.TYPE,Stream.CODEC,(p,c)->dispatch(c,s->s.stream(p)));
     }
@@ -104,6 +107,25 @@ public final class WatchNetwork {
         public Release{WatchNetwork.revision(revision);Objects.requireNonNull(lease);}
         public static final Type<Release> TYPE=new Type<>(id("release"));
         public static final StreamCodec<RegistryFriendlyByteBuf,Release> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.revision);b.writeUUID(p.lease);},b->new Release(b.readVarLong(),b.readUUID()));
+        @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
+    private static void preferenceSource(RegistryFriendlyByteBuf b,WatchPreferenceState.Source s){b.writeUtf(s.provider().toString(),128);b.writeUUID(s.source());b.writeUUID(s.hostLease());}
+    private static WatchPreferenceState.Source preferenceSource(RegistryFriendlyByteBuf b){return new WatchPreferenceState.Source(ResourceLocation.parse(b.readUtf(128)),b.readUUID(),b.readUUID());}
+    /** Exact existing relationship for pause; resume merely removes the caller's negative preference. */
+    public record Preference(long sequence,WatchPreferenceState.Source source,long revision,UUID lease,boolean paused) implements CustomPacketPayload {
+        public Preference{WatchNetwork.revision(sequence);WatchNetwork.revision(revision);Objects.requireNonNull(source);Objects.requireNonNull(lease);}
+        public static final Type<Preference> TYPE=new Type<>(id("preference"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,Preference> CODEC=StreamCodec.of((b,p)->{
+            b.writeVarLong(p.sequence);preferenceSource(b,p.source);b.writeVarLong(p.revision);b.writeUUID(p.lease);b.writeBoolean(p.paused);
+        },b->new Preference(b.readVarLong(),preferenceSource(b),b.readVarLong(),b.readUUID(),b.readBoolean()));
+        @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
+    public record PreferenceResult(long sequence,WatchPreferenceState.Source source,boolean paused,boolean accepted,String reason) implements CustomPacketPayload {
+        public PreferenceResult{WatchNetwork.revision(sequence);Objects.requireNonNull(source);if(reason==null||reason.length()>128)throw new IllegalArgumentException("watch preference reason");}
+        public static final Type<PreferenceResult> TYPE=new Type<>(id("preference_result"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,PreferenceResult> CODEC=StreamCodec.of((b,p)->{
+            b.writeVarLong(p.sequence);preferenceSource(b,p.source);b.writeBoolean(p.paused);b.writeBoolean(p.accepted);b.writeUtf(p.reason,128);
+        },b->new PreferenceResult(b.readVarLong(),preferenceSource(b),b.readBoolean(),b.readBoolean(),b.readUtf(128)));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     /** Total sustainable Netplay watch budget, including active/preparing watches; never authority. */
