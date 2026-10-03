@@ -80,6 +80,7 @@ public final class NetplayProcess implements AutoCloseable {
     public boolean canSave(){if(jni!=null)return jni.canSave();var p=persistence;return grant.host()&&ready&&!closed&&!closing&&p!=null&&p.enabled();}
     public String saveLabel(){return (jni!=null?"JNI · ":"")+profile.contentName()+" · "+(grant.host()?"主持":"参与 / 旁观");}
     public CompletableFuture<Void> terminated(){return jni!=null?jni.terminated():terminated;}
+    public boolean nativeSlotHeld(){return jni!=null&&jni.nativeSlotHeld();}
     public synchronized CompletableFuture<byte[]> checkpoint(){
         if(jni!=null)return jni.checkpoint();
         if(!grant.host()||!ready||closed)return CompletableFuture.failedFuture(new IllegalStateException("Netplay 主持尚未就绪"));

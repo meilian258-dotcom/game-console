@@ -1,5 +1,19 @@
 # Netplay 附属接入接口
 
+## FC76.36：逐源 JNI 多屏旁观（试验接口）
+
+2026-10-03，配套 SFC44 / MD12；见[第一批实现与验证](公共JNI多屏旁观第一批-20261003.md)。本轮 `watch-3` 要求主包两端同升级，`content-card-6` 不改线格式。下面 FC76.35 的准备、激活、权限和保存合同继续生效，但只读下载的单请求限制由本节替代。
+
+- `WatchProvider.isParticipant(server, source, player)` 和客户端 `DisplayAdapter.isParticipant(descriptor)` 必须检查这一台，而不是“玩家是否正在用任何同型机器”。旧重载保留作保守兼容。
+- 操作开始调用 `WatchClient.controlStarting(wire)` 或精确 `WatchDescriptor` 重载，只退目标源；未迁移私人/旧链仍可用无参清全部入口，不能照抄到新公开链。
+- 客户端每个来源独立租约、准备取消、心跳、纹理、音频及关闭回执；世界/连接/hostLease 改变不接受旧结果。只有真实 JNI 路径开放多源；MEDIA、独立进程 Netplay 仍为单源，不自动降级或混跑。
+- `WatchClient.registerPendingControl(id, IntSupplier)` 在客户端 setup 注册尚未取得原生槽的控制准备数（0～4）；只读查询、不得在此加载核心。总预算包括正在关闭但尚未归还的实例，原生四槽门禁不变。`Available.capacity` 是可保留的旁观总数，不是空闲数，不可直接用空闲槽覆盖已有旁观。
+- `NetplayWatchContent.Preparation` 的旧二/三参数构造保留；可选可信本地 `ProcessFactory` 仅用于保持 FC 原普通/光枪 JNI 协议身份，`open` 拒绝主持、玩家或非只读端口。不能接受网络传入类名、DLL 或工厂。常规适配沿用 48kHz 双声道；FC 44.1kHz 单声道只在输出呈现层转换。
+- `ContentCardClient.expectDownload/cancelDownload` 现在维护最多四个只读 token，与普通播放 Runtime 分离。服务端 `ContentCards.downloadOnly` 独立只读表：每玩家四个、全局十六个，仍合计原 64MiB 在途预算，逐 GET/完成 ACK 检查原连接、请求、系统、位置及授权。取消一个不停止普通播放，也不取消另外三个。
+- FC 内容继续复用原 hash 校验下载队列；SFC 用有界串行下载队列并允许同 hash 多读者，保留服务端限频。排队/下载成功不授予席位、输入或存档权。
+
+这不是一人多主持或不受限多实例。四槽已满时新控制仍需等待释放后重试；无自动主持交接、低帧率预览或 Opus。
+
 ## FC76.35：公共 JNI 准备、激活及授权内容下载（试验接口）
 
 2026-10-03。JNI Netplay 为适用模拟器机型的优先适配目标，见[通用制作规范 1.8](机器制作与交互标准.md)；不是把所有设备强制改为一种核心。以下是本轮公共接口，实际核心门禁与交付状态见 [MD 接入记录](../../piq-md-home/design/MD-JNI-Netplay-20261003.md)。不能把接口存在当作新机型已完成验收。旧 FC/SFC/街机调用未显式启用新选项时保持原有语义。
@@ -19,7 +33,7 @@
 1. MC 客户端主线程先调用 `ContentCardClient.expectDownload(system, requestUUID, pos, hash, size)`，捕获当前真实连接并得到 `CompletableFuture<byte[]>`。`size=0` 可用于只含哈希的旁观授权，但仍受机型大小上限约束。
 2. 机型通过自身获准请求向服务端申请。服务端复核当前席位或只读观看授权，调用 `ContentCards.downloadOnly(player, system, requestUUID, pos, entry, stillAuthorized, completed)`。返回实际传输 UUID 或繁忙时的 `null`；后续 GET 和完成确认仍重新检查授权。
 3. 工作线程只能读取/校验内容，不能接触世界或授予席位。完成回主线程复核请求、连接和取消状态后，future 才交出内容；`STARTED` 在此 lane 仅为**内容校验完成 ACK**，绝不是核心 READY。
-4. `ContentCardClient.cancelDownload(requestUUID)` 可从 worker 请求取消；主线程调用会立即释放该请求槽位，旧回调不能清除后来的请求。当前客户端只接受一个内容下载，冲突明确报繁忙；普通播放下载与只取内容互斥，不悄悄覆盖。
+4. `ContentCardClient.cancelDownload(requestUUID)` 可从 worker 请求取消；主线程调用会立即释放该请求槽位，旧回调不能清除后来的请求。FC76.35 历史版只接受一个内容下载；FC76.36 已按上节改成独立有界只读表，超限仍明确报繁忙，不悄悄覆盖。
 
 附近 Netplay 旁观仍使用原 `WatchProvider.netplay`、`WatchNetplay` 和 `NetplayWatchContent.Preparation`。prepare 时核对传入连接，cancel 回收当前下载，读完内容不能绕过观看范围或自动取得写存档权。
 
@@ -35,13 +49,13 @@
 
 ## FC73 / SFC39 补记：只读 Netplay 旁观
 
-共用 `WatchProvider.netplay(player, source)` 可返回 `WatchNetplay.Offer`，将现有附近观看租约绑定到原 Netplay relay。默认返回 null，旧附属与媒体观看不变。主包双方使用 `watch-2`；不是改 FC 主协议或原生 PNP3。
+共用 `WatchProvider.netplay(player, source)` 可返回 `WatchNetplay.Offer`，将现有附近观看租约绑定到原 Netplay relay。默认返回 null，旧附属与媒体观看不变。该历史版主包双方使用 `watch-2`；FC76.36 已升级 `watch-3`，不是改 FC 主协议或原生 PNP3。
 
 `WatchNetplay` 只用 `grantObserver`，每局最多7个只读远端，留一个远端名额给P2；按精确 ticket 撤销，不能以旧旁观 cleanup 撤销已升级的控制票据。各生产会话续期必须并入 `WatchNetplay.connections(server,sourceUUID)`，仍由 `WatchService` 校验范围、真实连接、设备身份与租约。不得用旁观身份获取手柄、编辑/上传/保存权限。
 
 客户端通过 `NetplayWatchContent.register(provider, preparationFactory)` 接入：主线程捕获可信核心工厂和当前连接；后台只做有界内容读取/下载与哈希验证，回到主线程复核当前 grant/连接才创建 `Grant(host=false,player=false)` 并 bind/start。`Preparation.cancel` 必须取消当前下载，迟到任务不得跨连接生效。通用街机复用 `CabinetSharedGames` 当前机柜只读授权，SFC只允许下载当前公开会话的确切ROM哈希。用户进入控制会话前调用 `WatchClient.controlStarting()`，不能覆盖同 wire 的旧观察进程而不清理。
 
-当前观察播放器限已验证48kHz立体声的软件渲染核心，处理空视频帧与最后一帧保留，不取得 `InputOwnership`。不是任意核心都已适配。SFC原LOCAL_SYNC旁观继续原有快照流程，Netplay用新流程，两者互斥；`/sfc-watch local`覆盖这两种公开本地旁观。FC自身旁观/光枪路径没有迁入此API。
+该历史观察播放器限已验证48kHz立体声的软件渲染核心，处理空视频帧与最后一帧保留，不取得 `InputOwnership`。不是任意核心都已适配。SFC原LOCAL_SYNC旁观继续原有快照流程，Netplay用新流程，两者互斥；`/sfc-watch local`覆盖这两种公开本地旁观。FC76.36 已将 FC 家用 JNI 普通/光枪旁观生命周期迁入公共 API，并保留 FC 既有核心构造和同步身份；FC 旧独立进程及 NES 机柜链不由此推定完成迁移。
 
 ## FC72 补记：光枪专用路径
 

@@ -21,7 +21,7 @@ import static cn.piq.fcarcade.home.content.ContentCardNetwork.*;
 public final class ContentCardClient {
     private static final ThreadPoolExecutor IO=new ThreadPoolExecutor(1,1,30,TimeUnit.SECONDS,new ArrayBlockingQueue<>(2),r->{var t=new Thread(r,"GameConsole-card-client-io");t.setDaemon(true);return t;});
     private static Writer writer;private static Download download;private static boolean installed;
-    private static volatile ContentCardDownloadRequest readOnly;
+    private static final ContentCardDownloads READ_ONLY=new ContentCardDownloads();
     /** Main-thread expectation only. Caller sends its own server-authorized seat/watch request next.
      * Size zero is allowed when a watch grant carries only the hash; the adapter still bounds allocation. */
     public static CompletableFuture<byte[]> expectDownload(net.minecraft.resources.ResourceLocation system,UUID request,
@@ -30,14 +30,14 @@ public final class ContentCardClient {
         if(!mc.isSameThread())throw new IllegalStateException("Download expectation must be captured on the client thread");
         if(mc.getConnection()==null||mc.player==null||a==null||request==null||pos==null||hash==null||!hash.matches("[0-9a-f]{64}")
                 ||size<0||size>a.maxBytes())throw new IllegalArgumentException("Download expectation");
-        if(readOnly!=null||download!=null)throw new IllegalStateException("Content download busy");
-        install();var expected=new ContentCardDownloadRequest(mc.isSameThread(),system,request,pos,hash,size,a.maxBytes(),mc.getConnection(),System.nanoTime());readOnly=expected;
+        for(var old:READ_ONLY.snapshot())if(old.connection!=mc.getConnection())cancelReadOnly(old,null);
+        install();var expected=new ContentCardDownloadRequest(mc.isSameThread(),system,request,pos,hash,size,a.maxBytes(),mc.getConnection(),System.nanoTime());READ_ONLY.add(expected);
         expected.result.whenComplete((bytes,error)->{if(expected.result.isCancelled())mc.execute(()->cancelReadOnly(expected,null));});
         return expected.result;
     }
     /** Safe from a worker; cancellation never stops a runtime or releases a controller/save lease. */
     public static void cancelDownload(UUID request){
-        var pending=readOnly;var mc=Minecraft.getInstance();
+        var pending=READ_ONLY.get(request);var mc=Minecraft.getInstance();
         cancelDownload(request,pending,mc.isSameThread(),()->cancelReadOnly(pending,null));
     }
     /** Main-thread handoff must release the old slot before a replacement expectation is captured.
@@ -66,19 +66,19 @@ public final class ContentCardClient {
     private static Runtime runtime(Message m){return RUNTIMES.getOrDefault(m.system(),HOME);}
     private static void install(){if(installed)return;installed=true;
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e)->tick());
-        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e)->{writer=null;var d=download;download=null;if(d!=null)runtime(d.message).stop(d.message);cancelReadOnly(readOnly,null);});
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e)->{writer=null;var d=download;download=null;if(d!=null)runtime(d.message).stop(d.message);for(var pending:READ_ONLY.snapshot())cancelReadOnly(pending,null);});
     }
     public static void receive(Message m){
         install();var mc=Minecraft.getInstance();if(mc.player==null||mc.getConnection()==null)return;
         if(m.op()==DOWNLOAD_ONLY){receiveReadOnlyOffer(m);return;}
-        var expected=readOnly;
-        if(expected!=null&&expected.matches(m)&&mc.getConnection()==expected.connection){
+        var expected=READ_ONLY.find(m,mc.getConnection());
+        if(expected!=null){
             if(m.op()==STOP){cancelReadOnly(expected,new IllegalStateException("内容下载授权已撤销"));return;}
             if(m.op()==DATA){receiveReadOnlyData(expected,m);return;}
         }
         if(m.op()==OPEN){if(writer!=null)writer.cancel();writer=new Writer(m);mc.setScreen(writer);writer.scanLocal();return;}
         if(m.op()==DOWNLOAD){
-            if(download!=null||readOnly!=null){send(with(m,STOP,0,new byte[0]));return;}
+            if(download!=null){send(with(m,STOP,0,new byte[0]));return;}
             var a=ContentCards.adapter(m.system());if(a==null||m.size()<1||m.size()>a.maxBytes()){send(with(m,STOP,0,new byte[0]));return;}
             try{if(!runtime(m).accept(m)){send(with(m,STOP,0,new byte[0]));return;}new ContentCardStore.Entry(m.hash(),m.name(),m.size());download=new Download(m,mc.getConnection());send(with(m,GET,0,new byte[0]));}
             catch(RuntimeException invalid){send(with(m,STOP,0,new byte[0]));}return;
@@ -116,8 +116,8 @@ public final class ContentCardClient {
         }
     }
     private static void receiveReadOnlyOffer(Message m){
-        var mc=Minecraft.getInstance();var pending=readOnly;var adapter=ContentCards.adapter(m.system());
-        if(pending==null||!pending.matches(m)||pending.connection!=mc.getConnection()) {send(with(m,STOP,0,new byte[0]));return;}
+        var mc=Minecraft.getInstance();var pending=READ_ONLY.find(m,mc.getConnection());var adapter=ContentCards.adapter(m.system());
+        if(pending==null) {send(with(m,STOP,0,new byte[0]));return;}
         try{
             if(adapter==null)throw new IllegalStateException("Missing content adapter");
             pending.offer(m,mc.getConnection());
@@ -132,17 +132,17 @@ public final class ContentCardClient {
             IO.execute(()->{
                 Exception failure=null;try{ContentCardDownloadBuffer.validate(pending.hash,bytes,adapter.validator());}catch(Exception error){failure=error;}
                 var error=failure;mc.execute(()->{
-                    if(readOnly!=pending||mc.getConnection()!=pending.connection)return;
+                    if(!READ_ONLY.contains(pending)||mc.getConnection()!=pending.connection)return;
                     if(pending.result.isDone()){cancelReadOnly(pending,null);return;}
                     if(error!=null){cancelReadOnly(pending,error);return;}
-                    if(pending.publish(mc.getConnection(),bytes)){readOnly=null;send(with(m,STARTED,0,new byte[0]));}
+                    if(pending.publish(mc.getConnection(),bytes)){READ_ONLY.remove(pending);send(with(m,STARTED,0,new byte[0]));}
                     else cancelReadOnly(pending,null);
                 });
             });
         }catch(RuntimeException failure){cancelReadOnly(pending,failure);}
     }
     private static void cancelReadOnly(ContentCardDownloadRequest pending,Throwable failure){
-        if(pending==null||readOnly!=pending)return;readOnly=null;
+        if(pending==null||!READ_ONLY.remove(pending))return;
         finishDownloadCancellation(pending,failure,()->{
             if(Minecraft.getInstance().getConnection()==pending.connection)
                 send(msg(STOP,pending.system,pending.token,pending.pos,"","",0,0,new byte[0]));
@@ -178,8 +178,7 @@ public final class ContentCardClient {
     }
     private static void tick(){
         var mc=Minecraft.getInstance();var w=writer;
-        var pending=readOnly;
-        if(pending!=null){
+        for(var pending:READ_ONLY.snapshot()){
             if(mc.getConnection()!=pending.connection||mc.player==null||pending.result.isCancelled())cancelReadOnly(pending,null);
             else if(pending.expired(System.nanoTime()))cancelReadOnly(pending,new TimeoutException("Content download timed out"));
         }

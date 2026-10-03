@@ -23,7 +23,7 @@ final class CabinetWatchDisplay implements WatchClient.DisplayAdapter {
         for (WatchAnchor screen : d.screens()) if (target(d, screen) == null) return false;
         return true;
     }
-    @Override public boolean isParticipant(WatchDescriptor d) { return CabinetClientBackends.hasLocalSession(); }
+    @Override public boolean isParticipant(WatchDescriptor d) { return CabinetClientBackends.hasLocalSession(d); }
     @Override public int maximumDistance(){return cn.piq.fcarcade.client.cabinet.CabinetClientSettings.rules().exitRange();}
     @Override public boolean visible(RenderLevelStageEvent event,WatchDescriptor d){
         for(var screen:d.screens())if(CabinetVideoDisplay.visible(event.getCamera().getPosition(),target(d,screen)))return true;

@@ -66,6 +66,7 @@ public final class MdEngine implements PrivateEngine {
     }
     public int maxPlayers(){return publicSession?2:1;}
     public boolean isReady(){return ready&&!closing;}
+    boolean nativeSlotHeld(){var active=core;return active instanceof cn.piq.retro.libretro.LibretroJniRuntime jni&&jni.nativeSlotHeld();}
     /** Native boot/restore may complete first, but gameplay waits for the server's exact launch generation. */
     public void activate(){synchronized(controls){if(!authorityGate||!ready||closing)return;runtimeStarted=true;paused=false;}LockSupport.unpark(owner);}
     public String error(){var c=core;String d=c==null?"":c.diagnosticError();return error!=null?error:d.isBlank()?null:d;}

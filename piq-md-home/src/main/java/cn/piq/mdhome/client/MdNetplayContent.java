@@ -20,7 +20,8 @@ final class MdNetplayContent {
     static void requireLocalPermission(){if(!cn.piq.fcarcade.client.JniNetplayConsent.allowed())throw new IllegalStateException("本机已停用 JNI Netplay 或平台不支持；Windows x64 可用 /gameconsole-jni-netplay 恢复");}
     static Request request(long wire,BlockPos pos,String hash,int size){
         var token=UUID.randomUUID();var result=ContentCardClient.expectDownload(MdMod.SYSTEM,token,pos,hash,size);
-        MdPublicNetwork.send(new MdPublicNetwork.Download(wire,token,hash));return new Request(token,result);
+        try{MdPublicNetwork.send(new MdPublicNetwork.Download(wire,token,hash));return new Request(token,result);}
+        catch(RuntimeException|LinkageError failed){ContentCardClient.cancelDownload(token);throw failed;}
     }
     static void install(){NetplayWatchContent.register(MdMod.SYSTEM,(grant,connection)->{
         if(!MdNetplayProfile.AVAILABLE||!MdMod.SYSTEM.equals(grant.backend()))throw new IllegalStateException(MdNetplayProfile.UNAVAILABLE);

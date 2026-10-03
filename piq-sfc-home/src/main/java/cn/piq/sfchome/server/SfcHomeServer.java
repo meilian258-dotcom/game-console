@@ -85,6 +85,14 @@ public final class SfcHomeServer {
         }
         return false;
     }
+    static boolean watchParticipant(MinecraftServer server,cn.piq.fcarcade.cabinet.WatchSource source,UUID player){
+        if(server==null||source==null||player==null||!server.isSameThread()||!watchSources(server).contains(source))return false;
+        State state=STATES.get(server);Session session=state==null?null:state.sessions.get(source.descriptor().origin().identity());
+        if(session==null)return false;
+        if(session.host.player.equals(player)||session.join!=null&&session.join.gate.applicant.equals(player))return true;
+        for(Lease lease:session.ports)if(lease!=null&&lease.player.equals(player))return true;
+        return false;
+    }
     static cn.piq.fcarcade.cabinet.WatchNetplay.Offer netplayWatch(MinecraftServer server,cn.piq.fcarcade.cabinet.WatchSource source){
         State st=STATES.get(server);Session s=st==null?null:st.sessions.get(source.descriptor().origin().identity());
         var run=s==null?null:NETPLAY.get(s);

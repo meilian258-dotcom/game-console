@@ -33,7 +33,7 @@ public final class WatchNetwork {
     static int heartbeatBytes(long revision){int bytes=17;while((revision>>>=7)!=0)bytes++;return bytes;}
     public static void register(RegisterPayloadHandlersEvent event){
         CabinetRooms.registerWatchProvider();
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"watch-2")
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"watch-3")
             .playToServer(Available.TYPE,Available.CODEC,(p,c)->server(c,s->WatchService.available(s,p)))
             .playToServer(Release.TYPE,Release.CODEC,(p,c)->server(c,s->WatchService.release(s,p)))
             .playToServer(Media.TYPE,Media.CODEC,(p,c)->server(c,s->WatchService.media(s,p)))
@@ -106,9 +106,12 @@ public final class WatchNetwork {
         public static final StreamCodec<RegistryFriendlyByteBuf,Release> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.revision);b.writeUUID(p.lease);},b->new Release(b.readVarLong(),b.readUUID()));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
-    public record Available(boolean enabled) implements CustomPacketPayload {
+    /** Total sustainable Netplay watch budget, including active/preparing watches; never authority. */
+    public record Available(boolean enabled,int capacity) implements CustomPacketPayload {
+        public Available(boolean enabled){this(enabled,enabled?1:0);}
+        public Available{if(capacity<0||capacity>WatchLedger.MAX_PLAYER_SOURCES)throw new IllegalArgumentException("watch capacity");}
         public static final Type<Available> TYPE=new Type<>(id("available"));
-        public static final StreamCodec<RegistryFriendlyByteBuf,Available> CODEC=StreamCodec.of((b,p)->b.writeBoolean(p.enabled),b->new Available(b.readBoolean()));
+        public static final StreamCodec<RegistryFriendlyByteBuf,Available> CODEC=StreamCodec.of((b,p)->{b.writeBoolean(p.enabled);b.writeVarInt(p.capacity);},b->new Available(b.readBoolean(),b.readVarInt()));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     public record HostDemand(long revision,WatchDescriptor descriptor,int watchers) implements CustomPacketPayload {

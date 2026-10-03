@@ -31,7 +31,7 @@ public final class LibretroJniRuntime implements LibretroRuntime {
     private AutoCloseable nativePin;
     private FileChannel saveChannel;
     private FileLock saveLock;
-    private long token;
+    private volatile long token;
     private boolean closed;
     private volatile String timeout = "";
     private LibretroProcess.Info info;
@@ -54,6 +54,8 @@ public final class LibretroJniRuntime implements LibretroRuntime {
         this.features = features;
     }
     static boolean isBusy() { return NativeLibretroBridge.atCapacity(); }
+    /** Read-only, generation-checked slot query, safe off the owner thread even while close is pending. */
+    public boolean nativeSlotHeld() { long current = token; return current != 0 && NativeLibretroBridge.reservationHeld(current); }
     @Override public LibretroRuntimes.Backend backend() { return LibretroRuntimes.Backend.JNI_TRIAL; }
     @Override public Set<Capability> capabilities() {
         var set = EnumSet.of(Capability.SOFTWARE_VIDEO, Capability.DIGITAL_PADS);

@@ -351,6 +351,8 @@ public final class ClientArcadeEvents {
         return SESSIONS.values().stream()
                 .anyMatch(ClientArcadeSession::hasController);
     }
+    /** Prepared public JNI control claims, excluding slots already counted by the native bridge. */
+    public static int pendingNativeControlClaims(){return ClientRomTransfers.pendingNativeControlClaims();}
 
     /** The gun renderer and input facade share the existing admitted FC session. */
     public static boolean authorizedZapper(cn.piq.fcarcade.home.ZapperBinding binding) {
@@ -693,6 +695,10 @@ public final class ClientArcadeEvents {
         for(var session:List.copyOf(SESSIONS.values()))session.mediaDemand(demand);
     }
     static boolean hasHomeParticipant(){return SESSIONS.values().stream().anyMatch(s->s.hasController()||s.isComputeHost());}
+    static boolean hasHomeParticipant(cn.piq.fcarcade.cabinet.WatchDescriptor source){
+        return SESSION_POSITIONS.entrySet().stream().anyMatch(e->source.screens().stream().anyMatch(a->a.pos().equals(e.getValue()))
+                &&SESSIONS.containsKey(e.getKey())&&(SESSIONS.get(e.getKey()).hasController()||SESSIONS.get(e.getKey()).isComputeHost()));
+    }
 
     private static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut ignored) {
         clearOnDisconnect();

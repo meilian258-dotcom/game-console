@@ -75,15 +75,18 @@ public final class SfcLocalWatchClient implements SfcLocalWatchNetwork.Client {
     }
     @Override public boolean acceptsConnection(Object source){var c=Minecraft.getInstance().getConnection();return c!=null&&c.getConnection()==source;}
     static boolean busy(){return assignment!=null;}
+    static boolean busy(WatchDescriptor source){return current(assignment)&&SfcWatchClient.matches(source,assignment.session());}
     static boolean suppressMedia(){return mode!=SfcLocalWatchNetwork.MEDIA;}
-    static void controlStarting(){stop(true);cn.piq.fcarcade.client.watch.WatchClient.controlStarting();available=null;quietUntil=ticks+100;}
+    /** Private startup has no public source identity and deliberately retains conservative cleanup. */
+    static void controlStarting(){yieldLocalForControl();cn.piq.fcarcade.client.watch.WatchClient.controlStarting();}
+    static void yieldLocalForControl(){stop(true);available=null;quietUntil=ticks+100;}
     /** Active cabinet startup runs off-thread; retire observation on the client thread, never steal its core. */
     public static void yieldForControl()throws Exception{
         if(!SfcCoreLease.observing()&&!busy())return;
         var mc=Minecraft.getInstance();
-        if(mc.isSameThread()){controlStarting();return;}
+        if(mc.isSameThread()){yieldLocalForControl();return;}
         var yielded=new CompletableFuture<Void>();
-        mc.execute(()->{try{controlStarting();yielded.complete(null);}catch(Throwable bad){yielded.completeExceptionally(bad);}});
+        mc.execute(()->{try{yieldLocalForControl();yielded.complete(null);}catch(Throwable bad){yielded.completeExceptionally(bad);}});
         yielded.get(5,TimeUnit.SECONDS);
     }
     private static boolean availableNow(){
@@ -94,12 +97,12 @@ public final class SfcLocalWatchClient implements SfcLocalWatchNetwork.Client {
     }
     private static boolean current(SfcLocalWatchNetwork.Start expected){return expected!=null&&assignment==expected&&connection!=null&&connection==Minecraft.getInstance().getConnection()&&mode==1&&!failed;}
     private static boolean owner(SfcPlayback p){return p!=null&&p==playback&&current(assignment);}
-    private static WatchDescriptor descriptor(SfcHomeNetwork.Session s){return new WatchDescriptor(SfcHomeMod.CABINET_BACKEND,s.mediaSource(),s.mediaStream(),s.dimension(),new WatchAnchor(s.consolePos(),s.consoleId()),s.linkId(),List.of(new WatchAnchor(s.tvPos(),s.tvId())));}
+    static WatchDescriptor descriptor(SfcHomeNetwork.Session s){return new WatchDescriptor(SfcHomeMod.CABINET_BACKEND,s.mediaSource(),s.mediaStream(),s.dimension(),new WatchAnchor(s.consolePos(),s.consoleId()),s.linkId(),List.of(new WatchAnchor(s.tvPos(),s.tvId())));}
     private static boolean hardwareCurrent(){var mc=Minecraft.getInstance();return assignment!=null&&mc.player!=null&&SfcWatchClient.hardwareCurrent(descriptor(assignment.session()))&&mc.player.distanceToSqr(assignment.session().tvPos().getCenter())<=(double)assignment.exitRange()*assignment.exitRange();}
     private static SfcRepairNetwork.Key key(int frame){var s=assignment.session();return new SfcRepairNetwork.Key(s.sessionId(),s.epoch(),assignment.lease(),assignment.lease(),frame);}
     private static boolean keyCurrent(SfcRepairNetwork.Key key){return current(assignment)&&key.session()==assignment.session().sessionId()&&key.epoch()==assignment.session().epoch()&&key.lease().equals(assignment.lease())&&key.token().equals(assignment.lease());}
     @Override public void start(SfcLocalWatchNetwork.Start p){
-        if(cn.piq.fcarcade.client.watch.WatchClient.hasNetplayWatch()){send(new SfcLocalWatchNetwork.Ack(p.lease(),2,true));return;}
+        if(cn.piq.fcarcade.client.watch.WatchClient.hasNetplayWatch(descriptor(p.session()))){send(new SfcLocalWatchNetwork.Ack(p.lease(),2,true));return;}
         if(p.revision()!=revision||mode!=1||failed||!availableNow()||assignment!=null)return;
         connection=Minecraft.getInstance().getConnection();assignment=p;startedAt=lastReceived=System.nanoTime();nextFrame=p.frame();restored=resumed=false;transfer=null;
         if(!SfcHomeNetwork.CORE_BUILD.equals(p.session().coreBuild())||!hardwareCurrent()){fail("旁观设备或核心版本不匹配");return;}

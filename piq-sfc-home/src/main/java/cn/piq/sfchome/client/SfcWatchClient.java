@@ -28,6 +28,7 @@ public final class SfcWatchClient implements WatchClient.DisplayAdapter {
         @SubscribeEvent public static void setup(FMLClientSetupEvent event){event.enqueueWork(()->{
             WatchClient.registerDisplay(SfcHomeMod.CABINET_BACKEND,new SfcWatchClient());
             WatchClient.registerHost(SfcHomeMod.CABINET_BACKEND,SfcWatchPublisher::demand);
+            WatchClient.registerPendingControl("sfc-home",SfcHomeClient::pendingNativeControlClaims);
             cn.piq.fcarcade.client.watch.NetplayWatchContent.register(SfcHomeMod.CABINET_BACKEND,SfcNetplayWatchContent::prepare);
         });}
     }
@@ -51,18 +52,20 @@ public final class SfcWatchClient implements WatchClient.DisplayAdapter {
         if(descriptor==null||session==null||descriptor.screens().size()!=1)return false;
         var tv=descriptor.screens().getFirst();
         return SfcHomeMod.CABINET_BACKEND.equals(descriptor.provider())&&session.dimension().equals(descriptor.dimension())
+                &&session.mediaSource().equals(descriptor.source())&&session.mediaStream().equals(descriptor.hostLease())
                 &&session.consolePos().equals(descriptor.origin().pos())&&session.consoleId().equals(descriptor.origin().identity())
                 &&session.tvPos().equals(tv.pos())&&session.tvId().equals(tv.identity())&&session.linkId().equals(descriptor.link());
     }
     @Override public boolean isParticipant(WatchDescriptor descriptor){
         if(SfcLocalWatchClient.suppressMedia())return true;
-        // Exclude any SFC assignment, including loading/joining a different television.
         var session=SfcHomeClient.currentSession();
-        return session!=null&&SfcHomeClient.sessionCurrent(session,Minecraft.getInstance().getConnection());
+        return matches(descriptor,session)&&SfcHomeClient.sessionCurrent(session,Minecraft.getInstance().getConnection())
+                ||SfcLocalWatchClient.busy(descriptor);
     }
     @Override public boolean blocksNetplay(WatchDescriptor descriptor){
         return SfcLocalWatchClient.preferenceMode()!=cn.piq.sfchome.net.SfcLocalWatchNetwork.LOCAL
-                ||SfcLocalWatchClient.busy()||SfcHomeClient.currentSession()!=null
+                ||SfcLocalWatchClient.busy(descriptor)
+                ||matches(descriptor,SfcHomeClient.currentSession())&&SfcHomeClient.sessionCurrent(SfcHomeClient.currentSession(),Minecraft.getInstance().getConnection())
                 ||cn.piq.fcarcade.client.PrivateHomeClient.isActiveOrClosing();
     }
     @Override public void render(RenderLevelStageEvent event,WatchDescriptor descriptor,ResourceLocation texture,float aspect,int rotation){

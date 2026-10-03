@@ -71,7 +71,12 @@ final class ClientRomTransfers {
     }
 
     static boolean hasPendingParticipant(){return EXPECTED_SESSIONS.values().stream().anyMatch(p->p.active()&&(p.computeHost()||p.role().controllerIndex()>=0));}
+    static int pendingNativeControlClaims(){
+        return (int)EXPECTED_SESSIONS.values().stream().filter(p->p.active()&&(p.computeHost()||p.role().controllerIndex()>=0))
+                .filter(p->{var state=NetplayClient.state(p.sessionId());return state!=null&&state.jniTrial()&&!NetplayClient.nativeSlotHeld(p.sessionId());}).limit(4).count();
+    }
     static void applySession(ArcadeSessionPayload payload) {
+        if(payload.active()&&(payload.computeHost()||payload.role().controllerIndex()>=0))cn.piq.fcarcade.client.watch.WatchClient.controlStarting(payload.sessionId());
         if(payload.active()&&(payload.computeHost()||payload.role().controllerIndex()>=0))PrivateHomeClient.stop("收到公开 FC 游戏会话");
         if (!payload.active()) {
             EXPECTED_SESSIONS.remove(payload.sessionId());
@@ -203,6 +208,11 @@ final class ClientRomTransfers {
         if (upload.offset >= upload.bytes.length) upload = null;
     }
 
+    /** Reuse the hash-verified FC download queue without creating a gameplay session. Main thread only. */
+    static Runnable observeContent(String sha256,Consumer<RomDescriptor> callback){
+        ensureLocal(sha256,callback);
+        return ()->{var list=AFTER_DOWNLOAD.get(sha256);if(list!=null){list.remove(callback);if(list.isEmpty())AFTER_DOWNLOAD.remove(sha256);}};
+    }
     private static void ensureLocal(String sha256, Consumer<RomDescriptor> callback) {
         if (MINECRAFT.getConnection() == null) return;
         AFTER_DOWNLOAD.computeIfAbsent(sha256, ignored -> new ArrayList<>())

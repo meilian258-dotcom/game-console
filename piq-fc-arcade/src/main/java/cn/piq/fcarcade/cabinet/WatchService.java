@@ -14,9 +14,20 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public final class WatchService {
     private WatchService() {}
     private static final Map<MinecraftServer,State> STATES=new WeakHashMap<>();
-    private static final class Control {
-        final Connection connection;boolean enabled=true;long blockedUntil,nextChange,nextHeartbeat;
+    static final class Control {
+        final Connection connection;boolean enabled=true;int capacity=1;long nextChange;
+        final Map<WatchLedger.Source,Long> blocked=new HashMap<>();
+        final Map<UUID,Long> nextHeartbeat=new HashMap<>();
         Control(Connection connection){this.connection=connection;}
+        boolean available(WatchNetwork.Available packet,long now){
+            // Reductions are immediate, while increases cannot manufacture rapid assignments.
+            if(packet.enabled()&&enabled&&packet.capacity()>capacity&&now<nextChange)return false;
+            if(packet.enabled()&&!enabled&&now<nextChange)return false;
+            enabled=packet.enabled();capacity=packet.enabled()?packet.capacity():0;nextChange=now+5;return true;
+        }
+        boolean allows(WatchLedger.Source source,long now){return now>=blocked.getOrDefault(source,0L);}
+        void block(WatchLedger.Source source,long until){blocked.put(source,until);}
+        boolean heartbeat(UUID token,long now){if(now<nextHeartbeat.getOrDefault(token,0L))return false;nextHeartbeat.put(token,now+5);return true;}
     }
     private static final class Live {
         final WatchSource source;final WatchProvider provider;final Connection hostConnection;
@@ -38,19 +49,23 @@ public final class WatchService {
     }
     static void available(ServerPlayer player,WatchNetwork.Available packet){
         if(!current(player))return;var server=player.getServer();var state=STATES.computeIfAbsent(server,s->new State());var c=control(state,player);long now=now(server);
-        // Disabling is immediate; enabling chatter cannot manufacture repeated assignments.
-        if(packet.enabled()&&now<c.nextChange)return;c.nextChange=now+5;c.enabled=packet.enabled();
-        if(!c.enabled){stop(server,state,state.ledger.remove(player.getUUID()),"正在使用其他设备");demands(server,state,now);}
+        if(!c.available(packet,now))return;
+        int retained=0;
+        for(var lease:state.ledger.all(player.getUUID()))if(!c.enabled
+                ||WatchNetplay.contains(server,lease.token())&&retained++>=c.capacity)
+            stop(server,state,state.ledger.remove(lease),"旁观预算已调整");
+        demands(server,state,now);
     }
     static void heartbeat(ServerPlayer player,WatchNetwork.Heartbeat packet){
         if(!current(player))return;var server=player.getServer();var state=STATES.get(server);if(state==null)return;var c=control(state,player);long now=now(server);
-        if(now<c.nextHeartbeat)return;c.nextHeartbeat=now+5;
+        // Authenticate first: invented lease IDs must not grow the throttle table.
+        if(state.ledger.authorized(player.getUUID(),c.connection,packet.lease(),packet.revision(),now)==null||!c.heartbeat(packet.lease(),now))return;
         state.ledger.heartbeat(player.getUUID(),c.connection,packet.lease(),packet.revision(),now);
     }
     static void release(ServerPlayer player,WatchNetwork.Release packet){
         if(!current(player))return;var server=player.getServer();var state=STATES.get(server);if(state==null)return;long now=now(server);
         var lease=state.ledger.release(player.getUUID(),player.connection.getConnection(),packet.lease(),packet.revision(),now);
-        if(lease!=null){control(state,player).blockedUntil=now+40;stop(server,state,lease,"已停止旁观");demands(server,state,now);}
+        if(lease!=null){control(state,player).block(lease.source(),now+40);stop(server,state,lease,"已停止旁观");demands(server,state,now);}
     }
     /** Home host upload route; existing cabinet rooms never accept uploads through this route. */
     static void media(ServerPlayer player,WatchNetwork.Media payload){
@@ -95,8 +110,8 @@ public final class WatchService {
             var lease=viewers.get((start+offset)%viewers.size());var viewer=server.getPlayerList().getPlayer(lease.player());
             if(WatchNetplay.contains(server,lease.token()))continue;
             if(viewer==null||viewer.connection.getConnection()!=lease.connection()||now>=lease.expires()
-                    ||!eligible(server,state,viewer,now)||!canSee(viewer,live)){
-                stop(server,state,state.ledger.remove(lease.player()),"已离开旁观范围");continue;
+                    ||!eligible(server,state,viewer,live,false,now)||!canSee(viewer,live)){
+                stop(server,state,state.ledger.remove(lease),"已离开旁观范围");continue;
             }
             // Charge each recipient copy including headers, atomically at whole-frame granularity.
             // Failed physical writes conservatively remain charged; never refund/retry into an unbounded queue.
@@ -135,11 +150,36 @@ public final class WatchService {
         if(distance(player,live.source.descriptor())>(double)exit*exit)return false;
         try{return live.provider.canObserve(player,live.source);}catch(RuntimeException|LinkageError failure){return false;}
     }
-    private static boolean eligible(MinecraftServer server,State state,ServerPlayer player,long now){
+    private static boolean eligible(MinecraftServer server,State state,ServerPlayer player,Live live,boolean netplay,long now){
         if(!current(player)||!player.isAlive())return false;var c=control(state,player);
-        if(!c.enabled||now<c.blockedUntil||ServerCabinets.hasLocalLease(player)||ServerArcadeSessions.hasPlayerCabinetSession(player))return false;
+        if(!c.enabled||!c.allows(live.key(),now))return false;
+        if(netplay){
+            if(c.capacity==0||live.source.hostPlayer().equals(player.getUUID()))return false;
+            try{return !live.provider.isParticipant(server,live.source,player.getUUID());}catch(RuntimeException|LinkageError failure){return false;}
+        }
+        // The legacy MEDIA lane remains single-source and keeps its old global participation guard.
+        if(ServerCabinets.hasLocalLease(player)||ServerArcadeSessions.hasPlayerCabinetSession(player))return false;
         for(var provider:WatchProviders.entries().values())try{if(provider.isParticipant(server,player.getUUID()))return false;}catch(RuntimeException|LinkageError failure){return false;}
         return true;
+    }
+    record Selection(List<WatchLedger.Candidate> candidates,int capacity) {}
+    /** Keep the existing lane while it is valid. MEDIA and Netplay never share a player selection. */
+    static Selection selectLane(WatchLedger ledger,UUID player,Object connection,List<WatchLedger.Candidate> candidates,
+                                Set<WatchLedger.Source> netplay,int capacity,long now){
+        Boolean lane=null;
+        for(var lease:ledger.all(player))if(lease.connection()==connection&&now<lease.expires()
+                &&(!netplay.contains(lease.source())||capacity>0)
+                &&candidates.stream().anyMatch(c->c.source().equals(lease.source())&&c.distanceSquared()<=c.exitSquared())){
+            lane=netplay.contains(lease.source());break;
+        }
+        if(lane==null){
+            var first=candidates.stream().filter(c->(!netplay.contains(c.source())||capacity>0)&&c.distanceSquared()<=c.enterSquared()
+                    &&ledger.count(c.source())<WatchLedger.MAX_VIEWERS)
+                    .min(Comparator.comparingDouble(WatchLedger.Candidate::distanceSquared).thenComparing(c->c.source().id())).orElse(null);
+            if(first==null)return new Selection(List.of(),0);lane=netplay.contains(first.source());
+        }
+        boolean selectedLane=lane;
+        return new Selection(candidates.stream().filter(c->netplay.contains(c.source())==selectedLane).toList(),selectedLane?capacity:1);
     }
     static void tick(MinecraftServer server){
         if(!server.isSameThread())return;long now=now(server);if(now%10!=0)return;
@@ -148,22 +188,39 @@ public final class WatchService {
         for(var lease:state.ledger.all()){
             var player=server.getPlayerList().getPlayer(lease.player());var live=state.sources.get(lease.source().id());
             if(player==null||player.connection.getConnection()!=lease.connection()||now>=lease.expires()||live==null||!live.key().equals(lease.source())
-                    ||!eligible(server,state,player,now)||!canSee(player,live))stop(server,state,state.ledger.remove(lease.player()),"旁观已结束");
+                    ||!eligible(server,state,player,live,WatchNetplay.contains(server,lease.token()),now)||!canSee(player,live))
+                stop(server,state,state.ledger.remove(lease),"旁观已结束");
         }
         for(var player:server.getPlayerList().getPlayers()){
-            boolean eligible=eligible(server,state,player,now);var candidates=new ArrayList<WatchLedger.Candidate>();
-            if(eligible)for(var live:state.sources.values())if(canSee(player,live)){
-                int enter=range(player,live),exit=enter+4;
-                candidates.add(new WatchLedger.Candidate(live.key(),distance(player,live.source.descriptor()),(double)enter*enter,(double)exit*exit));
+            var c=control(state,player);var candidates=new ArrayList<WatchLedger.Candidate>();
+            var offers=new HashMap<WatchLedger.Source,WatchNetplay.Offer>();var netplay=new HashSet<WatchLedger.Source>();
+            c.blocked.entrySet().removeIf(e->now>=e.getValue()||!state.sources.containsKey(e.getKey().id())
+                    ||!state.sources.get(e.getKey().id()).key().equals(e.getKey()));
+            if(c.enabled&&current(player)&&player.isAlive())for(var live:state.sources.values())if(c.allows(live.key(),now)&&canSee(player,live)){
+                try{
+                    var offer=live.provider.netplay(player,live.source);
+                    if(!eligible(server,state,player,live,offer!=null,now))continue;
+                    // Providers may explicitly select a different lane per player (e.g. SFC preference).
+                    // A lane change needs a fresh grant; failures below never manufacture MEDIA.
+                    for(var lease:state.ledger.all(player.getUUID()))if(lease.source().equals(live.key())
+                            &&WatchNetplay.contains(server,lease.token())!=(offer!=null))
+                        stop(server,state,state.ledger.remove(lease),"旁观方式已调整");
+                    if(offer!=null){offers.put(live.key(),offer);netplay.add(live.key());}
+                    int enter=range(player,live),exit=enter+4;
+                    candidates.add(new WatchLedger.Candidate(live.key(),distance(player,live.source.descriptor()),(double)enter*enter,(double)exit*exit));
+                }catch(RuntimeException|LinkageError failed){c.block(live.key(),now+200);}
             }
-            var before=state.ledger.get(player.getUUID());var after=state.ledger.select(player.getUUID(),player.connection.getConnection(),candidates,eligible,now);
-            if(before!=null&&(after==null||!before.token().equals(after.token())))stop(server,state,before,"已切换旁观画面");
-            if(after!=null&&(before==null||!after.token().equals(before.token()))){
-                var live=state.sources.get(after.source().id());var start=new WatchNetwork.Start(after.revision(),after.token(),live.source.descriptor());
-                try{var offer=live.provider.netplay(player,live.source);send(player,offer==null?start:WatchNetplay.open(player,start,offer));}
-                catch(RuntimeException|LinkageError failed){control(state,player).blockedUntil=now+200;stop(server,state,state.ledger.remove(player.getUUID()),"旁观连接暂不可用");}
+            var before=state.ledger.all(player.getUUID());var selection=selectLane(state.ledger,player.getUUID(),c.connection,candidates,netplay,c.capacity,now);
+            var after=state.ledger.selectMany(player.getUUID(),c.connection,selection.candidates(),selection.capacity(),now);
+            var oldTokens=new HashSet<UUID>();for(var lease:before)oldTokens.add(lease.token());
+            var newTokens=new HashSet<UUID>();for(var lease:after)newTokens.add(lease.token());
+            for(var lease:before)if(!newTokens.contains(lease.token()))stop(server,state,lease,"已切换旁观画面");
+            for(var lease:after)if(!oldTokens.contains(lease.token())){
+                var live=state.sources.get(lease.source().id());var start=new WatchNetwork.Start(lease.revision(),lease.token(),live.source.descriptor());
+                try{var offer=offers.get(lease.source());send(player,offer==null?start:WatchNetplay.open(player,start,offer));}
+                catch(RuntimeException|LinkageError failed){c.block(lease.source(),now+200);stop(server,state,state.ledger.remove(lease),"旁观连接暂不可用");}
             }
-            else if(after!=null&&now%40==0)send(player,new WatchNetwork.Heartbeat(after.revision(),after.token()));
+            else if(now%40==0)send(player,new WatchNetwork.Heartbeat(lease.revision(),lease.token()));
         }
         state.controls.entrySet().removeIf(e->{var player=server.getPlayerList().getPlayer(e.getKey());return player==null||player.connection.getConnection()!=e.getValue().connection;});
         demands(server,state,now);
@@ -208,11 +265,12 @@ public final class WatchService {
     private static void stop(MinecraftServer server,State state,WatchLedger.Lease lease,String reason){
         if(lease==null)return;var player=server.getPlayerList().getPlayer(lease.player());
         WatchNetplay.close(server,lease.token());
+        var c=state.controls.get(lease.player());if(c!=null&&c.connection==lease.connection())c.nextHeartbeat.remove(lease.token());
         if(player!=null&&player.connection.getConnection()==lease.connection())send(player,new WatchNetwork.Stop(lease.revision(),lease.token(),reason));
     }
     static void logout(ServerPlayer player){
         var server=player.getServer();var state=STATES.get(server);if(state==null)return;var connection=player.connection.getConnection();
-        var lease=state.ledger.get(player.getUUID());if(lease!=null&&lease.connection()==connection){state.ledger.remove(player.getUUID());WatchNetplay.close(server,lease.token());}
+        for(var lease:state.ledger.all(player.getUUID()))if(lease.connection()==connection){state.ledger.remove(lease);WatchNetplay.close(server,lease.token());}
         var c=state.controls.get(player.getUUID());if(c!=null&&c.connection==connection)state.controls.remove(player.getUUID());
         for(var live:List.copyOf(state.sources.values()))if(live.hostConnection==connection)drop(server,state,live,"主持玩家已离线");
         demands(server,state,now(server));
@@ -221,10 +279,11 @@ public final class WatchService {
     /** Exact live watch generation; no input, upload, editing or seat authority is implied. */
     static boolean authorized(ServerPlayer player,WatchNetwork.Start watch){
         if(!current(player))return false;var server=player.getServer();var state=STATES.get(server);if(state==null)return false;
-        var lease=state.ledger.get(player.getUUID());var live=state.sources.get(watch.descriptor().source());long time=now(server);
-        return lease!=null&&lease.connection()==player.connection.getConnection()&&lease.token().equals(watch.lease())
-                &&lease.revision()==watch.revision()&&time<lease.expires()&&live!=null&&live.source.descriptor().equals(watch.descriptor())
-                &&validSource(server,live)&&eligible(server,state,player,time)&&canSee(player,live);
+        long time=now(server);var lease=state.ledger.authorized(player.getUUID(),player.connection.getConnection(),watch.lease(),watch.revision(),time);
+        var live=state.sources.get(watch.descriptor().source());
+        return lease!=null&&lease.source().equals(new WatchLedger.Source(watch.descriptor().source(),watch.descriptor().hostLease()))
+                &&live!=null&&live.source.descriptor().equals(watch.descriptor())
+                &&validSource(server,live)&&eligible(server,state,player,live,true,time)&&canSee(player,live);
     }
     private static void send(ServerPlayer player,CustomPacketPayload payload){
         if(!current(player))return;

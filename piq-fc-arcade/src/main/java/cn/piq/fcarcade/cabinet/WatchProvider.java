@@ -11,6 +11,9 @@ public interface WatchProvider {
     boolean isCurrent(MinecraftServer server, WatchSource source);
     /** True for any controller of this provider, including loading/joining sessions. */
     boolean isParticipant(MinecraftServer server, UUID player);
+    /** Exact source participation for multi-source Netplay observation. Legacy providers retain
+     * their conservative global exclusion until explicitly adapted; this never grants controls. */
+    default boolean isParticipant(MinecraftServer server,WatchSource source,UUID player) { return isParticipant(server,player); }
     default boolean canObserve(ServerPlayer player, WatchSource source) { return true; }
     /** Optional native, receive-only observation; null retains the existing media lane. */
     default WatchNetplay.Offer netplay(ServerPlayer player,WatchSource source) { return null; }

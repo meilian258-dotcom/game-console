@@ -147,6 +147,8 @@ public final class JniNetplaySession implements AutoCloseable {
     public String saveStatus(){return saveStatus;}
     public boolean canSave(){return grant.host()&&active()&&ready()&&persistence!=null&&persistence.enabled();}
     public CompletableFuture<Void> terminated(){return terminated;}
+    /** No core invocation; includes a reserved, loading or still-closing native owner. */
+    public boolean nativeSlotHeld(){var value=core;return value instanceof LibretroJniRuntime runtime&&runtime.nativeSlotHeld();}
     public String diagnostic(){return status()+"\nJNI 试验；确认帧："+confirmedVisible+"；呈现帧："+delivered+"；重演帧："+replayed+"；拒绝异常连接："+rejectedPeers+"\n存档："+saveStatus;}
     public synchronized CompletableFuture<byte[]> checkpoint() {
         if(!grant.host()||!active()||!ready())return CompletableFuture.failedFuture(new IllegalStateException("JNI 主持未就绪或尚未激活"));

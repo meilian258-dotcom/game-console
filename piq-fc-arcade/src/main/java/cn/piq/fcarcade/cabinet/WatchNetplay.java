@@ -16,12 +16,18 @@ public final class WatchNetplay {
     private static final Map<MinecraftServer,Map<UUID,Entry>> ENTRIES=new WeakHashMap<>();
     private WatchNetplay(){}
     static WatchNetwork.NetplayStart open(ServerPlayer p,WatchNetwork.Start watch,Offer offer){
+        if(!WatchService.authorized(p,watch))throw new IllegalStateException("Expired Netplay watch authority");
+        var entries=ENTRIES.computeIfAbsent(p.getServer(),k->new HashMap<>());
+        if(entries.containsKey(watch.lease())||entries.values().stream().anyMatch(e->e.connection()==p.connection.getConnection()&&e.offer().wire()==offer.wire()))
+            throw new IllegalStateException("Duplicate Netplay watch wire");
         var ticket=offer.relay().grantObserver(p.connection.getConnection());
         if(ticket==null||ticket.player())throw new IllegalStateException("Netplay spectator capacity unavailable");
         var entry=new Entry(p,p.connection.getConnection(),watch,offer,ticket.id());
-        ENTRIES.computeIfAbsent(p.getServer(),k->new HashMap<>()).put(watch.lease(),entry);
-        NetplayNetwork.authorize(offer.wire(),entry.connection(),offer.relay());
-        return new WatchNetwork.NetplayStart(watch,offer.wire(),ticket.id(),offer.backend(),offer.romHash());
+        try{
+            NetplayNetwork.authorize(offer.wire(),entry.connection(),offer.relay());
+            var start=new WatchNetwork.NetplayStart(watch,offer.wire(),ticket.id(),offer.backend(),offer.romHash());
+            entries.put(watch.lease(),entry);return start;
+        }catch(RuntimeException|LinkageError failed){offer.relay().revoke(entry.connection(),ticket.id());throw failed;}
     }
     static boolean contains(MinecraftServer server,UUID lease){var m=ENTRIES.get(server);return m!=null&&m.containsKey(lease);}
     private static boolean valid(Entry e){return e.connection()==e.player().connection.getConnection()

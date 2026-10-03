@@ -96,7 +96,9 @@ class JniCabinetObserverTest {
         assertTrue(preparation.contains("this(load,cancel,false)"),"home-console compatibility remains two-port");
         var watch=Files.readString(Path.of(root+"watch/WatchClient.java"));
         assertTrue(watch.contains("new NetplayProcess.Grant(grant.wire(),grant.ticket(),false,false)"));
-        assertTrue(watch.contains("content::auxiliary,captured.cabinetTopology()"));
+        assertTrue(watch.contains("captured.open(new NetplayProcess.Grant"));
+        assertTrue(preparation.contains("content::auxiliary,cabinetTopology"));
+        assertTrue(preparation.contains("grant.host()||grant.player()||grant.port()!=-1"),"factory cannot be used to acquire a seat");
         var cabinet=Files.readString(Path.of(root+"cabinet/CabinetClientBackends.java"));
         assertTrue(cabinet.contains("boolean cabinetTopology=PgmServicePolicy.supportsBackend(start.backend().toString())"));
         assertTrue(cabinet.contains("CabinetSharedGames.cancel(request.lease()),cabinetTopology"));

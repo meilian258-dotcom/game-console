@@ -36,15 +36,22 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
     private static SfcPlayback playback;
     private static SfcHomeNetwork.Session waiting;
     private static SfcHomeNetwork.NetplayStart waitingNetplay;
-    @Override public void netplay(SfcHomeNetwork.NetplayStart value){session(value.session());if(waiting==value.session())waitingNetplay=value;}
+    static int pendingNativeControlClaims(){
+        var current=currentSession();
+        return current!=null&&current.syncMode()==3&&sessionCurrent(current,Minecraft.getInstance().getConnection())
+                &&(playback==null||!playback.nativeSlotHeld())?1:0;
+    }
+    @Override public void netplay(SfcHomeNetwork.NetplayStart value){session(value.session());if(waiting==value.session()){
+        cn.piq.fcarcade.client.watch.WatchClient.controlStarting(value.wire());waitingNetplay=value;
+    }}
     private static long waitingAt;
     private static Object sessionConnection;
     private static SfcStartupProgress startup;
     private static SfcStartupProgress.Stage shownStage;
     private static long startupToastAt;
-    private static byte[] download;
+    private static SfcRomDownloads.Ticket romDownload;
     private static byte[] waitingRom;
-    private static int downloadAt, sequence,lastMask=-1, keepalive;
+    private static int sequence,lastMask=-1, keepalive;
     private static long lastInputSample;
     private static long lastMediaInterruption;
     private static boolean inactiveReleased;
@@ -126,8 +133,8 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
             return;
         }
         cn.piq.fcarcade.client.PrivateHomeClient.stop("收到公开 SFC 游戏会话");
-        cn.piq.fcarcade.client.watch.WatchClient.controlStarting();
-        SfcLocalWatchClient.controlStarting();
+        cn.piq.fcarcade.client.watch.WatchClient.controlStarting(SfcLocalWatchClient.descriptor(message));
+        SfcLocalWatchClient.yieldLocalForControl();
         closeLocal();
         waitingNetplay=null;
         if(!message.executionHost()&&(ClientArcadeEvents.isControlling()||!CabinetClientOwner.acquire(INPUT_OWNER))){SfcHomeNetwork.leave(message.controllerLease(),new SfcHomeNetwork.Leave(message.sessionId(),message.epoch()));toast("请先退出当前模拟器的控制，再领取 SFC 手柄");return;}
@@ -138,13 +145,28 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
         Object connection=sessionConnection;var game=mc.gameDirectory.toPath();
         if(!submitIo(()-> {
             try { byte[] bytes=SfcClientFiles.cachedRom(game,message.romSha());
-                mc.execute(()->{if(!waitingCurrent(message,connection))return;if(bytes==null){startup.enter(SfcStartupProgress.Stage.DOWNLOAD);PacketDistributor.sendToServer(new SfcHomeNetwork.RomRequest(message.romSha()));}else begin(message,bytes);});
+                mc.execute(()->{if(!waitingCurrent(message,connection))return;if(bytes==null)downloadRom(message,connection);else begin(message,bytes);});
             }catch(Exception error){mc.execute(()->{if(waitingCurrent(message,connection))fail("SFC 准备失败",error);});}
         }))leave("SFC 文件任务繁忙，请归还后重新领取");
     }
     private static boolean submitIo(Runnable task){try{IO.execute(task);return true;}catch(RejectedExecutionException busy){return false;}}
     private static boolean waitingCurrent(SfcHomeNetwork.Session message,Object connection){return waiting==message&&sessionConnection==connection&&connection!=null&&Minecraft.getInstance().getConnection()==connection;}
-    private static void begin(SfcHomeNetwork.Session message,byte[] bytes){if(!waitingCurrent(message,sessionConnection))return;download=null;waitingRom=bytes;startup.enter(SfcStartupProgress.Stage.HARDWARE);maybeBegin();}
+    private static void begin(SfcHomeNetwork.Session message,byte[] bytes){if(!waitingCurrent(message,sessionConnection))return;romDownload=null;waitingRom=bytes;startup.enter(SfcStartupProgress.Stage.HARDWARE);maybeBegin();}
+    private static void downloadRom(SfcHomeNetwork.Session expected,Object connection){
+        var mc=Minecraft.getInstance();var game=mc.gameDirectory.toPath();startup.enter(SfcStartupProgress.Stage.DOWNLOAD);
+        try{
+            var transport=mc.getConnection().getConnection();SfcNetplayWatchContent.DOWNLOADS.connection(transport);
+            var reader=SfcNetplayWatchContent.DOWNLOADS.request(expected.romSha(),transport);romDownload=reader;
+            reader.result.whenComplete((bytes,error)->mc.execute(()->{
+                if(!waitingCurrent(expected,connection)||romDownload!=reader)return;
+                if(error!=null){fail("SFC ROM 下载失败",error);return;}
+                romDownload=null;startup.enter(SfcStartupProgress.Stage.CACHE_WRITE);
+                if(!submitIo(()->{try{SfcClientFiles.cacheRom(game,expected.romSha(),bytes);
+                    mc.execute(()->{if(waitingCurrent(expected,connection))begin(expected,bytes);});
+                }catch(Exception failure){mc.execute(()->{if(waitingCurrent(expected,connection))fail("SFC 准备失败",failure);});}}))leave("SFC 缓存任务繁忙，请归还后重新领取");
+            }));
+        }catch(RuntimeException failure){fail("SFC ROM 下载失败",failure);}
+    }
     private static boolean hardwareCurrent(SfcHomeNetwork.Session s){
         var mc=Minecraft.getInstance();
         if(mc.level==null||mc.player==null||!mc.level.dimension().location().equals(s.dimension())
@@ -165,18 +187,7 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
     }
     @Override public void romChunk(SfcHomeNetwork.RomChunk chunk) {
         SfcNetplayWatchContent.chunk(chunk);
-        if(waiting==null||waiting.receivesMedia()||!waitingCurrent(waiting,sessionConnection)||!waiting.romSha().equals(chunk.romSha()))return;
-        if(chunk.total()<32768||chunk.total()>SfcClientFiles.MAX_ROM||chunk.offset()<0||chunk.data().length>65536){leave("SFC ROM 分片无效");return;}
-        if(download==null){if(chunk.offset()!=0){leave("SFC ROM 缺失首片");return;}download=new byte[chunk.total()];downloadAt=0;}
-        if(chunk.total()!=download.length||chunk.offset()!=downloadAt||chunk.data().length>download.length-downloadAt){leave("SFC ROM 分片顺序错误");return;}
-        System.arraycopy(chunk.data(),0,download,downloadAt,chunk.data().length);downloadAt+=chunk.data().length;
-        startup.download(downloadAt,download.length);
-        if(downloadAt!=download.length)return;
-        var expected=waiting;byte[] complete=download;download=null;startup.enter(SfcStartupProgress.Stage.CACHE_WRITE);
-        var mc=Minecraft.getInstance();Object connection=sessionConnection;var game=mc.gameDirectory.toPath();
-        if(!submitIo(()->{try{SfcClientFiles.cacheRom(game,expected.romSha(),complete);
-            mc.execute(()->{if(waitingCurrent(expected,connection))begin(expected,complete);});}
-            catch(Exception error){mc.execute(()->{if(waitingCurrent(expected,connection))fail("SFC 准备失败",error);});}}))leave("SFC 缓存任务繁忙，请归还后重新领取");
+        if(romDownload!=null&&startup!=null&&romDownload.total()>0)startup.download(romDownload.offset(),romDownload.total());
     }
     @Override public void frames(SfcHomeNetwork.Frames message) {
         if(isCurrent(playback)&&!playback.session.receivesMedia()&&playback.matches(message.sessionId(),message.epoch())&&!playback.offer(message))leave("SFC 模拟跟不上输入，已安全停止");
@@ -221,7 +232,7 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
         if(s!=null&&sessionConnection!=null&&Minecraft.getInstance().getConnection()==sessionConnection)SfcHomeNetwork.leave(s.controllerLease(),new SfcHomeNetwork.Leave(s.sessionId(),s.epoch()));
         closeLocal();if(reason!=null&&!reason.isBlank())toast(reason);
     }
-    private static void closeLocal(){SfcRepairClient.clear();SfcJoinClient.clear();releaseControl();CONTROL_GATE.clear();waiting=null;waitingRom=null;waitingNetplay=null;download=null;downloadAt=0;sessionConnection=null;startup=null;shownStage=null;startupToastAt=0;if(playback!=null){playback.close();playback=null;}SfcHomeKeys.restore();}
+    private static void closeLocal(){SfcRepairClient.clear();SfcJoinClient.clear();releaseControl();CONTROL_GATE.clear();waiting=null;waitingRom=null;waitingNetplay=null;var reader=romDownload;romDownload=null;if(reader!=null)reader.cancel();sessionConnection=null;startup=null;shownStage=null;startupToastAt=0;if(playback!=null){playback.close();playback=null;}SfcHomeKeys.restore();}
     private static void showStartup(){
         if(startup==null)return;var stage=startup.stage();long now=System.nanoTime();
         if(stage!=shownStage||(stage!=SfcStartupProgress.Stage.READY&&stage!=SfcStartupProgress.Stage.RUNNING&&now-startupToastAt>2_000_000_000L)){
@@ -263,6 +274,7 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
         }
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
+        SfcNetplayWatchContent.tick();
         var mc=Minecraft.getInstance();
         if(mc.level==null||mc.player==null){closeLocal();return;}
         if(sessionConnection!=null&&mc.getConnection()!=sessionConnection){closeLocal();return;}

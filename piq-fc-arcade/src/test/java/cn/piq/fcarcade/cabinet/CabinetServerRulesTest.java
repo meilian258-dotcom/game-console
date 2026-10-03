@@ -82,7 +82,8 @@ class CabinetServerRulesTest {
         var client=source("client/cabinet/CabinetClientBackends");client=client.substring(client.indexOf("@SubscribeEvent public static void render("));
         assertTrue(client.indexOf("media.offer(frame)")<client.indexOf("if(visible){"));assertTrue(client.indexOf("if(visible){")<client.indexOf("new DynamicTexture"));
         var watch=source("client/watch/WatchClient");watch=watch.substring(watch.indexOf("@SubscribeEvent public static void render("));
-        assertTrue(watch.indexOf(".visible(event,current.descriptor())")<watch.indexOf("texture.upload()"));
+        assertTrue(watch.indexOf("adapter.visible(event,d)")>=0);
+        assertTrue(watch.indexOf("adapter.visible(event,d)")<watch.indexOf("r.texture.upload()"));
         var cache=source("client/cabinet/CabinetClientSettings");assertTrue(cache.contains("source==current()"));assertTrue(cache.contains("value.revision()<state.revision()"));
     }
 }

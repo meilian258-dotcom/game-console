@@ -125,7 +125,7 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         if(controlEnabled)CabinetClientOwner.acquire(INPUT_OWNER);else CabinetClientOwner.release(INPUT_OWNER);
     }
     @Override public void netplay(CabinetRoomNetwork.NetplayStart value){
-        cn.piq.fcarcade.client.watch.WatchClient.controlStarting();
+        cn.piq.fcarcade.client.watch.WatchClient.controlStarting(value.wire());
         if(room!=null&&room.member().equals(value.assignment().member())&&Minecraft.getInstance().getConnection()==sessionConnection)return;
         if(shuttingDown||launch!=null||room!=null||OPENING.get()){release(value.assignment().member());return;}
         netplayGrant=value;assignment(value.assignment());if(room!=value.assignment())netplayGrant=null;
@@ -184,6 +184,17 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         watchers=value.watchers();watchExpires=System.nanoTime()+6_000_000_000L;updateMediaDemand();
     }
     public static boolean hasLocalSession(){return launch!=null||room!=null||OPENING.get();}
+    public static int pendingNativeControlClaims(){
+        if(netplayGrant==null)return 0;
+        var mc=Minecraft.getInstance();if(mc.getConnection()==null)return 0;
+        return cn.piq.fcarcade.netplay.NetplayNetwork.clientRuns(mc.getConnection().getConnection()).stream()
+                .anyMatch(run->run.grant().session()==netplayGrant.wire()&&run.nativeSlotHeld())?0:1;
+    }
+    public static boolean hasLocalSession(WatchDescriptor source){
+        return room!=null&&room.room().equals(source.source())&&room.hostMember().equals(source.hostLease())
+                ||launch!=null&&launch.target().dimension().equals(source.dimension())
+                &&launch.target().identity().equals(source.origin().identity());
+    }
     private static List<cn.piq.fcarcade.client.NetworkDiagnosticsView.Device> diagnosticDevices(){
         var mc=Minecraft.getInstance();
         if(!playing||!current()||mc.getConnection()==null||!mc.getConnection().getConnection().isConnected())return List.of();

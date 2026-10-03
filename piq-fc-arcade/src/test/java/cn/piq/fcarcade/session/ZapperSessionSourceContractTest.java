@@ -60,8 +60,10 @@ class ZapperSessionSourceContractTest {
         String s=source("server/ServerArcadeSessions");
         String detach=section(s,"private void detachHomeDevice(","private void detachHome(");
         // The same live-connection guard encloses both paths: old local viewers
-        // retain local observation; hosted clients leave and use WatchService.
-        assertTrue(detach.contains("if(current(p)&&s.homeRuntime.player(p.getUUID())==null&&!computeHost(s,p)){if(s.hosted!=null||s.playerMedia)sendInactive(p,s);else{s.viewers.add(p.getUUID());addTracking(viewerships,p.getUUID(),s.key);sendViewerSession(p,s);}}"));
+        // retain local observation; hosted/MEDIA/shared-JNI clients leave and use WatchService.
+        assertTrue(detach.contains("if(current(p)&&s.homeRuntime.player(p.getUUID())==null&&!computeHost(s,p)){if(s.hosted!=null||s.playerMedia||sharedJniWatch(s))sendInactive(p,s);else{s.viewers.add(p.getUUID());addTracking(viewerships,p.getUUID(),s.key);sendViewerSession(p,s);}}"));
+        assertTrue(s.contains("candidate.playerMedia || sharedJniWatch(candidate)"),"Shared JNI must not also receive a legacy viewer core");
+        assertTrue(s.contains("if(sharedJniWatch(s))allowed.addAll(WatchNetplay.connections(server,s.mediaSource))"),"Shared observer tickets must survive the original room renew");
         assertFalse(section(s,"private void detachStaleHome(","private boolean storageInitialized").contains("viewers.add"),"Stale sockets must never be re-added as viewers");
         assertTrue(s.contains("request.connection()==player.connection.getConnection())session.homeRequests.remove(player.getUUID(),request)"));
         assertTrue(s.contains("memberSession != null && memberSession.homeRuntime==null && memberSession.id == sessionId"));

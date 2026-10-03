@@ -41,4 +41,17 @@ class SfcClientFilesTest {
         Files.writeString(temp.resolve("piq-sfc-home"),"occupied");byte[]data=rom();
         assertThrows(java.io.IOException.class,()->SfcClientFiles.cacheRom(temp,SfcClientFiles.hash(data),data));
     }
+    @Test void simultaneousControlAndObserverCachePublicationKeepsVerifiedBytes()throws Exception{
+        byte[] data=rom();String sha=SfcClientFiles.hash(data);
+        try(var workers=java.util.concurrent.Executors.newFixedThreadPool(4)){
+            for(int iteration=0;iteration<8;iteration++){
+                Path game=temp.resolve("parallel-"+iteration);var barrier=new java.util.concurrent.CyclicBarrier(4);
+                var writes=new java.util.ArrayList<java.util.concurrent.Future<?>>();
+                for(int i=0;i<4;i++)writes.add(workers.submit(()->{barrier.await();SfcClientFiles.cacheRom(game,sha,data);return null;}));
+                for(var write:writes)write.get(10,java.util.concurrent.TimeUnit.SECONDS);
+                assertArrayEquals(data,SfcClientFiles.cachedRom(game,sha));
+                try(var files=Files.list(game.resolve("game-console/piq-sfc-home/cache/roms"))){assertEquals(1,files.count());}
+            }
+        }
+    }
 }

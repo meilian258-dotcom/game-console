@@ -176,6 +176,9 @@ public final class MdPublicServer implements WatchProvider {
     @Override public boolean isCurrent(MinecraftServer server,WatchSource source){return source(server,source)!=null;}
     @Override public WatchNetplay.Offer netplay(ServerPlayer p,WatchSource source){var s=source(p.getServer(),source);return s!=null&&s.netplay?new WatchNetplay.Offer(s.wire,s.room,MdMod.SYSTEM,s.entry.hash(),null):null;}
     @Override public boolean isParticipant(MinecraftServer server,UUID p){return participant(server,p);}
+    @Override public boolean isParticipant(MinecraftServer server,WatchSource source,UUID p){
+        var s=source(server,source);return s!=null&&(s.host.getUUID().equals(p)||Arrays.stream(s.seats).anyMatch(a->a!=null&&a.player.getUUID().equals(p)));
+    }
     @Override public boolean canObserve(ServerPlayer p,WatchSource source){return current(p)&&p.serverLevel().dimension().location().equals(source.descriptor().dimension())&&p.serverLevel().hasChunkAt(source.descriptor().origin().pos())&&source.descriptor().screens().stream().allMatch(a->p.serverLevel().hasChunkAt(a.pos())&&p.serverLevel().getWorldBorder().isWithinBounds(a.pos()));}
     private static List<SeatLease> recipients(Session s){var result=new ArrayList<SeatLease>(2);for(int port=0;port<2;port++){var a=s.seats[port];if(a!=null&&a.player!=s.host&&current(a.player)&&a.player.connection.getConnection()==a.connection&&s.console.authorized(a.player,port,a.loan,false))result.add(a);}return result;}
     @Override public int controlRecipients(MinecraftServer server,WatchSource source){var s=source(server,source);return s==null||s.netplay?0:recipients(s).size();}

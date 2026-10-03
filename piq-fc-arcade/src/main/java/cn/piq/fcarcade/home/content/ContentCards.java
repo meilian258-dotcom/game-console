@@ -19,7 +19,7 @@ import java.util.concurrent.*;
 import java.util.function.*;
 import static cn.piq.fcarcade.home.content.ContentCardNetwork.*;
 
-/** Shared writer and authorized one-player content transfer. Native execution stays in the addon. */
+/** Shared writer, one controlled runtime/player, and bounded read-only content transfers. */
 public final class ContentCards {
     public record Adapter(Supplier<Item> item,String label,Set<String> extensions,ContentCardStore.Validator validator,int maxBytes){
         public Adapter(Supplier<Item> item,String label,Set<String> extensions,ContentCardStore.Validator validator){this(item,label,extensions,validator,ContentCardStore.DEFAULT_MAX_BYTES);}
@@ -57,7 +57,7 @@ public final class ContentCards {
     public static Adapter adapter(ResourceLocation system){return ADAPTERS.get(system);}
     public static synchronized void install(){if(installed)return;installed=true;
         NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post event)->tick(event.getServer()));
-        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event)->{var s=STATES.remove(event.getServer());if(s!=null){s.closed=true;s.edits.clear();s.plays.clear();}});
+        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event)->{var s=STATES.remove(event.getServer());if(s!=null){s.closed=true;s.edits.clear();s.plays.clear();s.reads.clear();}});
     }
     private static State state(ServerPlayer p){return STATES.computeIfAbsent(p.getServer(),s->new State());}
     // New content-card storage has no legacy directory to migrate. Resolve only here;
@@ -113,6 +113,8 @@ public final class ContentCards {
         var s=STATES.get(p.getServer());if(s==null)return;
         var play=s.plays.get(p.getUUID());
         if(play!=null&&play.token.equals(m.token())&&play.system.equals(m.system())&&play.pos.equals(m.pos())){playMessage(p,s,play,m);return;}
+        var read=s.reads.get(p.getUUID(),m.token(),p.connection.getConnection());
+        if(read!=null&&read.system.equals(m.system())&&read.pos.equals(m.pos())){playMessage(p,s,read,m);return;}
         var e=s.edits.get(p.getUUID());if(e==null||!e.token.equals(m.token())||!e.system.equals(m.system())||!e.pos.equals(m.pos()))return;
         if(!valid(p,s,e)){s.edits.remove(p.getUUID());reply(p,e,CANCEL,"写卡已取消：卡带、电脑、距离或权限改变",0,List.of());return;}
         if(m.op()==CANCEL){s.edits.remove(p.getUUID());return;}
@@ -230,14 +232,21 @@ public final class ContentCards {
     private static UUID transfer(ServerPlayer p,ResourceLocation system,UUID request,BlockPos pos,ContentCardStore.Entry entry,
                                  BooleanSupplier authorized,Consumer<Boolean> status,boolean downloadOnly){
         var s=state(p);var adapter=ADAPTERS.get(system);
-        if(adapter==null||entry.size()>adapter.maxBytes||reserved(s)+entry.size()>64L*1024*1024||s.closed||s.plays.containsKey(p.getUUID())||s.plays.size()>=4||!authorized.getAsBoolean())return null;
-        var play=new Play(p,system,request,pos,entry,authorized,status,downloadOnly);s.plays.put(p.getUUID(),play);var server=p.getServer();var files=store(p,system);
+        if(adapter==null||entry.size()>adapter.maxBytes||reserved(s)+entry.size()>64L*1024*1024||s.closed
+                ||!downloadOnly&&(s.plays.containsKey(p.getUUID())||s.plays.size()>=4)||!authorized.getAsBoolean())return null;
+        var existing=s.plays.get(p.getUUID());if(existing!=null&&existing.token.equals(request))return null;
+        var play=new Play(p,system,request,pos,entry,authorized,status,downloadOnly);
+        if(downloadOnly){if(!s.reads.add(p.getUUID(),request,play.connection,entry.size(),play,reserved(s)-s.reads.reservedBytes()))return null;}
+        else s.plays.put(p.getUUID(),play);
+        var server=p.getServer();var files=store(p,system);
         try{IO.execute(()->{byte[] data=null;Exception error=null;try{data=files.read(entry);}catch(Exception ex){error=ex;}var bytes=data;var failure=error;
             server.execute(()->{if(!valid(p,s,play))return;if(failure!=null){say(p,"卡带启动失败："+clean(failure));stop(p,s,play);return;}
                 play.bytes=bytes;send(p,msg(downloadOnly?DOWNLOAD_ONLY:DOWNLOAD,system,play.token,pos,entry.hash(),entry.name(),entry.size(),0,new byte[0]));});
         });}catch(RejectedExecutionException full){stop(p,s,play);return null;}return play.token;
     }
-    private static boolean valid(ServerPlayer p,State s,Play play){return !s.closed&&s.plays.get(p.getUUID())==play&&online(p,play.connection)&&play.authorized.getAsBoolean();}
+    private static boolean valid(ServerPlayer p,State s,Play play){return !s.closed
+            &&(play.downloadOnly?s.reads.get(p.getUUID(),play.token,play.connection)==play:s.plays.get(p.getUUID())==play)
+            &&online(p,play.connection)&&play.authorized.getAsBoolean();}
     /** Server world action only; clients cannot send this opcode to gain reset authority. */
     public static boolean reset(ServerPlayer p,UUID token){
         var s=STATES.get(p.getServer());var play=s==null?null:s.plays.get(p.getUUID());
@@ -246,7 +255,7 @@ public final class ContentCards {
     }
     private static long reserved(State s){
         long bytes=0;for(var e:s.edits.values()){if(e.upload!=null)bytes+=e.upload.total();else if(e.busy&&e.entry!=null)bytes+=e.entry.size();}
-        for(var p:s.plays.values())if(!p.started)bytes+=p.entry.size();return bytes;
+        for(var p:s.plays.values())if(!p.started)bytes+=p.entry.size();return bytes+s.reads.reservedBytes();
     }
     private static void playMessage(ServerPlayer p,State s,Play play,Message m){
         if(!valid(p,s,play)){stop(p,s,play);return;}
@@ -257,14 +266,17 @@ public final class ContentCards {
             if(end==play.bytes.length)play.bytes=null;
         }else if(m.op()==STARTED&&play.offset==play.entry.size()&&!play.started){
             play.started=true;play.last=System.nanoTime();
-            if(play.downloadOnly){s.plays.remove(p.getUUID(),play);play.bytes=null;}
+            if(play.downloadOnly){s.reads.remove(p.getUUID(),play.token,play);play.bytes=null;}
             play.status.accept(true);
         }else if(play.downloadOnly){stop(p,s,play);return;}
         if(m.op()==HEARTBEAT&&play.started)play.last=System.nanoTime();
     }
-    public static void stop(ServerPlayer p,UUID token){var s=STATES.get(p.getServer());if(s==null)return;var play=s.plays.get(p.getUUID());if(play!=null&&play.token.equals(token))stop(p,s,play);}
+    public static void stop(ServerPlayer p,UUID token){var s=STATES.get(p.getServer());if(s==null)return;var play=s.plays.get(p.getUUID());
+        if(play!=null&&play.token.equals(token))stop(p,s,play);
+        else{var read=s.reads.get(p.getUUID(),token,p.connection.getConnection());if(read!=null)stop(p,s,read);}
+    }
     private static void stop(ServerPlayer p,State s,Play play){
-        if(!s.plays.remove(p.getUUID(),play))return;play.bytes=null;
+        if(!(play.downloadOnly?s.reads.remove(p.getUUID(),play.token,play):s.plays.remove(p.getUUID(),play)))return;play.bytes=null;
         if(online(p,play.connection))send(p,msg(STOP,play.system,play.token,play.pos,"","",0,0,new byte[0]));play.status.accept(false);
     }
     private static void tick(MinecraftServer server){
@@ -274,11 +286,15 @@ public final class ContentCards {
         for(var id:List.copyOf(s.plays.keySet())){var play=s.plays.get(id);var p=server.getPlayerList().getPlayer(id);
             if(p==null){s.plays.remove(id);play.bytes=null;play.status.accept(false);}
             else if(!valid(p,s,play)||System.nanoTime()-play.last>(play.started?15:120)*1_000_000_000L)stop(p,s,play);}
+        for(var entry:s.reads.snapshot()){var read=entry.value();var p=server.getPlayerList().getPlayer(entry.player());
+            if(p==null){if(s.reads.remove(entry.player(),entry.token(),read)){read.bytes=null;read.status.accept(false);}}
+            else if(!valid(p,s,read)||System.nanoTime()-read.last>120_000_000_000L)stop(p,s,read);
+        }
     }
     private static void reply(ServerPlayer p,Edit e,int op,String text,int offset,List<ContentCardStore.Entry> entries){send(p,new Message(op,e.system,e.token,e.pos,"",text.substring(0,Math.min(250,text.length())),0,offset,new byte[0],entries));}
     private static String clean(Throwable e){var m=e.getMessage();if(m==null)m=e.getClass().getSimpleName();return m.replaceAll("[\\p{Cntrl}]"," ").substring(0,Math.min(160,m.length()));}
     private static void say(ServerPlayer p,String text){p.displayClientMessage(net.minecraft.network.chat.Component.literal(text),false);}
-    private static final class State{boolean closed;final Map<UUID,Edit> edits=new HashMap<>();final Map<UUID,Play> plays=new HashMap<>();}
+    private static final class State{boolean closed;final Map<UUID,Edit> edits=new HashMap<>();final Map<UUID,Play> plays=new HashMap<>();final ContentCardReadTransfers<Play> reads=new ContentCardReadTransfers<>();}
     private static final class Edit{
         final UUID token=UUID.randomUUID(),computerId;final Object connection;final ServerLevel level;final BlockPos pos;final CartridgeComputerBlockEntity computer;
         final ResourceLocation system;final InteractionHand hand;final int slot;final ItemStack stack;final CartridgeComputerBinding binding;ItemStack snapshot;final long opened=System.nanoTime();

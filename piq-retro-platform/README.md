@@ -3,6 +3,10 @@
 See the [branding and packaging policy](../source-control/BRANDING.md). Internal package names,
 API identities and build outputs remain compatible. This library is not a player-installable mod.
 
+## Read-only native budget queries (FC76.36 candidate, 2026-10-03)
+
+`NativeLibretroBridge.freeSlotsIfLoaded()` reports the existing four-owner gate without loading a DLL or taking an owner lock. `LibretroJniRuntime.nativeSlotHeld()` checks the exact token/generation; it remains held until native teardown actually returns. These are budget snapshots, not reservations or permission to call a core off its owner thread. No ABI, core binary, save identity or four-slot limit changes. Public multi-source observer lifetimes live in the main mod, not this library; see the [first-batch contract and verification](../piq-fc-arcade/design/公共JNI多屏旁观第一批-20261003.md).
+
 ## Shared launch lifecycle (FC76.34 candidate, 2026-10-03)
 
 `cn.piq.retro.flow.DeviceSessionFlow` is a pure, versioned state machine for preparation,

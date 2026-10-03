@@ -112,6 +112,7 @@ final class SfcPlayback implements AutoCloseable {
     private final byte[] rom;
     private final Thread thread;
     private volatile cn.piq.fcarcade.netplay.NetplayProcess netplay;
+    boolean nativeSlotHeld(){var active=netplay;return active!=null&&active.nativeSlotHeld();}
     private volatile int netplayMask;
     void netplayInput(int mask){netplayMask=mask;var run=netplay;if(run!=null)run.inputRetroPad(mask);}
     private volatile boolean running=true;

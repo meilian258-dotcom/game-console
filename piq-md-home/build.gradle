@@ -5,7 +5,7 @@ base { archivesName = 'game_console_md' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 neoForge { version = '21.1.236'; mods { piq_md_home { sourceSet(sourceSets.main) } } }
 repositories { mavenCentral() }
-def fc = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.35.jar'))
+def fc = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.36.jar'))
 dependencies {
     implementation fc
     testImplementation platform('org.junit:junit-bom:5.13.4')

@@ -18,6 +18,7 @@ public final class SfcWatchProvider implements WatchProvider {
         return expected!=null&&sources(server).contains(expected);
     }
     @Override public boolean isParticipant(MinecraftServer server,UUID player){return SfcHomeServer.watchParticipant(server,player);}
+    @Override public boolean isParticipant(MinecraftServer server,WatchSource source,UUID player){return SfcHomeServer.watchParticipant(server,source,player);}
     @Override public boolean serverHosted(MinecraftServer server,WatchSource source){return SfcHomeServer.watchHosted(server,source);}
     @Override public int controlRecipients(MinecraftServer server,WatchSource source){return SfcHomeServer.watchControlRecipients(server,source);}
     @Override public void relayControls(MinecraftServer server,WatchSource source,List<cn.piq.fcarcade.cabinet.CabinetMediaPacket> batch){SfcHomeServer.relayPlayerMedia(server,source,batch);}
