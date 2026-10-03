@@ -12,7 +12,7 @@ import java.util.concurrent.*;
 final class SfcHostedWorker implements AutoCloseable {
     private final UUID source,stream;
     private final ServerCoreContext context;
-    private final Path library;
+    private final SfcServerContentPaths.Location library;
     private final String rom;
     private final AutoCloseable capacity;
     private final HostedMediaQueue<List<CabinetMediaPacket>> outbound=new HostedMediaQueue<>(8,b->b.getFirst().kind()==0);
@@ -20,7 +20,7 @@ final class SfcHostedWorker implements AutoCloseable {
     private volatile String error;
     private volatile ServerCoreHandle core;
     private final Thread worker;
-    SfcHostedWorker(UUID source,UUID stream,ServerCoreContext context,Path library,String rom,AutoCloseable capacity){
+    SfcHostedWorker(UUID source,UUID stream,ServerCoreContext context,SfcServerContentPaths.Location library,String rom,AutoCloseable capacity){
         this.source=source;this.stream=stream;this.context=context;this.library=library;this.rom=rom;this.capacity=Objects.requireNonNull(capacity);
         worker=Thread.ofPlatform().daemon(true).name("SFC-Home-Hosted-"+source).start(this::run);
     }
@@ -40,7 +40,7 @@ final class SfcHostedWorker implements AutoCloseable {
             byte[] bytes=new SfcRomStore(library).read(rom); // Rehash normalized bytes before using the captured cartridge.
             if(closed)return;
             // read() has checked every library ancestor; create a unique child, never overwrite a library ROM.
-            staging=Files.createTempDirectory(library,".hosted-");file=staging.resolve("game.sfc");
+            staging=Files.createTempDirectory(library.root(),".hosted-");file=staging.resolve("game.sfc");
             Files.write(file,bytes,StandardOpenOption.CREATE_NEW,StandardOpenOption.WRITE);bytes=null;
             if(closed)return;
             core=ServerCoreRegistry.open(SfcHomeMod.CABINET_BACKEND,context,file);

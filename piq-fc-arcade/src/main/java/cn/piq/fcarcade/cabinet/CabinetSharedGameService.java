@@ -27,11 +27,11 @@ public final class CabinetSharedGameService {
     private record Grant(ServerPlayer player,Connection connection,UUID lease,ResourceLocation backend,CabinetTarget target,CabinetGameManifest manifest){}
     private record Pending(CabinetGameNetwork.Reply reply,boolean terminal){}
     private static final class Job {
-        final UUID id,lease;final ServerPlayer player;final Connection connection;final ResourceLocation backend;final CabinetTarget target;final CabinetGameManifest manifest;final CabinetGameStore store;final boolean upload;
+        final UUID id,lease;final ServerPlayer player;final Connection connection;final ResourceLocation backend;final CabinetTarget target;final CabinetGameManifest manifest;final CabinetGameStore store;final Path contentDirectory;final boolean upload;
         final long began=System.nanoTime();final AtomicBoolean closed=new AtomicBoolean();final CabinetGameTransfer flow;
         // Replies/progress are server-thread-only; plan construction/temporary belong to the single IO worker.
         final ArrayDeque<Pending> replies=new ArrayDeque<>();long progress=began;volatile CabinetGameUploadPlan uploadPlan;Path temporary;
-        Job(ServerPlayer p,CabinetGameNetwork.Command c,CabinetTarget target,CabinetGameManifest m){id=c.transaction();lease=c.lease();player=p;connection=p.connection.getConnection();backend=c.backend();this.target=target;manifest=m;upload=c.manifest()!=null;flow=new CabinetGameTransfer(m.files().stream().mapToInt(CabinetGameManifest.Entry::size).toArray());store=new CabinetGameStore(cn.piq.retro.storage.ConsoleStorage.root(p.getServer().getWorldPath(LevelResource.ROOT)).resolve("piq-cabinet/shared-games/objects"));}
+        Job(ServerPlayer p,CabinetGameNetwork.Command c,CabinetTarget target,CabinetGameManifest m){id=c.transaction();lease=c.lease();player=p;connection=p.connection.getConnection();backend=c.backend();this.target=target;manifest=m;upload=c.manifest()!=null;flow=new CabinetGameTransfer(m.files().stream().mapToInt(CabinetGameManifest.Entry::size).toArray());store=CabinetServerContent.store(p.getServer());contentDirectory=CabinetServerContent.directory(p.getServer());}
     }
     private CabinetSharedGameService(){}
     public static void register(){NeoForge.EVENT_BUS.addListener(CabinetSharedGameService::tick);NeoForge.EVENT_BUS.addListener(CabinetSharedGameService::stopped);CabinetGameLibraryService.register();}
@@ -74,7 +74,7 @@ public final class CabinetSharedGameService {
         if(m==null){reply(s,p,c,false,null,0,0,new byte[0],"尚未共享此机柜游戏；请管理员 Shift 空手右键重新选择一次并上传");return;}
         Job j=new Job(p,c,t,m);s.jobs.put(j.id,j);MinecraftServer server=p.getServer();
         try{IO.execute(()->{String error=null;try{if(j.closed.get())return;
-            if(!j.upload){for(var f:m.files())if(!j.store.contains(f))throw new java.io.IOException("服务器缺少游戏文件，请管理员重新上传");}
+            if(!j.upload){for(var f:m.files())if(!j.store.contains(f))throw new java.io.IOException("服务器缺少游戏或 BIOS："+f.name()+"；请管理员重新上传");}
             else{
                 int missingMask=0;for(int i=0;i<m.files().size();i++)if(!j.store.contains(m.files().get(i)))missingMask|=1<<i;
                 var plan=CabinetGameUploadPlan.fromVerifiedMissing(m,missingMask);
@@ -107,7 +107,8 @@ public final class CabinetSharedGameService {
                 }
                 case CabinetGameNetwork.END -> {
                     if(j.upload){if(j.uploadPlan==null)throw new java.io.IOException("游戏尚未上传完成");j.uploadPlan.requireComplete();}
-                    for(var entry:j.manifest.files())if(!j.store.contains(entry))throw new java.io.IOException("游戏校验失败");
+                    for(var entry:j.manifest.files())if(!j.store.contains(entry))throw new java.io.IOException("游戏或 BIOS 校验失败："+entry.name());
+                    CabinetContentIndex.write(j.contentDirectory,j.manifest);
                 }
                 default -> throw new java.io.IOException("Unsupported transfer operation");
             }
@@ -117,8 +118,11 @@ public final class CabinetSharedGameService {
             if(s.jobs.get(j.id)!=j)return;
             if(!valid(j)||problem!=null){fail(s,j,c.sequence(),problem==null?"机柜权限或连接已改变":problem);return;}
             if(c.operation()==CabinetGameNetwork.END){
-                try{Runnable commit=()->{if(j.upload)CabinetSharedGameData.get(server).put(j.target,j.manifest);
-                        s.grants.put(j.lease,new Grant(j.player,j.connection,j.lease,j.backend,j.target,j.manifest));};
+                try{Runnable commit=()->{
+                        Runnable abortCommit=CabinetNetplay.contentReady(j.player,j.lease,j.backend,j.target,j.manifest);
+                        try{if(j.upload)CabinetSharedGameData.get(server).put(j.target,j.manifest);
+                            s.grants.put(j.lease,new Grant(j.player,j.connection,j.lease,j.backend,j.target,j.manifest));
+                        }catch(RuntimeException failure){abortCommit.run();throw failure;}};
                     if(j.upload)j.uploadPlan.finish(commit);else commit.run();
                     enqueue(s,j,new CabinetGameNetwork.Reply(j.id,c.sequence(),true,j.manifest,0,0,new byte[0],"机柜游戏已同步"),true);
                 }catch(RuntimeException failed){fail(s,j,c.sequence(),message(failed));}

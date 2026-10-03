@@ -14,9 +14,10 @@ import net.minecraft.world.level.storage.LevelResource;
 /** Bounded cover-only transfer; clients cannot enumerate a server's cover store. */
 public final class SfcCoverService {
     private static final Map<MinecraftServer,State> STATES=new WeakHashMap<>();
+    private static final Map<MinecraftServer,SfcCoverStore> STORES=new WeakHashMap<>();
     private static final ExecutorService IO=new ThreadPoolExecutor(1,1,30,TimeUnit.SECONDS,new ArrayBlockingQueue<>(8),r->{Thread t=new Thread(r,"piq-sfc-covers");t.setDaemon(true);return t;},new ThreadPoolExecutor.AbortPolicy());
     private SfcCoverService(){}
-    public static SfcCoverStore store(MinecraftServer server){return new SfcCoverStore(cn.piq.retro.storage.ConsoleStorage.root(server.getWorldPath(LevelResource.ROOT)).resolve("piq-sfc-home/covers"));}
+    public static synchronized SfcCoverStore store(MinecraftServer server){return STORES.computeIfAbsent(server,s->new SfcCoverStore(SfcServerContentPaths.location(s.getServerDirectory(),s.getWorldPath(LevelResource.ROOT),SfcServerContentPaths.Area.COVERS)));}
     private static boolean matches(ItemStack stack,String hash){return SfcCartridgeData.isCartridge(stack)&&hash.equals(SfcCartridgeData.coverSha(stack));}
     private static boolean authorized(ServerPlayer p,SfcHomeNetwork.CoverRequest request){
         if(p.hasDisconnected()||!p.isAlive())return false;
@@ -44,7 +45,7 @@ public final class SfcCoverService {
             if(end==t.bytes.length)st.transfers.remove(id);
         }
     }
-    static void close(MinecraftServer server){STATES.remove(server);}
+    static void close(MinecraftServer server){STATES.remove(server);synchronized(SfcCoverService.class){STORES.remove(server);}}
     private static final class State{long tick;final Map<UUID,Long>last=new HashMap<>();final Map<UUID,Transfer>transfers=new HashMap<>();}
     private static final class Transfer{final SfcHomeNetwork.CoverRequest request;final long started;byte[]bytes;int offset;Transfer(SfcHomeNetwork.CoverRequest r,long t){request=r;started=t;}}
 }

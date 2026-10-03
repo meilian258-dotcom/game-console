@@ -26,7 +26,9 @@ public final class NetplaySaveServer {
     private static final Map<Key,Binding> BINDINGS=new ConcurrentHashMap<>();
     // Globally bounded, including integrated worlds still releasing an IO lease.
     private static final ThreadPoolExecutor IO=new ThreadPoolExecutor(1,1,0,TimeUnit.SECONDS,new ArrayBlockingQueue<>(32),r->{var t=new Thread(r,"PIQ-Netplay-save-IO");t.setDaemon(true);return t;},new ThreadPoolExecutor.AbortPolicy());
-    /** Registration must precede the start grant. Null storage explicitly means no saving. */
+    /** Registration must precede the client READ. Usually this is before the start grant;
+     * cabinet uploads bind after verified END and before its content-ready reply.
+     * Null storage explicitly means no saving, not an exemption from identity checks. */
     public static void open(MinecraftServer server,long wire,Connection host,UUID ticket,NetplaySaveState.Identity identity,String slot,Callable<Storage> storage){
         open(server,wire,host,ticket,identity,slot,storage,true);
     }

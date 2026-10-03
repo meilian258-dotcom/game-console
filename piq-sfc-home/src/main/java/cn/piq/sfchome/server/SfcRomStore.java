@@ -11,8 +11,10 @@ import java.util.*;
 /** Addon-owned library. Uses public SFC normalization but never follows user file links. */
 final class SfcRomStore {
     private final Path root;
-    SfcRomStore(Path root){this.root=root.toAbsolutePath().normalize();}
-    private void directory()throws IOException{Path cursor=root.getRoot();for(Path part:root){cursor=cursor.resolve(part);if(Files.exists(cursor,LinkOption.NOFOLLOW_LINKS)){if(Files.isSymbolicLink(cursor)||!Files.isDirectory(cursor,LinkOption.NOFOLLOW_LINKS))throw new IOException("ROM directory is not a real directory");}else Files.createDirectory(cursor);}}
+    private final SfcServerContentPaths.Location content;
+    SfcRomStore(Path root){this.root=root.toAbsolutePath().normalize();content=null;}
+    SfcRomStore(SfcServerContentPaths.Location content){this.content=Objects.requireNonNull(content);root=content.root();}
+    private void directory()throws IOException{if(content!=null)content.prepare();SfcServerContentPaths.directory(root,true);}
     List<SfcHomeNetwork.RomEntry> list()throws IOException{
         directory();var result=new ArrayList<SfcHomeNetwork.RomEntry>();
         try(var paths=Files.list(root)){for(Path p:paths.sorted().limit(512).toList()){

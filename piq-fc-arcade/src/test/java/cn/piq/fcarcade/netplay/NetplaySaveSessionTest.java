@@ -69,6 +69,23 @@ class NetplaySaveSessionTest {
         h.send(UPLOAD,0,0,packed,"");h.flush();assertEquals(1,h.writes);
     }
     @Test void disabledDoesNotTouchFilesystem(){var h=new Harness(false,root.resolve("none"));h.read();assertEquals(DISABLED,h.last().kind());assertTrue(h.released);assertFalse(Files.exists(root.resolve("none")));}
+    @Test void disabledStillRejectsAChangedRomOrBiosIdentity(){
+        var h=new Harness(false,root.resolve("disabled-wrong-content"));
+        var changed=NetplaySaveState.identity(NetplayProfile.fc(),"a".repeat(64),Map.of("neogeo.zip","b".repeat(64)));
+        assertEquals(identity.profile(),changed.profile());assertNotEquals(identity.content(),changed.content());
+        h.send(READ,0,0,new byte[0],changed.profile()+":"+changed.content());h.flush();
+        assertEquals(ERROR,h.last().kind());assertTrue(h.last().text().contains("身份不匹配"));
+        assertTrue(h.released);assertEquals(0,h.writes);assertFalse(Files.exists(root.resolve("disabled-wrong-content")));
+    }
+    @Test void abortedUnpublishedContentCannotReadOrWriteAnExistingSlot()throws Exception{
+        Path directory=root.resolve("unpublished-content");
+        var old=new Harness(true,directory);old.read();byte[] original=state(5,40);old.upload(original);old.flush();old.small(FINISH);old.flush();
+        var unpublished=new Harness(true,directory);unpublished.session.abort("内容提交失败");
+        unpublished.read();unpublished.send(BEGIN,20,0,new byte[0],"");unpublished.small(FINISH);unpublished.flush();
+        assertTrue(unpublished.replies.isEmpty());assertEquals(0,unpublished.writes);assertTrue(unpublished.released);
+        assertFalse(unpublished.finishes.getFirst().clean());
+        assertArrayEquals(original,Files.readAllBytes(directory.resolve("checkpoint.bin")));
+    }
     @Test void deviceCompletionWaitsForDurableFinishAndLeaseRelease()throws Exception{
         var h=new Harness(true,root.resolve("completion"));h.read();h.upload(state(1,40));h.flush();
         assertTrue(h.finishes.isEmpty()); // Periodic SAVED does not authorize card/device mutation.

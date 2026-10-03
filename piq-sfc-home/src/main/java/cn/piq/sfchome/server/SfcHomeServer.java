@@ -53,7 +53,7 @@ public final class SfcHomeServer {
     private static SfcHostedWorker openHosted(Session s,AutoCloseable capacity){
         var server=s.connection.level().getServer();var world=server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toAbsolutePath().normalize();
         var context=new cn.piq.fcarcade.server.hosted.ServerCoreContext(server.getServerDirectory(),cn.piq.retro.storage.ConsoleStorage.root(world).resolve("piq-sfc-home/hosted-saves"),s.host.player,s.connection.consoleId());
-        return new SfcHostedWorker(s.watchSource,s.host.id,context,cn.piq.retro.storage.ConsoleStorage.root(world).resolve("piq-sfc-home/roms"),s.rom,capacity);
+        return new SfcHostedWorker(s.watchSource,s.host.id,context,SfcServerContentPaths.location(server.getServerDirectory(),world,SfcServerContentPaths.Area.ROMS),s.rom,capacity);
     }
     static boolean watchHosted(MinecraftServer server,cn.piq.fcarcade.cabinet.WatchSource source){
         if(server==null||!server.isSameThread()||source==null)return false;State st=STATES.get(server);if(st==null)return false;
