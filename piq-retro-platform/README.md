@@ -3,6 +3,22 @@
 See the [branding and packaging policy](../source-control/BRANDING.md). Internal package names,
 API identities and build outputs remain compatible. This library is not a player-installable mod.
 
+## Read-only native budget queries (FC76.36 candidate, 2026-10-03)
+
+`NativeLibretroBridge.freeSlotsIfLoaded()` reports the existing four-owner gate without loading a DLL or taking an owner lock. `LibretroJniRuntime.nativeSlotHeld()` checks the exact token/generation; it remains held until native teardown actually returns. These are budget snapshots, not reservations or permission to call a core off its owner thread. No ABI, core binary, save identity or four-slot limit changes. Public multi-source observer lifetimes live in the main mod, not this library; see the [first-batch contract and verification](../piq-fc-arcade/design/公共JNI多屏旁观第一批-20261003.md).
+
+## Shared launch lifecycle (FC76.34 candidate, 2026-10-03)
+
+`cn.piq.retro.flow.DeviceSessionFlow` is a pure, versioned state machine for preparation,
+optional save selection, independent second-player permission, loading, READY and bounded shutdown.
+Content capacity, save player labels and session join permission are separate fields.
+It contains no world, network or storage implementation. The Minecraft adapter/UI belongs to the
+main mod's `HomeLaunchServer/Network/Screen`; MD10 uses it and FC retains its existing save editor
+before the shared confirmation. This does not migrate all legacy systems or establish a stable SDK.
+See the [adapter contract, compatibility and verification record](../piq-fc-arcade/design/公共流程与MD接入-20261003.md).
+Flash and PvZ are development-validation devices deferred by the user for this business migration;
+their existing code and prior JNI evidence remain intact.
+
 ## Client defaults (FC76.26, 2026-09-29)
 
 New confirmed migration target (2026-09-29): FC, SFC, GBA, native arcade, PvZ and MD must migrate their existing runtime modes to the shared JNI route, including existing light-gun support. Future emulator addons use JNI as their default integration target; Flash and Java ME are excluded from this migration. This is a development requirement, not a claim of completed adapters, multi-instance support or gun Netplay. See the [scope and acceptance plan](../piq-fc-arcade/design/JNI全面迁移-范围与验收.md). The following FC76.26 description remains the shipped baseline.

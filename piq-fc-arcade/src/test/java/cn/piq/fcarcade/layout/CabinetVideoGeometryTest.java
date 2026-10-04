@@ -17,7 +17,7 @@ class CabinetVideoGeometryTest {
                 throw new AssertionError(method.getName(),error.getCause());
             }
         }
-        if(count!=11)throw new AssertionError("Unexpected test count: "+count);
+        if(count!=13)throw new AssertionError("Unexpected test count: "+count);
         System.out.println("CabinetVideoGeometry: "+count+" checks passed; no Minecraft or emulator launched.");
     }
     private static final double EPS=1e-10;
@@ -97,13 +97,37 @@ class CabinetVideoGeometryTest {
     }
     @Test void inverseUvRotationMatchesNativePresentationAtEveryTextureCorner() {
         float[][] displayed={{0,1},{1,1},{1,0},{0,0}};
-        float[][][] expected={{{0,1},{1,1},{1,0},{0,0}},{{0,0},{0,1},{1,1},{1,0}},
-                {{1,0},{0,0},{0,1},{1,1}},{{1,1},{1,0},{0,0},{0,1}}};
+        float[][][] expected={{{0,1},{1,1},{1,0},{0,0}},{{1,1},{1,0},{0,0},{0,1}},
+                {{1,0},{0,0},{0,1},{1,1}},{{0,0},{0,1},{1,1},{1,0}}};
         for(int rotation=0;rotation<4;rotation++)for(int i=0;i<4;i++){
             var uv=CabinetVideoGeometry.textureUv(displayed[i][0],displayed[i][1],rotation);
             assertEquals(expected[rotation][i][0],uv.u(),0);assertEquals(expected[rotation][i][1],uv.v(),0);
             var vertex=CabinetVideoGeometry.frame(true,0,4.0/3,rotation).vertices().get(i);
             assertEquals(uv.u(),vertex.u(),0);assertEquals(uv.v(),vertex.v(),0);
+        }
+    }
+    @Test void libretroCounterClockwiseBecomesClockwiseExactlyOnceAtAllFourCorners(){
+        // Oracle follows libretro.h's CCW source-to-display transform, independent of inverse sampling.
+        for(int ccw=0;ccw<4;ccw++)for(float sourceU:new float[]{0,1})for(float sourceV:new float[]{0,1}){
+            float displayU=sourceU,displayV=sourceV;
+            for(int turn=0;turn<ccw;turn++){float oldU=displayU;displayU=displayV;displayV=1-oldU;}
+            var recovered=CabinetVideoGeometry.textureUv(displayU,displayV,(4-ccw)&3);
+            assertEquals(sourceU,recovered.u(),0);assertEquals(sourceV,recovered.v(),0);
+        }
+    }
+    @Test void portraitGlassChangesFitButNeverAddsAnotherContentRotation(){
+        for(int facing=0;facing<4;facing++)for(int rotation=0;rotation<4;rotation++){
+            var landscape=RocketArcadeGeometry.screen(facing);
+            var portrait=PortraitCabinetGeometry.screen(facing);
+            var vertical=CabinetVideoGeometry.frame(portrait,4.0/3,rotation);
+            var horizontal=CabinetVideoGeometry.frame(landscape,4.0/3,rotation);
+            assertEquals((rotation&1)==0?4.0/3:3.0/4,vertical.displayAspect(),EPS);
+            assertEquals(vertical.displayAspect(),vertical.image().aspectRatio(),EPS);
+            for(int i=0;i<4;i++){
+                assertEquals(horizontal.vertices().get(i).u(),vertical.vertices().get(i).u(),0);
+                assertEquals(horizontal.vertices().get(i).v(),vertical.vertices().get(i).v(),0);
+            }
+            point(portrait.center(),vertical.image().center());
         }
     }
     @Test void normalsPreserveTwentyTwoAndAHalfDegreeTiltAndFrontWinding() {

@@ -35,7 +35,9 @@ class SfcLocalWatchSourceTest {
     @Test void publicAndPrivatePlaybackCannotShareTheObserverCore()throws Exception{
         String client=source("client/SfcLocalWatchClient");assertTrue(client.contains("SfcHomeClient.currentSession()==null"));
         assertTrue(client.contains("!cn.piq.retro.input.InputOwnership.occupied()"));assertTrue(client.contains("!SfcCoreLease.occupied()"));
-        assertTrue(source("client/SfcHomeClient").contains("SfcLocalWatchClient.controlStarting()"));
+        assertTrue(source("client/SfcHomeClient").contains("SfcLocalWatchClient.yieldLocalForControl()"));
+        assertTrue(source("client/SfcHomeClient").contains("WatchClient.controlStarting(SfcLocalWatchClient.descriptor(message))"));
+        assertTrue(client.contains("WatchClient.hasNetplayWatch(descriptor(p.session()))"));
         assertFalse(source("client/SfcPrivateProvider").contains("SfcLocalWatchClient.busy()"));
         assertTrue(client.contains("PrivateHomeClient.registerBeforeStart"));assertTrue(client.contains("PrivateHomeClient.isActiveOrClosing()"));
         assertTrue(source("client/SfcPrivateEngine").contains("acquireAfterObserver(()->stopping)"));

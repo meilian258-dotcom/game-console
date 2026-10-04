@@ -35,8 +35,8 @@ with zipfile.ZipFile(source) as z:
                 key=f'facing={facing},inserted={str(inserted).lower()},borrowed={str(borrowed).lower()}'
                 variants[key]={'model':'piq_md_home:block/md2_'+('inserted' if inserted else 'empty')+('_borrowed' if borrowed else ''),'y':turn}
     write(assets/'blockstates/md2.json',{'variants':variants})
-    write(assets/'lang/zh_cn.json',{'block.piq_md_home.md2':'MD2 家用机（私人单人）','item.piq_md_home.md_cartridge':'MD 游戏卡带','item.piq_md_home.md_controller':'MD 6键手柄（借用）'})
-    write(assets/'lang/en_us.json',{'block.piq_md_home.md2':'MD2 Console (Private P1)','item.piq_md_home.md_cartridge':'MD Game Cartridge','item.piq_md_home.md_controller':'MD 6-Button Controller (Loan)'})
+    write(assets/'lang/zh_cn.json',{'block.piq_md_home.md2':'MD2 家用机','item.piq_md_home.md_cartridge':'MD 游戏卡带','item.piq_md_home.md_controller':'MD 6键手柄（借用）'})
+    write(assets/'lang/en_us.json',{'block.piq_md_home.md2':'MD2 Console','item.piq_md_home.md_cartridge':'MD Game Cartridge','item.piq_md_home.md_controller':'MD 6-Button Controller (Loan)'})
     data=root/'src/main/resources/data/piq_md_home/loot_table/blocks'
     write(data/'md2.json',{'type':'minecraft:block','pools':[{'rolls':1,'entries':[{'type':'minecraft:item','name':'piq_md_home:md2'}],'conditions':[{'condition':'minecraft:survives_explosion'}]}]})
     print(json.dumps({'sourceSha256':hashlib.sha256(source.read_bytes()).hexdigest(),'models':[len(m['elements']) for m in models],'controller':len(pad['elements']),'cartridge':len(cart['elements'])}))

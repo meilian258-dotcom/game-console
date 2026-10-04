@@ -1,8 +1,10 @@
 # 方块电玩：电脑 / Game Console: Computer
 
-当前候选 prototype.11，需要双方 FC76.26 / 可选 PvZ11。未设置运行器时 Windows x64 默认 JNI，已有明确进程选择保留；读取配置失败不启用新默认，存档隔离及旁观串流不变，Flash 不改。见[当前指南](../piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md)。对外交付名采用 `game-console-computer-版本.jar`，见[命名规范与工具](../source-control/BRANDING.md)；内部兼容标识、保存目录和历史交付不改。
+2026-10-04 **电脑prototype.12 / NeoForge1.21.1兼容范围测试候选**：配套本批FC76.39及可选PvZ12；可选范围精确平移为 `[0.1.0-prototype.12,0.1.0-prototype.13)`，其他游戏最低依赖保持。默认编译236/最低229、MC1.21.1/Java21；229/236源码构建与回归通过，最终七包在229/235/236隔离专服正常启动/停止。图形客户端/多人/Iris未验，不标稳定；原236用户无需降级，其他MOD下界仍有效。Flash运行桥不变，独立Flash盒不在本批。七SHA与同批安装见[本轮范围与安装规则](../piq-fc-arcade/design/NeoForge兼容范围-20261004.md)，最新目录/管理台同步以另行回执为准。本批显式构建输入可用 `-PgameConsoleJar=<FC76.39路径> -PpvzJar=<PvZ12路径>`。
 
-构建可用 `-PgameConsoleJar=<FC76.26完整路径> -PpvzJar=<PvZ11完整路径>` 指定配套编译输入；记录实际 SHA，不用同名旧主包。附属构建依赖尚未全部标准化。
+历史候选 prototype.11，需要双方 FC76.26 / 可选 PvZ11。未设置运行器时 Windows x64 默认 JNI，已有明确进程选择保留；读取配置失败不启用新默认，存档隔离及旁观串流不变，Flash 不改。见[历史指南](../piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md)。对外交付名采用 `game-console-computer-版本.jar`，见[命名规范与工具](../source-control/BRANDING.md)；内部兼容标识、保存目录和历史交付不改。
+
+上述历史版本构建可用 `-PgameConsoleJar=<FC76.26完整路径> -PpvzJar=<PvZ11完整路径>` 指定配套编译输入；记录实际 SHA，不用同名旧主包。附属构建依赖尚未全部标准化。
 
 ## 历史：prototype.10
 

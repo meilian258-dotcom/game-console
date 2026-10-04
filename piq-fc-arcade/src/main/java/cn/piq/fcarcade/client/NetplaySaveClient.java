@@ -19,11 +19,18 @@ public final class NetplaySaveClient {
     private static final Map<Key,Channel> CHANNELS=new ConcurrentHashMap<>();
     private static final ThreadPoolExecutor IO=new ThreadPoolExecutor(1,1,0,TimeUnit.SECONDS,new ArrayBlockingQueue<>(16),r->{var t=new Thread(r,"PIQ-Netplay-save-client");t.setDaemon(true);return t;},new ThreadPoolExecutor.AbortPolicy());
     private static final ScheduledExecutorService PACE=Executors.newSingleThreadScheduledExecutor(r->{var t=new Thread(r,"PIQ-Netplay-save-transfer");t.setDaemon(true);return t;});
+    /** Reuses the bounded checkpoint transport for an explicitly server-authorized non-Netplay host.
+     * The server must register the same connection/session/ticket before sending its start grant. */
+    public static NetplayProcess.Persistence open(Connection connection,long session,UUID ticket){
+        Objects.requireNonNull(connection);Objects.requireNonNull(ticket);
+        if(session<0||!connection.isConnected())throw new IllegalArgumentException("保存连接或会话无效");
+        var key=new Key(connection,session);var channel=new Channel(key,ticket);
+        synchronized(CHANNELS){if(CHANNELS.size()>=16||CHANNELS.putIfAbsent(key,channel)!=null)throw new IllegalStateException("保存通道仍在关闭，请稍后重试");}
+        return channel;
+    }
     @SubscribeEvent public static void setup(FMLClientSetupEvent event){event.enqueueWork(()->{
         NetplayNetwork.persistenceFactory((connection,grant)->{
-            var key=new Key(connection,grant.session());var channel=new Channel(key,grant.ticket());
-            if(CHANNELS.size()>=16||CHANNELS.putIfAbsent(key,channel)!=null)throw new IllegalStateException("保存通道仍在关闭，请稍后重试");
-            return channel;
+            return open(connection,grant.session(),grant.ticket());
         });
         NetplaySaveNetwork.sink((source,m)->{var c=CHANNELS.get(new Key(source,m.session()));if(c!=null)c.receive(m);});
         PACE.scheduleWithFixedDelay(()->{for(var c:CHANNELS.values())c.expire();},1,1,TimeUnit.SECONDS);

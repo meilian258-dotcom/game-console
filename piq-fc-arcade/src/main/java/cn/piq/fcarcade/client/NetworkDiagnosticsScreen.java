@@ -58,8 +58,10 @@ public final class NetworkDiagnosticsScreen extends cn.piq.fcarcade.client.ui.De
                     .bounds(left+10,top+160,half,20).build());
             addRenderableWidget(Button.builder(Component.literal("重新计数"),b->NetworkDiagnosticsClient.resetCounters())
                     .bounds(left+16+half,top+160,half,20).build());
-            addRenderableWidget(Button.builder(Component.literal("Netplay 存档…"),b->NetplaySaveScreen.open(this)).bounds(left+10,top+196,half,20).build());
-            addRenderableWidget(Button.builder(Component.literal("返回"),b->onClose()).bounds(left+16+half,top+196,half,20).build());return;
+            int third=(panelWidth-32)/3;
+            addRenderableWidget(Button.builder(Component.literal("Netplay 存档…"),b->NetplaySaveScreen.open(this)).bounds(left+10,top+196,third,20).build());
+            addRenderableWidget(Button.builder(Component.literal("旁观管理…"),b->cn.piq.fcarcade.client.watch.WatchManagementScreen.open(this)).bounds(left+16+third,top+196,third,20).build());
+            addRenderableWidget(Button.builder(Component.literal("返回"),b->onClose()).bounds(left+22+2*third,top+196,third,20).build());return;
         }
         int slot=(panelWidth-32)/3;
         for(int index=0;index<3;index++) {

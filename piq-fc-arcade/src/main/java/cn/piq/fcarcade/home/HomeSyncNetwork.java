@@ -26,7 +26,7 @@ public final class HomeSyncNetwork {
     }
     static void send(ServerPlayer player,Setting setting) { PacketDistributor.sendToPlayer(player,setting); }
     @SubscribeEvent public static void register(RegisterPayloadHandlersEvent event) {
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"home-sync-4")
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"home-sync-5")
                 .playToServer(Request.TYPE,Request.CODEC,(packet,context) -> {
                     Connection source = context.connection();var entity = context.player();
                     context.enqueueWork(() -> {
@@ -52,17 +52,28 @@ public final class HomeSyncNetwork {
     }
     public record Setting(UUID token,int revision,ResourceLocation dimension,BlockPos console,UUID hardware,String system,
                           int mode,int supported,boolean editable,String reason,boolean open,
-                          boolean occupancy,boolean approval,boolean occupancySupported,boolean debugTool) implements CustomPacketPayload {
+                          boolean occupancy,boolean approval,boolean occupancySupported,boolean debugTool,
+                          java.util.List<String> modeReasons) implements CustomPacketPayload {
+        public Setting(UUID token,int revision,ResourceLocation dimension,BlockPos console,UUID hardware,String system,
+                       int mode,int supported,boolean editable,String reason,boolean open,
+                       boolean occupancy,boolean approval,boolean occupancySupported,boolean debugTool) {
+            this(token,revision,dimension,console,hardware,system,mode,supported,editable,reason,open,occupancy,approval,occupancySupported,debugTool,
+                    java.util.Collections.nCopies(5,"此运行方式不可用，请刷新设备状态。"));
+        }
         public Setting {
             Objects.requireNonNull(token);Objects.requireNonNull(dimension);console = Objects.requireNonNull(console).immutable();Objects.requireNonNull(hardware);
             if (revision < 0 || mode < 0 || mode > 4 || (supported & ~31) != 0 || system == null || system.length() > 128 || reason == null || reason.length() > 256) throw new IllegalArgumentException("Home setting");
+            modeReasons=java.util.List.copyOf(Objects.requireNonNull(modeReasons));
+            if(modeReasons.size()!=5||modeReasons.stream().anyMatch(s->s.length()>256))throw new IllegalArgumentException("Home mode reasons");
         }
         public static final Type<Setting> TYPE = new Type<>(id("setting"));
         public static final StreamCodec<RegistryFriendlyByteBuf,Setting> CODEC = StreamCodec.of((b,p) -> {
             b.writeUUID(p.token);b.writeVarInt(p.revision);b.writeResourceLocation(p.dimension);b.writeBlockPos(p.console);b.writeUUID(p.hardware);b.writeUtf(p.system,128);
             b.writeVarInt(p.mode);b.writeVarInt(p.supported);b.writeBoolean(p.editable);b.writeUtf(p.reason,256);b.writeBoolean(p.open);
             b.writeBoolean(p.occupancy);b.writeBoolean(p.approval);b.writeBoolean(p.occupancySupported);b.writeBoolean(p.debugTool);
-        },b -> new Setting(b.readUUID(),b.readVarInt(),b.readResourceLocation(),b.readBlockPos(),b.readUUID(),b.readUtf(128),b.readVarInt(),b.readVarInt(),b.readBoolean(),b.readUtf(256),b.readBoolean(),b.readBoolean(),b.readBoolean(),b.readBoolean(),b.readBoolean()));
+            for(String reason:p.modeReasons)b.writeUtf(reason,256);
+        },b -> new Setting(b.readUUID(),b.readVarInt(),b.readResourceLocation(),b.readBlockPos(),b.readUUID(),b.readUtf(128),b.readVarInt(),b.readVarInt(),b.readBoolean(),b.readUtf(256),b.readBoolean(),b.readBoolean(),b.readBoolean(),b.readBoolean(),b.readBoolean(),
+                java.util.List.of(b.readUtf(256),b.readUtf(256),b.readUtf(256),b.readUtf(256),b.readUtf(256))));
         @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 }

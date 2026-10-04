@@ -22,7 +22,7 @@ public final class SfcCartridgeEditorService {
     private static final ExecutorService IO=new ThreadPoolExecutor(1,1,30,TimeUnit.SECONDS,new ArrayBlockingQueue<>(32),r->{Thread t=new Thread(r,"piq-sfc-home-files");t.setDaemon(true);return t;},new ThreadPoolExecutor.AbortPolicy());
     private static final ThreadLocal<Boolean> CHECKING=ThreadLocal.withInitial(()->false);
     private SfcCartridgeEditorService(){}
-    private static State state(MinecraftServer s){return STATES.computeIfAbsent(s,k->new State(new SfcRomStore(cn.piq.retro.storage.ConsoleStorage.root(s.getWorldPath(LevelResource.ROOT)).resolve("piq-sfc-home/roms"))));}
+    private static State state(MinecraftServer s){return STATES.computeIfAbsent(s,k->new State(new SfcRomStore(SfcServerContentPaths.location(s.getServerDirectory(),s.getWorldPath(LevelResource.ROOT),SfcServerContentPaths.Area.ROMS))));}
     public static void openAt(ServerPlayer p,InteractionHand hand,BlockPos pos){
         if(p==null||p.getServer()==null||!p.getServer().isSameThread())return;
         if(CHECKING.get()||!p.serverLevel().hasChunkAt(pos)||!(p.serverLevel().getBlockEntity(pos) instanceof CartridgeComputerBlockEntity computer))return;

@@ -146,7 +146,7 @@ class WatchControlRelayTest {
         assertTrue(source.contains("if(provider.isParticipant(server,player.getUUID()))return false"));
         assertTrue(source.contains("if(state.budget.tryReserve(source,now,bytes))CabinetMediaSender.watchClientbound"));
         String watchClient=Files.readString(Path.of("src/main/java/cn/piq/fcarcade/client/watch/WatchClient.java"));
-        assertTrue(watchClient.contains("!InputOwnership.occupied() && !ClientArcadeEvents.isControlling()"));
-        assertTrue(watchClient.contains("netplayGrant!=null?adapter.blocksNetplay(d):adapter.isParticipant(d)"));
+        assertTrue(watchClient.contains("InputOwnership.occupied()||ClientArcadeEvents.isControlling()"));
+        assertTrue(watchClient.contains("r.grant!=null?adapter.blocksNetplay(d):adapter.isParticipant(d)"));
     }
 }

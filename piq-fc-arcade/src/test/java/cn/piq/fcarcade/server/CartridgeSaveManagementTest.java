@@ -24,6 +24,11 @@ class CartridgeSaveManagementTest {
     @Test void replyBindsOriginalEditorAndIndependentSessionAndDeletionVersion(){
         var b=buffer();try{UUID editor=UUID.randomUUID(),session=UUID.randomUUID(),confirm=UUID.randomUUID();var row=new Entry(HASH,HASH,"存档","本人","FC 本地输入同步",123,400,false,true);var reply=new Reply(session,"fc",HASH,"确认删除",List.of(row),HASH,HASH,confirm,false,editor);Reply.CODEC.encode(b,reply);assertEquals(reply,Reply.CODEC.decode(b));assertEquals(0,b.readableBytes());}finally{b.release();}
     }
+    @Test void namespacedAddonCodecDoesNotGrantUnknownSystemAuthority()throws Exception{
+        var b=buffer();try{var open=new Open("piq_md_home:md",UUID.randomUUID(),UUID.randomUUID(),0,3);Open.CODEC.encode(b,open);assertEquals(open,Open.CODEC.decode(b));}finally{b.release();}
+        var s=source("home/CartridgeSaveNetwork");assertTrue(s.contains("else if(r.system().equals(\"fc\")||r.system().equals(\"sfc\"))opener.accept(p,r)"));assertTrue(s.contains("此机型未注册存档管理服务"));
+        assertThrows(IllegalArgumentException.class,()->new Open("UPPER:bad",UUID.randomUUID(),UUID.randomUUID(),0,0));
+    }
     @Test void malformedOrUnconfirmedDeleteAndHiddenFieldsFailClosed(){
         UUID id=UUID.randomUUID();assertThrows(IllegalArgumentException.class,()->new Request(id,3,HASH,HASH,"",null));assertThrows(IllegalArgumentException.class,()->new Request(id,2,HASH,HASH,"",id));assertThrows(IllegalArgumentException.class,()->new Request(id,0,HASH,"","",null));assertThrows(IllegalArgumentException.class,()->new Request(id,1,"../../save",HASH,"new",null));assertThrows(IllegalArgumentException.class,()->new Request(id,1,HASH,HASH,"x".repeat(33),null));assertThrows(IllegalArgumentException.class,()->new Open("gba",id,id,0,0));
     }

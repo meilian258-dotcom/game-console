@@ -35,7 +35,7 @@ final class CabinetHostedSessions {
         Path world=server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize();
         try {
             runs.put(room.id,new HostedCabinetWorker(room.id,room.streamHostId,ResourceLocation.parse(room.backend),context(server,room.target,room.ownerId,room.id),manifest,
-                cn.piq.retro.storage.ConsoleStorage.root(world).resolve("piq-cabinet/shared-games/objects"),cn.piq.retro.storage.ConsoleStorage.root(world).resolve("piq-cabinet/hosted-running").resolve(room.id.toString()),lease,
+                CabinetServerContent.store(server),cn.piq.retro.storage.ConsoleStorage.root(world).resolve("piq-cabinet/hosted-running").resolve(room.id.toString()),lease,
                 peer==null?Set.of(room.target.identity()):Set.of(room.target.identity(),peer.identity())));
         } catch (RuntimeException | LinkageError failure) {
             lease.close();

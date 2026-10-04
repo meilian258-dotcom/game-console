@@ -1,0 +1,24 @@
+Genesis Plus GX PIQ Netplay v1.7.4c2838c7-piqnp1 (Windows x64).
+An independently named, modified build; NOT the original MEDIA/private core.
+Copyright (c) 1998-2003 Charles MacDonald; (c) 2007-2026 Eke-Eke.
+All original component copyrights and licenses remain in force. Non-commercial use only.
+The adapter's GPL identifier does NOT relicense this core or its components.
+Full upstream conditions are also retained in ../genesis-plus-gx/LICENSE.txt.
+
+Upstream: https://github.com/libretro/Genesis-Plus-GX/tree/c2838c7dc4236fc2fe94e5dbd08b41486067918e
+Original source ZIP SHA256: dd4f5ef7ad3bae410854da8d0d7b99c99f13caa1df77f4ef1f2b8f59be3b6977
+Modified DLL SHA256: 8200a6d5e7c39f60afefd8e87e369d253f737de6a73bf8d920d2ab81888a5fb5
+Complete corresponding source: genesis-plus-gx-piqnp1-source.zip
+Corresponding source SHA256: adeb3901c851c941fbeb07080aac3c49f64f4c3be5faf4d315cb1f015ea0b3fb
+
+Distribution MUST include that complete source archive alongside the JAR/DLL.
+The archive contains modified upstream source, original component notices,
+and piq-md-home/native-genesis-netplay patch files and build instructions.
+GX and Nuked components retain non-commercial/source distribution conditions;
+blip_buf retains LGPL-2.1-or-later. No blanket MIT/GPL relicensing is claimed.
+
+PIQ changes (2026-10-03): independent PIQGXNP schema 1 with CPU timing,
+two six-button controller handshakes, SRAM/EEPROM protocol state, FM/blip/filter
+history and frontend geometry; rebuild derived host pointers on state restore.
+Separate core identity and save namespace protect all original save formats.
+No game ROM, BIOS, or end-user save is included.

@@ -12,7 +12,7 @@ description='''Super Famicom home hardware addon for Game Console televisions an
 [[dependencies.piq_sfc_home]]
 modId="neoforge"
 type="required"
-versionRange="[21.1.236,22)"
+versionRange="[${neo_min_version},22)"
 ordering="NONE"
 side="BOTH"
 
@@ -26,7 +26,7 @@ side="BOTH"
 [[dependencies.piq_sfc_home]]
 modId="piq_fc_arcade"
 type="required"
-versionRange="[0.31.0-alpha.76.22,0.31.0-alpha.77)"
+versionRange="[0.31.0-alpha.76.36,0.31.0-alpha.77)"
 ordering="AFTER"
 side="BOTH"
 

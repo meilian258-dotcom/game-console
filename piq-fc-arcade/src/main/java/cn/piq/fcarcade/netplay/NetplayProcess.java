@@ -80,6 +80,7 @@ public final class NetplayProcess implements AutoCloseable {
     public boolean canSave(){if(jni!=null)return jni.canSave();var p=persistence;return grant.host()&&ready&&!closed&&!closing&&p!=null&&p.enabled();}
     public String saveLabel(){return (jni!=null?"JNI · ":"")+profile.contentName()+" · "+(grant.host()?"主持":"参与 / 旁观");}
     public CompletableFuture<Void> terminated(){return jni!=null?jni.terminated():terminated;}
+    public boolean nativeSlotHeld(){return jni!=null&&jni.nativeSlotHeld();}
     public synchronized CompletableFuture<byte[]> checkpoint(){
         if(jni!=null)return jni.checkpoint();
         if(!grant.host()||!ready||closed)return CompletableFuture.failedFuture(new IllegalStateException("Netplay 主持尚未就绪"));
@@ -117,13 +118,18 @@ public final class NetplayProcess implements AutoCloseable {
         this(grant,content,sender,profile,auxiliary,cabinetAuthority,true);
     }
     public NetplayProcess(Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,NetplayProfile profile,Callable<Map<String,byte[]>> auxiliary,boolean cabinetAuthority,boolean paid) {
+        this(grant,content,sender,profile,auxiliary,cabinetAuthority,paid,false);
+    }
+    /** JNI hosts may prepare/restore first; the caller activates only after authoritative READY. */
+    public NetplayProcess(Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,NetplayProfile profile,Callable<Map<String,byte[]>> auxiliary,boolean cabinetAuthority,boolean paid,boolean waitForActivation) {
         this.cabinetInputs=new NetplayCabinetInputs(paid);
         this.grant=Objects.requireNonNull(grant);this.content=Objects.requireNonNull(content);this.sender=Objects.requireNonNull(sender);
         this.profile=Objects.requireNonNull(profile);this.gunMode=profile.isFcZapper();this.auxiliary=Objects.requireNonNull(auxiliary);
         this.cabinetAuthority=cabinetAuthority;if(cabinetAuthority&&gunMode)throw new IllegalArgumentException("Cabinet gun authority");
         if(grant.port()>=profile.ports())throw new IllegalArgumentException("Port not supported by core profile");
+        if(waitForActivation&&(profile.jni()==null||!grant.host()))throw new IllegalArgumentException("Prepared activation requires a JNI host");
         if(profile.jni()!=null) {
-            jni=new JniNetplaySession(grant,content,sender,profile,auxiliary,cabinetAuthority?cabinetInputs:null);
+            jni=new JniNetplaySession(grant,content,sender,profile,auxiliary,cabinetAuthority?cabinetInputs:null,waitForActivation);
         }
     }
     private boolean started;
@@ -133,6 +139,7 @@ public final class NetplayProcess implements AutoCloseable {
         return os.startsWith("windows")&&(arch.equals("amd64")||arch.equals("x86_64"))?null:"Netplay 实验仅支持 Windows x64 客户端";
     }
     public boolean ready(){return jni!=null?jni.ready():ready&&!closed;}
+    public void activate(){if(jni==null)throw new IllegalStateException("Prepared activation requires JNI");jni.activate();}
     public String error(){return jni!=null?jni.error():error;}
     /** Presentation only, never an authority/handshake decision. ready() still means local AV bridge ready. */
     public String status(){return jni!=null?jni.status():error!=null?"已停止："+error:closed?"已结束":phase;}
@@ -140,12 +147,18 @@ public final class NetplayProcess implements AutoCloseable {
     private synchronized void fail(String reason){if(!closed&&error==null)error=reason;}
     public long framesReceived(){return jni!=null?jni.framesReceived():framesReceived;}
     public Grant grant(){return grant;}
+    /** PNP7's libretro CCW metadata becomes CW once, before any public frame consumer. */
+    static int legacyClockwiseRotation(int counterClockwise){
+        if(counterClockwise<0||counterClockwise>3)throw new IllegalArgumentException("Legacy rotation");
+        return (4-counterClockwise)&3;
+    }
     public Frame poll(){return jni!=null?jni.poll():frames.poll();}
     public void input(int nes){if(jni!=null){jni.input(retroPad(nes));return;}if(!gunMode)input=grant.player()||grant.host()?retroPad(nes):0;}
     public void inputRetroPad(int mask){if(jni!=null){jni.input(mask);return;}if(!gunMode)input=grant.player()||grant.host()?mask&65535:0;}
-    public void cabinetInput(int port,int mask){if(cabinetAuthority&&grant.host()&&!closed)cabinetInputs.input(port,mask,System.nanoTime());}
-    public void cabinetRelease(int port){if(cabinetAuthority&&grant.host())cabinetInputs.release(port);}
-    public void cabinetCoin(int port,long sequence){if(cabinetAuthority&&grant.host()&&!closed)cabinetInputs.coin(port,sequence);}
+    public void cabinetInput(int port,int mask){if(!cabinetAuthority)return;checkAuthorityPort(port);if(grant.host()&&!closed&&(jni==null||jni.active()))cabinetInputs.input(port,mask,System.nanoTime());}
+    public void cabinetRelease(int port){if(!cabinetAuthority)return;checkAuthorityPort(port);if(grant.host())cabinetInputs.release(port);}
+    public void cabinetCoin(int port,long sequence){if(!cabinetAuthority)return;checkAuthorityPort(port);if(grant.host()&&!closed&&(jni==null||jni.active()))cabinetInputs.coin(port,sequence);}
+    private void checkAuthorityPort(int port){if(port<0||port>=profile.ports())throw new IllegalArgumentException("Port not supported by core profile");}
     /** Only the computing host accepts canonical server input; gun peers are native spectators. */
     public void authoritativeGun(long revision,long sequence,int buttons,int aim){
         if(jni!=null){jni.authoritativeGun(revision,sequence,buttons,aim);return;}
@@ -278,7 +291,8 @@ public final class NetplayProcess implements AutoCloseable {
                     int at=i*4;short l=(short)((pcm[at]&255)|(pcm[at+1]<<8)),r=(short)((pcm[at+2]&255)|(pcm[at+3]<<8));mono[i]=(l+r)/65536f;
                     stereo[i*2]=l;stereo[i*2+1]=r;
                 }
-                Frame frame=new Frame(number,bgra,mono,width,height,aspect/100000f,stereo,rate,rotation);
+                // PNP7 keeps libretro's CCW rotation; its bridge already supplies unrotated DAR.
+                Frame frame=new Frame(number,bgra,mono,width,height,aspect/100000f,stereo,rate,legacyClockwiseRotation(rotation));
                 synchronized(this){if(closed)break;while(!frames.offer(frame))frames.poll();framesReceived++;ready=true;phase="音画已就绪";}
                 if(persistence!=null&&!closing&&System.nanoTime()>=nextSaveNanos){nextSaveNanos=System.nanoTime()+TimeUnit.SECONDS.toNanos(30);saveNow();}
             }

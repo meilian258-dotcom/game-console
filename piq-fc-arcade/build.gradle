@@ -3,6 +3,8 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.141'
 }
 
+apply from: '../source-control/neoforge-compat.gradle'
+
 group = mod_group_id
 version = mod_version
 
@@ -226,7 +228,7 @@ tasks.named('test', Test).configure {
 var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     var replaceProperties = [
             minecraft_version: minecraft_version,
-            neo_version      : neo_version,
+            neo_min_version  : neo_min_version,
             mod_id           : mod_id,
             mod_name         : mod_name,
             mod_version      : mod_version

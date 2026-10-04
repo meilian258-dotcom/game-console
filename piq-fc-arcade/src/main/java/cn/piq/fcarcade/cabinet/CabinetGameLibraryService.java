@@ -50,8 +50,8 @@ final class CabinetGameLibraryService {
         if(!PlayerContentAccess.canUseServerRom(p)||state.pending.containsKey(p.getUUID())||state.pending.size()>=4||CabinetSharedGameService.hasTransfer(p)){reply(p,r,false,"没有已有 ROM 选用权限，或机柜正在传输/选择",0,0,List.of());return;}
         var selected=catalog.stream().filter(m->m.contentId().equals(r.selectedContentId())).findFirst().orElse(null);if(selected==null){reply(p,r,false,"游戏不在当前服务器目录中，请刷新",0,0,List.of());return;}
         var selection=new Selection(p,connection,r,target,CabinetSharedGameData.get(server).find(target,r.backend().toString()),selected,now);state.pending.put(p.getUUID(),selection);
-        var store=new CabinetGameStore(cn.piq.retro.storage.ConsoleStorage.root(server.getWorldPath(LevelResource.ROOT)).resolve("piq-cabinet/shared-games/objects"));
-        try{IO.execute(()->{boolean verified=true;try{for(var file:selected.files())if(!store.contains(file)){verified=false;break;}}catch(Exception error){verified=false;}boolean ready=verified;
+        var store=CabinetServerContent.store(server);var directory=CabinetServerContent.directory(server);
+        try{IO.execute(()->{boolean verified=true;try{for(var file:selected.files())if(!store.contains(file)){verified=false;break;}if(verified)CabinetContentIndex.write(directory,selected);}catch(Exception error){verified=false;}boolean ready=verified;
             server.execute(()->{if(state.pending.get(p.getUUID())!=selection)return;boolean authorized=valid(selection);state.pending.remove(p.getUUID(),selection);if(!authorized||!ready){if(current(p,connection))reply(p,r,false,ready?"权限或机柜已改变，原游戏未替换":"服务器文件不完整，请管理员重新上传",0,0,List.of());return;}
                 try{CabinetSharedGameData.get(server).put(target,selected);reply(p,r,true,"已选择服务器游戏，可启动",0,0,List.of());}catch(RuntimeException failure){reply(p,r,false,"机柜绑定已满，原游戏未替换",0,0,List.of());}});
         });}catch(RejectedExecutionException busy){state.pending.remove(p.getUUID(),selection);reply(p,r,false,"服务器目录校验繁忙，请稍后重试",0,0,List.of());}

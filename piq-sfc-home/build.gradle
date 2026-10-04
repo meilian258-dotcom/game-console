@@ -2,6 +2,7 @@ plugins {
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.141'
 }
+apply from: '../source-control/neoforge-compat.gradle'
 group = 'cn.piq.sfchome'
 version = mod_version
 base { archivesName = 'piq_sfc_home' }
@@ -9,11 +10,11 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 // Protocol tests exercise the real Minecraft/Netty codecs, not local stubs.
 sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
 neoForge {
-    version = '21.1.236'
+    version = neo_version
     mods { piq_sfc_home { sourceSet(sourceSets.main) } }
 }
 repositories { mavenCentral() }
-def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.26.jar'),
+def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.36.jar'),
         '../piq-sfc-arcade/build/libs/piq_sfc_arcade-0.2.0-alpha.9.jar')
 dependencies {
     implementation localModJars
@@ -24,8 +25,8 @@ dependencies {
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 def metadata = tasks.register('generateModMetadata', ProcessResources) {
-    inputs.property 'version', project.version
-    expand(version: project.version)
+    inputs.properties(version: project.version, neo_min_version: neo_min_version)
+    expand(version: project.version, neo_min_version: neo_min_version)
     from 'src/main/templates'
     into 'build/generated/modMetadata'
 }
@@ -52,8 +53,8 @@ tasks.named('test', Test) {
 }
 jar {
     from('LICENSE') { into 'META-INF' }
-    // Internal thin build; tools/build_audit34.py in the FC project merges the
-    // reviewed core7 into one SFC delivery while preserving both legacy mod IDs.
+    // Internal thin build. Package with the reviewed core9 using the explicit
+    // merge procedure in the current delivery guide; preserve both legacy mod IDs.
     // FC owns the public platform and runtime: do not embed duplicate copies.
     manifest { attributes 'Implementation-Title': 'Game Console: SFC', 'Implementation-Version': project.version }
 }

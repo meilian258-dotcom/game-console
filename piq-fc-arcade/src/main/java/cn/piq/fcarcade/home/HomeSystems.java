@@ -39,15 +39,26 @@ public final class HomeSystems {
             connection(player.serverLevel(), console.getBlockPos()).ifPresent(link -> onController(player, link, port));
         }
         default boolean isRunning(ServerLevel level, ExternalHomeConsoleBlockEntity console) { return false; }
+        /** A validated asynchronous startup/slot-choice, not a running or failed native core. */
+        default boolean pendingStart(ServerLevel level, ExternalHomeConsoleBlockEntity console) { return false; }
         /** Opt-in: unadapted addons cannot advertise a configurable execution lane. */
         default boolean synchronizationSettingsAvailable() { return false; }
+        /** Opt in only after wiring/validating a JNI room, not merely a native runner. */
+        default boolean jniNetplaySettingsAvailable() { return false; }
         /** Read-only device diagnostics must not advertise an unsupported execution mode. */
         default boolean deviceSettingsAvailable() { return synchronizationSettingsAvailable(); }
+        /** Opt-in only when the provider publishes real, currently authorized operators. */
+        default boolean occupancyDisplaySupported() { return false; }
         default String deviceSettingsStatus(ServerLevel level, ExternalHomeConsoleBlockEntity console) {
             return "此设备未开放公共联机模式。";
         }
         default int synchronizationSupportedModes(ServerLevel level, ExternalHomeConsoleBlockEntity console) { return 2; }
         default String synchronizationUnavailableReason(ServerLevel level, ExternalHomeConsoleBlockEntity console, cn.piq.fcarcade.cabinet.CabinetSyncMode mode) { return HomeSyncPolicy.unavailable(mode); }
+        /** Menu 3/4 are distinct transports, not CabinetSyncMode values; old hooks remain compatible. */
+        default String synchronizationUnavailableReason(ServerLevel level, ExternalHomeConsoleBlockEntity console, int menuMode) {
+            if(menuMode==4)return "此附属尚未接入并验证 JNI Netplay。";
+            return HomeSyncMenuPolicy.addonUnavailable(menuMode,mode->synchronizationUnavailableReason(level,console,mode));
+        }
         /** Includes startup/join/save transactions, not borrowed idle controllers. */
         default boolean synchronizationSettingsBusy(ServerLevel level, ExternalHomeConsoleBlockEntity console) { return true; }
         default void onLinked(ServerPlayer player, Connection connection) {}

@@ -37,6 +37,11 @@
         1.2,
         1.2,
         1.2
+      ],
+      "right_rotation": [
+        0,
+        180,
+        0
       ]
     },
     "thirdperson_righthand": {
@@ -54,6 +59,55 @@
         0.6,
         0.6,
         0.6
+      ],
+      "right_rotation": [
+        0,
+        180,
+        0
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        -45,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ],
+      "right_rotation": [
+        0,
+        180,
+        0
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        60,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ],
+      "right_rotation": [
+        0,
+        180,
+        0
       ]
     }
   }

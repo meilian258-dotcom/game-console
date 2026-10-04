@@ -4,6 +4,7 @@ import cn.piq.fcarcade.home.ExternalHomeConsoleBlockEntity;
 import cn.piq.fcarcade.home.HomeConsoleBlockEntity;
 import cn.piq.fcarcade.home.HomeSyncNetwork;
 import cn.piq.fcarcade.home.HomeSyncSaveHints;
+import cn.piq.fcarcade.home.HomeSyncMenuPolicy;
 import cn.piq.fcarcade.client.ui.DeviceUi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,13 +20,23 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 /** Vanilla settings page; opening or closing never powers off or returns a controller. */
 public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
+    /** Small per-device actions; the common settings layout and server mode authority remain shared. */
+    public interface DeviceActions {
+        void open(net.minecraft.client.gui.screens.Screen parent,net.minecraft.core.BlockPos console);
+        String footer(net.minecraft.core.BlockPos console);
+        default boolean choosesSecondPortAtStartup(){return false;}
+    }
+    private static final java.util.Map<net.minecraft.resources.ResourceLocation,DeviceActions> ACTIONS=new java.util.HashMap<>();
+    public static void registerDeviceActions(net.minecraft.resources.ResourceLocation system,DeviceActions actions){if(ACTIONS.putIfAbsent(system,java.util.Objects.requireNonNull(actions))!=null)throw new IllegalArgumentException("Duplicate device settings actions");}
+    public static void openRuntimeSettings(net.minecraft.client.gui.screens.Screen parent,net.minecraft.resources.ResourceLocation system,String label){Minecraft.getInstance().setScreen(new HomeRuntimeSettingsScreen(parent,system,label));}
+    private DeviceActions actions(){return ACTIONS.get(deviceSystem());}
     private final Connection connection;
     private HomeSyncNetwork.Setting setting;
     private String status;
     private boolean pending,timedOut;
     private int waiting,age,cooldown,left,top,panelWidth;
     private HomeSyncSettingsLayout layout;
-    private static final String[] LABELS = { "玩家音画串流", "本地输入同步", "服务端托管音画", "RetroArch Netplay（实验）", "FC JNI Netplay（试验 / 本机确认）" };
+    private static final String[] LABELS = { "玩家音画串流", "本地输入同步", "服务端托管音画", "RetroArch Netplay（实验）", "JNI Netplay（试验 / 本机确认）" };
     private HomeSyncSettingsScreen(HomeSyncNetwork.Setting value,Connection source) {
         super(Component.literal("设备设置 · "+value.system()));setting = value;connection = source;status = value.reason();
     }
@@ -52,10 +63,13 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         for(int mode=0;mode<5;mode++) {
             final int selected=mode;
             boolean privateOnly=diagnosticsOnly();
+            boolean external=minecraft.level!=null&&minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity;
+            if(!HomeSyncMenuPolicy.showMode(mode,external,privateOnly,setting.supported())&&setting.mode()!=mode)continue;
             String label=(setting.mode()==mode&&!privateOnly?"✓ ":"")+LABELS[mode];
             if(privateOnly&&mode==4)label="私人单人 · 本机设置…";
             else if(privateOnly)label+="（尚未接入）";
             else if((setting.supported()&(1<<mode))==0)label+="（不可用）";
+            else if(setting.mode()==mode)label+="（当前）";
             var button=Button.builder(Component.literal(label),b->{
                 if(privateOnly&&selected==4){if(ready()&&current())openLocalSettings();}
                 else if(selected==4)JniNetplayConsent.confirm(this,()->{if(current()&&setting.mode()!=4)apply(4,-1,-1);});
@@ -68,9 +82,9 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
                 ?(mode==4?"打开已可用的本机控制、运行环境与运行器设置；不会开关机或切换公共模式。"
                         :"本附属尚未接入此公共运行方式；不是权限不足，也不能通过此按钮解锁。当前仅私人单人，附近玩家不能旁观。")
                 :(setting.supported()&(1<<mode))==0
-                ?status
-                :(mode==0?"由开机玩家运行游戏，向其他玩家发送音画。":mode==1?"各客户端运行游戏，同步操作数据。":mode==2?"由服务器运行游戏，向玩家发送音画。":mode==4?"FC 普通双手柄 JNI 回滚，原生崩溃可影响整个 MC。Windows x64默认允许，参与和旁观跟随房间；个人/卡带独立JNI档，不与原 Netplay 混接。":"RetroArch Netplay 同步操作与状态；Windows x64。按卡带策略保存，开机恢复；网络页可手动保存。")
-                    +"\n管理员关机后可修改；已借手柄无需归还。")));
+                ?setting.modeReasons().get(mode)
+                :(mode==0?"由开机玩家运行游戏，向其他玩家发送音画。":mode==1?"各客户端运行游戏，同步操作数据。":mode==2?"由服务器运行游戏，向玩家发送音画。":mode==4?"使用机型声明的 JNI 核心同步输入与状态，原生崩溃可影响整个 MC。参与和只读旁观跟随房间；保存按开局策略和核心身份隔离，不与 RetroArch 进度混接。":"RetroArch Netplay 同步操作与状态；Windows x64。按卡带策略保存，开机恢复；网络页可手动保存。")
+                    +"\n"+HomeSyncMenuPolicy.buttonState(mode,setting.mode(),setting.supported(),setting.editable(),setting.modeReasons().get(mode)))));
             addRenderableWidget(button);
         }
         int half=(panelWidth-26)/2,right=left+16+half;
@@ -81,10 +95,11 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
             ?"需 OP2；显示或隐藏使用者标牌，不影响游戏画面。":"此机型不支持使用者标牌。")));
         addRenderableWidget(occupancy);
         boolean fc=minecraft.level==null||!(minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity);
-        var approval=Button.builder(Component.literal(diagnosticsOnly()?"2P：尚未接入":fc?"2P：开局选择":"加入需同意："+(setting.approval()?"开":"关")),
+        boolean startupSecond=fc||actions()!=null&&actions().choosesSecondPortAtStartup();
+        var approval=Button.builder(Component.literal(diagnosticsOnly()?"2P：尚未接入":startupSecond?"2P：开局选择":"加入需同意："+(setting.approval()?"开":"关")),
             b->apply(-1,-1,setting.approval()?0:1)).bounds(right,top+HomeSyncSettingsLayout.ADVANCED_ROW,half,20).build();
-        approval.active=!diagnosticsOnly()&&!fc&&ready()&&setting.editable();
-        approval.setTooltip(Tooltip.create(Component.literal(diagnosticsOnly()?"此附属尚未接入公共多席位；不会借出无法操作的 2P 手柄。":fc?"开机玩家决定是否允许 2P；本局不再弹出申请。":"需 OP2；加入仍受席位、游戏人数和交互权限限制。")));
+        approval.active=!diagnosticsOnly()&&!startupSecond&&ready()&&setting.editable();
+        approval.setTooltip(Tooltip.create(Component.literal(diagnosticsOnly()?"此附属尚未接入公共多席位；不会借出无法操作的 2P 手柄。":startupSecond?"开机玩家决定是否允许 2P；本局不再弹出申请。":"需 OP2；加入仍受席位、游戏人数和交互权限限制。")));
         addRenderableWidget(approval);
         int footer=(panelWidth-44)/5;
         var refresh=Button.builder(Component.literal("刷新"),b->apply(-1,-1,-1))
@@ -96,7 +111,7 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         var network=Button.builder(Component.literal("网络"),b->NetworkDiagnosticsScreen.open(this)).bounds(left+22+2*footer,top+HomeSyncSettingsLayout.FOOTER_ROW,footer,20).build();
         network.active=ready();addRenderableWidget(network);
         addRenderableWidget(Button.builder(Component.literal(diagnosticsOnly()?"本机设置":"私人模式"),b->{
-            if(diagnosticsOnly())openLocalSettings();else PrivateHomeClient.open();
+            if(actions()!=null)actions().open(this,setting.console());else if(diagnosticsOnly())openLocalSettings();else PrivateHomeClient.open();
         }).bounds(left+28+3*footer,top+HomeSyncSettingsLayout.FOOTER_ROW,footer,20).build());
         addRenderableWidget(Button.builder(Component.literal("关闭"),b->onClose()).bounds(left+34+4*footer,top+HomeSyncSettingsLayout.FOOTER_ROW,footer,20).build());
     }
@@ -150,6 +165,6 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         else if(mx>=left+8&&mx<left+panelWidth-8&&my>=top+HomeSyncSettingsLayout.HINT_ROW&&my<top+HomeSyncSettingsLayout.FOOTER_ROW)
             g.renderTooltip(font,Component.literal(footerHint()),mx,my);
     }
-    private String footerHint(){return diagnosticsOnly()?PrivateHomeClient.cartridgeRuntimeLabel(deviceSystem(),setting.console())
+    private String footerHint(){if(actions()!=null)return actions().footer(setting.console());return diagnosticsOnly()?PrivateHomeClient.cartridgeRuntimeLabel(deviceSystem(),setting.console())
             +" · 本机个人进度；尚无服务器卡带档/公共旁观。":HomeSyncSaveHints.footer(setting.system(),setting.mode());}
 }

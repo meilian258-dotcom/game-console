@@ -31,14 +31,24 @@ public final class MdMod {
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(MdController::tossed);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(MdController::drops);
         ContentCards.register(SYSTEM,new ContentCards.Adapter(CARTRIDGE,"MD2",java.util.Set.of("md","bin","gen"),cn.piq.mdhome.client.MdRom::validate));
-        ContentCards.features(SYSTEM,new ContentCards.Features(true,true));
+        ContentCards.features(SYSTEM,new ContentCards.Features(true,true,true,2));
+        cn.piq.mdhome.save.MdPublicSaves.install();
+        bus.addListener(MdPublicNetwork::register);MdPublicServer.register();
         HomeApplianceService.registerControls(SYSTEM,MdControls::pick);
         HomeSystems.register(SYSTEM,new HomeSystems.ServerHooks(){
             public boolean deviceSettingsAvailable(){return true;}
+            public boolean occupancyDisplaySupported(){return true;}
+            public boolean synchronizationSettingsAvailable(){return true;}
+            public boolean jniNetplaySettingsAvailable(){return MdNetplayProfile.AVAILABLE;}
+            public int synchronizationSupportedModes(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){return MdNetplayProfile.AVAILABLE?1|16:1;}
+            public boolean synchronizationSettingsBusy(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){return ((MdConsole)c).busy();}
+            public boolean pendingStart(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){return cn.piq.mdhome.save.MdPublicSaves.pending(l.getServer(),c.hardwareId())||MdPrivateServer.pending((MdConsole)c);}
+            public String synchronizationUnavailableReason(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c,cn.piq.fcarcade.cabinet.CabinetSyncMode mode){return "MD 尚未适配此运行方式；JNI Netplay 使用独立的验证与设置项。";}
+            public String synchronizationUnavailableReason(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c,int mode){return mode==4?MdNetplayProfile.AVAILABLE?"服务器尚未允许本地同步 / JNI Netplay":MdNetplayProfile.UNAVAILABLE:"MD 尚未适配此运行方式；可使用玩家音画串流";}
             public String deviceSettingsStatus(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){
                 var md=(MdConsole)c;
-                return "私人单人 · "+(md.running()?"已通电 / 启动或运行中":"关机")+" · "+(md.televisionPos()==null?"未接电视":"已接电视")
-                        +"\n卡带："+md.cartridgeTitle()+"\n1P手柄："+(md.borrower()==null?"未借出":"已借出")+"；不支持公共联机或旁观。";
+                return (md.running()?(md.publicPlay()?(md.netplayJniTrial()?"公开 JNI Netplay":"公开玩家串流 · JNI"):"私人单人")+" · 运行中":md.busy()?"正在准备或结束保存":"关机 · 下次 "+(md.netplayJniTrial()?"JNI Netplay":"JNI 串流"))+" · "+(md.televisionPos()==null?"未接电视":"已接电视")
+                        +"\n卡带："+md.cartridgeTitle()+"\n1P："+(md.borrower(0)==null?"未借出":"已借出")+" · 2P："+(md.borrower(1)==null?"未借出":"已借出")+"；第二端口由开局选择允许。";
             }
             public boolean onPowerOn(net.minecraft.server.level.ServerPlayer p,HomeSystems.Connection c){return ((MdConsole)c.console()).powerOn(p,c);}
             public void onPowerOff(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){((MdConsole)c).powerOff();}
@@ -52,5 +62,5 @@ public final class MdMod {
         });
         bus.addListener((BuildCreativeModeTabContentsEvent e)->{if(e.getTabKey().equals(ModCreativeTabs.FC.getKey())){e.accept(CONSOLE_ITEM);e.accept(CARTRIDGE);}});
     }
-    static void hint(net.minecraft.server.level.ServerPlayer p){p.displayClientMessage(net.minecraft.network.chat.Component.literal("MD2：卡带右键老式电脑写游戏 → 视频线连接电视 → 插卡 → 打开电视和主机电源 → 点击 1P 手柄取用。默认 JNI；当前为单人本机画面。"),false);}
+    static void hint(net.minecraft.server.level.ServerPlayer p){p.displayClientMessage(net.minecraft.network.chat.Component.literal("MD2：卡带右键老式电脑写游戏 → 视频线连接电视 → 插卡 → 打开电视和主机电源 → 选择进度与人数 → 点击对应手柄取用。默认公开 JNI 串流；旁观自动接入。"),false);}
 }

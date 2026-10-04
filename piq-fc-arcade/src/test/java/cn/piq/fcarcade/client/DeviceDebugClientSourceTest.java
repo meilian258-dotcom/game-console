@@ -21,7 +21,7 @@ class DeviceDebugClientSourceTest {
         assertTrue(code.contains("setting.console().getY()"));
         assertTrue(code.contains("setting.console().getZ()"));
         assertTrue(code.contains("设备设置 · "));
-        assertTrue(code.contains("已借手柄无需归还"));
+        assertTrue(code.contains("HomeSyncMenuPolicy.buttonState("));
         assertFalse(code.contains("归还控制器后调整"));
         assertFalse(code.contains("HomeControllerReturn"));
         assertFalse(code.contains("homeSaveAction("));

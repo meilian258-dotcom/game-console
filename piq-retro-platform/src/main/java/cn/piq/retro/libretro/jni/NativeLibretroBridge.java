@@ -70,7 +70,9 @@ public final class NativeLibretroBridge {
     }
     public static native int abiVersion();
     /** Does not load native code during discovery, or wait for a potentially stuck core owner. */
-    public static boolean atCapacity() { return loadFailure != null || loaded && availableSlots() == 0; }
+    public static boolean atCapacity() { return freeSlotsIfLoaded() == 0; }
+    /** Advisory discovery budget. Never loads a DLL or takes a core owner's lock; reserve() remains authoritative. */
+    public static int freeSlotsIfLoaded() { return loadFailure != null ? 0 : loaded ? Math.max(0, Math.min(4, availableSlots())) : 4; }
     public static native int availableSlots();
     /** Reserve before staging/open: cleanup failures always have a known, generation-safe identity. */
     public static native long reserve() throws IOException;

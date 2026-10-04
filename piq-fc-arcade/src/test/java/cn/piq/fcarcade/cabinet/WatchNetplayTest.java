@@ -73,7 +73,7 @@ class WatchNetplayTest {
         assertTrue(service.contains("WatchNetplay.contains(server,lease.token()))continue"));
         assertTrue(service.contains("!WatchNetplay.contains(server,l.token())"));
         assertTrue(transfer.contains("WatchNetplay.gameTarget(p,lease,backend)"));assertTrue(transfer.contains("!CabinetRooms.canConfigureGame(p,c.lease())"));
-        assertTrue(client.contains("grant.ticket(),false,false"));assertTrue(client.contains("NetplayNetwork.unbind(connection,netplay)"));
+        assertTrue(client.contains("grant.ticket(),false,false"));assertTrue(client.contains("NetplayNetwork.unbind(r.connection,r.netplay)"));
         assertFalse(client.contains("inputRetroPad("));assertFalse(client.contains("InputOwnership.acquire("));
     }
 }

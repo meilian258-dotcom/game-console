@@ -34,6 +34,7 @@ public final class CabinetRooms {
                 var host=server.getPlayerList().getPlayer(room.host().player);return host!=null&&validateLease(host,room.host().id,ResourceLocation.parse(room.backend))!=null;
             }
             @Override public boolean isParticipant(MinecraftServer server,UUID player){var state=STATES.get(server);return state!=null&&state.ledger.player(player)!=null;}
+            @Override public boolean isParticipant(MinecraftServer server,WatchSource source,UUID player){var state=STATES.get(server);var member=state==null?null:state.ledger.player(player);return member!=null&&member.room.equals(source.descriptor().source());}
             @Override public boolean acceptsUpload(){return false;}
             @Override public WatchNetplay.Offer netplay(ServerPlayer p,WatchSource source){return CabinetNetplay.observation(p.getServer(),source.descriptor().source());}
             @Override public boolean serverHosted(MinecraftServer server,WatchSource source){var room=syncRoom(server,source.descriptor().source());return room!=null&&room.mode==CabinetSyncMode.SERVER_MEDIA;}

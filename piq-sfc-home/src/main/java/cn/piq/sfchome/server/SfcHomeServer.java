@@ -53,7 +53,7 @@ public final class SfcHomeServer {
     private static SfcHostedWorker openHosted(Session s,AutoCloseable capacity){
         var server=s.connection.level().getServer();var world=server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toAbsolutePath().normalize();
         var context=new cn.piq.fcarcade.server.hosted.ServerCoreContext(server.getServerDirectory(),cn.piq.retro.storage.ConsoleStorage.root(world).resolve("piq-sfc-home/hosted-saves"),s.host.player,s.connection.consoleId());
-        return new SfcHostedWorker(s.watchSource,s.host.id,context,cn.piq.retro.storage.ConsoleStorage.root(world).resolve("piq-sfc-home/roms"),s.rom,capacity);
+        return new SfcHostedWorker(s.watchSource,s.host.id,context,SfcServerContentPaths.location(server.getServerDirectory(),world,SfcServerContentPaths.Area.ROMS),s.rom,capacity);
     }
     static boolean watchHosted(MinecraftServer server,cn.piq.fcarcade.cabinet.WatchSource source){
         if(server==null||!server.isSameThread()||source==null)return false;State st=STATES.get(server);if(st==null)return false;
@@ -83,6 +83,14 @@ public final class SfcHomeServer {
             if(session.host.player.equals(player)||session.join!=null&&session.join.gate.applicant.equals(player))return true;
             for(Lease lease:session.ports)if(lease!=null&&lease.player.equals(player))return true;
         }
+        return false;
+    }
+    static boolean watchParticipant(MinecraftServer server,cn.piq.fcarcade.cabinet.WatchSource source,UUID player){
+        if(server==null||source==null||player==null||!server.isSameThread()||!watchSources(server).contains(source))return false;
+        State state=STATES.get(server);Session session=state==null?null:state.sessions.get(source.descriptor().origin().identity());
+        if(session==null)return false;
+        if(session.host.player.equals(player)||session.join!=null&&session.join.gate.applicant.equals(player))return true;
+        for(Lease lease:session.ports)if(lease!=null&&lease.player.equals(player))return true;
         return false;
     }
     static cn.piq.fcarcade.cabinet.WatchNetplay.Offer netplayWatch(MinecraftServer server,cn.piq.fcarcade.cabinet.WatchSource source){

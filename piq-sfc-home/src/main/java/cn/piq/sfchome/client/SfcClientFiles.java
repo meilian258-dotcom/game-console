@@ -22,16 +22,18 @@ final class SfcClientFiles {
         if (!name.endsWith(".sfc") && !name.endsWith(".smc")) throw new IOException("请选择 .sfc 或 .smc 文件");
         return SfcRomImage.fromBytes(readBounded(explicitUserPath, MAX_ROM + 512)).copyPayload();
     }
-    static byte[] cachedRom(Path game, String sha) throws IOException {
+    static synchronized byte[] cachedRom(Path game, String sha) throws IOException {
         Path path = cache(game).resolve(validHash(sha) + ".sfc");
         if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) return null;
         byte[] bytes = readBounded(path, MAX_ROM);
         if (!sha.equals(hash(bytes))) throw new IOException("SFC 缓存校验失败，请移走该损坏缓存再重试");
         return bytes;
     }
-    static void cacheRom(Path game, String sha, byte[] bytes) throws IOException {
+    static synchronized void cacheRom(Path game, String sha, byte[] bytes) throws IOException {
         if (bytes.length > MAX_ROM || !validHash(sha).equals(hash(bytes))) throw new IOException("SFC ROM 摘要不符");
-        Path root=cache(game); safeDirectories(root); atomic(root.resolve(sha+".sfc"), bytes);
+        Path root=cache(game);safeDirectories(root);Path destination=root.resolve(sha+".sfc");
+        if(Files.exists(destination,LinkOption.NOFOLLOW_LINKS)&&java.util.Arrays.equals(bytes,readBounded(destination,MAX_ROM)))return;
+        atomic(destination,bytes);
     }
     static Path snapshot(Path game, String sha, java.util.UUID backupSession, byte[] state, byte[] sram, int frame) throws IOException {
         var saved=SfcRecoveryBackups.save(game,sha,backupSession,state,sram,frame);
@@ -60,7 +62,12 @@ final class SfcClientFiles {
             cursor=cursor.resolve(part);
             if (Files.exists(cursor,LinkOption.NOFOLLOW_LINKS)) {
                 if (Files.isSymbolicLink(cursor) || !Files.isDirectory(cursor,LinkOption.NOFOLLOW_LINKS)) throw new IOException("缓存目录不安全");
-            } else Files.createDirectory(cursor);
+            } else {
+                try{Files.createDirectory(cursor);}catch(FileAlreadyExistsException raced){
+                    // Control and spectator readers can publish the same verified cache concurrently.
+                    if(Files.isSymbolicLink(cursor)||!Files.isDirectory(cursor,LinkOption.NOFOLLOW_LINKS))throw new IOException("缓存目录不安全",raced);
+                }
+            }
         }
     }
     private static void atomic(Path destination, byte[] bytes) throws IOException {

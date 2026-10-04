@@ -1,11 +1,12 @@
 plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
+apply from: '../source-control/neoforge-compat.gradle'
 group = 'cn.piq.mdhome'
 version = mod_version
 base { archivesName = 'game_console_md' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-neoForge { version = '21.1.236'; mods { piq_md_home { sourceSet(sourceSets.main) } } }
+neoForge { version = neo_version; mods { piq_md_home { sourceSet(sourceSets.main) } } }
 repositories { mavenCentral() }
-def fc = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.31.jar'))
+def fc = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.36.jar'))
 dependencies {
     implementation fc
     testImplementation platform('org.junit:junit-bom:5.13.4')
@@ -26,13 +27,20 @@ test {
 def verifyCores = tasks.register('verifyCores') {
     doLast {
         ['blastem_libretro.dll':'3e275e9656e389be11a2623a47a6b454b214a91966af984a2105fa7c8249d016',
-         'genesis_plus_gx_libretro.dll':'9ffa10a115b20e1b49e9caf0b53f287c640ed4e5bb93f7ed9a23b416a4ccfdf7'].each { name, sha ->
+         'genesis_plus_gx_libretro.dll':'9ffa10a115b20e1b49e9caf0b53f287c640ed4e5bb93f7ed9a23b416a4ccfdf7',
+         'genesis_plus_gx_piq_netplay_libretro.dll':'8200a6d5e7c39f60afefd8e87e369d253f737de6a73bf8d920d2ab81888a5fb5'].each { name, sha ->
             def input = file('src/main/resources/core/windows-x64/' + name)
             if(!input.isFile() || input.length() > 32 * 1024 * 1024 ||
                 java.security.MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() != sha)
-                throw new GradleException('Pinned MD core missing/mismatched: ' + name + '; see tools/prepare_genesis.py and README')
+                throw new GradleException('Pinned MD core missing/mismatched: ' + name + '; see tools/prepare_genesis.py, native-genesis-netplay/README.md and README')
         }
     }
 }
 processResources.dependsOn verifyCores
+tasks.named('processResources', ProcessResources) {
+    inputs.properties(version: project.version, neo_min_version: neo_min_version)
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand(version: project.version, neo_min_version: neo_min_version)
+    }
+}
 jar { manifest { attributes 'Implementation-Title': 'Game Console MD', 'Implementation-Version': project.version } }

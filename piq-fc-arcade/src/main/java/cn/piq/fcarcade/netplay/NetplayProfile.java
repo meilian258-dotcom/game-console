@@ -6,7 +6,15 @@ import java.util.*;
 /** Trusted addon declaration, never constructed from a network packet or a downloaded manifest. */
 public record NetplayProfile(Class<?> owner,String resource,String sha,String contentName,
                              Map<String,String> options,int device,int sampleRate,int maxRomBytes,int ports,
-                             cn.piq.retro.libretro.LibretroProfile jni) {
+                             cn.piq.retro.libretro.LibretroProfile jni,JniAspect jniAspect) {
+    /** The pinned core's reported DAR space, not its framebuffer pixel ratio. */
+    public enum JniAspect { RAW, PRESENTED }
+    /** Preserve the existing addon constructor and its unrotated-DAR default. */
+    public NetplayProfile(Class<?> owner,String resource,String sha,String contentName,
+                          Map<String,String> options,int device,int sampleRate,int maxRomBytes,int ports,
+                          cn.piq.retro.libretro.LibretroProfile jni) {
+        this(owner,resource,sha,contentName,options,device,sampleRate,maxRomBytes,ports,jni,JniAspect.RAW);
+    }
     public NetplayProfile(Class<?> owner,String resource,String sha,String contentName,
                           Map<String,String> options,int device,int sampleRate,int maxRomBytes,int ports) {
         this(owner,resource,sha,contentName,options,device,sampleRate,maxRomBytes,ports,null);
@@ -17,6 +25,7 @@ public record NetplayProfile(Class<?> owner,String resource,String sha,String co
     }
     public NetplayProfile {
         Objects.requireNonNull(owner);Objects.requireNonNull(resource);Objects.requireNonNull(sha);
+        Objects.requireNonNull(jniAspect);
         if(!resource.startsWith("/")||!sha.matches("[a-fA-F0-9]{64}")||!safeName(contentName)
                 ||device<1||device>65535||ports<1||ports>4||(sampleRate!=44100&&sampleRate!=48000)||maxRomBytes<16||maxRomBytes>64*1024*1024)
             throw new IllegalArgumentException("Netplay profile");
@@ -33,9 +42,20 @@ public record NetplayProfile(Class<?> owner,String resource,String sha,String co
     }
     /** Trusted addon declaration; not deserialized from content or network packets. */
     public NetplayProfile withJni(cn.piq.retro.libretro.LibretroProfile runtime){
-        return new NetplayProfile(owner,resource,sha,contentName,runtime.options(),device,sampleRate,maxRomBytes,ports,runtime);
+        return new NetplayProfile(owner,resource,sha,contentName,runtime.options(),device,sampleRate,maxRomBytes,ports,runtime,jniAspect);
     }
-    public static boolean safeName(String name){return name!=null&&name.matches("[a-zA-Z0-9_-]{1,64}\\.(nes|sfc|smc|zip)");}
+    /** Trusted adapter metadata only; deliberately excluded from emulation/save identity. */
+    public NetplayProfile withJniAspect(JniAspect space){
+        return new NetplayProfile(owner,resource,sha,contentName,options,device,sampleRate,maxRomBytes,ports,jni,space);
+    }
+    public float rawJniAspect(float reportedAspect,int clockwiseRotation){
+        if(!Float.isFinite(reportedAspect)||reportedAspect<=0||clockwiseRotation<0||clockwiseRotation>3)
+            throw new IllegalArgumentException("JNI presentation metadata");
+        float raw=jniAspect==JniAspect.PRESENTED&&(clockwiseRotation&1)!=0?1f/reportedAspect:reportedAspect;
+        if(!Float.isFinite(raw)||raw<=0)throw new IllegalArgumentException("JNI raw aspect");
+        return raw;
+    }
+    public static boolean safeName(String name){return name!=null&&name.matches("[a-zA-Z0-9_-]{1,64}\\.(nes|sfc|smc|zip|md)");}
     public String config(){var out=new StringBuilder();new TreeMap<>(options).forEach((k,v)->out.append(k).append(" = \"").append(v).append("\"\n"));return out.toString();}
     public static NetplayProfile fc(){return new NetplayProfile(NetplayProcess.class,"/core/libretro/windows-x64/mesen_libretro.dll",
         "2b3fbe286995c80ebbc85239fd28c8fa07b1011cc69c7f9021816429e3473885","content.nes",

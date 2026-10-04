@@ -37,6 +37,7 @@ public final class NetplayClient {
         }));}
     }
     static NetplayNetwork.State state(long session){return STATES.get(new Key(current(),session));}
+    static boolean nativeSlotHeld(long session){var run=RUNS.get(new Key(current(),session));return run!=null&&run.nativeSlotHeld();}
     static NetplayProcess start(NetplayNetwork.State state)throws IllegalStateException {
         Connection connection=current();var key=new Key(connection,state.session().sessionId());
         String sha=state.session().romSha256();

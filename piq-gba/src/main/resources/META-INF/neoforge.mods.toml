@@ -3,14 +3,14 @@ loaderVersion="[4,)"
 license="GPL-3.0-or-later"
 [[mods]]
 modId="piq_gba"
-version="0.1.0-alpha.14"
+version="0.1.0-alpha.15"
 displayName="方块电玩：GBA"
 authors="PIQ / Codex"
 description='''Portable GBA handheld with physical cartridges copied at the retro computer. Right-click raises/lowers without powering off; Shift+right-click inserts a cartridge held in the other hand, otherwise toggles power. Shift+left-click safely ejects after battery saving. Windows x64 defaults to common JNI with isolated battery saves and explicit process fallback. One-seat cabinet and hosted JNI remain separate from the personal handheld. No GBA link or Netplay. See capability and risk guide.'''
 [[dependencies.piq_gba]]
 modId="neoforge"
 type="required"
-versionRange="[21.1.236,)"
+versionRange="[${neo_min_version},)"
 ordering="NONE"
 side="BOTH"
 [[dependencies.piq_gba]]

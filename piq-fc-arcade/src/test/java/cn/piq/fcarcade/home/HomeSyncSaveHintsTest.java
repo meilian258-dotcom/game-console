@@ -62,7 +62,7 @@ class HomeSyncSaveHintsTest {
         assertTrue(screen.contains("HomeSyncSaveHints.footer(setting.system(),setting.mode())"));
         assertFalse(screen.contains("存档仍在卡带菜单"));
         assertTrue(screen.contains("setting=value;pending=false"));
-        assertTrue(source("home/HomeSyncNetwork").contains("TrafficPayloadRegistrar.create(event,\"home-sync-4\")"));
+        assertTrue(source("home/HomeSyncNetwork").contains("TrafficPayloadRegistrar.create(event,\"home-sync-5\")"));
     }
     @Test void sharedTvRemoteDoesNotPromiseEveryMachineACartridgeMenu() throws Exception {
         String remote=source("home/TvRemoteService");

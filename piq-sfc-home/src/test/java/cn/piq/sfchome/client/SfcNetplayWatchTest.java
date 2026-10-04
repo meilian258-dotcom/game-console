@@ -37,7 +37,8 @@ class SfcNetplayWatchTest {
         assertTrue(server.contains("NETPLAY.containsKey(s)||s.mode!="));
         assertTrue(provider.contains("SfcLocalWatchServer.netplayAllowed(p)"));assertTrue(legacy.contains("WatchNetplay.observing(p)"));
         for(String prohibited:Arrays.asList("SfcCoreLease.acquire(","SfcControllerData", "ControllerReady", "ControllerInput", "saveState"))assertFalse(client.contains(prohibited),prohibited);
-        assertTrue(client.contains("SfcHomeNetwork.requestRom(pending.hash)"));assertTrue(client.contains("SfcClientFiles.hash(bytes).equals(pending.hash)"));
-        assertTrue(client.contains("get(60,TimeUnit.SECONDS)"));assertTrue(client.contains("c.getConnection()==d.connection"));
+        assertTrue(client.contains("SfcHomeNetwork::requestRom"));assertTrue(client.contains("SfcClientFiles.hash(bytes).equals(pending.hash)"));
+        assertTrue(client.contains("get(60,TimeUnit.SECONDS)"));assertTrue(client.contains("c.getConnection()==connection"));
+        assertTrue(client.contains("DOWNLOADS.request(pending.hash,connection)"));
     }
 }

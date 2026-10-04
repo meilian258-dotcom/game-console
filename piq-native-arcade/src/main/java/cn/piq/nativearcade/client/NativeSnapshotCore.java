@@ -24,7 +24,8 @@ public final class NativeSnapshotCore implements CabinetSyncCore {
         if(p3!=0||p4!=0)throw new IOException("本地输入同步最多支持两个游戏席位；第三/四席请使用音画串流");
         var value=session.step(p1,p2);
         if(!value.hasVideo())throw new IOException("Native core did not produce a post-bootstrap picture");
-        return new CabinetFrame(value.width(),value.height(),value.abgr(),value.displayAspect(),value.rotation(),value.pcm48k());
+        // The legacy helper is CCW; only normalize at its entrance to the public CW frame contract.
+        return new CabinetFrame(value.width(),value.height(),value.abgr(),value.displayAspect(),(4-value.rotation())&3,value.pcm48k());
     }
     @Override public byte[] saveState()throws IOException{return NativeSnapshotState.encode(session.frame(),session.romHash(),session.saveState());}
     @Override public void loadState(byte[] value)throws IOException{var state=NativeSnapshotState.decode(value,session.romHash());session.loadState(state.internalFrame(),state.payload());}

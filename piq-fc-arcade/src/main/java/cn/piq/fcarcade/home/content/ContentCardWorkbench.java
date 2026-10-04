@@ -11,7 +11,11 @@ public final class ContentCardWorkbench {
     public static Page page(List<ContentCardStore.Entry> catalog,String query,int page){
         if(query==null||query.length()>64||query.chars().anyMatch(Character::isISOControl)||page<0||page>31)throw new IllegalArgumentException("搜索或页码无效");
         var key=query.strip().toLowerCase(Locale.ROOT);
-        var found=catalog.stream().filter(e->e.name().toLowerCase(Locale.ROOT).contains(key)).toList();
+        // Keep old filenames/IDs searchable for diagnostics without using them as the visible title.
+        var unique=new LinkedHashMap<String,ContentCardStore.Entry>();
+        for(var entry:catalog)if(entry.displayName().toLowerCase(Locale.ROOT).contains(key)||entry.name().toLowerCase(Locale.ROOT).contains(key))
+            unique.putIfAbsent(entry.hash()+":"+entry.size(),entry);
+        var found=List.copyOf(unique.values());
         int index=Math.min(page,Math.max(0,(found.size()-1)/PAGE_SIZE)),from=index*PAGE_SIZE;
         return new Page(index,found.size(),found.subList(from,Math.min(from+PAGE_SIZE,found.size())));
     }

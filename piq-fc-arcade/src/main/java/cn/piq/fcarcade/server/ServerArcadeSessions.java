@@ -60,6 +60,9 @@ import cn.piq.fcarcade.world.ArcadeStructure;
 import cn.piq.fcarcade.world.FcArcadeBlock;
 import cn.piq.fcarcade.home.HomeHardware;
 import cn.piq.fcarcade.home.HomeFeedback;
+import cn.piq.fcarcade.home.flow.HomeLaunchServer;
+import cn.piq.fcarcade.home.flow.HomeLaunchNetwork;
+import java.util.Objects;
 import cn.piq.fcarcade.cabinet.*;
 import cn.piq.fcarcade.server.hosted.*;
 import cn.piq.fcarcade.home.HomeControllerService;
@@ -73,6 +76,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -108,6 +112,14 @@ public final class ServerArcadeSessions {
     }
 
     public static void register() {
+        WatchProviders.register(JNI_WATCH_PROVIDER,new WatchProvider(){
+            public List<WatchSource> sources(MinecraftServer server){var m=MANAGERS.get(server);return m==null?List.of():m.sessions.values().stream().filter(s->sharedJniWatch(s)&&s.homeReady&&m.validHome(server,s)).map(ServerArcadeSessions::jniWatchSource).toList();}
+            public boolean isCurrent(MinecraftServer server,WatchSource source){return jniWatchSession(server,source)!=null;}
+            public boolean isParticipant(MinecraftServer server,UUID player){var m=MANAGERS.get(server);return m!=null&&m.sessions.values().stream().anyMatch(s->sharedJniWatch(s)&&homeParticipant(server,s,player));}
+            public boolean isParticipant(MinecraftServer server,WatchSource source,UUID player){var s=jniWatchSession(server,source);return s!=null&&homeParticipant(server,s,player);}
+            public boolean acceptsUpload(){return false;}
+            public WatchNetplay.Offer netplay(ServerPlayer player,WatchSource source){var s=jniWatchSession(player.getServer(),source);return s==null?null:new WatchNetplay.Offer(s.id,s.netplay,s.variant.isZapper()?JNI_GUN_BACKEND:JNI_PAD_BACKEND,s.romSha256,null);}
+        });
         WatchProviders.register(PLAYER_WATCH_PROVIDER,new WatchProvider(){
             public List<WatchSource> sources(MinecraftServer server){var m=MANAGERS.get(server);if(m==null)return List.of();return m.sessions.values().stream().filter(s->s.playerMedia&&s.homeReady&&m.validHome(server,s)).map(ServerArcadeSessions::playerWatchSource).toList();}
             public boolean isCurrent(MinecraftServer server,WatchSource source){return playerMediaSession(server,source)!=null;}
@@ -130,6 +142,13 @@ public final class ServerArcadeSessions {
     }
     private static final net.minecraft.resources.ResourceLocation HOSTED_WATCH_PROVIDER=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("piq_fc_arcade","home_server");
     private static final net.minecraft.resources.ResourceLocation PLAYER_WATCH_PROVIDER=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("piq_fc_arcade","home_player");
+    public static final ResourceLocation JNI_WATCH_PROVIDER=ResourceLocation.fromNamespaceAndPath("piq_fc_arcade","home_jni_netplay");
+    public static final ResourceLocation JNI_PAD_BACKEND=ResourceLocation.fromNamespaceAndPath("piq_fc_arcade","fc_jni_pad");
+    public static final ResourceLocation JNI_GUN_BACKEND=ResourceLocation.fromNamespaceAndPath("piq_fc_arcade","fc_jni_gun");
+    private static boolean sharedJniWatch(Session s){return s.homeRuntime!=null&&s.netplay!=null&&s.netplayJniTrial;}
+    private static WatchSource jniWatchSource(Session s){return new WatchSource(new WatchDescriptor(JNI_WATCH_PROVIDER,s.mediaSource,s.mediaToken,s.key.dimension().location(),new WatchAnchor(s.homeConsolePos,s.homeConsoleId),s.homeLinkId,List.of(new WatchAnchor(s.key.anchor(),s.homeTvId))),s.homeRuntime.host());}
+    private static Session jniWatchSession(MinecraftServer server,WatchSource source){var m=MANAGERS.get(server);if(m==null||source==null||!server.isSameThread())return null;for(var s:m.sessions.values())if(sharedJniWatch(s)&&s.homeReady&&!s.netplay.closed()&&jniWatchSource(s).equals(source)&&m.validHome(server,s))return s;return null;}
+    private static boolean homeParticipant(MinecraftServer server,Session s,UUID player){var p=server.getPlayerList().getPlayer(player);if(!Manager.current(p))return false;var control=s.homeRuntime.player(player);return Manager.computeHost(s,p)||control!=null&&control.connection()==p.connection.getConnection();}
     private static WatchSource hostedWatchSource(Session s){return new WatchSource(new WatchDescriptor(HOSTED_WATCH_PROVIDER,s.hosted.source,s.hosted.token,s.key.dimension().location(),new WatchAnchor(s.homeConsolePos,s.homeConsoleId),s.homeLinkId,List.of(new WatchAnchor(s.key.anchor(),s.homeTvId))),s.homeRuntime.host());}
     private static WatchSource playerWatchSource(Session s){return new WatchSource(new WatchDescriptor(PLAYER_WATCH_PROVIDER,s.mediaSource,s.mediaToken,s.key.dimension().location(),new WatchAnchor(s.homeConsolePos,s.homeConsoleId),s.homeLinkId,List.of(new WatchAnchor(s.key.anchor(),s.homeTvId))),s.homeRuntime.host());}
     private static Session playerMediaSession(MinecraftServer server,WatchSource source){
@@ -280,6 +299,7 @@ public final class ServerArcadeSessions {
         if(!storageReady(player)||console==null||console.tvPos()==null||!player.serverLevel().hasChunkAt(console.tvPos())||!(player.serverLevel().getBlockEntity(console.tvPos()) instanceof cn.piq.fcarcade.home.HomeTvBlockEntity tv)
                 ||!tv.powered()||!cn.piq.fcarcade.home.HomeZapperService.facts(player,console,tv)||validStructure(player,tv.getBlockPos())==null)return false;
         Manager m=manager(player.getServer());if(m.homeSaveBusy.contains(player.getUUID()))return false;SessionKey key=new SessionKey(player.level().dimension(),tv.getBlockPos(),ArcadeMode.LOCKSTEP);
+        if(HomeLaunchServer.busy(player.getServer(),launchKey(player.serverLevel(),console)))return false;
         Session existing=m.sessions.get(key);if(existing!=null)return existing.homeRuntime!=null&&m.validHome(player.getServer(),existing);
         if(m.sessions.values().stream().anyMatch(s->s.homeRuntime!=null&&s.homeRuntime.host().equals(player.getUUID())))return false;
         String rom=HomeHardware.selectedRom(player.serverLevel(),tv.getBlockPos());if(m.library(player.getServer()).find(rom)==null)return false;
@@ -292,7 +312,8 @@ public final class ServerArcadeSessions {
         String cardKey=m.cartridgeSaveKey(player.getServer(),console,rom,gun);
         if(mode==RomSaveMode.MACHINE&&m.saves(player.getServer()).exists(cardKey,rom)){m.openHomeSaveSlots(player,console,tv,rom,gun);return false;}
         m.homeSaveRequests.remove(player.getUUID());
-        return m.createHome(player,console,tv,rom,gun,mode,mode==RomSaveMode.NONE?"":cardKey,"卡带进度",gun?2:m.library(player.getServer()).homeMaxPlayers(rom),false);
+        m.prepareHome(player,console,tv,rom,gun,mode,mode==RomSaveMode.NONE?"":cardKey,"卡带进度",gun?2:m.library(player.getServer()).homeMaxPlayers(rom),false);
+        return false; // A prepared launch is not yet a powered/ready machine.
     }
     public static int personalRetentionDays(MinecraftServer server){return manager(server).settings(server).saveRetentionDays();}
     public static boolean setPersonalRetentionDays(ServerPlayer player,int expected,int days){
@@ -313,6 +334,7 @@ public final class ServerArcadeSessions {
         Manager m=MANAGERS.get(player.getServer());if(m!=null&&Manager.current(player))m.homeSaveAction(player,payload);
     }
     public static boolean homeSavePending(ServerPlayer p,cn.piq.fcarcade.home.HomeConsoleBlockEntity c){
+        if(p!=null&&c!=null&&HomeLaunchServer.pending(p.getServer(),launchKey(p.serverLevel(),c)))return true;
         Manager m=p==null?null:MANAGERS.get(p.getServer());HomeSaveRequest r=m==null?null:m.homeSaveRequests.get(p.getUUID());
         return r!=null&&c!=null&&c.hardwareId().equals(r.consoleId())&&c.getBlockPos().equals(r.consolePos())&&m.validHomeSave(p,r,r.intent().token());
     }
@@ -323,6 +345,7 @@ public final class ServerArcadeSessions {
     /** Configuration cannot race an active/closing runtime or any player's pending save-slot start. */
     public static boolean homeConfigurationBusy(ServerLevel level,cn.piq.fcarcade.home.HomeConsoleBlockEntity console){
         if(level==null||console==null||console.getLevel()!=level||!level.getServer().isSameThread())return true;
+        if(HomeLaunchServer.busy(level.getServer(),launchKey(level,console)))return true;
         Manager m=MANAGERS.get(level.getServer());if(m==null)return false;
         if(m.sessions.values().stream().anyMatch(s->s.homeRuntime!=null&&console.hardwareId().equals(s.homeConsoleId)))return true;
         // The core can be terminated while its final snapshot still awaits the
@@ -335,6 +358,9 @@ public final class ServerArcadeSessions {
         return false;
     }
     public static boolean isPoweredHomeSession(MinecraftServer server,long id){Manager m=MANAGERS.get(server);return m!=null&&m.sessions.values().stream().anyMatch(s->s.id==id&&s.homeRuntime!=null);}
+    private static HomeLaunchServer.Key launchKey(ServerLevel level,cn.piq.fcarcade.home.HomeConsoleBlockEntity c){
+        return new HomeLaunchServer.Key(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("piq_fc_arcade","nes"),level.dimension().location(),c.getBlockPos(),c.hardwareId());
+    }
     public static void resetHomeConsole(ServerPlayer player,cn.piq.fcarcade.home.HomeConsoleBlockEntity console){
         Manager m=MANAGERS.get(player.getServer());Session s=m==null||console==null||console.tvPos()==null?null:m.sessions.get(new SessionKey(player.level().dimension(),console.tvPos(),ArcadeMode.LOCKSTEP));
         if(s==null||s.homeRuntime==null||!m.validHome(player.getServer(),s)||validStructure(player,s.key.anchor())==null||!console.hardwareId().equals(s.homeConsoleId))return;
@@ -368,6 +394,8 @@ public final class ServerArcadeSessions {
     public static void homeReady(ServerPlayer player,cn.piq.fcarcade.ArcadeHomeReadyPayload payload){
         Manager m=MANAGERS.get(player.getServer());Session s=m==null?null:m.sessionFor(player,payload.sessionId());
         if(s!=null&&s.hosted==null&&s.homeRuntime!=null&&Manager.computeHost(s,player)&&m.validHome(player.getServer(),s)&&s.lockstep.epoch()==payload.epoch()){
+            if(!s.homeReady&&s.homeLaunch!=null&&s.homeLaunch.stage()!=cn.piq.retro.flow.DeviceSessionFlow.Stage.READY&&!s.homeLaunch.ready())return;
+            if(!s.homeReady&&s.netplay!=null&&s.saveMode!=RomSaveMode.NONE&&!cn.piq.fcarcade.netplay.NetplaySaveServer.activate(player.getServer(),s.id,player.connection.getConnection())){m.close(player.getServer(),s,false);return;}
             boolean first=!s.homeReady;s.homeReady=true;
             if(first){var c=HomeHardware.connectedConsole(player.serverLevel(),s.key.anchor());HomeControllerService.attachHeld(player,c);
                 if(s.homeRuntime.gunMode()&&cn.piq.fcarcade.home.ZapperStandService.loanPlayer(c)==player)takeHomeZapper(player,c,player.getMainHandItem());}
@@ -432,9 +460,13 @@ public final class ServerArcadeSessions {
     /** Hard unplug/physical removal: preserve the latest confirmed snapshot and stop only this TV. */
     public static void stopHomeConsole(MinecraftServer server, ResourceKey<Level> dimension, BlockPos tvPos) {
         if (server == null || tvPos == null) return;
+        var level=server.getLevel(dimension);
+        var console=level==null?null:HomeHardware.connectedConsole(level,tvPos);
+        if(console!=null)HomeLaunchServer.cancel(server,launchKey(level,console),"实体电源取消开局，原进度保留");
         Manager home = MANAGERS.get(server);
         if (home != null) {
             SessionKey key = new SessionKey(dimension, tvPos, ArcadeMode.LOCKSTEP);
+            home.homeSaveRequests.entrySet().removeIf(e->e.getValue().key().equals(key));
             Session current = home.sessions.get(key);
             if (current != null) home.close(server, current);
             home.idleLeaderboardDisplays.remove(key);
@@ -815,6 +847,8 @@ public final class ServerArcadeSessions {
         private final Map<UUID,HomeRequest> homeRequests=new HashMap<>();
         private boolean homeDecisionBusy;
         private boolean homeReady;
+        private HomeLaunchServer.Handle homeLaunch;
+        private net.minecraft.network.Connection homeLaunchHost;
         private int homeStartTick;
         private cn.piq.fcarcade.session.NesCoreVariant variant=cn.piq.fcarcade.session.NesCoreVariant.LIBRETRO_V1;
         private cn.piq.fcarcade.home.ZapperBinding zapperBinding;
@@ -987,6 +1021,42 @@ public final class ServerArcadeSessions {
         private boolean homeAccepts(MinecraftServer server,cn.piq.fcarcade.home.HomeConsoleBlockEntity c,String rom,boolean gun,byte[] bytes){
             return c.netplayExperimental()?cn.piq.fcarcade.netplay.FcNetplaySaves.accepts(gun,c.netplayJniTrial(),rom,bytes):coreVariant(server,rom,gun).acceptsPersistentStateHeader(bytes,rom);
         }
+        /** Legacy FC slot editor feeds the same pre-core join/ready coordinator as addons.
+         * Slot editing/storage formats remain FC-owned; merely accepting a selection never writes. */
+        private void prepareHome(ServerPlayer p,cn.piq.fcarcade.home.HomeConsoleBlockEntity c,cn.piq.fcarcade.home.HomeTvBlockEntity tv,String rom,boolean gun,
+                                 RomSaveMode mode,String saveKey,String name,int players,boolean resume){
+            var server=p.getServer();var card=c.insertedCartridge().copy();var consoleId=c.hardwareId();var tvId=tv.hardwareId();var link=c.linkId();
+            var syncMode=c.synchronizationMode();boolean netplay=c.netplayExperimental(),jni=c.netplayJniTrial();
+            int max=gun?2:library(server).homeMaxPlayers(rom);
+            var expected=mode==RomSaveMode.NONE?null:saves(server).list().stream().filter(i->i.saveKey().equals(saveKey)).findFirst().orElse(null);
+            String cardTitle=cn.piq.fcarcade.home.FcCartridgeData.title(card);
+            String label=cardTitle.isBlank()?library(server).displayName(rom):cardTitle;
+            final String title=label.length()>128?label.substring(0,128):label;
+            HomeLaunchServer.start(p,launchKey(p.serverLevel(),c),new HomeLaunchServer.Adapter<Boolean>(){
+                Session created;
+                public HomeLaunchServer.Definition definition(){return new HomeLaunchServer.Definition("FC",title,max,0,false,"");}
+                public boolean valid(){
+                    if(!current(p)||!tv.powered()||!cn.piq.fcarcade.home.HomeZapperService.facts(p,c,tv)
+                            ||!consoleId.equals(c.hardwareId())||!tvId.equals(tv.hardwareId())||!Objects.equals(link,c.linkId())
+                            ||!net.minecraft.world.item.ItemStack.isSameItemSameComponents(card,c.insertedCartridge())||c.insertedCartridge().getCount()!=1
+                            ||cartridgeMode(c)!=mode||c.synchronizationMode()!=syncMode||c.netplayExperimental()!=netplay||c.netplayJniTrial()!=jni
+                            ||!rom.equals(HomeHardware.selectedRom(p.serverLevel(),tv.getBlockPos()))||library(server).find(rom)==null
+                            ||(gun?2:library(server).homeMaxPlayers(rom))!=max)return false;
+                    var actual=sessions.get(new SessionKey(p.level().dimension(),tv.getBlockPos(),ArcadeMode.LOCKSTEP));
+                    if(created!=null)return actual==created;
+                    if(actual!=null||cardActive(cn.piq.fcarcade.home.FcCartridgeData.id(card)))return false;
+                    return mode==RomSaveMode.NONE||Objects.equals(expected,saves(server).list().stream().filter(i->i.saveKey().equals(saveKey)).findFirst().orElse(null));
+                }
+                public void list(java.util.function.Consumer<List<HomeLaunchNetwork.Row>> success,java.util.function.Consumer<String> failure){failure.accept("FC 存档已在前一步选择");}
+                public void select(HomeLaunchNetwork.Choice choice,java.util.function.Consumer<Boolean> success,java.util.function.Consumer<String> failure){success.accept(Boolean.TRUE);}
+                public void load(HomeLaunchServer.Launch<Boolean> launch,HomeLaunchServer.Handle handle){
+                    if(!createHome(p,c,tv,rom,gun,mode,saveKey,name,players,resume)){handle.fail("FC 开机条件已变化，原进度保留");return;}
+                    created=sessions.get(new SessionKey(p.level().dimension(),tv.getBlockPos(),ArcadeMode.LOCKSTEP));
+                    created.homeLaunch=handle;created.homeLaunchHost=p.connection.getConnection();created.multiplayerEnabled=launch.allowSecondPort();created.multiplayerChosen=true;
+                }
+                public void cancelled(String reason){if(created!=null&&sessions.get(created.key)==created)close(server,created,created.homeReady);}
+            });
+        }
         private boolean createHome(ServerPlayer p,cn.piq.fcarcade.home.HomeConsoleBlockEntity c,cn.piq.fcarcade.home.HomeTvBlockEntity tv,String rom,boolean gun,
                                    RomSaveMode mode,String saveKey,String name,int players,boolean resume){
             if(c.netplayExperimental()&&c.synchronizationMode()!=CabinetSyncMode.LOCAL_SYNC)return false;
@@ -1011,7 +1081,7 @@ public final class ServerArcadeSessions {
                 s.netplay=cn.piq.fcarcade.netplay.NetplayNetwork.room(s.id,p.connection.getConnection());
                 var identity=cn.piq.fcarcade.netplay.FcNetplaySaves.identity(gun,s.netplayJniTrial,rom);
                 var store=saves(p.getServer());var server=p.getServer();
-                try{cn.piq.fcarcade.netplay.NetplaySaveServer.open(server,s.id,p.connection.getConnection(),s.netplay.grant(p.connection.getConnection(),true).id(),identity,saveKey,mode==RomSaveMode.NONE?null:()->new cn.piq.fcarcade.netplay.NetplaySaveServer.Storage(){
+                try{cn.piq.fcarcade.netplay.NetplaySaveServer.openPrepared(server,s.id,p.connection.getConnection(),s.netplay.grant(p.connection.getConnection(),true).id(),identity,saveKey,mode==RomSaveMode.NONE?null:()->new cn.piq.fcarcade.netplay.NetplaySaveServer.Storage(){
                     public byte[] read(){if(!resume)return null;byte[] state=store.loadReadOnly(saveKey,rom);if(state==null)throw new IllegalStateException("无法读取已有 Netplay 存档");return state;}
                     public void write(byte[] state){
                         store.save(saveKey,rom,state,s.saveSlotName,s.savePlayers);
@@ -1043,7 +1113,7 @@ public final class ServerArcadeSessions {
                 }catch(RuntimeException failure){if(admission!=null)admission.close();sessions.remove(key,s);s.homeRuntime.close();p.displayClientMessage(Component.literal("服务器托管未开机："+failure.getMessage()),false);return false;}
             }
             sync(p.getServer(),s,true);if(saved!=null&&s.hosted==null)FcNetwork.sendPersistentState(p,new ArcadePersistentStatePayload(s.id,s.lockstep.epoch(),saved));
-            if(s.maxPlayers==2)FcNetwork.offerMultiplayer(p,new ArcadeMultiplayerOfferPayload(s.id));
+            // The common coordinator already asked before any core or input grant.
             recordPlay(p);
             return true;
         }
@@ -1108,7 +1178,9 @@ public final class ServerArcadeSessions {
                 if(a.action()==ArcadeSaveSlotActionPayload.DELETE){if(existing!=null)store.delete(slotKey,existing.romSha256());if(card)c.cartridgeSaved(r.cardId(),r.rom(),cardProgressExists(p.getServer(),r.cardId(),r.rom()));openHomeSaveSlots(p,c,tv,r.rom(),r.gun());return;}
                 if(a.action()==ArcadeSaveSlotActionPayload.RENAME){if(same){byte[] state=store.load(slotKey,r.rom());if(state!=null&&homeAccepts(p.getServer(),c,r.rom(),r.gun(),state))store.save(slotKey,r.rom(),state,name,a.players());}openHomeSaveSlots(p,c,tv,r.rom(),r.gun());return;}
                 if(a.resume()&&same){byte[] state=store.load(slotKey,r.rom());if(!homeAccepts(p.getServer(),c,r.rom(),r.gun(),state)){p.displayClientMessage(Component.literal("存档核心不匹配，未开机、未覆盖原存档。"),false);openHomeSaveSlots(p,c,tv,r.rom(),r.gun());return;}}
-                if(createHome(p,c,tv,r.rom(),r.gun(),r.mode(),slotKey,name,a.players(),a.resume())&&existing!=null&&!a.resume()&&!card&&!c.netplayExperimental())store.delete(slotKey,existing.romSha256());
+                // Starting a replacement is not a durable save. Keep the old slot until saveState
+                // has committed the new state; cancellation/crash must not destroy good progress.
+                prepareHome(p,c,tv,r.rom(),r.gun(),r.mode(),slotKey,name,a.players(),a.resume());
             }catch(RuntimeException error){FcArcadeMod.LOGGER.warn("[PIQ FC] Home save selection failed without a fallback save mode",error);p.displayClientMessage(Component.literal("存档操作失败，请重新按电源选择。"),false);}
             finally{homeSaveBusy.remove(p.getUUID());}
         }
@@ -1203,7 +1275,7 @@ public final class ServerArcadeSessions {
         private void detachHomeDevice(ServerPlayer p,Session s,int port,UUID lease){
             if(!detachHomeSocket(p.getServer(),s,p.getUUID(),p.connection.getConnection(),port,lease))return;
             sync(p.getServer(),s,false);
-            if(current(p)&&s.homeRuntime.player(p.getUUID())==null&&!computeHost(s,p)){if(s.hosted!=null||s.playerMedia)sendInactive(p,s);else{s.viewers.add(p.getUUID());addTracking(viewerships,p.getUUID(),s.key);sendViewerSession(p,s);}}
+            if(current(p)&&s.homeRuntime.player(p.getUUID())==null&&!computeHost(s,p)){if(s.hosted!=null||s.playerMedia||sharedJniWatch(s))sendInactive(p,s);else{s.viewers.add(p.getUUID());addTracking(viewerships,p.getUUID(),s.key);sendViewerSession(p,s);}}
         }
         private void detachHome(ServerPlayer p,Session s){
             for(var c:s.homeRuntime.controls(p.getUUID()))detachHomeDevice(p,s,c.port(),c.lease());
@@ -2651,7 +2723,14 @@ public final class ServerArcadeSessions {
         }
 
         private void tick(MinecraftServer server) {
-            for(var stopped:List.copyOf(closingHosted))if(stopped.hosted.terminated()){collectHostedSnapshot(server,stopped);if(stopped.hostedFinalPersist)saveState(server,stopped);closingHosted.remove(stopped);}
+            for(var stopped:List.copyOf(closingHosted))if(stopped.hosted.terminated()){
+                collectHostedSnapshot(server,stopped);boolean clean=stopped.hosted.error()==null;
+                boolean saved=clean&&stopped.saveMode==RomSaveMode.NONE;
+                // A previous periodic snapshot is not evidence that a failed final capture succeeded.
+                if(stopped.hostedFinalPersist&&clean)saved=saveState(server,stopped)||saved;
+                if(stopped.homeLaunch!=null)stopped.homeLaunch.finished(saved,saved?"":"FC 最后进度未确认保存；原档保留。");
+                closingHosted.remove(stopped);
+            }
             HomeControllerService.tick(server);
             cn.piq.fcarcade.home.HomeZapperService.tick(server);
             if (scoreStore != null && server.getTickCount() % 200 == 0) {
@@ -2845,6 +2924,7 @@ public final class ServerArcadeSessions {
                 close(server,session);return false;
             }
             if(!session.homeReady&&run.ready()){
+                if(session.homeLaunch!=null&&session.homeLaunch.stage()!=cn.piq.retro.flow.DeviceSessionFlow.Stage.READY&&!session.homeLaunch.ready()){close(server,session,false);return false;}
                 session.homeReady=true;var level=server.getLevel(session.key.dimension());if(level!=null)cn.piq.fcarcade.home.HomeApplianceService.refresh(level,session.key.anchor());
                 var host=server.getPlayerList().getPlayer(session.homeRuntime.host());if(computeHost(session,host)&&host.level().dimension()==session.key.dimension()){
                     var console=HomeHardware.connectedConsole(host.serverLevel(),session.key.anchor());HomeControllerService.attachHeld(host,console);
@@ -3244,10 +3324,21 @@ public final class ServerArcadeSessions {
                 boolean persist
         ) {
             finishScoreRound(server, session);
-            if(session.netplay!=null){cn.piq.fcarcade.netplay.NetplaySaveServer.retire(server,session.id);cn.piq.fcarcade.netplay.NetplayNetwork.retire(session.netplay);}
+            boolean coordinated=session.homeLaunch!=null&&session.homeLaunch.beginStopping();
+            boolean saveConfirmed=session.saveMode==RomSaveMode.NONE;
+            if(coordinated&&session.netplay!=null&&session.saveMode!=RomSaveMode.NONE){
+                boolean waiting=cn.piq.fcarcade.netplay.NetplaySaveServer.awaitFinish(server,session.id,session.homeLaunchHost,
+                    result->session.homeLaunch.finished(result.clean(),result.clean()?"FC 已正常保存关机。":"FC 保存未完成："+result.reason()));
+                if(!waiting)session.homeLaunch.finished(false,"FC 保存会话已失效，最后进度未确认；原档保留。");
+            }
+            if(session.netplay!=null){
+                if(persist&&session.homeReady)cn.piq.fcarcade.netplay.NetplaySaveServer.retire(server,session.id);
+                else cn.piq.fcarcade.netplay.NetplaySaveServer.abort(server,session.id,session.homeLaunchHost,"开局取消或未就绪，未授权覆盖原档");
+                cn.piq.fcarcade.netplay.NetplayNetwork.retire(session.netplay);
+            }
             if(session.playerMedia)WatchService.closed(server,session.mediaSource,session.mediaToken);
             if(session.hosted!=null){collectHostedSnapshot(server,session);session.hostedFinalPersist=persist;session.hosted.close();closingHosted.add(session);}
-            if (persist) saveState(server, session);
+            if (persist) saveConfirmed=saveState(server, session)||saveConfirmed;
             if (session.homeConsole) {if(session.homeRuntime!=null)HomeControllerService.deactivateSession(server,session.id);else HomeControllerService.closeSession(server, session.id);}
             if(session.zapperBinding!=null)cn.piq.fcarcade.home.HomeZapperService.closeSession(server,session.id);
             expireApplicants(server, session);
@@ -3282,6 +3373,8 @@ public final class ServerArcadeSessions {
                     session.key.dimension(),
                     session.key.anchor());
             sessions.remove(session.key);
+            if(coordinated&&session.hosted==null&&(session.netplay==null||session.saveMode==RomSaveMode.NONE))
+                session.homeLaunch.finished(saveConfirmed,saveConfirmed?"":"FC 最近进度未确认保存；原档保留。");
             if(session.homeRuntime!=null){session.homeRuntime.close();session.homeRequests.clear();var level=server.getLevel(session.key.dimension());if(level!=null)cn.piq.fcarcade.home.HomeApplianceService.refresh(level,session.key.anchor());}
             refreshIdleScoreDisplay(server, session.key);
         }
@@ -3385,7 +3478,7 @@ public final class ServerArcadeSessions {
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 SessionKey membership = memberships.get(player.getUUID());
                 for (Session candidate : sessions.values()) {
-                    if (candidate.hosted!=null || candidate.playerMedia || candidate.lockstep == null || candidate.lockstep.epoch() == 0
+                    if (candidate.hosted!=null || candidate.playerMedia || sharedJniWatch(candidate) || candidate.lockstep == null || candidate.lockstep.epoch() == 0
                             || candidate.homeRuntime!=null&&candidate.homeRuntime.host().equals(player.getUUID())
                             || candidate.key.equals(membership)
                             || player.level().dimension()
@@ -3781,6 +3874,13 @@ public final class ServerArcadeSessions {
                         session.savePlayers);
                 if (session.personalSave != null) session.personalSave.write(write);
                 else write.run();
+                if(session.homeConsolePos!=null&&session.saveMode==RomSaveMode.PLAYER){
+                    // A different ROM in the same personal slot is retired only after commit.
+                    // Cleanup failure does not turn an already durable save into a false failure.
+                    try{for(var old:saves(server).list())if(old.saveKey().equals(session.saveKey)
+                            &&!old.romSha256().equals(session.romSha256))saves(server).delete(session.saveKey,old.romSha256());}
+                    catch(RuntimeException cleanup){FcArcadeMod.LOGGER.warn("New home save committed; previous slot cleanup deferred",cleanup);}
+                }
                 String personalOwner=FcSaveManagementStore.owner(session.saveKey);
                 if(!personalOwner.isEmpty())try{saves(server).played(UUID.fromString(personalOwner),Instant.now());}
                 catch(RuntimeException activityFailure){FcArcadeMod.LOGGER.warn("Saved FC progress but could not record play activity",activityFailure);}
@@ -3976,7 +4076,7 @@ public final class ServerArcadeSessions {
             if(!current(p))return;
             var config=settings(p.getServer());var control=s.homeRuntime.player(p.getUUID());
             if(control!=null&&control.connection()!=p.connection.getConnection())control=null;
-            if((s.hosted!=null||s.playerMedia)&&control==null&&!computeHost(s,p))return;
+            if((s.hosted!=null||s.playerMedia||sharedJniWatch(s))&&control==null&&!computeHost(s,p))return;
             ArcadeRole role=control==null?ArcadeRole.SPECTATOR:control.port()==0?ArcadeRole.PLAYER_ONE:ArcadeRole.PLAYER_TWO;
             int viewRange=role==ArcadeRole.SPECTATOR?cn.piq.fcarcade.config.GameConsoleAdminSettings.watchRange(p.serverLevel(),s.homeConsolePos,config.viewDistance()):config.viewDistance();
             var payload=new ArcadeSessionPayload(s.key.anchor(),s.id,s.key.mode(),role,s.roster.size(),playerNames(p.getServer(),s),viewRange,config.audioDistance(),config.audioVolumePercent(),s.romSha256,s.lockstep.epoch(),reset,true,s.variant,
@@ -4009,6 +4109,7 @@ public final class ServerArcadeSessions {
                 control=s.homeRuntime.player(id);
                 if(computeHost(s,p)||control!=null||p.distanceToSqr(s.key.anchor().getX()+0.5,s.key.anchor().getY()+0.5,s.key.anchor().getZ()+0.5)<=viewerDistanceSquared(server,s))allowed.add(p.connection.getConnection());
             }
+            if(sharedJniWatch(s))allowed.addAll(WatchNetplay.connections(server,s.mediaSource));
             s.netplay.renew(allowed);
             cn.piq.fcarcade.netplay.NetplayNetwork.prune(s.netplay,allowed);
         }

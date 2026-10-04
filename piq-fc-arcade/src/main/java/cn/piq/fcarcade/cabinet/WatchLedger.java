@@ -4,7 +4,7 @@ import java.util.*;
 
 /** Pure observation authority. Connection comparison is object identity, not equals or player UUID alone. */
 public final class WatchLedger {
-    public static final int MAX_SOURCES=8, MAX_VIEWERS=8, TIMEOUT=100;
+    public static final int MAX_SOURCES=8, MAX_VIEWERS=8, MAX_PLAYER_SOURCES=4, TIMEOUT=100;
     public static final double ENTER_SQUARED=16*16, EXIT_SQUARED=20*20;
     public record Source(UUID id,UUID hostLease) {
         public Source { Objects.requireNonNull(id); Objects.requireNonNull(hostLease); }
@@ -19,42 +19,63 @@ public final class WatchLedger {
         }
     }
     public record Lease(UUID player,Object connection,UUID token,Source source,long revision,long expires) {}
+    // Key by unforgeable watch token, not player: one connection may watch several sources.
     private final Map<UUID,Lease> leases=new LinkedHashMap<>();
     private long revision;
-    public Lease get(UUID player) { return leases.get(player); }
+    /** Legacy single-source accessor. Multi-source callers must use all(player) or authorized. */
+    public Lease get(UUID player) { return leases.values().stream().filter(l->l.player.equals(player)).findFirst().orElse(null); }
     public List<Lease> all() { return List.copyOf(leases.values()); }
+    public List<Lease> all(UUID player) { return leases.values().stream().filter(l->l.player.equals(player)).toList(); }
     public int count(Source source) { int n=0;for(var lease:leases.values())if(lease.source.equals(source))n++;return n; }
     public Lease select(UUID player,Object connection,List<Candidate> candidates,boolean eligible,long now) {
+        var selected=selectMany(player,connection,candidates,eligible?1:0,now);
+        return selected.isEmpty()?null:selected.getFirst();
+    }
+    /** Select a homogeneous lane: callers must keep MEDIA at one and never mix it with Netplay.
+     * Existing valid leases retain priority; each new source has its own token, revision and TTL. */
+    public List<Lease> selectMany(UUID player,Object connection,List<Candidate> candidates,int capacity,long now) {
         Objects.requireNonNull(player);Objects.requireNonNull(connection);Objects.requireNonNull(candidates);
         if(now<0)throw new IllegalArgumentException("watch time");
+        if(capacity<0||capacity>MAX_PLAYER_SOURCES)throw new IllegalArgumentException("watch capacity");
         if(candidates.size()>MAX_SOURCES)throw new IllegalArgumentException("source limit");
-        var old=leases.get(player);
-        if(old!=null&&(old.connection!=connection||now>=old.expires||!eligible)){leases.remove(player);old=null;}
-        if(!eligible)return null;
-        if(old!=null)for(var candidate:candidates)if(candidate.source.equals(old.source)&&candidate.distanceSquared<=candidate.exitSquared)return old;
-        leases.remove(player);
-        Candidate best=null;var occupiedSources=new HashSet<Source>();for(var lease:leases.values())occupiedSources.add(lease.source);
-        for(var candidate:candidates)if(candidate.distanceSquared<=candidate.enterSquared&&count(candidate.source)<MAX_VIEWERS
-                &&(occupiedSources.contains(candidate.source)||occupiedSources.size()<MAX_SOURCES)
-                &&(best==null||candidate.distanceSquared<best.distanceSquared
-                ||candidate.distanceSquared==best.distanceSquared&&candidate.source.id.compareTo(best.source.id)<0))best=candidate;
-        if(best==null)return null;
-        if(revision==Long.MAX_VALUE)return null; // Exhaustion is fail-closed; never recycle a revision.
-        var next=new Lease(player,connection,UUID.randomUUID(),best.source,++revision,now+TIMEOUT);leases.put(player,next);return next;
+        var retained=new ArrayList<Lease>();var selectedSources=new HashSet<Source>();
+        for(var old:all(player)){
+            boolean valid=old.connection==connection&&now<old.expires&&retained.size()<capacity
+                    &&candidates.stream().anyMatch(c->c.source.equals(old.source)&&c.distanceSquared<=c.exitSquared);
+            if(valid){retained.add(old);selectedSources.add(old.source);}else leases.remove(old.token);
+        }
+        var occupiedSources=new HashSet<Source>();for(var lease:leases.values())occupiedSources.add(lease.source);
+        var sorted=new ArrayList<>(candidates);
+        sorted.sort(Comparator.comparingDouble(Candidate::distanceSquared).thenComparing(c->c.source.id).thenComparing(c->c.source.hostLease));
+        for(var candidate:sorted){
+            if(retained.size()>=capacity||revision==Long.MAX_VALUE)break; // Never recycle an exhausted revision.
+            if(selectedSources.contains(candidate.source)||candidate.distanceSquared>candidate.enterSquared||count(candidate.source)>=MAX_VIEWERS
+                    ||!occupiedSources.contains(candidate.source)&&occupiedSources.size()>=MAX_SOURCES)continue;
+            var next=new Lease(player,connection,UUID.randomUUID(),candidate.source,++revision,now+TIMEOUT);
+            leases.put(next.token,next);retained.add(next);selectedSources.add(candidate.source);occupiedSources.add(candidate.source);
+        }
+        return List.copyOf(retained);
     }
     public boolean heartbeat(UUID player,Object connection,UUID token,long expectedRevision,long now) {
         var lease=authorized(player,connection,token,expectedRevision,now);if(lease==null)return false;
-        leases.put(player,new Lease(player,connection,token,lease.source,lease.revision,now+TIMEOUT));return true;
+        leases.put(token,new Lease(player,connection,token,lease.source,lease.revision,now+TIMEOUT));return true;
     }
     public Lease authorized(UUID player,Object connection,UUID token,long expectedRevision,long now) {
-        var lease=leases.get(player);return now>=0&&lease!=null&&lease.connection==connection&&lease.token.equals(token)
+        var lease=leases.get(token);return now>=0&&lease!=null&&lease.player.equals(player)&&lease.connection==connection
                 &&lease.revision==expectedRevision&&now<lease.expires?lease:null;
     }
     public Lease release(UUID player,Object connection,UUID token,long expectedRevision,long now) {
-        var lease=authorized(player,connection,token,expectedRevision,now);if(lease!=null)leases.remove(player);return lease;
+        var lease=authorized(player,connection,token,expectedRevision,now);if(lease!=null)leases.remove(token);return lease;
     }
-    public Lease remove(UUID player) { return leases.remove(player); }
+    /** Legacy whole-player removal. The return value is the first removed lease only. */
+    public Lease remove(UUID player) { var removed=removeAll(player);return removed.isEmpty()?null:removed.getFirst(); }
+    public List<Lease> removeAll(UUID player) {var removed=all(player);for(var lease:removed)leases.remove(lease.token);return removed;}
+    public Lease remove(Lease lease) {
+        if(lease==null)return null;var current=leases.get(lease.token);
+        return current!=null&&current.player.equals(lease.player)&&current.connection==lease.connection&&current.revision==lease.revision
+                &&current.source.equals(lease.source)?leases.remove(lease.token):null;
+    }
     public List<Lease> removeSource(Source source) {
-        var removed=new ArrayList<Lease>();for(var lease:all())if(lease.source.equals(source)){leases.remove(lease.player);removed.add(lease);}return List.copyOf(removed);
+        var removed=new ArrayList<Lease>();for(var lease:all())if(lease.source.equals(source)){leases.remove(lease.token);removed.add(lease);}return List.copyOf(removed);
     }
 }

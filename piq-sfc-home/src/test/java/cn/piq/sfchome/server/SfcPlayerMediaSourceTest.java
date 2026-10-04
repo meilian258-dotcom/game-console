@@ -22,7 +22,17 @@ class SfcPlayerMediaSourceTest {
         int bypass=c.indexOf("if(message.receivesMedia()){begin(message,new byte[0]);return;}");
         assertTrue(bypass>=0&&bypass<c.indexOf("SfcClientFiles.cachedRom"));
         assertTrue(c.contains("!waiting.receivesMedia()&&SfcCoreLease.occupied()"));
-        assertTrue(c.contains("waiting==null||waiting.receivesMedia()"));
+        // ROM chunks now also serve independent observers while this player receives MEDIA.
+        // Only an explicitly queued, exact control reader may progress into control playback.
+        assertTrue(bypass<c.indexOf("if(bytes==null)downloadRom(message,connection)"));
+        String romChunks=part(c,"@Override public void romChunk(","@Override public void frames(");
+        assertTrue(romChunks.contains("SfcNetplayWatchContent.chunk(chunk)"));
+        assertTrue(romChunks.contains("if(romDownload!=null&&startup!=null&&romDownload.total()>0)"));
+        for(String forbidden:new String[]{"begin(","new SfcPlayback", "cacheRom(","DOWNLOADS.request("})assertFalse(romChunks.contains(forbidden),forbidden);
+        String loader=part(c,"private static void downloadRom(","private static boolean hardwareCurrent(");
+        assertTrue(loader.contains("DOWNLOADS.request(expected.romSha(),transport)"));
+        assertTrue(loader.contains("if(!waitingCurrent(expected,connection)||romDownload!=reader)return;"));
+        assertTrue(loader.contains("SfcClientFiles.cacheRom(game,expected.romSha(),bytes)"));
         assertTrue(c.contains("!playback.session.receivesMedia()"));
         String legacy=worker.substring(worker.indexOf("if(session.receivesMedia())"));
         assertTrue(legacy.indexOf("lease=null;")<legacy.indexOf("lease=SfcCoreLease.acquire()"));
