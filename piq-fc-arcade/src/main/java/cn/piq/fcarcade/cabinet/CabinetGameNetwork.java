@@ -18,7 +18,7 @@ public final class CabinetGameNetwork {
     public static void setSink(Sink value){sink=Objects.requireNonNull(value);}
     public static void setLibrarySink(java.util.function.BiConsumer<Connection,LibraryReply> value){librarySink=Objects.requireNonNull(value);}
     public static void register(RegisterPayloadHandlersEvent event){
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"cabinet-game-6")
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"cabinet-game-7")
             .playToServer(LibraryRequest.TYPE,LibraryRequest.CODEC,(p,c)->{var source=c.connection();if(source==null||!source.isConnected())return;c.enqueueWork(()->{if(source.isConnected()&&c.player() instanceof ServerPlayer player&&player.connection.getConnection()==source)CabinetGameLibraryService.handle(player,p);});})
             .playToClient(LibraryReply.TYPE,LibraryReply.CODEC,(p,c)->{var source=c.connection();if(source==null||!source.isConnected())return;c.enqueueWork(()->{var receiver=librarySink;if(receiver!=null&&source.isConnected())receiver.accept(source,p);});})
             .playToServer(Command.TYPE,Command.CODEC,(p,c)->{var source=c.connection();if(source==null||!source.isConnected())return;c.enqueueWork(()->{if(source.isConnected()&&c.player() instanceof ServerPlayer player&&player.connection.getConnection()==source)CabinetSharedGameService.handle(player,p);});})

@@ -27,7 +27,7 @@ public record NetplayProfile(Class<?> owner,String resource,String sha,String co
         Objects.requireNonNull(owner);Objects.requireNonNull(resource);Objects.requireNonNull(sha);
         Objects.requireNonNull(jniAspect);
         if(!resource.startsWith("/")||!sha.matches("[a-fA-F0-9]{64}")||!safeName(contentName)
-                ||device<1||device>65535||ports<1||ports>4||(sampleRate!=44100&&sampleRate!=48000)||maxRomBytes<16||maxRomBytes>64*1024*1024)
+                ||device<1||device>65535||ports<1||ports>4||(sampleRate!=44100&&sampleRate!=48000)||maxRomBytes<16||maxRomBytes>cn.piq.retro.libretro.LibretroContentFiles.MAX_MAIN)
             throw new IllegalArgumentException("Netplay profile");
         options=Map.copyOf(options);
         if(options.size()>128)throw new IllegalArgumentException("Too many core options");

@@ -26,9 +26,9 @@
     "libretro-jni-abi2": {
       "filename": "piq-libretro-jni.dll",
       "bytes": 1375744,
-      "sha256": "60c05ac6e30f8e696d989a0fae3634a685c664f247b67fb7e4944eeea59251b5",
-      "legacyPath": "piq-fc-arcade/native/libretro-jni/dist/piq-libretro-jni.dll",
-      "purpose": "Common JNI ABI2 with four independent owner sessions; native/libretro-jni/README.md and build_native.py"
+      "sha256": "aec72d00384d89de94c214e12fe32a19c1c54c93ea80c9bc82727895be509a36",
+      "legacyPath": "outputs/content-library-closure-20261004/jni-large-content-v1/piq-libretro-jni.dll",
+      "purpose": "Common JNI ABI2: four independent owners, full-path content 96 MiB / memory content 64 MiB; native/libretro-jni/README.md and build_native.py; matching build receipt alongside legacyPath"
     },
     "retroarch-netplay": {
       "filename": "piq-retroarch.exe",

@@ -153,7 +153,9 @@ public final class CabinetSharedGames {
     }
     private static CabinetGameManifest.Entry describe(Transfer t,Path path)throws IOException{
         t.check();
-        var attrs=CabinetGameStore.regular(path);if(attrs.size()<1||attrs.size()>CabinetGameManifest.MAX_FILE)throw new IOException("共享游戏单个文件上限为 64 MiB");
+        String name=path.getFileName().toString().toLowerCase(Locale.ROOT);
+        int limit=name.endsWith(".zip")&&!CabinetGameManifest.BIOS.contains(name)?CabinetGameManifest.MAX_FILE:CabinetGameManifest.MAX_LEGACY_FILE;
+        var attrs=CabinetGameStore.regular(path);if(attrs.size()<1||attrs.size()>limit)throw new IOException("共享游戏文件上限为 "+limit/(1024*1024)+" MiB："+path.getFileName());
         MessageDigest hash;try{hash=MessageDigest.getInstance("SHA-256");}catch(NoSuchAlgorithmException impossible){throw new AssertionError(impossible);}
         try(var in=Files.newByteChannel(path,Set.of(StandardOpenOption.READ,LinkOption.NOFOLLOW_LINKS))){ByteBuffer b=ByteBuffer.allocate(32768);long total=0;for(int n;(n=in.read(b))!=-1;){t.check();if(n==0)continue;total+=n;if(total>attrs.size())throw new IOException("游戏文件在读取时变化");b.flip();hash.update(b);b.clear();}if(total!=attrs.size())throw new IOException("游戏文件被截断");}
         var entry=new CabinetGameManifest.Entry(path.getFileName().toString(),HexFormat.of().formatHex(hash.digest()),(int)attrs.size());CabinetGameStore.verify(path,entry);t.check();return entry;

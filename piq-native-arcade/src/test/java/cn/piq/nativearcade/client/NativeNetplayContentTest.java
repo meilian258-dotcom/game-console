@@ -40,4 +40,27 @@ class NativeNetplayContentTest {
     @Test void rejectBogusZipAndDirectory()throws Exception{Files.write(tmp.resolve("dino.zip"),new byte[24]);assertThrows(java.io.IOException.class,()->NativeNetplayContent.load(tmp.resolve("dino.zip")));Files.createDirectory(tmp.resolve("kov.zip"));assertThrows(java.io.IOException.class,()->NativeNetplayContent.load(tmp.resolve("kov.zip")));}
     @Test void rejectOversizedCompanion()throws Exception{Path game=zip("kov.zip");try(var f=new java.io.RandomAccessFile(tmp.resolve("pgm.zip").toFile(),"rw")){f.setLength(16L*1024*1024+1);}assertThrows(java.io.IOException.class,()->NativeNetplayContent.load(game));}
     @Test void rejectInvalidCompanionRatherThanSilentlySkipping()throws Exception{Path game=zip("kov.zip");Files.createDirectory(tmp.resolve("pgm.zip"));assertThrows(java.io.IOException.class,()->NativeNetplayContent.load(game));}
+    @Test void verifiedFilesIncludeEverySupportedBiosWithoutRetainingRomArrays()throws Exception {
+        Path game=zip("samsho5.zip");for(String n:List.of("neogeo.zip","pgm.zip","qsound.zip","qsound_hle.zip"))zip(n);
+        zip("other.zip");var c=NativeNetplayContent.loadFiles(game);
+        assertEquals(0,c.rom().length);assertTrue(c.auxiliary().isEmpty());assertNotNull(c.files());
+        assertEquals(Set.of("samsho5.zip","neogeo.zip","pgm.zip","qsound.zip","qsound_hle.zip"),c.files().files().keySet());
+        assertEquals(96*1024*1024,c.profile().maxRomBytes());
+        Path stage=Files.createDirectory(tmp.resolve("stage"));assertEquals(32,c.files().stage(stage,()->{}).length);
+        for(var e:c.files().files().entrySet())assertEquals(-1,Files.mismatch(e.getValue().source(),stage.resolve(e.getKey())));
+    }
+    @Test void seventyNineMiBFileIsJniOnlyAndLegacyArrayRouteStillRefusesIt()throws Exception {
+        Path game=zip("samsho5.zip");try(var f=new java.io.RandomAccessFile(game.toFile(),"rw")){f.setLength(83_164_356);}
+        var c=NativeNetplayContent.loadFiles(game);assertEquals(83_164_356,c.files().main().size());assertEquals(0,c.rom().length);
+        assertThrows(java.io.IOException.class,()->NativeNetplayContent.load(game));
+        try(var f=new java.io.RandomAccessFile(game.toFile(),"rw")){f.setLength(96L*1024*1024+1);}
+        assertThrows(java.io.IOException.class,()->NativeNetplayContent.loadFiles(game));
+    }
+    @Test void fileAdapterRejectsInvalidAndOversizedCompanionsExplicitly()throws Exception {
+        Path game=zip("samsho5.zip"),bios=zip("neogeo.zip");
+        try(var f=new java.io.RandomAccessFile(bios.toFile(),"rw")){f.setLength(16L*1024*1024+1);}
+        var error=assertThrows(java.io.IOException.class,()->NativeNetplayContent.loadFiles(game));
+        assertTrue(error.getMessage().contains("16777216"));assertTrue(error.getMessage().contains("neogeo.zip"));
+        Files.write(bios,new byte[24]);assertThrows(java.io.IOException.class,()->NativeNetplayContent.loadFiles(game));
+    }
 }

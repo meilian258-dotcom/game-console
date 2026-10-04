@@ -1,5 +1,19 @@
 # 方块电玩：SFC / Game Console: SFC
 
+## 当前：完整SFC47 / FC76.40（2026-10-04，内容库收尾候选）
+
+完整SFC47由家用47薄包与审计后的内部core10合并，保留 `piq_sfc_home` / `piq_sfc_arcade` 两个注册ID；不能只装本目录薄包，也不要叠加安装旧core9。客户端/服务端均需配套FC76.40，依赖下界已明确拒绝缺公共路径API的旧主包。NeoForge仍默认21.1.236编译、最低21.1.229，MC1.21.1/Java21不变。当前最终完整包、安装清单及未验项以[本轮指南](../piq-fc-arcade/design/内容库收尾与核心退役-20261004.md)为准，不标稳定、不代表已发布部署。
+
+家用服务端 ROM/封面继续位于实例根 `game-console/world-content/<相对世界scope>/piq-sfc-home/{roms,covers}`，此次只复用主包新增 `ServerContentPaths.worldArea/worldScope`，相对世界身份算法、目录和复制策略不变。core10收掉旧独立柜的服务端目录例外：正式库存改为 `game-console/piq-sfc-arcade/roms`，旧实例根 `sfc-roms` 后台校验复制、同名冲突拒绝、不删原件；客户端自己的 `sfc-roms` 缓存不搬，任何玩家存档不搬。
+
+旧柜库选择、后台准备/列库/查询/上传、取消与连接/机器代次有界处理见[core10说明](../piq-sfc-arcade/README.md)。不是给家用加入另一套WASM运行链，也未改变Mesen-S、Netplay和模型；历史core9的52个class先与未改源码基线确认全部一致，才只放行本轮内容库范围的core10变化，WASM原件不变。旧成品保留，不再把“只能合并冻结core9”作为当前构建要求。
+
+**尚未统一的业务继续明确保留**：SFC家用自有 `SfcRomStore` 上传原名展示仍需后续适配；本轮不声称已解决SFC原名丢失。家用尚未接齐公共 `HomeLaunchServer/Screen` 的按需选档→独立2P确认链，普通备份/托管SRAM/Netplay/私人四种保存轨也没有合并；公共SFC机柜未新增JNI Netplay。这些不能由“目录已统一”推断完成。新主包还提供可选 `LibretroContentFiles/loadFiles` 供文件式ROM/BIOS加载，当前先由街机JNI链使用，不表示SFC所有路径已经调用它。
+
+开发构建默认使用FC76.40和core10；可显式传 `-PgameConsoleJar=...` 与 `-PsfcCoreJar=...`，路径相对于本项目。构建顺序与完整包审核见[BUILDING](../source-control/BUILDING.md)。正式core10与家用47各自 `check jar` 已通过：core有ABI/仓库/迁移/取消及两项真实WASM smoke，家用517项（516通过、1跳过、0失败/错误）；符号链接创建探针受宿主限制明确跳过。日志在 `outputs/content-library-retirement-20261004/`，薄包通过不替代完整合包/MC真人验收。
+
+## 历史：完整SFC46兼容范围候选（2026-10-04上一批）
+
 2026-10-04 **完整SFC46兼容范围测试候选**：配套本批FC76.39；默认编译NeoForge21.1.236、最低21.1.229，MC1.21.1/Java21不变。229/236源码构建/回归通过，最终完整七包在229/235/236隔离专服确认双SFC容器及8 ID版本、正常启动/停止。新合包只白名单调整core9的NeoForge依赖，原core9冻结JAR/版本与62个受保护条目不变；薄包/旧独立core不作为本次玩家交付。原236用户无需降级，其他MOD下界仍约束；图形客户端/多人/Iris未验，不标稳定。精确SHA与同批安装见[本轮范围与安装规则](../piq-fc-arcade/design/NeoForge兼容范围-20261004.md)，最新目录/管理台同步以另行回执为准。
 
 对外命名与交付遵循[Game Console 命名规范](../source-control/BRANDING.md)。完整玩家包为 `game-console-sfc-版本.jar`；本目录独立构建仍是开发薄包，不能冒充完整 SFC。兼容 ID、原存档和历史成品不改。
@@ -24,7 +38,7 @@
 
 私人模式可在启动前明确选择通用 JNI 试验，默认仍为进程；需要风险确认，使用单独试验存档，不覆盖个人/卡带 Netplay 档和原本机备份。共享局与 SFC 街机不自动改用 JNI。双方使用完整 SFC43（保留 core9）及 FC76.22，不装薄包或独立公共平台 JAR。[本轮安装和开发入口](../piq-fc-arcade/design/通用JNI一期-FC76.22-使用与附属接入.md)。Minecraft 实机验收未完成，不标稳定。以下为历史记录。
 
-## 当前：完整 SFC42 / FC76.21（2026-09-28）
+## 历史：完整 SFC42 / FC76.21（2026-09-28）
 
 家用Netplay按开机玩家+游戏或实体卡带+游戏保存，也可不保存；默认卡带。卡带编辑器切换策略，网络诊断的Netplay存档页手动保存；30秒检查点/正常关机保存、开机恢复。原本机备份不覆盖；不是机器归属，也不新增SFC共享街机Netplay。双方同换完整SFC42（含core9）和FC76.21，不能用薄包或SFC41混装。[使用及验收说明](../piq-fc-arcade/design/Netplay存档-FC76.21-SFC42-使用说明.md)。Minecraft真人多人待验，未安装发布、不标稳定。以下“当前”字样均为对应历史版本的记录。
 
@@ -32,27 +46,27 @@
 
 新开发者先读[机器与附属通用制作规范](../piq-fc-arcade/design/机器制作与交互标准.md)第 1 节的完整流程目标与设备类型分支，再查[全组件运行流程与复用接口总览](../piq-fc-arcade/design/全组件运行流程与复用接口总览.md)的实际界面、源码/API、保存与缺口。距离、配置权限查[专项细则](../piq-fc-arcade/design/方块电玩功能行为与配置规范-v1.md)。[SFC 接入蓝本](design/以SFC为蓝本-附属制作说明.md)基于完整 SFC41，仅作历史接线、薄包/完整包和兼容参考；不得将其早期进程默认或各自实现的业务链当作新附属目标。文档更新不改变安装版本或验收状态。
 
-当前：**完整 SFC41 + FC76**（2026-09-26测试候选，内含core9）。仅共享目录/路径与依赖配套；原核心、Netplay、资产和存档格式不变。482项测试通过，真实MC升级待验。安装与备份以[FC76统一目录指南](../piq-fc-arcade/design/统一目录-FC76-电脑4-使用说明.md)为准。以下为历史版本说明，不混装旧薄包/旧路径。
+历史：**完整 SFC41 + FC76**（2026-09-26测试候选，内含core9）。仅共享目录/路径与依赖配套；原核心、Netplay、资产和存档格式不变。482项测试通过，真实MC升级待验。安装与备份以[FC76统一目录指南](../piq-fc-arcade/design/统一目录-FC76-电脑4-使用说明.md)为准。以下为历史版本说明，不混装旧薄包/旧路径。
 
-## 当前测试候选：SFC40 + FC74（2026-09-25）
+## 历史测试候选：SFC40 + FC74（2026-09-25）
 
 修正SFC真实Netplay会话的监控名称，复用FC74分类流量；核心、音画、控制及原生旁观实现不变。两端使用完整SFC40和FC74；街机013不变，已有PvZ配套prototype.6。[安装与测试](../piq-fc-arcade/design/FC74-SFC40-Netplay流量监控测试说明.md)。不部署、不标稳定，实际多人监控待验。以下为历史记录。
 
-## 当前测试候选：SFC39 + FC73（2026-09-25）
+## 历史测试候选：SFC39 + FC73（2026-09-25）
 
 本轮修复 SFC Netplay 的默认本地旁观缺口：附近玩家不领取手柄也能看和听，领取 2P 后切为操作，归还后重新旁观；首次缺缓存只下载当前授权公开游戏。旁观端使用 `/sfc-watch local`。两端安装完整 SFC39 与 FC73，街机013不改；若已装 PvZ 须用 prototype.5。核心9/资产/Mesen-S/旧保存保留，不安装薄包或重复旧SFC核心。[本轮安装、验证与限制](../piq-fc-arcade/design/FC73-SFC39-Netplay旁观修复测试说明.md)。构建482测试全过，Minecraft多人实际交互待验收，不标稳定。以下 SFC38/37 配套信息仅为历史基线，勿当成本轮安装清单。
 
 2026-09-24本轮配套 **FC70 + SFC38 + 街机0.1.3**，SFC38使用上一轮完整冻结件，不重新生成薄包；公共Netplay视频标志修复后做输入/音画/重进回归。见 [当前配套说明](../piq-fc-arcade/design/FC70-街机013-通用Netplay测试说明.md)。SFC本轮无新增机型或保存能力；下方FC69为上一轮记录。
 
-最新候选：**SFC38 + FC69**（2026-09-24）。新增可选游戏内 RetroArch Netplay 实验，家用机主持 P1、另一玩家 P2，旁观保留音画；Windows x64，两端同版，实验模式不读写进度。见 [FC69 / SFC38 / 街机0.1.2说明](../piq-fc-arcade/design/FC69-SFC38-街机012-Netplay测试说明.md)。MC 实机待验，不标稳定；下方 SFC37 是上一轮实现记录。
+历史候选：**SFC38 + FC69**（2026-09-24）。新增可选游戏内 RetroArch Netplay 实验，家用机主持 P1、另一玩家 P2，旁观保留音画；Windows x64，两端同版，实验模式不读写进度。见 [FC69 / SFC38 / 街机0.1.2说明](../piq-fc-arcade/design/FC69-SFC38-街机012-Netplay测试说明.md)。MC 实机待验，不标稳定；下方 SFC37 是上一轮实现记录。
 
-当前测试候选：**0.1.0-alpha.37**，配套方块电玩 FC **0.31.0-alpha.67**。适用 Minecraft 1.21.1 / NeoForge 21.1.236 / Java 21 / Windows x64。2026-09-23。
+历史测试候选：**0.1.0-alpha.37**，配套方块电玩 FC **0.31.0-alpha.67**。适用 Minecraft 1.21.1 / NeoForge 21.1.236 / Java 21 / Windows x64。2026-09-23。以下安装、同步模式和当时验证仅描述SFC37，不覆盖本文顶部的SFC47合同。
 
 本次家用机、私人、共享街机后端、旁观与托管入口接入 Mesen-S / libretro，共用主模组的独立核心进程。详见 [SFC37 接入测试说明](design/SFC37-libretro接入-测试说明.md)。旧 WASM 存档不迁移、不覆盖；本地测试候选尚未经过 Minecraft 实机及真实多人验收，不能视为正式发布版。
 
 提供 SFC 主机、卡带和两只手柄，共用基础模组的电视、视频线、写卡电脑、遥控器及调试螺丝刀。此 README 已替换早期 alpha.1 的安装与功能描述；本轮构建状态、实际测试结果和成品哈希以最终交付验证记录为准，不以历史检查结果代替本版验收。
 
-## 安装
+## 历史安装参考（SFC37）
 
 客户端与服务端均需安装以下正式交付包：
 
@@ -82,7 +96,7 @@ OP2 使用 `/gameconsole content` 分别设置 ROM/封面上传与所有玩家/U
 
 不提供商业 ROM、原厂 BIOS 或其下载链接；模组免费。媒体接收端无需为该会话下载 ROM，但主持仍须按既有游戏库流程准备有权使用的文件。
 
-## 同步模式与存档边界
+## 历史同步模式与存档边界（SFC37）
 
 | 模式 | 核心运行位置 | 存档/恢复能力 |
 | --- | --- | --- |
@@ -125,4 +139,4 @@ OP2 使用 `/gameconsole content` 分别设置 ROM/封面上传与所有玩家/U
 
 ## 许可与来源
 
-本附属代码使用 GPL-3.0-or-later。新核心为 [Mesen-S](https://github.com/libretro/Mesen-S)，资源中保留许可证、来源及固定 SHA256；本地 buildbot 候选的精确对应源码/构建来源尚未闭环，公开发布前必须补齐。原 core9 中历史 [jgenesis](https://github.com/jsgroth/jgenesis/tree/25fc9e55ff065284c7b5f5855e2fc6d0f26e8270) 资源未改变，其适配源码仍在 `piq-sfc-arcade/native/`。不提供游戏 ROM 或原厂 BIOS。
+本附属代码使用 GPL-3.0-or-later。家用核心为 [Mesen-S](https://github.com/libretro/Mesen-S)，资源中保留许可证、来源及固定 SHA256；本地 buildbot 候选的精确对应源码/构建来源尚未闭环，公开发布前必须补齐。core10沿用core9的历史 [jgenesis](https://github.com/jsgroth/jgenesis/tree/25fc9e55ff065284c7b5f5855e2fc6d0f26e8270) WASM资源字节，适配源码仍在 `piq-sfc-arcade/native/`。不提供游戏 ROM 或原厂 BIOS。

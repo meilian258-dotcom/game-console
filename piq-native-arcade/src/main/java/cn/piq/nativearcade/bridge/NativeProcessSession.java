@@ -50,7 +50,7 @@ public final class NativeProcessSession implements AutoCloseable {
         if(driver==null||!driver.matches("[a-z0-9_]{1,32}"))throw new IOException("Invalid arcade driver name");
         this.runtime=runtimeDir.toAbsolutePath().normalize();this.rom=romZip.toAbsolutePath().normalize();this.driver=driver;
         if(!rom.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".zip")||!Files.isRegularFile(rom,LinkOption.NOFOLLOW_LINKS)
-            ||Files.size(rom)<22||Files.size(rom)>BridgeProtocol.MAX_ROM)throw new IOException("ROM ZIP must be a regular file, at most 64 MiB");
+            ||Files.size(rom)<22||Files.size(rom)>BridgeProtocol.MAX_ROM)throw new IOException("旧 MAME 进程模式仅支持 22 字节至 64 MiB 的常规 ROM ZIP；64–96 MiB 游戏请使用 FBNeo JNI Netplay（需兼容该 ROM 集）");
         for(String file:List.of("mame_libretro.dll","jna-5.14.0.jar",HELPER_NAME))
             if(!Files.isRegularFile(runtime.resolve(file),LinkOption.NOFOLLOW_LINKS))throw new IOException("Missing runtime file: "+file);
         if(!ACTIVE.compareAndSet(false,true))throw new IOException("A native arcade process is already active or stopping");

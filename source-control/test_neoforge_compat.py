@@ -116,11 +116,13 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Unexpanded'):
                 read_metadata(path)
 
-    def test_only_intentional_game_dependency_change_is_computer_pvz_pair(self):
+    def test_game_dependency_floors_match_required_public_api_generations(self):
         expected = {
-            'piq-sfc-home': '[0.31.0-alpha.76.36,0.31.0-alpha.77)',
+            # Unified content paths / file-backed JNI content require FC 76.40.
+            'piq-sfc-home': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
+            'piq-sfc-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
             'piq-md-home': '[0.31.0-alpha.76.36,0.31.0-alpha.77)',
-            'piq-native-arcade': '[0.31.0-alpha.76.34,0.31.0-alpha.77)',
+            'piq-native-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
             'piq-gba': '[0.31.0-alpha.76.31,0.31.0-alpha.77)',
             'piq-computer': '[0.31.0-alpha.76.26,0.31.0-alpha.77)',
             'piq-pvz-addon': '[0.31.0-alpha.76.22,0.31.0-alpha.77)',
@@ -129,7 +131,12 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
             template = ROOT / module / 'src/main/templates' / META
             if not template.exists():
                 template = ROOT / module / 'src/main/resources' / META
-            data = tomllib.loads(template.read_text('utf8'))
+            text = template.read_text('utf8')
+            if module == 'piq-sfc-arcade':
+                self.assertIn('mod_id=piq_sfc_arcade',
+                              (ROOT / module / 'gradle.properties').read_text('utf8'))
+                text = text.replace('${mod_id}', 'piq_sfc_arcade')
+            data = tomllib.loads(text)
             owner = data['mods'][0]['modId']
             deps = {d['modId']: d for d in data['dependencies'][owner]}
             self.assertEqual(required_fc, deps['piq_fc_arcade']['versionRange'])
@@ -137,7 +144,7 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
                 self.assertEqual('optional', deps['piq_pvz']['type'])
                 self.assertEqual('[0.1.0-prototype.12,0.1.0-prototype.13)', deps['piq_pvz']['versionRange'])
             if owner == 'piq_sfc_home':
-                self.assertEqual('[0.2.0-alpha.9,0.3.0)', deps['piq_sfc_arcade']['versionRange'])
+                self.assertEqual('[0.2.0-alpha.10,0.3.0)', deps['piq_sfc_arcade']['versionRange'])
 
 
 if __name__ == '__main__':

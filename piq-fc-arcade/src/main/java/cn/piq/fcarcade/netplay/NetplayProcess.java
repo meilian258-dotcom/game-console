@@ -133,6 +133,11 @@ public final class NetplayProcess implements AutoCloseable {
         }
     }
     private boolean started;
+    /** Captured immutable files are checked on the JNI owner thread, never loaded on the caller. */
+    public synchronized void fileContent(cn.piq.retro.libretro.LibretroContentFiles files){
+        if(started||closed||jni==null)throw new IllegalStateException("Verified files require an unstarted JNI process");
+        jni.fileContent(files);
+    }
     public synchronized void start(){if(started||closed)return;started=true;if(jni!=null){jni.start();return;}daemon("PIQ-Netplay-owner",this::run);}
     public static String unavailableReason() {
         String os=System.getProperty("os.name","").toLowerCase(Locale.ROOT),arch=System.getProperty("os.arch","");

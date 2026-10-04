@@ -96,7 +96,7 @@
     },
     {
       "path": "piq-md-home/src/main/resources/core/windows-x64/blastem_libretro.dll",
-      "purpose": "MD core; component tools and third-party license/provenance",
+      "purpose": "Retired 2026-10-04: historical BlastEm provenance only; excluded from current build and runtime; original files and saves retained",
       "exists": true,
       "sha256": "3e275e9656e389be11a2623a47a6b454b214a91966af984a2105fa7c8249d016",
       "bytes": 8726016

@@ -2,6 +2,7 @@ plugins {
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.141'
 }
+apply from: '../source-control/neoforge-compat.gradle'
 
 group = mod_group_id
 version = mod_version
@@ -50,6 +51,8 @@ configurations {
 }
 
 dependencies {
+    // The main mod owns the shared path API. Never embed its classes in this addon.
+    implementation files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.40.jar'))
     // PIQ FC Arcade already ships this runtime. Keep it on the compile/test
     // classpath, but do not bundle a second copy into the SFC mod JAR.
     wasmtimeRuntime "ai.tegmentum:wasmtime4j:${wasmtime4j_version}"
@@ -101,6 +104,7 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
     var replaceProperties = [
             minecraft_version: minecraft_version,
             neo_version      : neo_version,
+            neo_min_version  : neo_min_version,
             mod_id           : mod_id,
             mod_name         : mod_name,
             mod_version      : mod_version

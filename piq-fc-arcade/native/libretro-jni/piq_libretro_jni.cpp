@@ -27,6 +27,7 @@
 namespace {
 constexpr int ABI = 2, MAX_SESSIONS = 4, MAX_DIM = 2048, MAX_VIDEO = MAX_DIM * MAX_DIM * 4;
 constexpr size_t MAX_AUDIO = 32768, MAX_STATE = 16 * 1024 * 1024, MAX_RAM = 4 * 1024 * 1024, MAX_RTC = 64 * 1024;
+constexpr uintmax_t MAX_MEMORY_CONTENT = 64ULL * 1024 * 1024, MAX_FULLPATH_CONTENT = 96ULL * 1024 * 1024;
 constexpr int GL_COMPAT = 1, POINTER = 2, MOUSE = 4, KEYBOARD = 8, MESEN_GUN = 16, NO_GAME = 32,
               LEGACY_INLINE_OPTIONS = 64, ALL_FEATURES = 127;
 using Gen = void(APIENTRY *)(GLsizei, GLuint *);
@@ -883,8 +884,11 @@ extern "C" JNIEXPORT jlong JNICALL JNI(openReserved)(JNIEnv *env, jclass, jlong 
         } else {
             file = checkedPath(env, content, false);
             size = std::filesystem::file_size(file);
-            if (!size || size > 64ULL * 1024 * 1024)
-                throw std::runtime_error("Content exceeds 64 MiB native file limit");
+            if (!size)
+                throw std::runtime_error("Native content file is empty");
+            if (size > (fullPath ? MAX_FULLPATH_CONTENT : MAX_MEMORY_CONTENT))
+                throw std::runtime_error(fullPath ? "Content exceeds 96 MiB native full-path limit"
+                                                 : "Content exceeds 64 MiB native memory-content limit");
         }
         auto expectedName = utf8(wide(env, expected, 128));
         if (!ports || env->GetArrayLength(ports) < 1 || env->GetArrayLength(ports) > 4 || !options ||
@@ -930,7 +934,9 @@ extern "C" JNIEXPORT jlong JNICALL JNI(openReserved)(JNIEnv *env, jclass, jlong 
                 throw std::runtime_error("Duplicate pinned option");
         }
         // Persistent extended-content overrides may request bytes even for a full-path core.
-        // The same 64 MiB bound applies; keep this allocation alive until unload.
+        // Keep this allocation alive until unload: at most 96 MiB for an explicitly
+        // full-path profile, 64 MiB otherwise. File-backed Java loading saves Java
+        // heap copies; it does not remove this bounded native compatibility copy.
         if (!noGame) {
             s->content.resize(size);
             std::ifstream stream(file, std::ios::binary);

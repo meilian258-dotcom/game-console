@@ -54,5 +54,8 @@
   "screen.piq_sfc_arcade.refresh": "刷新游戏库",
   "screen.piq_sfc_arcade.library_page": "第 %s / %s 页",
   "screen.piq_sfc_arcade.library_upload_notice": "点击仅存在于本地的游戏会上传到服务器并配置这台机器",
-  "screen.piq_sfc_arcade.library_empty": "本地与服务器的 sfc-roms 文件夹中都没有可用的 .sfc/.smc ROM"
+  "screen.piq_sfc_arcade.library_empty": "没有可用的 .sfc/.smc ROM；本地：sfc-roms，服务端：game-console/piq-sfc-arcade/roms",
+  "message.piq_sfc_arcade.content_preparing": "SFC 服务端内容库正在后台准备（保留旧文件），请稍后重新操作",
+  "message.piq_sfc_arcade.content_working": "SFC 内容库正在后台处理，请稍候",
+  "message.piq_sfc_arcade.content_failed": "SFC 内容库操作失败：%s；旧文件未删除，请检查服务端日志后重试"
 }

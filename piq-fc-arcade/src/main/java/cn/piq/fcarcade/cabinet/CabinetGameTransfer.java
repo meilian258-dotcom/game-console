@@ -7,9 +7,14 @@ public final class CabinetGameTransfer {
     private int nextCommand = 1, nextReply, pending = 1, lastFile = -1;
     private boolean opened, ending, closed;
     public CabinetGameTransfer(int[] sizes) {
-        if (sizes == null || sizes.length < 1 || sizes.length > 3) throw new IllegalArgumentException("File count");
+        if (sizes == null || sizes.length < 1 || sizes.length > CabinetGameManifest.MAX_FILES) throw new IllegalArgumentException("File count");
         this.sizes = sizes.clone(); this.offsets = new int[sizes.length];
-        for (int size : sizes) if (size < 1 || size > CabinetGameManifest.MAX_FILE) throw new IllegalArgumentException("File size");
+        long total = 0;
+        for (int size : sizes) {
+            if (size < 1 || size > CabinetGameManifest.MAX_FILE) throw new IllegalArgumentException("File size");
+            total += size;
+        }
+        if (total > CabinetGameManifest.MAX_TOTAL) throw new IllegalArgumentException("Manifest size");
     }
     public synchronized boolean reserve(int sequence, boolean terminal) {
         if (closed || !opened || ending || sequence != nextCommand || pending >= PIPELINE) return false;

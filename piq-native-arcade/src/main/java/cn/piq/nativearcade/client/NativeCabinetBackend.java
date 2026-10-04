@@ -49,7 +49,7 @@ public final class NativeCabinetBackend implements CabinetBackend {
     }
     @Override public String netplayUnavailableReason(){return System.getProperty("os.name","").startsWith("Windows")&&System.getProperty("os.arch","").matches("amd64|x86_64")?null:"Netplay 实验当前仅支持 Windows x64";}
     @Override public NetplayFactory prepareNetplayFactory(){
-        return NativeNetplayContent::load;
+        return NativeNetplayContent::loadFiles;
     }
     @Override public CabinetSyncCore openSync(Path rom)throws Exception{
         throw new java.io.IOException("本地同步必须使用主线程捕获的开局上下文");

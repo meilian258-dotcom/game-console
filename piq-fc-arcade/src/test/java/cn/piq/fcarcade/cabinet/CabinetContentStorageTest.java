@@ -11,6 +11,37 @@ import static org.junit.jupiter.api.Assertions.*;
 class CabinetContentStorageTest {
     @TempDir Path temp;
     private CabinetGameManifest.Entry entry(String name,byte[] data){return new CabinetGameManifest.Entry(name,CabinetGameManifest.digest(data),data.length);}
+    @Test void fiveFileUploadAndDownloadUseRealLedgersAndHashVerifiedStores()throws Exception {
+        var entries=new ArrayList<CabinetGameManifest.Entry>();var bytes=new ArrayList<byte[]>();
+        var names=new ArrayList<String>();names.add("samsho5.zip");names.addAll(CabinetGameManifest.BIOS.stream().sorted().toList());
+        for(int i=0;i<5;i++){byte[] data=new byte[CabinetGameManifest.CHUNK+i+1];Arrays.fill(data,(byte)(i+1));bytes.add(data);entries.add(entry(names.get(i),data));}
+        var manifest=new CabinetGameManifest("test:arcade",entries);var upload=new CabinetGameTransfer(entries.stream().mapToInt(CabinetGameManifest.Entry::size).toArray());
+        var plan=CabinetGameUploadPlan.fromVerifiedMissing(manifest,31);var server=new CabinetGameStore(temp.resolve("server-objects"));
+        upload.delivered(0);int sequence=1;
+        for(int i=0;i<5;i++){
+            Path part=server.temporary(UUID.randomUUID(),i);var e=entries.get(i);
+            for(int offset=0;offset<e.size();){
+                byte[] chunk=Arrays.copyOfRange(bytes.get(i),offset,Math.min(e.size(),offset+CabinetGameManifest.CHUNK));
+                assertTrue(upload.reserve(sequence,false));plan.validate(i,offset,chunk.length);server.append(part,offset,chunk);
+                if(offset+chunk.length==e.size())server.commit(part,e);
+                plan.accepted(i,offset,chunk.length);upload.delivered(sequence++);offset+=chunk.length;
+            }
+        }
+        assertTrue(upload.reserve(sequence,true));var authorized=new java.util.concurrent.atomic.AtomicBoolean();
+        plan.finish(()->{for(var e:entries)try{assertTrue(server.contains(e));}catch(IOException ex){throw new java.io.UncheckedIOException(ex);}authorized.set(true);});
+        upload.delivered(sequence);assertTrue(authorized.get());
+        var client=new CabinetGameStore(temp.resolve("client-cache"));var download=new CabinetGameTransfer(entries.stream().mapToInt(CabinetGameManifest.Entry::size).toArray());
+        download.delivered(0);sequence=1;
+        for(int i=0;i<5;i++){
+            var e=entries.get(i);Path part=client.temporary(UUID.randomUUID(),i);
+            for(int offset=0;offset<e.size();){
+                assertTrue(download.reserve(sequence,false));int count=download.download(i,offset);byte[] chunk=server.chunk(e,offset);assertEquals(count,chunk.length);
+                client.append(part,offset,chunk);download.delivered(sequence++);offset+=count;
+            }
+            client.commit(part,e);assertEquals(-1,Files.mismatch(server.verifiedPath(e),client.verifiedPath(e)));
+        }
+        assertTrue(download.reserve(sequence,true));download.delivered(sequence);assertEquals(0,download.pending());
+    }
     @Test void everyDeclaredCompanionCanUploadDownloadAndDeduplicate()throws Exception {
         var store=new CabinetGameStore(temp.resolve("objects"));var files=new ArrayList<CabinetGameManifest.Entry>();
         var names=new ArrayList<String>();names.add("samsho.zip");names.addAll(CabinetGameManifest.BIOS.stream().sorted().toList());

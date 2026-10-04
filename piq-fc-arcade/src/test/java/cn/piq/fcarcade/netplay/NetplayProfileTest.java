@@ -44,7 +44,7 @@ class NetplayProfileTest {
             assertFalse(NetplayProfile.safeName(name));
     }
     @Test void profileRejectsConfigInjection(){assertThrows(IllegalArgumentException.class,()->p("a.zip",Map.of("x","true\nother = false"),1024));assertThrows(IllegalArgumentException.class,()->p("a.zip",Map.of("x\n","a"),1024));}
-    @Test void romAllocationBounded(){assertThrows(IllegalArgumentException.class,()->p("a.zip",Map.of(),64*1024*1024+1));assertThrows(IllegalArgumentException.class,()->p("a.zip",Map.of(),0));}
+    @Test void romAllocationBounded(){assertThrows(IllegalArgumentException.class,()->p("a.zip",Map.of(),cn.piq.retro.libretro.LibretroContentFiles.MAX_MAIN+1));assertThrows(IllegalArgumentException.class,()->p("a.zip",Map.of(),0));assertDoesNotThrow(()->p("a.zip",Map.of(),cn.piq.retro.libretro.LibretroContentFiles.MAX_MAIN));}
     @Test void oldFcProfileUnchanged(){var p=NetplayProfile.fc();assertEquals(44100,p.sampleRate());assertEquals("content.nes",p.contentName());assertEquals("NTSC",p.options().get("mesen_region"));assertEquals("2b3fbe286995c80ebbc85239fd28c8fa07b1011cc69c7f9021816429e3473885",p.sha());}
     @Test void ownedConfigImmutable(){var values=new HashMap<String,String>();values.put("z","disabled");var profile=p("kof97.zip",values,100);values.put("z","enabled");assertEquals("z = \"disabled\"\n",profile.config());assertThrows(UnsupportedOperationException.class,()->profile.options().put("x","y"));}
     @Test void adjunctAuthorityAndCloseAreWired()throws Exception{

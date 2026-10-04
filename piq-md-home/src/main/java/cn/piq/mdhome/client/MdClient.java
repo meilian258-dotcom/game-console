@@ -37,7 +37,7 @@ public final class MdClient {
     }
     @SubscribeEvent public static void models(net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional e){e.register(MdCartridgeRenderer.MODEL);for(var model:MdControllerRenderer.MODELS)e.register(model);}
     public static final class Provider implements PrivateHomeClient.Provider {
-        public String label(){return "MD2 · "+MdProfile.profile(MdCoreChoice.selected()).name()+"（私人单人）";}
+        public String label(){return "MD2 · "+MdProfile.profile().name()+"（私人单人）";}
         public String storageKey(){return "md";}
         public boolean cartridgePower(){return true;}
         public boolean independentCartridgePower(){return true;}
@@ -48,7 +48,7 @@ public final class MdClient {
         public boolean acceptsFile(String name){return MdRom.accepts(name);}
         public String fileHint(){return ".md / .bin / .gen（普通卡带，非CD/32X）";}
         public KeyboardConfig.Profile profile(){return KeyboardConfig.Profile.SFC;}
-        // Preserve canonical bindings; MdProfile maps them to the selected core's RetroPad layout.
+        // Preserve canonical bindings; MdProfile maps them to GX's RetroPad layout.
         public int[][] keys(){return new int[][]{{74},{76},{259},{257},{87},{83},{65},{68},{75},{73},{79},{80}};}
         public UUID identity(ItemStack s){return MdController.loan(s);}
         public UUID lease(ItemStack s){return s.getCount()==1?identity(s):null;}
@@ -67,12 +67,12 @@ public final class MdClient {
         }
         public PrivateEngine create(Path rom,Path root){return create(rom,root,LibretroRuntimes.defaultBackend(true));}
         public boolean supportsJniTrial(){return true;}
-        public PrivateEngine create(Path rom,Path root,LibretroRuntimes.Backend b){return new MdEngine(rom,root,b,MdCoreChoice.selected());}
+        public PrivateEngine create(Path rom,Path root,LibretroRuntimes.Backend b){return new MdEngine(rom,root,b);}
         public PrivateEngine createCartridge(Path rom,Path root,LibretroRuntimes.Backend b,BlockEntity entity){
             if(!(entity instanceof MdConsole c))throw new IllegalArgumentException("MD 主机已失效");
             if(c.publicPlay())throw new IllegalStateException("公开会话必须使用已授权的公共运行器");
             if(cn.piq.fcarcade.home.content.ContentCardData.saveMode(c.cartridge())==1)throw new IllegalStateException("私人模式不能覆盖卡带归属存档");
-            var engine=new MdEngine(rom,root,b,MdCoreChoice.selected(),cn.piq.fcarcade.home.content.ContentCardData.saveMode(c.cartridge())!=0,true);
+            var engine=new MdEngine(rom,root,b,MdProfile.Core.GENESIS_PLUS_GX,cn.piq.fcarcade.home.content.ContentCardData.saveMode(c.cartridge())!=0,true);
             MdPublicClient.privateEngine(engine,c.powerSession());
             MdControllerVisual.privateEngine(engine,c);return engine;
         }

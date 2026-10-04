@@ -43,15 +43,15 @@ public final class ClientSfcRomTransfers {
 
     public static void select(BlockPos pos, String sha256, boolean serverHasRom) {
         try {
+            if (serverHasRom) {
+                SfcNetwork.selectRom(pos, sha256);
+                closeScreen();
+                return;
+            }
             SfcRomEntry local = ClientSfcRomLibrary.find(sha256);
             if (local == null) {
                 overlay(Component.translatable(
                         "message.piq_sfc_arcade.upload_local_missing"));
-                return;
-            }
-            if (serverHasRom) {
-                SfcNetwork.selectRom(pos, sha256);
-                closeScreen();
                 return;
             }
             if (upload != null) {

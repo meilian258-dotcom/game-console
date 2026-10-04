@@ -26,13 +26,13 @@ side="BOTH"
 [[dependencies.piq_sfc_home]]
 modId="piq_fc_arcade"
 type="required"
-versionRange="[0.31.0-alpha.76.36,0.31.0-alpha.77)"
+versionRange="[0.31.0-alpha.76.40,0.31.0-alpha.77)"
 ordering="AFTER"
 side="BOTH"
 
 [[dependencies.piq_sfc_home]]
 modId="piq_sfc_arcade"
 type="required"
-versionRange="[0.2.0-alpha.9,0.3.0)"
+versionRange="[0.2.0-alpha.10,0.3.0)"
 ordering="AFTER"
 side="BOTH"

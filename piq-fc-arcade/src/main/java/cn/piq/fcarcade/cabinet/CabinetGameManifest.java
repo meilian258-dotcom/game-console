@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 
 /** Only opaque, explicitly selected game data. Never a native runtime or a client path. */
 public record CabinetGameManifest(String backend,List<Entry> files) {
-    public static final int CHUNK=24576,MAX_FILES=5,MAX_FILE=64*1024*1024,MAX_TOTAL=128*1024*1024;
+    public static final int CHUNK=24576,MAX_FILES=5,MAX_FILE=96*1024*1024,MAX_LEGACY_FILE=64*1024*1024,MAX_TOTAL=128*1024*1024;
     public static final Set<String> BIOS=Set.of("neogeo.zip","qsound_hle.zip","qsound.zip","pgm.zip");
     public record Entry(String name,String sha256,int size) {
         public Entry {
@@ -23,6 +23,7 @@ public record CabinetGameManifest(String backend,List<Entry> files) {
         files=List.copyOf(files);long total=0;Set<String> names=new HashSet<>();
         for(int i=0;i<files.size();i++){
             Entry entry=Objects.requireNonNull(files.get(i));String name=entry.name.toLowerCase(Locale.ROOT);
+            if(entry.size>MAX_LEGACY_FILE&&(i!=0||!name.endsWith(".zip")))throw new IllegalArgumentException("Only a main arcade ZIP may exceed 64 MiB");
             if(!names.add(name))throw new IllegalArgumentException("Duplicate game filename");
             if(i==0){if(!(name.endsWith(".nes")||name.endsWith(".sfc")||name.endsWith(".smc")||name.endsWith(".gba")||name.endsWith(".zip"))||BIOS.contains(name))throw new IllegalArgumentException("Unsupported game data");}
             else if(!files.getFirst().name.toLowerCase(Locale.ROOT).endsWith(".zip")||!BIOS.contains(name))throw new IllegalArgumentException("Only declared arcade BIOS companions are allowed");

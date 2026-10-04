@@ -4,7 +4,6 @@ package cn.piq.sfchome.server;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
@@ -35,19 +34,10 @@ final class SfcServerContentPaths {
 
     /** Only relative world location contributes to identity: copying an instance to another disk is stable. */
     static String scope(Path server, Path world) {
-        Path base = absolute(server), source = absolute(world);
-        final Path relative;
-        try { relative = base.relativize(source); }
+        try { return cn.piq.retro.storage.ServerContentPaths.worldScope(server, world); }
         catch (IllegalArgumentException differentRoots) {
             throw new IllegalArgumentException("SFC 世界与服务器目录必须能生成相对路径；未使用绝对盘符作为身份", differentRoots);
         }
-        String identity = relative.toString().replace('\\', '/');
-        if (identity.isEmpty()) identity = ".";
-        String label = identity.equals(".") ? "root" : relative.getFileName().toString();
-        label = label.replaceAll("[^a-zA-Z0-9_-]", "_");
-        if (label.isBlank() || label.equals("_") || label.equals("..")) label = "world";
-        if (label.length() > 24) label = label.substring(0, 24);
-        return label + "-" + HexFormat.of().formatHex(digest().digest(identity.getBytes(StandardCharsets.UTF_8)));
     }
 
     /** Path construction is IO-free; first prepare belongs to an existing bounded IO worker. */
@@ -56,7 +46,7 @@ final class SfcServerContentPaths {
         Path targetBase = absolute(server).resolve("game-console/world-content");
         Path legacy = absolute(world).resolve("game-console/piq-sfc-home").resolve(area.directory);
         try {
-            Path target = targetBase.resolve(scope(server, world)).resolve("piq-sfc-home").resolve(area.directory);
+            Path target = cn.piq.retro.storage.ServerContentPaths.worldArea(server, world, "piq-sfc-home", area.directory);
             return new Location(target, legacy, area, null);
         } catch (IllegalArgumentException differentRoots) {
             // Stores are constructed by server tick paths. Keep construction IO-free/non-throwing;

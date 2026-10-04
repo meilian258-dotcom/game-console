@@ -54,5 +54,8 @@
   "screen.piq_sfc_arcade.refresh": "Refresh Library",
   "screen.piq_sfc_arcade.library_page": "Page %s / %s",
   "screen.piq_sfc_arcade.library_upload_notice": "Selecting a local-only game uploads it to the server and configures this machine",
-  "screen.piq_sfc_arcade.library_empty": "No usable .sfc/.smc ROM exists in either the local or server sfc-roms folder"
+  "screen.piq_sfc_arcade.library_empty": "No usable .sfc/.smc ROM; local: sfc-roms; server: game-console/piq-sfc-arcade/roms",
+  "message.piq_sfc_arcade.content_preparing": "Preparing the SFC server library in the background (originals retained). Please retry shortly",
+  "message.piq_sfc_arcade.content_working": "Processing the SFC content library in the background",
+  "message.piq_sfc_arcade.content_failed": "SFC library operation failed: %s. Original files were retained; check the server log and retry"
 }

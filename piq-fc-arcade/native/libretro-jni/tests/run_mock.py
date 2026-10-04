@@ -11,10 +11,12 @@ def main():
     (work/'中文测试.bin').write_bytes(bytes(64))
     commands=[
       [str(a.compiler),'-std=c++20','-O2','-static','-shared','-Wl,--no-insert-timestamp',str(here/'mock_core.cpp'),'-o',str(out/'mock.dll'),'-lopengl32'],
-      [str(a.jdk/'bin/javac.exe'),'-encoding','UTF-8','-d',str(classes),str(here/'NativeLibretroBridge.java'),str(here/'MultiSessionProbe.java')],
+      [str(a.compiler),'-std=c++20','-O2','-static','-shared','-DPIQ_MOCK_FULLPATH','-Wl,--no-insert-timestamp',str(here/'mock_core.cpp'),'-o',str(out/'mock-fullpath.dll'),'-lopengl32'],
+      [str(a.jdk/'bin/javac.exe'),'-encoding','UTF-8','-d',str(classes),str(here/'NativeLibretroBridge.java'),str(here/'MultiSessionProbe.java'),str(here/'LargeContentProbe.java')],
       [str(a.jdk/'bin/java.exe'),'-Xcheck:jni','-cp',str(classes),'cn.piq.retro.libretro.jni.NativeLibretroBridge',str(a.bridge),str(out/'mock.dll'),str(work)],
       [str(a.jdk/'bin/java.exe'),'-Xcheck:jni','-cp',str(classes),'cn.piq.retro.libretro.jni.NativeLibretroBridge',str(a.bridge),str(out/'mock.dll'),str(work),'startup-cleanup-failure'],
-      [str(a.jdk/'bin/java.exe'),'-Xcheck:jni','-cp',str(classes),'cn.piq.retro.libretro.jni.MultiSessionProbe',str(a.bridge),str(out/'mock.dll'),str(work)]
+      [str(a.jdk/'bin/java.exe'),'-Xcheck:jni','-cp',str(classes),'cn.piq.retro.libretro.jni.MultiSessionProbe',str(a.bridge),str(out/'mock.dll'),str(work)],
+      [str(a.jdk/'bin/java.exe'),'-Xmx128m','-Xcheck:jni','-cp',str(classes),'cn.piq.retro.libretro.jni.LargeContentProbe',str(a.bridge),str(out/'mock.dll'),str(out/'mock-fullpath.dll'),str(work)]
     ]
     receipt={'bridgeSha256':hashlib.sha256(a.bridge.read_bytes()).hexdigest().upper(),'runs':[]}
     for i,cmd in enumerate(commands):

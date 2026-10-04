@@ -16,6 +16,9 @@ static unsigned mode = 0, frame = 0, keyEvents = 0;
 static std::array<uint8_t, 32> ram{};
 static std::array<uint8_t, 8> rtc{};
 static retro_hw_render_callback hw{};
+#ifdef PIQ_MOCK_FULLPATH
+static const retro_game_info_ext *persistentContent;
+#endif
 static void key(bool, unsigned, unsigned, uint16_t) { keyEvents++; }
 static void resetGl() {
     if (mode == 35) {
@@ -47,7 +50,13 @@ void retro_set_audio_sample(retro_audio_sample_t cb) { audio = cb; }
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { batch = cb; }
 void retro_set_input_poll(retro_input_poll_t cb) { poll = cb; }
 void retro_set_input_state(retro_input_state_t cb) { input = cb; }
-void retro_get_system_info(retro_system_info *info) { *info = {"PIQ mock", "abi1", "bin", false, false}; }
+void retro_get_system_info(retro_system_info *info) {
+#ifdef PIQ_MOCK_FULLPATH
+    *info = {"PIQ mock", "abi1", "bin", true, false};
+#else
+    *info = {"PIQ mock", "abi1", "bin", false, false};
+#endif
+}
 void retro_get_system_av_info(retro_system_av_info *av) {
     av->geometry = {2, 2, 4, 4, 4.0f / 3};
     av->timing = {60, 32040};
@@ -57,6 +66,19 @@ void retro_deinit() {}
 bool retro_load_game(const retro_game_info *game) {
     frame = keyEvents = 0;
     mode = game && game->size ? ((const uint8_t *)game->data)[0] : 0;
+#ifdef PIQ_MOCK_FULLPATH
+    // Mirrors the Mesen-style persistent extended-info contract even though
+    // retro_load_game itself receives only a path. Read again in retro_run.
+    persistentContent = nullptr;
+    if (!game || !game->path || game->data || game->size ||
+        !environment(RETRO_ENVIRONMENT_GET_GAME_INFO_EXT, &persistentContent) ||
+        !persistentContent || !persistentContent->persistent_data || !persistentContent->data ||
+        !persistentContent->size || std::strcmp(game->path, persistentContent->full_path))
+        return false;
+    auto data = static_cast<const uint8_t *>(persistentContent->data);
+    if (data[0] != 0x41 || data[persistentContent->size - 1] != 0x5a)
+        return false;
+#endif
     ram.fill(0);
     rtc.fill(0);
     if (mode == 10) {
@@ -80,6 +102,14 @@ bool retro_load_game(const retro_game_info *game) {
 void retro_unload_game() {}
 void retro_set_controller_port_device(unsigned, unsigned) {}
 void retro_run() {
+#ifdef PIQ_MOCK_FULLPATH
+    auto data = static_cast<const uint8_t *>(persistentContent->data);
+    if (data[0] != 0x41 || data[persistentContent->size - 1] != 0x5a) {
+        retro_game_geometry bad{4096, 1, 4096, 1, 1};
+        environment(RETRO_ENVIRONMENT_SET_GEOMETRY, &bad);
+        return;
+    }
+#endif
     frame++;
     if (mode == 12 && frame == 1) Sleep(2000);
     if (mode == 13) {
