@@ -6,11 +6,11 @@ modId="piq_pvz"
 version="${version}"
 displayName="方块电玩：PvZ 测试附属"
 authors="meilian; PvZ-Portable and libretro port contributors"
-description='''方块电玩 PvZ 测试附属：默认独立进程，配套电脑10可选通用JNI一期实验（原生故障可能导致MC退出、全新独立试验存档）。需自行提供main.pak，仅Windows x64。音画旁观由电脑附属提供，非双人Netplay；尚未Minecraft验收，不含游戏素材。'''
+description='''方块电玩 PvZ 测试附属：默认独立进程，配套电脑12可选通用JNI一期实验（原生故障可能导致MC退出、全新独立试验存档）。需自行提供main.pak，仅Windows x64。音画旁观由电脑附属提供，非双人Netplay；尚未Minecraft验收，不含游戏素材。'''
 [[dependencies.piq_pvz]]
 modId="neoforge"
 type="required"
-versionRange="[21.1.236,22)"
+versionRange="[${neo_min_version},22)"
 ordering="NONE"
 side="BOTH"
 [[dependencies.piq_pvz]]

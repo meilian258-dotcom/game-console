@@ -1,10 +1,11 @@
 plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
+apply from: '../source-control/neoforge-compat.gradle'
 group = 'cn.piq.pvz'
-version = '0.1.0-prototype.11'
+version = '0.1.0-prototype.12'
 base { archivesName = 'game_console_pvz' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 neoForge {
-    version = '21.1.236'
+    version = neo_version
     mods { piq_pvz { sourceSet(sourceSets.main) } }
 }
 repositories { mavenCentral() }
@@ -17,8 +18,8 @@ dependencies {
 }
 tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8' }
 def metadata = tasks.register('generateModMetadata', ProcessResources) {
-    inputs.property 'version', project.version
-    expand(version: project.version)
+    inputs.properties(version: project.version, neo_min_version: neo_min_version)
+    expand(version: project.version, neo_min_version: neo_min_version)
     from 'src/main/templates'; into 'build/generated/modMetadata'
 }
 sourceSets.main.resources.srcDir metadata

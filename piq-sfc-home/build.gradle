@@ -2,6 +2,7 @@ plugins {
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.141'
 }
+apply from: '../source-control/neoforge-compat.gradle'
 group = 'cn.piq.sfchome'
 version = mod_version
 base { archivesName = 'piq_sfc_home' }
@@ -9,7 +10,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 // Protocol tests exercise the real Minecraft/Netty codecs, not local stubs.
 sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
 neoForge {
-    version = '21.1.236'
+    version = neo_version
     mods { piq_sfc_home { sourceSet(sourceSets.main) } }
 }
 repositories { mavenCentral() }
@@ -24,8 +25,8 @@ dependencies {
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 def metadata = tasks.register('generateModMetadata', ProcessResources) {
-    inputs.property 'version', project.version
-    expand(version: project.version)
+    inputs.properties(version: project.version, neo_min_version: neo_min_version)
+    expand(version: project.version, neo_min_version: neo_min_version)
     from 'src/main/templates'
     into 'build/generated/modMetadata'
 }

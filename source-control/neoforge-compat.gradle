@@ -1,0 +1,28 @@
+// Compile target and published runtime floor are deliberately independent.
+def compatibilityFile = file('../source-control/neoforge-compat.properties')
+def compatibility = new Properties()
+compatibilityFile.withInputStream { compatibility.load(it) }
+if (compatibility.stringPropertyNames() != (['minecraft_version', 'neo_version', 'neo_min_version'] as Set)) {
+    throw new GradleException('Unexpected NeoForge compatibility policy keys')
+}
+def revision = { String value ->
+    if (!(value ==~ /21\.1\.(0|[1-9][0-9]*)/)) {
+        throw new GradleException('Only NeoForge 21.1 numeric releases are supported: ' + value)
+    }
+    new BigInteger(value.substring('21.1.'.length()))
+}
+def minimum = compatibility.getProperty('neo_min_version')
+def defaultCompile = compatibility.getProperty('neo_version')
+def compileVersion = providers.gradleProperty('neo_version').getOrElse(defaultCompile)
+if (compatibility.getProperty('minecraft_version') != '1.21.1' ||
+        providers.gradleProperty('minecraft_version').getOrElse('1.21.1') != '1.21.1' ||
+        revision(defaultCompile) < revision(minimum) || revision(compileVersion) < revision(minimum)) {
+    throw new GradleException('Compile target must be Minecraft 1.21.1 / NeoForge >= ' + minimum)
+}
+// A CLI compile override must never silently rewrite the published support floor.
+if (providers.gradleProperty('neo_min_version').isPresent()) {
+    throw new GradleException('Edit the reviewed common policy to change neo_min_version; no CLI override')
+}
+ext.neo_version = compileVersion
+ext.neo_min_version = minimum
+ext.neoCompatibilityPolicyFile = compatibilityFile

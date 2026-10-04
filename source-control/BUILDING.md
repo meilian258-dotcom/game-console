@@ -1,5 +1,15 @@
 # 从 Git 源码构建：一期（FC 主包）
 
+## 2026-10-04：NeoForge 编译版与最低运行版分离（测试候选）
+
+当前七组件开发线仍是Minecraft1.21.1/Java21。共同 [neoforge-compat.properties](neoforge-compat.properties) 保留默认编译 `neo_version=21.1.236`，独立最低 `neo_min_version=21.1.229`。FC/SFC家用/MD/街机/电脑/PvZ使用 [共同Gradle策略](neoforge-compat.gradle)，`-Pneo_version=21.1.229`或235只指定编译测试目标，发行最低不跟着改变；拒绝非21.1、低于floor、其他MC与命令行最低值覆盖。GBA自建从同一策略展开最终元数据，但真实依赖目录仍须显式匹配本次测试版。
+
+开发版本为FC76.39/完整SFC46/MD13/街机1.5.6/GBA15/电脑12/PvZ12；完整SFC须保留冻结core9，只在新合包元数据中白名单调整其NeoForge下界。策略检查入口是 `python -B -m unittest discover -s source-control -p "test_neoforge_compat.py" -v`；[只读最终包检查器](neoforge_compat.py)支持七次 `--jar`，覆盖完整SFC的两个依赖owner，不代替Maven依赖/实际加载测试。
+
+已验证：229/236六Gradle组件每轮3,686项（3,676通过、10跳过、0失败/错误），GBA每轮六探针32,389检查全部通过且调用真实mGBA JNI；七个源码构建JAR两轮逐件同SHA（SFC此处为开发薄包）。七件完整冻结候选在229/235/236隔离专服均核验8 ID/版本、Done、正常stop与exit0，QA原53文件全恢复、无遗留进程。54项Python工具单测为52通过/2跳过，7项真实配置正负门禁和68项Maven边界/互依赖检查均达到预期。仍非稳定版：图形客户端、多人与Iris未验；不能把235配置/专服通过说成235整套源码重编通过。完整七SHA、core9保留、PvZ仅来源登记文档例外及229首轮检查器误报复测说明均在下方指南；最新目录/管理台同步以另行回执为准。
+
+原236及更高兼容21.1用户无需主动降级；整合包其他MOD的更高最低要求仍有效。229下界的官方安全修复依据、同批安装规则、旧core9例外及明确未验项见[本轮完整说明](../piq-fc-arcade/design/NeoForge兼容范围-20261004.md)。Flash/J2ME/旧独立SFC core不纳入此批，原固定输入与构建授权门禁不变。以下保留构建标准化一期的历史范围与证据，不把旧测试数计为本次通过。
+
 适用：2026-09-29，FC76.24/76.25源码、Java21、项目wrapper锁定Gradle9.2.1与NeoForge21.1.236。这是开发构建说明，不是游戏升级通知。
 
 FC76.25 的功能修复将第9项 JNI Netplay 核心更新为 `mesen-jni-netplay-r2`，仍共9个输入；r1缓存不删除且不能代替r2。原生重建入口见 [Mesen r2](../piq-fc-arcade/native-mesen-netplay/README.md)，导入使用 `python source-control/build_inputs.py import --id mesen-jni-netplay-r2 --file "实际重建目录/mesen_piq_jni_netplay_r2.dll"`。游戏行为/存档变更另见 [FC76.25指南](../piq-fc-arcade/design/FC76.25-JNI游戏加载修复.md)。下方第3、4节保留最初76.24构建迁移的历史证据，不作为76.25未修复的结论。

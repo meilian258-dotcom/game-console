@@ -1,9 +1,10 @@
 plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
+apply from: '../source-control/neoforge-compat.gradle'
 group = 'cn.piq.nativearcade'
 version = mod_version
 base { archivesName = 'piq_native_arcade' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-neoForge { version = '21.1.236'; mods { piq_native_arcade { sourceSet(sourceSets.main) } } }
+neoForge { version = neo_version; mods { piq_native_arcade { sourceSet(sourceSets.main) } } }
 repositories { mavenCentral() }
 def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.34.jar'))
 dependencies {
@@ -14,7 +15,8 @@ dependencies {
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 def metadata = tasks.register('generateModMetadata', ProcessResources) {
-    inputs.property 'version', project.version; expand(version: project.version)
+    inputs.properties(version: project.version, neo_min_version: neo_min_version)
+    expand(version: project.version, neo_min_version: neo_min_version)
     from 'src/main/templates'; into 'build/generated/modMetadata'
 }
 sourceSets.main.resources.srcDir metadata

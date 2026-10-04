@@ -10,7 +10,7 @@ description='''Windows x64 arcade with fixed-version MAME and separately license
 [[dependencies.piq_native_arcade]]
 modId="neoforge"
 type="required"
-versionRange="[21.1.236,22)"
+versionRange="[${neo_min_version},22)"
 ordering="NONE"
 side="BOTH"
 [[dependencies.piq_native_arcade]]

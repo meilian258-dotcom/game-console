@@ -3,13 +3,13 @@ loaderVersion="[4,)"
 license="GPL-3.0-or-later (adapter); Genesis Plus GX non-commercial (see licenses); supplied model redistribution permission pending"
 [[mods]]
 modId="piq_md_home"
-version="0.1.0-alpha.12"
+version="${version}"
 displayName="方块电玩 · MD2"
 description='''MD2 家用机：老式电脑写卡、实体电源、AV电视、双手柄和服务器个人/卡带进度。支持玩家音画串流及显式选择的 JNI Netplay 试验模式，使用独立 Genesis Plus GX PIQ Netplay 核心与隔离存档。保留私人本机旧档和BlastEm兼容入口。Genesis Plus GX禁止商业用途，分发须附完整对应源码。测试候选；本地同步/RetroArch Netplay/服务器托管/CD/32X未开放。'''
 [[dependencies.piq_md_home]]
 modId="neoforge"
 type="required"
-versionRange="[21.1.236,22)"
+versionRange="[${neo_min_version},22)"
 ordering="NONE"
 side="BOTH"
 [[dependencies.piq_md_home]]

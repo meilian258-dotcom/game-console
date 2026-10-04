@@ -1,9 +1,10 @@
 plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
+apply from: '../source-control/neoforge-compat.gradle'
 group = 'cn.piq.mdhome'
 version = mod_version
 base { archivesName = 'game_console_md' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-neoForge { version = '21.1.236'; mods { piq_md_home { sourceSet(sourceSets.main) } } }
+neoForge { version = neo_version; mods { piq_md_home { sourceSet(sourceSets.main) } } }
 repositories { mavenCentral() }
 def fc = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.36.jar'))
 dependencies {
@@ -36,4 +37,10 @@ def verifyCores = tasks.register('verifyCores') {
     }
 }
 processResources.dependsOn verifyCores
+tasks.named('processResources', ProcessResources) {
+    inputs.properties(version: project.version, neo_min_version: neo_min_version)
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand(version: project.version, neo_min_version: neo_min_version)
+    }
+}
 jar { manifest { attributes 'Implementation-Title': 'Game Console MD', 'Implementation-Version': project.version } }
