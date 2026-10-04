@@ -2,11 +2,13 @@
 
 在 Minecraft 中放置和操作游戏设备的模组项目。主模组内置 FC/NES、电视与公共设备能力，SFC、街机、GBA、MD、电脑程序等通过各自附属接入。
 
-面向 Minecraft 1.21.1、NeoForge 21.1 和 Java 21。当前是持续开发中的候选版本，**不是全部机型、联机方式和平台均已验证的稳定发行版，也不是稳定附属 SDK**。
+面向 Minecraft 1.21.1、NeoForge 21.1 和 Java 21。当前七个配套包的最低 NeoForge 要求为 21.1.229，默认编译基线仍为 21.1.236；验证范围及安装限制见[NeoForge 兼容说明](piq-fc-arcade/design/NeoForge兼容范围-20261004.md)。当前是持续开发中的候选版本，**不是全部机型、联机方式和平台均已验证的稳定发行版，也不是稳定附属 SDK**。
 
 ## 从哪里开始
 
 制作目标以[机器与附属通用制作规范](piq-fc-arcade/design/机器制作与交互标准.md)为准：第 1 节规定完整统一流程及各设备类型分支。实际源码入口、界面、API、保存与缺口查[全组件运行流程与复用接口总览](piq-fc-arcade/design/全组件运行流程与复用接口总览.md)。规范不是已实现声明，历史版本指南不覆盖当前流程目标。
+
+2026-10-04 本次源码整合包含此前的 MD、公共开局、JNI Netplay、多屏旁观、服务端内容／BIOS 修复及版本兼容调整，不再是 2026-10-03 的单独规范同步。源码纳入不等于全部功能通过真人验收；各候选的已验证范围与待办仍以对应记录为准。
 
 - 玩家：[主模组与当前版本说明](piq-fc-arcade/README.md)。按配套指南安装，不把各目录的最大版本号任意混搭。
 - 开发者：[Git 工作流](GIT_WORKFLOW.md)、[固定输入与构建](source-control/BUILDING.md)、[协作规范](piq-fc-arcade/AGENTS.md)。
@@ -21,7 +23,7 @@
 | Game Console: SFC | [piq-sfc-home](piq-sfc-home) | 使用包含 SFC 核心的完整交付包；薄包不是完整安装包 |
 | Game Console: Arcade | [piq-native-arcade](piq-native-arcade) | 原生街机附属，各运行模式能力不同 |
 | Game Console: GBA | [piq-gba](piq-gba) | 掌机及单席机柜；不代表支持 GBA 通讯联机 |
-| Game Console: MD | [piq-md-home](piq-md-home) | 已接公开玩家串流、双手柄、旁观及服务器保存；完整业务流程尚未达标，仍为测试候选 |
+| Game Console: MD | [piq-md-home](piq-md-home) | 已接公共开局、显式 JNI Netplay、公开玩家串流、双手柄、旁观及服务器保存；仍为测试候选，真人多人等验收见组件记录 |
 | Game Console: Computer | [piq-computer](piq-computer) | 可组装电脑与程序接入 |
 | Game Console: PvZ | [piq-pvz-addon](piq-pvz-addon) | 自备游戏资源的运行适配 |
 | Game Console: Flash Box | [piq-flash-box](piq-flash-box) | 历史播放盒，有独立版本限制，不与当前主包随意混装 |
