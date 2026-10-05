@@ -15,7 +15,7 @@ class SfcPlayerMediaSourceTest {
         assertTrue(s.contains("c.synchronizationMode()!=mode||!modeSupported(c)"));
         assertTrue(s.contains("st.tick,mode"));assertTrue(s.contains("st.tick,old.mode"));
         assertTrue(s.contains("host,run==null?s.mode.ordinal():3,s.watchSource,s.host.id"));
-        assertTrue(read("net/SfcHomeNetwork").contains("TrafficPayloadRegistrar.create(event,\"12\")"));
+        assertTrue(read("net/SfcHomeNetwork").contains("TrafficPayloadRegistrar.create(event,\"13\")"));
     }
     @Test void receiverBypassesRomAndCoreButHostKeepsOrderedInput()throws Exception{
         String c=read("client/SfcHomeClient"),worker=read("client/SfcPlayback"),s=read("server/SfcHomeServer");

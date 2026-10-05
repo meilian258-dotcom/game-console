@@ -50,7 +50,7 @@ class SfcContentPermissionSourceTest {
     }
     @Test void editorWireCarriesValidatedCapabilitiesAndOldConstructorsDenyByDefault()throws Exception{
         String s=source("net/SfcHomeNetwork");
-        assertTrue(s.contains("TrafficPayloadRegistrar.create(event,\"12\")"));
+        assertTrue(s.contains("TrafficPayloadRegistrar.create(event,\"13\")"));
         assertTrue(s.contains("boolean explicitPlayers,int capabilities,List<RomEntry> catalog"));
         assertTrue(s.contains("b.writeByte(v.capabilities)"));
         assertTrue(s.contains("SfcEditorPermissions.checked(b.readUnsignedByte())"));

@@ -9,6 +9,7 @@ import cn.piq.fcarcade.home.CartridgeCoverCodec;
 import cn.piq.fcarcade.home.CartridgeLimits;
 import cn.piq.sfchome.net.SfcHomeNetwork;
 import cn.piq.sfchome.net.SfcEditorPermissions;
+import cn.piq.sfchome.net.SfcEditorStatus;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -38,7 +39,7 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
     private EditBox titleField,searchField;
     private Button writeButton,romFolderButton,coverFolderButton,refreshButton,previousButton,nextButton;
     private Button gamesTabButton,coversTabButton,playersButton,saveNameButton,clearCoverButton,restoreCoverButton,saveManagerButton;
-    private String status="",libraryStatus="",uploadSha="",uploadName="",searchQuery="";
+    private String status="",serverStatus="",libraryStatus="",uploadSha="",uploadName="",searchQuery="";
     private byte[] upload;
     private SfcUploadTitle uploadTitle;
     private int uploadOffset;
@@ -47,7 +48,8 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
     private long actionAt;
 
     SfcCardEditorScreen(SfcHomeNetwork.Editor data){
-        super(Component.literal("SFC / 卡带工作台"));this.data=data;status=data.message();
+        super(Component.literal("SFC / 卡带工作台"));this.data=data;
+        serverStatus=SfcEditorStatus.remember("",data.message());status=SfcEditorStatus.directory(data.message())?"选择文件后确认写入":data.message();
         library=new SfcCardLibrary(data.title());library.labels(this::displayName);serverRows();
     }
     UUID token(){return data.token();}
@@ -78,7 +80,7 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
         if(titleCursor>=0)titleField.moveCursorTo(Math.min(titleCursor,library.title().length()),false);
         titleField.setTooltip(Tooltip.create(Component.literal("卡带名称草稿；点击保存名称后才修改当前卡带")));
         saveNameButton=action("保存名称",workbench.saveName(),()->setting(SfcHomeNetwork.SAVE_NAME,0),DeviceUi.Tone.NORMAL);
-        playersButton=action("",workbench.players(),()->setting(SfcHomeNetwork.SET_PLAYERS,data.explicitPlayers()&&data.maxPlayers()==2?1:2),DeviceUi.Tone.NORMAL);
+        playersButton=action("",workbench.players(),()->setting(SfcHomeNetwork.SET_PLAYERS,SfcWorkbenchDisplay.nextPlayers(data.maxPlayers())),DeviceUi.Tone.NORMAL);
         gamesTabButton=action("游戏库",workbench.gamesTab(),()->tab(false),DeviceUi.Tone.NORMAL);
         coversTabButton=action("封面",workbench.coversTab(),()->tab(true),DeviceUi.Tone.NORMAL);
         var search=workbench.search();searchField=new EditBox(font,search.x(),search.y(),search.width(),search.height(),Component.literal("搜索名称或文件名"));
@@ -137,7 +139,7 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
         gamesTabButton.active=!busy()&&!scanning&&coverTab;coversTabButton.active=!busy()&&!scanning&&!coverTab;
         gamesTabButton.setMessage(Component.literal(coverTab?"游戏库":"> 游戏库"));coversTabButton.setMessage(Component.literal(coverTab?"> 封面":"封面"));
         saveNameButton.active=!busy()&&canBrowse();playersButton.active=!busy()&&canAdmin();
-        playersButton.setMessage(Component.literal("人数："+(data.explicitPlayers()&&data.maxPlayers()==2?"双人":"单人")));
+        playersButton.setMessage(Component.literal(SfcWorkbenchDisplay.players(data.maxPlayers())));
         playersButton.setTooltip(Tooltip.create(Component.literal(canAdmin()?"设置可加入人数；是否需要申请由主机设置决定。游戏本身也需要支持双人。":"人数设置仅管理员可修改；名称可保存到自己手中的卡带")));
         if(clearCoverButton!=null){clearCoverButton.active=!busy()&&canBrowse()&&!data.coverSha().isEmpty();restoreCoverButton.active=!busy()&&canBrowse();}
         if(saveManagerButton!=null)saveManagerButton.active=!busy()&&canBrowse();if(saveManagerButton!=null)saveManagerButton.setMessage(Component.literal("Netplay 存档："+new String[]{"不保存","个人","卡带"}[data.saveMode()]));
@@ -225,6 +227,11 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
         data=message;serverRows();
         if(!canBrowse()){SfcHomeClient.toast("服务器游戏库授权已撤销，请联系管理员");onClose();return;}
         if(!canUpload(false))library.local(List.of());if(!canUpload(true))covers.local(List.of());
+        serverStatus=SfcEditorStatus.remember(serverStatus,message.message());
+        if(SfcEditorStatus.directory(message.message())){
+            if(phase==Phase.REFRESHING){phase=Phase.IDLE;status="服务器目录刷新已返回；详情见状态栏";}
+            rebuildRows();return;
+        }
         if(message.message().equals("PERMISSIONS_UPDATED")){
             if(phase==Phase.READING&&!canUpload(coverTab)){importWork.begin();phase=Phase.IDLE;status=uploadDenied(coverTab);}
             else if((phase==Phase.WAIT_UPLOAD||phase==Phase.UPLOADING)&&!canUpload(uploadCover)){phase=Phase.IDLE;upload=null;uploadTitle=null;status="上传权限已关闭，未继续发送文件";}
@@ -284,11 +291,11 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
         String[] detailLines=SfcWorkbenchDisplay.details(heading,selectedName,source,lines);
         for(int i=0;i<detailLines.length;i++)DeviceUi.text(g,font,detailLines[i],details.x()+6,textY+i*12,details.width()-12,i==0?DeviceUi.TEXT:DeviceUi.MUTED);
         String page=(shownLibrary().page(layout.rows())+1)+" / "+shownLibrary().pages(layout.rows())+" 页 · "+shownLibrary().filtered().size()+" 项";
-        var line=layout.status();DeviceUi.status(g,font,page+" · "+status+" · "+libraryStatus,line.x(),line.y(),line.width(),busy()||scanning);
+        var line=layout.status();DeviceUi.status(g,font,page+" · "+status+" · "+serverStatus+" · "+libraryStatus,line.x(),line.y(),line.width(),busy()||scanning);
         super.render(g,mouseX,mouseY,delta);
         if(mouseX>=details.x()&&mouseX<details.right()&&mouseY>=details.y()&&mouseY<textBottom)
             g.renderTooltip(font,Component.literal(heading+"\n名称："+selectedName+"\n来源："+source+(selected==null?"":"\n"+selected.bytes()+" 字节\n"+SfcWorkbenchDisplay.original(selected))),mouseX,mouseY);
         if(mouseX>=line.x()&&mouseX<line.right()&&mouseY>=line.y()&&mouseY<line.bottom())
-            g.renderTooltip(font,Component.literal(page+"\n"+status+"\n"+libraryStatus),mouseX,mouseY);
+            g.renderTooltip(font,Component.literal(page+"\n"+status+"\n"+serverStatus+"\n"+libraryStatus),mouseX,mouseY);
     }
 }

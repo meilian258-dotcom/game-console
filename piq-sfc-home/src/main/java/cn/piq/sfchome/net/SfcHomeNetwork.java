@@ -25,6 +25,7 @@ public final class SfcHomeNetwork {
         void romChunk(RomChunk value); void editor(Editor value);
         default void control(Control value){}
         default void netplay(NetplayStart value){}
+        default void netplayActivated(NetplayActivated value){}
         default void hosted(SfcHostedNetwork.Stream value){}
         default void hostedReset(SfcHostedNetwork.Reset value){}
         default boolean acceptsConnection(Object source){return false;}
@@ -34,7 +35,7 @@ public final class SfcHomeNetwork {
     public static void setCoverHandler(java.util.function.Consumer<CoverChunk> handler){coverClient=Objects.requireNonNull(handler);}
     public static void setClientHandler(ClientHandler handler) { client = Objects.requireNonNull(handler); }
     public static void register(RegisterPayloadHandlersEvent event) {
-        var r = cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"12");
+        var r = cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"13");
         SfcHostedNetwork.register(event);
         SfcJoinNetwork.register(event);
         r.playToServer(CoverRequest.TYPE,CoverRequest.CODEC,(p,c)->c.enqueueWork(()->{if(c.player() instanceof ServerPlayer s)cn.piq.sfchome.server.SfcCoverService.download(s,p);}));
@@ -44,6 +45,7 @@ public final class SfcHomeNetwork {
         r.playToServer(EditorAction.TYPE,EditorAction.CODEC,(p,c)->c.enqueueWork(()->{if(c.player() instanceof ServerPlayer s) SfcCartridgeEditorService.handle(s,p);}));
         r.playToClient(Session.TYPE,Session.CODEC,(p,c)->dispatch(c,h->h.session(p)));
         r.playToClient(NetplayStart.TYPE,NetplayStart.CODEC,(p,c)->dispatch(c,h->h.netplay(p)));
+        r.playToClient(NetplayActivated.TYPE,NetplayActivated.CODEC,(p,c)->dispatch(c,h->h.netplayActivated(p)));
         r.playToClient(Control.TYPE,Control.CODEC,(p,c)->dispatch(c,h->h.control(p)));
         r.playToClient(Frames.TYPE,Frames.CODEC,(p,c)->dispatch(c,h->h.frames(p)));
         r.playToClient(Stopped.TYPE,Stopped.CODEC,(p,c)->dispatch(c,h->h.stopped(p)));
@@ -81,6 +83,13 @@ public final class SfcHomeNetwork {
         public NetplayStart{Objects.requireNonNull(session);Objects.requireNonNull(ticket);if(session.syncMode()!=3||wire<(1L<<50))throw new IllegalArgumentException("Netplay grant");}
         public static final Type<NetplayStart> TYPE=id("netplay_start");
         public static final StreamCodec<RegistryFriendlyByteBuf,NetplayStart> CODEC=StreamCodec.of((b,v)->{Session.CODEC.encode(b,v.session);b.writeLong(v.wire);b.writeUUID(v.ticket);},b->new NetplayStart(Session.CODEC.decode(b),b.readLong(),b.readUUID()));
+        @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
+    /** Sent only after the server commits launch and (when enabled) save authority. */
+    public record NetplayActivated(long sessionId,int epoch,long wire,UUID ticket) implements CustomPacketPayload {
+        public NetplayActivated{SfcHomeNetwork.sessionId(sessionId,epoch);Objects.requireNonNull(ticket);if(wire<(1L<<50))throw new IllegalArgumentException("Netplay activation");}
+        public static final Type<NetplayActivated> TYPE=id("netplay_activated");
+        public static final StreamCodec<RegistryFriendlyByteBuf,NetplayActivated> CODEC=StreamCodec.of((b,v)->{b.writeVarLong(v.sessionId);b.writeVarInt(v.epoch);b.writeLong(v.wire);b.writeUUID(v.ticket);},b->new NetplayActivated(b.readVarLong(),b.readVarInt(),b.readLong(),b.readUUID()));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     public record Control(long sessionId,int epoch,UUID lease,int port,boolean active) implements CustomPacketPayload {

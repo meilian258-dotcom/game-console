@@ -14,7 +14,7 @@ neoForge {
     mods { piq_sfc_home { sourceSet(sourceSets.main) } }
 }
 repositories { mavenCentral() }
-def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.41.jar'),
+def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.42.jar'),
         providers.gradleProperty('sfcCoreJar').getOrElse('../piq-sfc-arcade/build/libs/piq_sfc_arcade-0.2.0-alpha.10.jar'))
 dependencies {
     implementation localModJars

@@ -7,6 +7,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SfcWorkbenchDisplayTest {
     private static final String HASH="0123456789abcdef".repeat(4);
+    @Test void legacyEditorDefaultsShowTheSameTwoPlayersTheServerUses(){
+        var old=new cn.piq.sfchome.net.SfcHomeNetwork.Editor(java.util.UUID.randomUUID(),true,"",HASH,"旧卡",List.of());
+        assertFalse(old.explicitPlayers());assertEquals(2,old.maxPlayers());
+        assertEquals("人数：双人",SfcWorkbenchDisplay.players(old.maxPlayers()));assertEquals(1,SfcWorkbenchDisplay.nextPlayers(old.maxPlayers()));
+        assertEquals("人数：单人",SfcWorkbenchDisplay.players(1));assertEquals(2,SfcWorkbenchDisplay.nextPlayers(1));
+    }
     @Test void currentServerRomUsesActualCardNameNotAHashGuess(){var row=SfcCardLibrary.Row.server(HASH,HASH+".sfc",32768);assertEquals("我的游戏",SfcWorkbenchDisplay.name(row,HASH,"我的游戏"));assertEquals(HASH+".sfc",row.name());assertEquals(HASH,row.hash());}
     @Test void unnamedServerHashHasShortExplicitlyUnknownLabel(){var row=SfcCardLibrary.Row.server(HASH,HASH+".smc",32768);assertEquals("未命名游戏 · 01234567",SfcWorkbenchDisplay.name(row,"","other"));assertTrue(SfcWorkbenchDisplay.original(row).contains(HASH+".smc"));assertTrue(SfcWorkbenchDisplay.original(row).contains("SHA-256："+HASH));}
     @Test void ordinaryNamesAreNeverGuessedOrRenamed(){for(String n:new String[]{"Super Game.sfc","马里奥.smc","01234567.sfc",HASH+"-copy.sfc",HASH+".png"})assertEquals(n,SfcWorkbenchDisplay.name(SfcCardLibrary.Row.server(HASH,n,12),"",null));}
