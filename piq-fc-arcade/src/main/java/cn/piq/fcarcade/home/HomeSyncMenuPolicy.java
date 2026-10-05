@@ -28,6 +28,7 @@ public final class HomeSyncMenuPolicy {
     public static String buttonState(int mode, int selected, int mask, boolean editable, String unavailable) {
         if (!supported(mask, mode)) return unavailable;
         if (mode == selected) return "当前已选择此模式，无需重复选择。";
+        if(!editable&&unavailable!=null&&!unavailable.isBlank())return unavailable;
         return editable ? "管理员关机后可修改；已借手柄无需归还。"
                 : "目前只读：需要管理员权限，并先关机、关闭加入或存档选择窗口。";
     }

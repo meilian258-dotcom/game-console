@@ -37,8 +37,9 @@ public final class HomeLaunchScreen extends DeviceScreen {
         if(confirmFresh){button("确认从头开始",x,layout.rowY(3),half,()->start(false),true);button("返回选择",x+half+6,layout.rowY(3),w-half-6,()->{confirmFresh=false;rebuildWidgets();},true);}
         else if(data.stage()==Stage.SAVE_SELECTION){int count=data.rows().size(),bw=(w-(count-1)*4)/Math.max(1,count);
             for(int i=0;i<count;i++){int index=i;var row=data.rows().get(i);button((i==selected?"> ":"")+(data.mode()==1?"卡带进度":"槽位 "+row.slot())+(row.occupied()?" · 已有":" · 空"),x+i*(bw+4),layout.rowY(0),bw,()->{select(index);rebuildWidgets();},true);}
-            var name=new EditBox(font,layout.fieldX(),layout.rowY(2),layout.fieldWidth(),20,Component.literal("存档名称"));name.setMaxLength(32);name.setValue(draft);name.setResponder(v->draft=v);name.setEditable(!sent);addRenderableWidget(name);
-            button(savePlayers==2?"存档标签：双人":"存档标签：单人",x,layout.rowY(3),w,()->{savePlayers=savePlayers==1?2:1;rebuildWidgets();},data.maxPlayers()>1);
+            boolean metadataEditable=data.rows().get(selected).metadataEditable();
+            var name=new EditBox(font,layout.fieldX(),layout.rowY(2),layout.fieldWidth(),20,Component.literal("存档名称"));name.setMaxLength(32);name.setValue(draft);name.setResponder(v->draft=v);name.setEditable(!sent&&metadataEditable);addRenderableWidget(name);
+            button(metadataEditable?(savePlayers==2?"存档标签：双人":"存档标签：单人"):"旧档不含人数标签；加入许可在下一步选择",x,layout.rowY(3),w,()->{savePlayers=savePlayers==1?2:1;rebuildWidgets();},metadataEditable&&data.maxPlayers()>1);
             var row=data.rows().get(selected);button(row.occupied()&&row.compatible()?"继续游戏":"开始游戏",x,layout.rowY(4),half,()->{if(row.occupied()&&!row.compatible()){confirmFresh=true;rebuildWidgets();}else start(row.occupied());},true);
             button("从头开始…",x+half+6,layout.rowY(4),w-half-6,()->{confirmFresh=true;rebuildWidgets();},row.occupied());
         }else if(data.stage()==Stage.JOIN_CONFIRM){button("允许第二名玩家加入",x,layout.rowY(2),w,()->send(ALLOW,null),true);button("不允许，仅单人开始",x,layout.rowY(3),w,()->send(DENY,null),true);if(data.mode()!=0)button("返回存档选择",x,layout.rowY(4),w,()->send(BACK,null),true);}

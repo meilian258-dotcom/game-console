@@ -1,6 +1,10 @@
 # 方块电玩：SFC / Game Console: SFC
 
-## 当前：完整SFC47 / FC76.40（2026-10-04，内容库收尾候选）
+## 当前：完整SFC49 / FC76.41（2026-10-05，公共流程候选）
+
+客户端和服务端同换主包41与完整SFC49（内含core10）。公共名称、扫描诊断及家用开局适配完成源码接入；JNI Netplay 保留每游戏原有一份个人/卡带档，选档后另问2P，准备阶段不写档，正常退出等待保存确认。详细安装、接口和待验项见[本轮说明](../piq-fc-arcade/design/公共内容与SFC开局接入-20261004.md)。开发构建默认依赖FC41/core10；本目录build/libs仍是薄包。
+
+## 历史：完整SFC47 / FC76.40（2026-10-04，内容库收尾候选）
 
 完整SFC47由家用47薄包与审计后的内部core10合并，保留 `piq_sfc_home` / `piq_sfc_arcade` 两个注册ID；不能只装本目录薄包，也不要叠加安装旧core9。客户端/服务端均需配套FC76.40，依赖下界已明确拒绝缺公共路径API的旧主包。NeoForge仍默认21.1.236编译、最低21.1.229，MC1.21.1/Java21不变。当前最终完整包、安装清单及未验项以[本轮指南](../piq-fc-arcade/design/内容库收尾与核心退役-20261004.md)为准，不标稳定、不代表已发布部署。
 
@@ -8,7 +12,7 @@
 
 旧柜库选择、后台准备/列库/查询/上传、取消与连接/机器代次有界处理见[core10说明](../piq-sfc-arcade/README.md)。不是给家用加入另一套WASM运行链，也未改变Mesen-S、Netplay和模型；历史core9的52个class先与未改源码基线确认全部一致，才只放行本轮内容库范围的core10变化，WASM原件不变。旧成品保留，不再把“只能合并冻结core9”作为当前构建要求。
 
-**尚未统一的业务继续明确保留**：SFC家用自有 `SfcRomStore` 上传原名展示仍需后续适配；本轮不声称已解决SFC原名丢失。家用尚未接齐公共 `HomeLaunchServer/Screen` 的按需选档→独立2P确认链，普通备份/托管SRAM/Netplay/私人四种保存轨也没有合并；公共SFC机柜未新增JNI Netplay。这些不能由“目录已统一”推断完成。新主包还提供可选 `LibretroContentFiles/loadFiles` 供文件式ROM/BIOS加载，当前先由街机JNI链使用，不表示SFC所有路径已经调用它。
+以上是 SFC47 的历史范围。**SFC49 / FC76.41 更新**：上传原名复用公共 `ContentCardNames`，扫描复用 `ContentScanReport`，公开家用开局复用 `HomeLaunchServer/Screen` 的独立双人确认；JNI Netplay 接按需选档、加载恢复和持久化收尾。旧个人/卡带档仍每游戏一份，不迁为三槽；旧档名称/人数标签只读，不显示假编辑能力。其他保存轨、私人入口、公共 SFC 机柜保持原机制，不能称四轨合并或机柜已新增 Netplay。[安装与验证范围](../piq-fc-arcade/design/公共内容与SFC开局接入-20261004.md)。
 
 开发构建默认使用FC76.40和core10；可显式传 `-PgameConsoleJar=...` 与 `-PsfcCoreJar=...`，路径相对于本项目。构建顺序与完整包审核见[BUILDING](../source-control/BUILDING.md)。正式core10与家用47各自 `check jar` 已通过：core有ABI/仓库/迁移/取消及两项真实WASM smoke，家用517项（516通过、1跳过、0失败/错误）；符号链接创建探针受宿主限制明确跳过。日志在 `outputs/content-library-retirement-20261004/`，薄包通过不替代完整合包/MC真人验收。
 

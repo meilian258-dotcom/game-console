@@ -7,6 +7,9 @@ import java.util.UUID;
 
 /** Player-count metadata permits joining, never forces P1 to wait. */
 final class SfcHomeStartPolicy {
+    /** Translate presentation only; never rewrite legacy NBT or owner keys. */
+    static int commonSaveMode(int mode){return switch(mode){case 0->0;case 1->2;case 2->1;default->throw new IllegalArgumentException("Invalid SFC save mode");};}
+    static String saveOwner(int mode,UUID player,UUID card){return switch(mode){case 0->"sfc-no-save";case 1->"sfc-personal|"+java.util.Objects.requireNonNull(player);case 2->"sfc-card|"+java.util.Objects.requireNonNull(card);default->throw new IllegalArgumentException("Invalid SFC save mode");};}
     enum Plan { SINGLE, WAIT_FOR_SECOND, DUAL }
     static Plan plan(int players,boolean explicit,boolean approvedSecond){
         if(players!=1&&players!=2)throw new IllegalArgumentException("SFC players must be 1 or 2");

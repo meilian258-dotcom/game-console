@@ -118,8 +118,9 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
 
     def test_game_dependency_floors_match_required_public_api_generations(self):
         expected = {
+            # Shared launch protocol / legacy-save adapter require FC 76.41.
+            'piq-sfc-home': '[0.31.0-alpha.76.41,0.31.0-alpha.77)',
             # Unified content paths / file-backed JNI content require FC 76.40.
-            'piq-sfc-home': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
             'piq-sfc-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
             'piq-md-home': '[0.31.0-alpha.76.36,0.31.0-alpha.77)',
             'piq-native-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',

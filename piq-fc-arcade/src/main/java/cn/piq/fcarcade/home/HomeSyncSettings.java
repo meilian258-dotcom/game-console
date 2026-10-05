@@ -135,8 +135,9 @@ public final class HomeSyncSettings {
         var c = intent.console;
         String system = system(c);
         int modes=supported(player,c);
+        var access=DeviceSettingAccess.resolve(true,diagnosticsOnly(c),player.hasPermissions(2),busy(player,c));
         var modeReasons=new ArrayList<String>(5);
-        for(int mode=0;mode<5;mode++)modeReasons.add(HomeSyncMenuPolicy.supported(modes,mode)?"":bounded(unavailableMode(player,c,mode)));
+        for(int mode=0;mode<5;mode++)modeReasons.add(HomeSyncMenuPolicy.supported(modes,mode)?(access.editable()?"":access.reason()):bounded(unavailableMode(player,c,mode)));
         if(reason.equals("联机设置下次开机生效。")&&!diagnosticsOnly(c)) {
             if(!player.hasPermissions(2))reason="仅管理员可修改设备设置。";
             else if(busy(player,c))reason="关机并关闭加入、存档窗口后可修改设置。";
@@ -150,7 +151,7 @@ public final class HomeSyncSettings {
         if(reason.length()>256)reason=reason.substring(0,255)+"…";
         var setting=new HomeSyncNetwork.Setting(intent.token,intent.revision,player.serverLevel().dimension().location(),
                 c.getBlockPos(),c.hardwareId(),system,displayMode(c),modes,
-                !diagnosticsOnly(c)&&player.hasPermissions(2)&&!busy(player,c),reason,open,c.occupancyVisible(),c.joinApprovalRequired(),HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos()),intent.tool!=null,modeReasons);
+                access.editable(),reason,open,c.occupancyVisible(),c.joinApprovalRequired(),HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos()),intent.tool!=null,modeReasons);
         if(!identity(player,intent))return;
         intent.lastSetting=setting;HomeSyncNetwork.send(player,setting);
     }
