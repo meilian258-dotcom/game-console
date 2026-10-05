@@ -114,9 +114,10 @@ def relabel_console(model):
 
 
 def face_cartridge_forward(card):
-    # Its real cover is on NORTH (-Z), not SOUTH; rotate only handheld contexts.
-    # A proper rotation keeps glyphs upright/not mirrored and preserves GUI,
-    # ground/fixed transforms, the actual cover plane and inserted world mesh.
+    # Its real cover is on NORTH (-Z), not SOUTH. GUI and handheld views need
+    # the same proper turn to keep the label/cover upright and unmirrored.
+    # Ground/fixed transforms, the actual cover plane and world mesh stay put.
+    card['display']['gui']['right_rotation'] = [0, 180, 0]
     for hand in HANDS:
         right = hand.replace('lefthand', 'righthand')
         pose = copy.deepcopy(card['display'][right])
@@ -161,6 +162,13 @@ def split_controller(items, pad):
 
 def prepare(assets):
     items = assets / 'models/item'
+    # The world mesh sits on Y=0, so its inherited GUI pose puts the bottom
+    # below a 16px inventory slot. Override only the item GUI display: the
+    # fully rotated mesh projects to 13.34 x 5.83px, centered within 0.01px.
+    console = json.loads((items / 'md2.json').read_text(encoding='utf-8'))
+    console.setdefault('display', {})['gui'] = {
+        'rotation': [25, -45, 0], 'translation': [-.26, 5.42, 0], 'scale': [.8] * 3}
+    write_model(items / 'md2.json', console)
     card = json.loads((items / 'md_cartridge.json').read_text(encoding='utf-8'))
     if 'elements' in card:
         face_cartridge_forward(card)

@@ -20,6 +20,11 @@
         2.5,
         2.5,
         2.5
+      ],
+      "right_rotation": [
+        0,
+        180,
+        0
       ]
     },
     "firstperson_righthand": {
