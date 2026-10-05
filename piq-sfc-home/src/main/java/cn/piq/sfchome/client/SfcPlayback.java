@@ -28,6 +28,12 @@ final class SfcPlayback implements AutoCloseable {
         default String failureMessage(){return null;}
         @Override void close();
     }
+    /** Thin owned-process seam; production still uses the shared Netplay lifecycle. */
+    interface Netplay extends AutoCloseable {
+        void start(); boolean ready(); void activate(); boolean nativeSlotHeld();
+        void input(int mask); cn.piq.fcarcade.netplay.NetplayProcess.Frame poll();
+        String error(); String diagnostic(); @Override void close();
+    }
     interface Host {
         void execute(Runnable action);
         boolean isCurrent(SfcPlayback playback);
@@ -35,6 +41,7 @@ final class SfcPlayback implements AutoCloseable {
         void captured(SfcPlayback playback,SfcJoinNetwork.Capture request,byte[] bytes,String sha);
         void applied(SfcPlayback playback,SfcJoinNetwork.Capture request,String sha,boolean success);
         Audio openAudio();
+        default Netplay openNetplay(SfcHomeNetwork.NetplayStart grant,byte[] rom,boolean waitForActivation){throw new UnsupportedOperationException("Netplay host not configured");}
         void backup(SfcPlayback playback,SfcCore core,int frame) throws Exception;
         /** Local disk result: may arrive after leaving; never sends a network packet. */
         default void backupNotice(SfcPlayback playback,String message){}
@@ -51,6 +58,8 @@ final class SfcPlayback implements AutoCloseable {
         default void synchronizationFault(SfcPlayback playback,int frame){}
     }
     private static final class MinecraftHost implements Host {
+        // Capture on the MC thread with the assignment, never bind a late worker to a new server.
+        private final net.minecraft.network.Connection connection=Minecraft.getInstance().getConnection().getConnection();
         public void execute(Runnable action){Minecraft.getInstance().execute(action);}
         public boolean isCurrent(SfcPlayback playback){return SfcHomeClient.isCurrent(playback);}
         public void ready(SfcPlayback playback,SfcHomeNetwork.Ready ready){PacketDistributor.sendToServer(new SfcJoinNetwork.ControllerReady(playback.session.controllerLease(),ready));}
@@ -63,6 +72,21 @@ final class SfcPlayback implements AutoCloseable {
                 public String failureMessage(){return player==null?null:player.failureMessage();}
                 public void discardQueued(){var previous=player;player=null;if(previous!=null)previous.close();player=new SfcAudioPlayer();}
                 public void close(){var previous=player;player=null;if(previous!=null)previous.close();}
+            };
+        }
+        public Netplay openNetplay(SfcHomeNetwork.NetplayStart grant,byte[] rom,boolean waitForActivation){
+            var authority=new cn.piq.fcarcade.netplay.NetplayProcess.Grant(grant.wire(),grant.ticket(),grant.session().executionHost(),true);
+            var run=new cn.piq.fcarcade.netplay.NetplayProcess(authority,()->rom,
+                    c->cn.piq.fcarcade.netplay.NetplayNetwork.upstream(connection,c),
+                    cn.piq.sfchome.core.SfcNetplayProfile.profile(),java.util.Map::of,false,false,waitForActivation);
+            try{cn.piq.fcarcade.netplay.NetplayNetwork.bind(connection,run);}
+            catch(RuntimeException|Error failure){run.close();throw failure;}
+            return new Netplay(){
+                public void start(){run.start();} public boolean ready(){return run.ready();}
+                public void activate(){run.activate();} public boolean nativeSlotHeld(){return run.nativeSlotHeld();}
+                public void input(int mask){run.inputRetroPad(mask);} public cn.piq.fcarcade.netplay.NetplayProcess.Frame poll(){return run.poll();}
+                public String error(){return run.error();} public String diagnostic(){return run.diagnostic();}
+                public void close(){cn.piq.fcarcade.netplay.NetplayNetwork.unbind(connection,run);run.close();}
             };
         }
         public void backup(SfcPlayback playback,SfcCore core,int frame)throws Exception{
@@ -111,10 +135,14 @@ final class SfcPlayback implements AutoCloseable {
     private boolean mediaFailed;
     private final byte[] rom;
     private final Thread thread;
-    private volatile cn.piq.fcarcade.netplay.NetplayProcess netplay;
+    private volatile Netplay netplay;
+    private final SfcNetplayStartGate netplayStart;
     boolean nativeSlotHeld(){var active=netplay;return active!=null&&active.nativeSlotHeld();}
     private volatile int netplayMask;
-    void netplayInput(int mask){netplayMask=mask;var run=netplay;if(run!=null)run.inputRetroPad(mask);}
+    void netplayInput(int mask){netplayMask=netplayStart!=null&&netplayStart.active()?mask:0;var run=netplay;if(run!=null)run.input(netplayMask);}
+    boolean activateNetplay(SfcHomeNetwork.NetplayActivated message){
+        var run=netplay;return running&&run!=null&&netplayStart!=null&&netplayStart.activate(message,run::activate);
+    }
     private volatile boolean running=true;
     private volatile boolean started;
     private volatile float gain;
@@ -136,12 +164,12 @@ final class SfcPlayback implements AutoCloseable {
     SfcPlayback(SfcHomeNetwork.Session session,byte[] rom,SfcStartupProgress startup,Host host,SfcHomeNetwork.NetplayStart grant) {
         // The loader transfers its private byte[]; avoid cloning 32 MiB on the render thread.
         this.session=session;this.rom=java.util.Objects.requireNonNull(rom);this.startup=startup;this.host=java.util.Objects.requireNonNull(host);
+        netplayStart=grant==null?null:new SfcNetplayStartGate(grant);
         receivedFrameMeter=cn.piq.fcarcade.network.ModTrafficProbe.videoMeter(session.mediaSource());
         if(session.syncMode()==3){
             if(grant==null||grant.session()!=session)throw new IllegalArgumentException("Missing Netplay authority");
             lease=SfcCoreLease.acquire();
-            var connection=Minecraft.getInstance().getConnection().getConnection();
-            try{thread=Thread.ofPlatform().daemon(true).name("PIQ-SFC-Netplay-"+session.sessionId()).start(()->runNetplay(grant,connection));}
+            try{thread=Thread.ofPlatform().daemon(true).name("PIQ-SFC-Netplay-"+session.sessionId()).start(()->runNetplay(grant));}
             catch(Throwable failure){lease.close();throw failure;}return;
         }
         if(session.receivesMedia()){
@@ -154,18 +182,21 @@ final class SfcPlayback implements AutoCloseable {
         try { thread=Thread.ofPlatform().daemon(true).name("PIQ-SFC-Home-"+session.sessionId()).start(this::run); }
         catch(Throwable failure) { lease.close();throw failure; }
     }
-    private void runNetplay(SfcHomeNetwork.NetplayStart grant,net.minecraft.network.Connection connection){
-        cn.piq.fcarcade.netplay.NetplayProcess run=null;Audio audio=null;
+    private void runNetplay(SfcHomeNetwork.NetplayStart grant){
+        Netplay run=null;Audio audio=null;
         try{
-            var authority=new cn.piq.fcarcade.netplay.NetplayProcess.Grant(grant.wire(),grant.ticket(),session.executionHost(),true);
-            run=new cn.piq.fcarcade.netplay.NetplayProcess(authority,()->rom,c->cn.piq.fcarcade.netplay.NetplayNetwork.upstream(connection,c),cn.piq.sfchome.core.SfcNetplayProfile.profile(),java.util.Map::of);
-            netplay=run;cn.piq.fcarcade.netplay.NetplayNetwork.bind(connection,run);
-            if(!running)return;run.start();audio=host.openAudio();boolean announced=false;
+            run=host.openNetplay(grant,rom,session.executionHost());netplay=run;
+            if(!running)return;run.start();
             while(running){
                 if(run.error()!=null)throw new IllegalStateException(run.error()+"\n"+run.diagnostic());
-                run.inputRetroPad(netplayMask);
+                if(run.ready()&&netplayStart.prepared()){
+                    startup.enter(SfcStartupProgress.Stage.READY);
+                    host.execute(()->{if(running&&host.isCurrent(this))host.ready(this,new SfcHomeNetwork.Ready(session.sessionId(),session.epoch(),session.romSha(),SfcHomeNetwork.CORE_BUILD,60,session.romSha()));});
+                }
+                if(!netplayStart.active()){Thread.sleep(2);continue;}
+                if(audio==null)audio=host.openAudio();
+                run.input(netplayMask);
                 var frame=run.poll();if(frame==null){Thread.sleep(2);continue;}
-                if(!announced){announced=true;host.execute(()->{if(running&&host.isCurrent(this))host.ready(this,new SfcHomeNetwork.Ready(session.sessionId(),session.epoch(),session.romSha(),SfcHomeNetwork.CORE_BUILD,60,session.romSha()));});}
                 if(frame.rgba().length>0){
                     var picture=new Picture(frame.width(),frame.height(),frame.width()*4,frame.aspect(),frame.rgba());pending.set(picture);watchPicture=picture;
                     host.mediaFrame(this,frame.width(),frame.height(),frame.width()*4,frame.aspect(),frame.rgba(),frame.stereo(),frame.stereo().length/2);
@@ -175,7 +206,7 @@ final class SfcPlayback implements AutoCloseable {
             }
         }catch(InterruptedException interrupted){Thread.currentThread().interrupt();}
         catch(Exception|LinkageError failure){if(running){LoggerFactory.getLogger("PIQ SFC Home").warn("Netplay stopped",failure);cn.piq.fcarcade.client.ui.DeviceNotices.record("SFC",run==null?"Netplay 启动失败":run.diagnostic(),failure);error="SFC Netplay 已停止，请查看运行环境诊断";}}
-        finally{running=false;if(run!=null){cn.piq.fcarcade.netplay.NetplayNetwork.unbind(connection,run);run.close();}netplay=null;if(audio!=null)audio.close();lease.close();}
+        finally{running=false;netplayStart.close();try{if(run!=null)run.close();}finally{netplay=null;try{if(audio!=null)audio.close();}finally{lease.close();}}}
     }
     boolean matches(long id,int epoch) { return session.sessionId()==id && session.epoch()==epoch; }
     void offerMedia(cn.piq.sfchome.net.SfcHostedNetwork.Stream packet){
@@ -415,7 +446,7 @@ final class SfcPlayback implements AutoCloseable {
         else if(texture!=null) texture.close();
         texture=null; textureId=null;
     }
-    @Override public void close() { running=false;capture=null;restore=null;repair=null;repairRestore=null;checkpoints.clear(); thread.interrupt(); pending.set(null);watchPicture=null; input.clear();mediaInput.clear(); release();try{host.mediaClosed(this);}catch(RuntimeException|LinkageError ignored){} }
+    @Override public void close() { running=false;if(netplayStart!=null)netplayStart.close();capture=null;restore=null;repair=null;repairRestore=null;checkpoints.clear(); thread.interrupt(); pending.set(null);watchPicture=null; input.clear();mediaInput.clear(); release();try{host.mediaClosed(this);}catch(RuntimeException|LinkageError ignored){} }
     private record FrameBatch(int firstFrame,int[] p1Masks,int[] p2Masks){}
     private record RepairRestore(SfcRepairNetwork.Key key,byte[] bytes,String sha){}
     private record Restore(SfcJoinNetwork.Capture request,byte[] bytes,String sha){}

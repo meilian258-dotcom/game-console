@@ -135,8 +135,8 @@ class SfcClientIdentityTest {
         assertFalse(home.contains("sendToServer(new SfcHomeNetwork.Leave("));
         for(String file:List.of("net/SfcHomeNetwork.java","net/SfcJoinNetwork.java")){
             String network=Files.readString(root.resolve(file));assertTrue(network.contains("Object source=context.connection();"));assertTrue(network.contains("h.acceptsConnection(source)"));
-            // Home protocol 11 includes explicit Netplay grants; join wire remains unchanged.
-            assertTrue(network.contains(file.equals("net/SfcHomeNetwork.java")?"TrafficPayloadRegistrar.create(event,\"12\")":"TrafficPayloadRegistrar.create(e,\"5\")"));
+            // Home protocol 13 adds an explicit READY activation grant; join wire remains unchanged.
+            assertTrue(network.contains(file.equals("net/SfcHomeNetwork.java")?"TrafficPayloadRegistrar.create(event,\"13\")":"TrafficPayloadRegistrar.create(e,\"5\")"));
         }
         String hosted=Files.readString(root.resolve("net/SfcHostedNetwork.java"));
         assertTrue(hosted.contains("SfcHomeNetwork.dispatch(c,h->h.hosted(p))"));

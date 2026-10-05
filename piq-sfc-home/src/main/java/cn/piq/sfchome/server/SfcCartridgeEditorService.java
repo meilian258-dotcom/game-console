@@ -3,6 +3,7 @@ import cn.piq.fcarcade.home.CartridgeComputerBlockEntity;
 import cn.piq.fcarcade.access.PlayerContentAccess;
 import cn.piq.sfchome.data.SfcCartridgeData;
 import cn.piq.sfchome.net.SfcHomeNetwork;
+import cn.piq.sfchome.net.SfcEditorStatus;
 import java.util.*;
 import java.util.concurrent.*;
 import net.minecraft.core.*;
@@ -33,7 +34,9 @@ public final class SfcCartridgeEditorService {
         Edit edit=new Edit(p,hand,stack,computer,st.tick);
         if(!valid(p,edit)){SfcHomeServer.feedback(p,"电脑或卡带授权失效");return;}
         SfcCartridgeData.ensureId(stack);edit.snapshot=stack.copy();st.edits.put(p.getUUID(),edit);
-        if(!valid(p,edit)){cancel(p,st,edit,"电脑或卡带授权失效");return;}refresh(p,st,edit,true,"选择 SFC ROM 写入卡带");
+        if(!valid(p,edit)){cancel(p,st,edit,"电脑或卡带授权失效");return;}
+        // Opening is an authorization result, not a dependency on either remote directory being readable.
+        reply(p,edit,true,SfcEditorStatus.LOADING,edit.catalog);refresh(p,st,edit);
     }
     private static boolean facts(ServerPlayer p,Edit e){
         if(p.hasDisconnected()||!p.isAlive()||p.isSpectator()||!PlayerContentAccess.canBrowse(p)||p.connection.getConnection()!=e.connection||p.getServer().getPlayerList().getPlayer(p.getUUID())!=p||p.serverLevel()!=e.level||!e.level.hasChunkAt(e.pos)||e.level.getBlockEntity(e.pos)!=e.computer||e.computer.isRemoved()||!e.computer.computerId().equals(e.computerId)||p.distanceToSqr(e.pos.getCenter())>25||!e.level.getWorldBorder().isWithinBounds(e.pos)||!e.level.mayInteract(p,e.pos)||p.getItemInHand(e.hand)!=e.stack||e.hand==InteractionHand.MAIN_HAND&&p.getInventory().selected!=e.slot||!SfcCartridgeData.supported(e.stack)||!ItemStack.isSameItemSameComponents(e.stack,e.snapshot))return false;
@@ -67,7 +70,7 @@ public final class SfcCartridgeEditorService {
                 else {e.busy=true;submit(p,st,e,()->SfcCoverService.store(p.getServer()).read(e.originalCover),png->{SfcCartridgeData.setCover(e.stack,e.originalCover);changed(p,e,"已恢复打开时的封面");});}
                 }catch(RuntimeException invalid){reply(p,e,false,"设置未保存，请检查卡带和名称",e.catalog);}
             }
-            case SfcHomeNetwork.REFRESH->{if(e.upload!=null){reply(p,e,false,"上传进行中",e.catalog);return;}refresh(p,st,e,false,"目录已刷新");}
+            case SfcHomeNetwork.REFRESH->{if(e.upload!=null){reply(p,e,false,"上传进行中",e.catalog);return;}refresh(p,st,e);}
             case SfcHomeNetwork.USE_COVER->{
                 if(e.upload!=null||!PlayerContentAccess.canUseServerCover(p)||a.total()!=0||a.offset()!=0||a.data().length!=0||!a.name().isEmpty()||!e.covers.contains(a.hash())){reply(p,e,false,"请选择有权限使用的服务器封面",e.catalog);return;}
                 e.busy=true;submit(p,st,e,()->SfcCoverService.store(p.getServer()).read(a.hash()),png->{
@@ -98,11 +101,18 @@ public final class SfcCartridgeEditorService {
         e.busy=true;submit(p,st,e,()->{st.store.read(hash);return st.store.list();},catalog->{
             if(needsPermission&&!PlayerContentAccess.canUseServerRom(p)){reply(p,e,false,"服务器ROM使用权限已关闭，旧卡带未改动",e.catalog);return;}
             if(catalog.stream().noneMatch(x->x.sha256().equals(hash))){reply(p,e,false,"此 ROM 已被移除，旧卡带未改动",catalog);return;}writeRom(e.stack,hash,name.isBlank()?catalog.stream().filter(x->x.sha256().equals(hash)).findFirst().orElseThrow().fileName():name);e.snapshot=e.stack.copy();e.catalog=catalog;p.getInventory().setChanged();reply(p,e,false,"写入完成",catalog);});}
-    private record Catalog(List<SfcHomeNetwork.RomEntry> roms,List<String> covers){}
-    private static void refresh(ServerPlayer p,State st,Edit e,boolean open,String message){boolean covers=PlayerContentAccess.canUseServerCover(p);var coverStore=SfcCoverService.store(p.getServer());e.busy=true;submit(p,st,e,()->new Catalog(st.store.list(),covers?coverStore.list():List.of()),c->{e.catalog=c.roms();e.covers=PlayerContentAccess.canUseServerCover(p)?c.covers():List.of();reply(p,e,open,message,e.catalog);});}
+    private static void refresh(ServerPlayer p,State st,Edit e){
+        boolean covers=PlayerContentAccess.canUseServerCover(p);MinecraftServer server=p.getServer();
+        var previousRoms=e.catalog;var previousCovers=e.covers;e.busy=true;
+        submit(p,st,e,()->SfcEditorCatalog.scan(st.store::scan,()->SfcCoverService.store(server).list(),previousRoms,previousCovers,covers),c->{
+            e.catalog=c.roms();e.covers=PlayerContentAccess.canUseServerCover(p)?c.covers():List.of();
+            reply(p,e,false,c.status(PlayerContentAccess.canUseServerCover(p)),e.catalog);
+        },()->{},reason->reply(p,e,false,SfcEditorStatus.PREFIX+"刷新失败（保留上次列表）："+SfcEditorStatus.compact(reason,180),e.catalog));
+    }
     private interface Work<T>{T run()throws Exception;}
     private static <T>void submit(ServerPlayer p,State st,Edit e,Work<T> work,java.util.function.Consumer<T> commit){submit(p,st,e,work,commit,()->{});}
-    private static <T>void submit(ServerPlayer p,State st,Edit e,Work<T> work,java.util.function.Consumer<T> commit,Runnable completed){MinecraftServer server=p.getServer();try{IO.execute(()->{T result=null;Exception error=null;try{result=work.run();}catch(Exception ex){error=ex;}T value=result;Exception failure=error;server.execute(()->{try{if(STATES.get(server)!=st||st.edits.get(p.getUUID())!=e)return;e.busy=false;if(!valid(p,e)){cancel(p,st,e,"授权失效，旧卡带未改动");return;}if(failure!=null){reply(p,e,false,"文件操作失败，旧卡带未改动",e.catalog);return;}try{commit.accept(value);}catch(RuntimeException ex){reply(p,e,false,"写入失败，旧卡带未改动",e.catalog);}}finally{completed.run();}});});}catch(RejectedExecutionException ex){completed.run();e.busy=false;reply(p,e,false,"文件任务繁忙，请稍后重试",e.catalog);}}
+    private static <T>void submit(ServerPlayer p,State st,Edit e,Work<T> work,java.util.function.Consumer<T> commit,Runnable completed){submit(p,st,e,work,commit,completed,reason->reply(p,e,false,reason,e.catalog));}
+    private static <T>void submit(ServerPlayer p,State st,Edit e,Work<T> work,java.util.function.Consumer<T> commit,Runnable completed,java.util.function.Consumer<String> failed){MinecraftServer server=p.getServer();try{IO.execute(()->{T result=null;Exception error=null;try{result=work.run();}catch(Exception ex){error=ex;}T value=result;Exception failure=error;server.execute(()->{try{if(STATES.get(server)!=st||st.edits.get(p.getUUID())!=e)return;e.busy=false;if(!valid(p,e)){cancel(p,st,e,"授权失效，旧卡带未改动");return;}if(failure!=null){failed.accept("文件操作失败，旧卡带未改动");return;}try{commit.accept(value);}catch(RuntimeException ex){failed.accept("写入失败，旧卡带未改动");}}finally{completed.run();}});});}catch(RejectedExecutionException ex){completed.run();e.busy=false;failed.accept("文件任务繁忙，请稍后重试");}}
     private static void reply(ServerPlayer p,Edit e,boolean open,String text,List<SfcHomeNetwork.RomEntry> catalog){e.lastCapabilities=PlayerContentAccess.capabilities(p);SfcHomeNetwork.send(p,new SfcHomeNetwork.Editor(e.token,open,text,SfcCartridgeData.romSha(e.stack),SfcCartridgeData.title(e.stack),SfcCartridgeData.coverSha(e.stack),SfcCartridgeData.maxPlayers(e.stack),SfcCartridgeData.hasExplicitPlayerCount(e.stack),e.lastCapabilities,PlayerContentAccess.canBrowse(p)?catalog:List.of(),PlayerContentAccess.canUseServerCover(p)?e.covers:List.of(),SfcCartridgeData.saveMode(e.stack)));}
     private static void cancel(ServerPlayer p,State st,Edit e,String reason){if(st.edits.remove(p.getUUID(),e)){if(e.upload!=null){st.uploadBudget.release(e.upload.length);e.upload=null;}removeDownload(st,p.getUUID());reply(p,e,false,reason,List.of());}}
     private static boolean downloadAuthorized(ServerPlayer p,String hash,State st){if(SfcHomeServer.authorizedRom(p,hash)

@@ -11,14 +11,20 @@ import java.nio.file.*;
 import java.util.Objects;
 import java.util.UUID;
 
-/** First-upload names only, separate from ROM files and card titles. IO-worker only. */
-final class ContentCardNames {
+/**
+ * First-upload names only, separate from ROM files and card titles. IO-worker only.
+ * Addons supply a dedicated metadata directory in their existing content scope;
+ * this service neither authorizes uploads nor changes content/save identity.
+ * At most 256 names, 128 UTF-16 characters / 512 UTF-8 bytes each. Missing returns
+ * null; corrupt metadata throws IOException and must not hide otherwise valid ROMs.
+ */
+public final class ContentCardNames {
     static final int MAX_NAME_BYTES = 512;
     private final Path root;
 
-    ContentCardNames(Path root) { this.root = root.toAbsolutePath().normalize(); }
+    public ContentCardNames(Path root) { this.root = root.toAbsolutePath().normalize(); }
 
-    String read(String hash) throws IOException {
+    public String read(String hash) throws IOException {
         if (!Files.exists(root, LinkOption.NOFOLLOW_LINKS)) return null;
         CabinetGameStore.requireDirectory(root);
         Path path = path(hash);
@@ -40,8 +46,9 @@ final class ContentCardNames {
     }
 
     /** No rename API: a second uploader cannot change the first accepted global name. */
-    String remember(String hash, String originalName) throws IOException {
+    public String remember(String hash, String originalName) throws IOException {
         validate(originalName);
+        path(hash); // Reject invalid identity before creating any files.
         CabinetGameStore.directory(root);
         Path lockPath = root.resolve("catalog.lock");
         if (Files.exists(lockPath, LinkOption.NOFOLLOW_LINKS)) CabinetGameStore.regular(lockPath);
@@ -81,7 +88,7 @@ final class ContentCardNames {
         return root.resolve(hash + ".name");
     }
 
-    static void validate(String name) {
+    public static void validate(String name) {
         if (name == null || name.isBlank() || name.length() > 128
                 || name.chars().anyMatch(Character::isISOControl)
                 || !StandardCharsets.UTF_8.newEncoder().canEncode(name)
@@ -89,7 +96,7 @@ final class ContentCardNames {
             throw new IllegalArgumentException("Invalid content display name");
     }
 
-    static String fallback(String fileName) {
+    public static String fallback(String fileName) {
         return fileName != null && fileName.matches("[0-9a-f]{64}\\.[A-Za-z0-9]+")
                 ? "未命名内容 · " + fileName.substring(0, 12) + "（名称缺失）" : fileName;
     }

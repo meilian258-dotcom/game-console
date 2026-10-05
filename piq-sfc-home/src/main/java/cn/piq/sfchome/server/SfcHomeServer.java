@@ -1,5 +1,6 @@
 package cn.piq.sfchome.server;
 import cn.piq.fcarcade.home.*;
+import cn.piq.fcarcade.home.flow.*;
 import cn.piq.fcarcade.netplay.*;
 import cn.piq.sfchome.data.*;
 import cn.piq.sfchome.net.SfcHomeNetwork;
@@ -25,7 +26,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 /** Server owns leases. Player media drives only the host core; local sync drives every core. */
 public final class SfcHomeServer {
     private static final Map<MinecraftServer,State> STATES=new WeakHashMap<>();
-    private record NetplayRun(long wire,NetplayRelay<net.minecraft.network.Connection> room){}
+    private record NetplayRun(long wire,NetplayRelay<net.minecraft.network.Connection> room,UUID hostTicket){}
     private static final Map<Session,NetplayRun> NETPLAY=new java.util.concurrent.ConcurrentHashMap<>();
     private static void retireNetplay(Session s){var run=NETPLAY.remove(s);if(run!=null){NetplaySaveServer.retire(s.connection.level().getServer(),run.wire());NetplayNetwork.retire(run.room());}}
     private static void renewNetplay(Session s){
@@ -159,15 +160,21 @@ public final class SfcHomeServer {
         HomeSystems.register(SfcHomeConsoleBlockEntity.SYSTEM_ID,new HomeSystems.ServerHooks(){
             @Override public void onInteract(ServerPlayer p,InteractionHand hand,HomeSystems.Connection c,BlockHitResult hit){} // Legacy TV/body entry never powers on or grants a controller.
             @Override public boolean onPowerOn(ServerPlayer p,HomeSystems.Connection c){return powerOn(p,c);}
-            @Override public void onPowerOff(ServerLevel l,ExternalHomeConsoleBlockEntity c){if(c instanceof SfcHomeConsoleBlockEntity console)stop(state(l.getServer()),console.hardwareId(),"主机已关机；手柄仍保留");}
+            @Override public boolean pendingStart(ServerLevel l,ExternalHomeConsoleBlockEntity c){return HomeLaunchServer.pending(l.getServer(),launchKey(c));}
+            @Override public void onPowerOff(ServerLevel l,ExternalHomeConsoleBlockEntity c){if(c instanceof SfcHomeConsoleBlockEntity console){
+                var st=state(l.getServer());stop(st,console.hardwareId(),"主机已关机；手柄仍保留");
+                // The common appliance plays an immediate OFF itself. Only an actual delayed
+                // shutdown keeps ownership of that one sound until the completion callback.
+                var ending=st.stopping.get(console.hardwareId());if(ending!=null&&ending.connection.console()==console)ending.powerFeedback.deferStop();
+            }}
             @Override public void onReset(ServerPlayer p,HomeSystems.Connection c){reset(p,c);}
             @Override public void onController(ServerPlayer p,HomeSystems.Connection c,int port){if(c.console() instanceof SfcHomeConsoleBlockEntity console)claim(p,console,state(p.getServer()),port);}
             @Override public void onControllerDock(ServerPlayer p,ExternalHomeConsoleBlockEntity c,int port){if(c instanceof SfcHomeConsoleBlockEntity console)claim(p,console,state(p.getServer()),port);}
-            @Override public boolean isRunning(ServerLevel l,ExternalHomeConsoleBlockEntity c){var s=state(l.getServer()).sessions.get(c.hardwareId());return s!=null&&s.connection.console()==c;}
+            @Override public boolean isRunning(ServerLevel l,ExternalHomeConsoleBlockEntity c){var st=state(l.getServer());var s=st.sessions.get(c.hardwareId());if(s==null)s=st.stopping.get(c.hardwareId());return s!=null&&s.connection.console()==c;}
             @Override public boolean synchronizationSettingsAvailable(){return true;}
             @Override public int synchronizationSupportedModes(ServerLevel l,ExternalHomeConsoleBlockEntity c){return (cn.piq.fcarcade.cabinet.CabinetHostingConfig.playerAllowed()?1:0)|(cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed()?10:0)|(hostedUnavailable(l,c)==null?4:0);}
             @Override public String synchronizationUnavailableReason(ServerLevel l,ExternalHomeConsoleBlockEntity c,cn.piq.fcarcade.cabinet.CabinetSyncMode mode){return mode==cn.piq.fcarcade.cabinet.CabinetSyncMode.SERVER_MEDIA?Objects.requireNonNullElse(hostedUnavailable(l,c),"服务端托管可用。"):mode==cn.piq.fcarcade.cabinet.CabinetSyncMode.MEDIA&&cn.piq.fcarcade.cabinet.CabinetHostingConfig.playerAllowed()?"玩家音画串流可用；主持退出会安全停机，不自动转交进度。":HomeSyncPolicy.unavailable(mode);}
-            @Override public boolean synchronizationSettingsBusy(ServerLevel l,ExternalHomeConsoleBlockEntity c){var st=state(l.getServer());return st.sessions.containsKey(c.hardwareId())||st.stopping.containsKey(c.hardwareId());}
+            @Override public boolean synchronizationSettingsBusy(ServerLevel l,ExternalHomeConsoleBlockEntity c){var st=state(l.getServer());return st.sessions.containsKey(c.hardwareId())||st.stopping.containsKey(c.hardwareId())||HomeLaunchServer.busy(l.getServer(),launchKey(c));}
             @Override public void onPlaybackStopped(ServerLevel l,ExternalHomeConsoleBlockEntity c,HomeSystems.StopReason reason){if(c instanceof SfcHomeConsoleBlockEntity console)stop(state(l.getServer()),console.hardwareId(),"电视连接已停止；手柄仍保留");}
             @Override public void onRemoved(ServerLevel l,ExternalHomeConsoleBlockEntity c){if(c instanceof SfcHomeConsoleBlockEntity console){releaseConsole(l.getServer(),console,"主机已拆除");ItemStack card=console.eject();if(!card.isEmpty())Block.popResource(l,c.getBlockPos(),card);}}
         });
@@ -202,7 +209,7 @@ public final class SfcHomeServer {
         if(!held.isEmpty()||!p.getOffhandItem().isEmpty())return;
         if(p.isShiftKeyDown()){
             if(!c.hasCartridge()){feedback(p,"没有插入卡带");return;}
-            stop(st,c.hardwareId(),"卡带已取出");ItemStack card=c.eject();p.setItemInHand(h,card);if(!card.isEmpty())HomeInteractionSounds.play(p.serverLevel(),c.getBlockPos(),HomeInteractionSounds.Action.CARTRIDGE_EJECT);feedback(p,"卡带已取出；请先保存退出以免丢失进度");return;
+            stop(st,c.hardwareId(),"请求取出卡带");if(st.stopping.containsKey(c.hardwareId())){feedback(p,"正在保存并停止，完成后再次取卡；卡带未移除");return;}ItemStack card=c.eject();p.setItemInHand(h,card);if(!card.isEmpty())HomeInteractionSounds.play(p.serverLevel(),c.getBlockPos(),HomeInteractionSounds.Action.CARTRIDGE_EJECT);feedback(p,"卡带已取出");return;
         }
         feedback(p,"请瞄准电源、重置键或桌上的手柄操作");
     }
@@ -358,7 +365,55 @@ public final class SfcHomeServer {
             return c;
         }catch(RuntimeException rejected){if(notify)feedback(p,"主机或电视的交互权限已失效");return null;}finally{if(previous)INTERACTING.set(true);else INTERACTING.remove();}
     }
+    private static HomeLaunchServer.Key launchKey(ExternalHomeConsoleBlockEntity c){return new HomeLaunchServer.Key(c.systemId(),c.getLevel().dimension().location(),c.getBlockPos(),c.hardwareId());}
+    private record StartSave(java.nio.file.Path directory,NetplaySaveState.Identity identity,String slot,String version,boolean resume,boolean enabled){}
     private static boolean powerOn(ServerPlayer p,HomeSystems.Connection connection){
+        if(!(connection.console() instanceof SfcHomeConsoleBlockEntity c)||preflight(p,c,true)==null)return false;
+        var server=p.getServer();var st=state(server);var key=launchKey(c);
+        if(HomeLaunchServer.busy(server,key)||st.sessions.containsKey(c.hardwareId())||st.stopping.containsKey(c.hardwareId()))return false;
+        final ItemStack snapshot=c.insertedCartridge();final var mode=c.synchronizationMode();final boolean netplay=c.netplayExperimental();
+        final int oldSave=netplay?SfcCartridgeData.saveMode(snapshot):0;
+        final int commonSave=SfcHomeStartPolicy.commonSaveMode(oldSave);
+        final int players=SfcCartridgeData.maxPlayers(snapshot);
+        final var identity=netplay?NetplaySaveState.identity(cn.piq.sfchome.core.SfcNetplayProfile.profile(),c.romSha(),Map.of()):null;
+        if(netplay&&SfcCartridgeData.id(snapshot)==null){feedback(p,"卡带身份缺失，请先放入卡带工作台");return false;}
+        final String owner=SfcHomeStartPolicy.saveOwner(oldSave,p.getUUID(),SfcCartridgeData.id(snapshot));
+        final var directory=oldSave==0?null:NetplaySaveServer.directory(server,owner,identity);
+        final String slot=identity==null?"":owner+"|"+identity.profile()+"|"+identity.content();
+        final String title=SfcCartridgeData.title(snapshot).isBlank()?"SFC · "+c.romSha().substring(0,12):SfcCartridgeData.title(snapshot);
+        st.launches.put(c.hardwareId(),key);
+        var handle=HomeLaunchServer.start(p,key,new HomeLaunchServer.Adapter<StartSave>(){
+            private Session loaded;
+            public HomeLaunchServer.Definition definition(){return new HomeLaunchServer.Definition("SFC",title,players,commonSave,false,
+                netplay?(oldSave==0?"本局不保存，原档保留":oldSave==1?"个人：每个游戏保留原有一份进度；旧档名称和标签只读":"卡带：保留原有一份进度；旧档名称和标签只读"):
+                "此模式沿用原保存机制，不读取或迁移 Netplay 存档");}
+            public boolean valid(){return STATES.get(server)==st&&HomeSystems.isCurrent(connection)&&basic(p,c)
+                &&ItemStack.matches(snapshot,c.insertedCartridge())&&c.synchronizationMode()==mode&&c.netplayExperimental()==netplay&&modeSupported(c)
+                &&!st.stopping.containsKey(c.hardwareId())&&(st.sessions.get(c.hardwareId())==null||st.sessions.get(c.hardwareId())==loaded)
+                &&st.sessions.values().stream().noneMatch(s->s!=loaded&&s.host.player.equals(p.getUUID()));}
+            public void list(java.util.function.Consumer<List<HomeLaunchNetwork.Row>> success,java.util.function.Consumer<String> failure){
+                HomeLaunchIo.read(server,()->NetplayLegacySlot.inspect(directory,identity),version->success.accept(List.of(
+                    new HomeLaunchNetwork.Row(1,version,"原有进度",identity.content(),1,0,true,false))),failure);
+            }
+            public void select(HomeLaunchNetwork.Choice choice,java.util.function.Consumer<StartSave> success,java.util.function.Consumer<String> failure){
+                if(preflight(p,c,false)==null){failure.accept("交互权限已改变");return;}
+                if(oldSave==0){success.accept(new StartSave(null,identity,slot,"",false,false));return;}
+                if(choice==null||choice.slot()!=1||NetplaySaveServer.busy(slot)){failure.accept("此存档正在使用或保存");return;}
+                HomeLaunchIo.read(server,()->NetplayLegacySlot.inspect(directory,identity),version->{
+                    if(!version.equals(choice.version())||choice.resume()&&version.isEmpty()){failure.accept("存档已变化，请重新开机选择");return;}
+                    success.accept(new StartSave(directory,identity,slot,version,choice.resume(),true));
+                },failure);
+            }
+            public void load(HomeLaunchServer.Launch<StartSave> launch,HomeLaunchServer.Handle flow){
+                if(!beginRuntime(p,connection,launch.save(),flow,launch.allowSecondPort())){flow.fail("SFC 启动失败，原档保留");return;}
+                loaded=st.sessions.get(c.hardwareId());
+            }
+            public void cancelled(String reason){st.launches.remove(c.hardwareId(),key);stop(st,c.hardwareId(),reason);}
+        });
+        if(handle==null)st.launches.remove(c.hardwareId(),key);
+        return false; // Physical power reports pendingStart until the runtime is ready.
+    }
+    private static boolean beginRuntime(ServerPlayer p,HomeSystems.Connection connection,StartSave save,HomeLaunchServer.Handle flow,boolean allowSecond){
         if(!(connection.console() instanceof SfcHomeConsoleBlockEntity c))return false;State st=state(p.getServer());
         if(!modeSupported(c)){feedback(p,hostedMode(c)?Objects.requireNonNullElse(hostedUnavailable(p.serverLevel(),c),"服务端托管不可用"):HomeSyncPolicy.unavailable(c.synchronizationMode()));return false;}
         if(st.stopping.containsKey(c.hardwareId())){feedback(p,"服务端核心仍在保存并停止，请稍后再开机或更改模式；手柄仍保留");return false;}
@@ -368,21 +423,18 @@ if(st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size(
                 ||c.synchronizationMode()!=mode||!modeSupported(c)||st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size()>=4||st.sessions.values().stream().anyMatch(s->s.host.player.equals(p.getUUID()))||st.leases.values().stream().anyMatch(l->l.player.equals(p.getUUID())&&l.console!=c))return false;
         long id=++st.nextSession;if(id<=0)throw new IllegalStateException("Session IDs exhausted");
         Session s=new Session(id,1,checked,rom,new Host(p),new Lease[2],st.tick,mode);
+        s.flow=flow;s.saveEnabled=save.enabled();
         if(c.netplayExperimental()){
             if(mode!=cn.piq.fcarcade.cabinet.CabinetSyncMode.LOCAL_SYNC){feedback(p,"请重新选择 Netplay 模式");return false;}
             long wire=NetplayNetwork.nextAddonId();var relay=NetplayNetwork.room(wire,p.connection.getConnection());
             try{
-                var identity=NetplaySaveState.identity(cn.piq.sfchome.core.SfcNetplayProfile.profile(),rom,Map.of());
-                UUID cardId=cn.piq.sfchome.data.SfcCartridgeData.id(card);int saveMode=cn.piq.sfchome.data.SfcCartridgeData.saveMode(card);
-                if(cardId==null)throw new IllegalStateException("卡带身份缺失，请先放入卡带工作台");
-                String owner=saveMode==1?"sfc-personal|"+p.getUUID():"sfc-card|"+cardId;
-                String slot=owner+"|"+identity.profile()+"|"+identity.content();
-                NetplaySaveServer.open(p.getServer(),wire,p.connection.getConnection(),relay.grant(p.connection.getConnection(),true).id(),identity,slot,
-                    saveMode==0?null:NetplaySaveServer.file(NetplaySaveServer.directory(p.getServer(),owner,identity),identity));
-                NETPLAY.put(s,new NetplayRun(wire,relay));
+                var ticket=relay.grant(p.connection.getConnection(),true).id();
+                NetplaySaveServer.openPrepared(p.getServer(),wire,p.connection.getConnection(),ticket,save.identity(),save.slot(),
+                    save.enabled()?()->NetplayLegacySlot.lease(save.directory(),save.identity(),save.version(),save.resume()):null);
+                NETPLAY.put(s,new NetplayRun(wire,relay,ticket));
             }catch(RuntimeException failure){NetplayNetwork.retire(relay);feedback(p,"Netplay 存档未就绪："+failure.getMessage());return false;}
         }
-        s.multiplayer=true; // Public playback permits vacant ports; stored card/approval limits still apply.
+        s.multiplayer=allowSecond;
         if(mode==cn.piq.fcarcade.cabinet.CabinetSyncMode.SERVER_MEDIA){
             var permit=cn.piq.fcarcade.server.hosted.HostedServerLimits.tryAcquire(p.getServer());
             if(permit==null){feedback(p,"服务端托管未启用或全服容量已满；主机未开机");return false;}
@@ -414,7 +466,7 @@ if(st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size(
             HomeInteractionSounds.play(p.serverLevel(),c.getBlockPos(),HomeInteractionSounds.Action.RESET);feedback(p,"SFC 服务端核心已请求重置；控制租约保留");return;
         }
         finishRepair(old);abortJoin(st,old,"主机正在重置");for(var player:recipients(p.getServer(),old))SfcHomeNetwork.send(player,new SfcHomeNetwork.Stopped(old.id,old.epoch,"主机已重置"));
-        Session next=new Session(old.id,old.epoch+1,old.connection,old.rom,new Host(host),old.ports.clone(),st.tick,old.mode);next.multiplayer=old.multiplayer;st.sessions.put(c.hardwareId(),next);sendRuntime(host,next,null);
+        Session next=new Session(old.id,old.epoch+1,old.connection,old.rom,new Host(host),old.ports.clone(),st.tick,old.mode);next.multiplayer=old.multiplayer;next.flow=old.flow;next.powerFeedback=old.powerFeedback;st.sessions.put(c.hardwareId(),next);sendRuntime(host,next,null);
         for(Lease l:next.ports)if(l!=null){ServerPlayer owner=p.getServer().getPlayerList().getPlayer(l.player);if(owner==null)continue;if(!l.player.equals(next.host.player))sendRuntime(owner,next,l);else SfcHomeNetwork.send(owner,new SfcHomeNetwork.Control(next.id,next.epoch,l.id,l.port,true));}
         HomeInteractionSounds.play(p.serverLevel(),c.getBlockPos(),HomeInteractionSounds.Action.RESET);
     }
@@ -568,9 +620,24 @@ if(st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size(
     }
     private static void startClockIfReady(MinecraftServer server,Session s){
         if(s.clock!=null||s.hostReady==null)return;
-        if(s.hosted!=null){if(!s.hosted.ready())return;s.clock=new SfcFrameClock(60);s.health.start(state(server).tick);HomeApplianceService.refresh(s.connection.level(),s.connection.television().getBlockPos());return;}
+        if(s.hosted!=null&&!s.hosted.ready())return;
+        var run=NETPLAY.get(s);
+        if(run!=null&&(run.room().closed()||!hostValid(server.getPlayerList().getPlayer(s.host.player),s))){stop(state(server),s.connection.consoleId(),"Netplay 开局连接已失效，原档保留");return;}
+        if(!s.playerMedia()&&!NETPLAY.containsKey(s)&&s.hosted==null){
+            for(int i=0;i<2;i++)if(s.ports[i]!=null&&!s.ports[i].player.equals(s.host.player)){
+                if(s.ready[i]==null)return;
+                if(!s.hostReady.initialStateHash().equals(s.ready[i].initialStateHash())||Math.abs(s.hostReady.targetFps()-s.ready[i].targetFps())>0.000001){stop(state(server),s.connection.consoleId(),"运行端的初始状态不一致");return;}
+            }
+        }
+        if(s.flow!=null&&s.flow.stage()==cn.piq.retro.flow.DeviceSessionFlow.Stage.LOADING){
+            if(!s.flow.ready()){stop(state(server),s.connection.consoleId(),"开局授权失效，原档保留");return;}
+            if(run!=null&&s.saveEnabled&&!NetplaySaveServer.activate(server,run.wire(),s.host.connection)){stop(state(server),s.connection.consoleId(),"保存授权失效，原档保留");return;}
+        }
+        if(s.hosted!=null){if(!s.hosted.ready())return;s.clock=new SfcFrameClock(60);s.health.start(state(server).tick);powerReady(s);HomeApplianceService.refresh(s.connection.level(),s.connection.television().getBlockPos());return;}
         if(s.playerMedia()||NETPLAY.containsKey(s)){
             s.clock=new SfcFrameClock(s.hostReady.targetFps());s.health.start(state(server).tick);
+            if(run!=null)SfcHomeNetwork.send(server.getPlayerList().getPlayer(s.host.player),new SfcHomeNetwork.NetplayActivated(s.id,s.epoch,run.wire(),run.hostTicket()));
+            powerReady(s);
             HomeApplianceService.refresh(s.connection.level(),s.connection.television().getBlockPos());return;
         }
         for(int i=0;i<2;i++)if(s.ports[i]!=null&&!s.ports[i].player.equals(s.host.player)){
@@ -578,8 +645,16 @@ if(st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size(
             if(!s.hostReady.initialStateHash().equals(s.ready[i].initialStateHash())||Math.abs(s.hostReady.targetFps()-s.ready[i].targetFps())>0.000001){stop(state(server),s.connection.consoleId(),"运行端的初始状态不一致");return;}
         }
         s.clock=new SfcFrameClock(s.hostReady.targetFps());s.health.start(state(server).tick);
+        powerReady(s);
         HomeApplianceService.refresh(s.connection.level(),s.connection.television().getBlockPos());
         for(var p:recipients(server,s))feedback(p,"SFC 已运行；未领取手柄只观看，归还手柄不关机");
+    }
+    private static void powerReady(Session s){
+        if(s.flow!=null&&s.powerFeedback.started())HomeInteractionSounds.play(s.connection.level(),s.connection.console().getBlockPos(),HomeInteractionSounds.Action.POWER_ON);
+    }
+    private static void powerStopped(Session s){
+        if(s.powerFeedback.finished()&&s.connection.level().getBlockEntity(s.connection.console().getBlockPos())==s.connection.console())
+            HomeInteractionSounds.play(s.connection.level(),s.connection.console().getBlockPos(),HomeInteractionSounds.Action.POWER_OFF);
     }
     private static boolean controlLease(ServerPlayer p,Session s,UUID lease){
         if(s==null||lease==null)return false;
@@ -667,9 +742,13 @@ if(st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size(
         }catch(RuntimeException failure){failRepair(st,s,"本端追帧历史已过期；主机继续");}
     }
     private static void tick(MinecraftServer server){State st=state(server);st.tick++;
-        for(var entry:List.copyOf(st.stopping.entrySet()))if(entry.getValue().hosted.terminated()){
+        st.launches.entrySet().removeIf(e->!HomeLaunchServer.busy(server,e.getValue()));
+        for(var entry:List.copyOf(st.stopping.entrySet()))if(entry.getValue().hosted!=null&&entry.getValue().hosted.terminated()){
             Session ending=entry.getValue();st.stopping.remove(entry.getKey());String error=ending.hosted.error();
             if(error!=null){var owner=server.getPlayerList().getPlayer(ending.host.player);if(owner!=null&&owner.connection.getConnection()==ending.host.connection)feedback(owner,error);}
+            if(ending.flow!=null)ending.flow.finished(error==null,error==null?"服务端核心已正常停止":error);
+            powerStopped(ending);
+            HomeApplianceService.refresh(ending.connection.level(),ending.connection.television().getBlockPos());
         }
         if(st.tick%200==0)st.interactions.expireBefore(st.tick-2);for(Lease l:List.copyOf(st.leases.values())){ServerPlayer p=server.getPlayerList().getPlayer(l.player);if(p==null||!validLease(p,l,false))release(server,l,p!=null&&p.serverLevel()==l.console.getLevel()&&!cableReach(p,l.console)?"手柄线超过 6 格，已自动归还；主机继续运行":"手柄连接已失效，已自动归还");}
         for(Session s:List.copyOf(st.sessions.values())){
@@ -735,7 +814,30 @@ for(Lease l:s.ports.clone())if(l!=null){ServerPlayer p=server.getPlayerList().ge
         SfcCartridgeEditorService.tick(server);
         SfcLocalWatchServer.tick(server);
     }
-    private static void stop(State st,UUID console,String reason){Session s=st.sessions.remove(console);if(s==null)return;retireNetplay(s);if(s.hosted!=null){st.stopping.put(console,s);s.hosted.close();}finishRepair(s);abortJoin(st,s,reason);for(var input:s.inputs)input.clear();MinecraftServer server=s.connection.level().getServer();for(var p:recipients(server,s))SfcHomeNetwork.send(p,new SfcHomeNetwork.Stopped(s.id,s.epoch,reason));HomeApplianceService.refresh(s.connection.level(),s.connection.television().getBlockPos());}
+    private static void stop(State st,UUID console,String reason){
+        Session s=st.sessions.remove(console);
+        if(s==null){var key=st.launches.get(console);if(key!=null)for(var e:STATES.entrySet())if(e.getValue()==st){HomeLaunchServer.cancel(e.getKey(),key,reason);break;}return;}
+        MinecraftServer server=s.connection.level().getServer();boolean ready=s.clock!=null;
+        if(s.flow!=null)s.flow.beginStopping();
+        var run=NETPLAY.get(s);boolean awaiting=false;
+        if(run!=null&&s.saveEnabled){
+            if(!ready)NetplaySaveServer.abort(server,run.wire(),s.host.connection,"开局未完成，禁止覆盖旧档");
+            st.stopping.put(console,s);
+            awaiting=NetplaySaveServer.awaitFinish(server,run.wire(),s.host.connection,result->{
+                st.stopping.remove(console,s);
+                if(s.flow!=null)s.flow.finished(ready&&result.clean()&&(!s.saveEnabled||result.persisted()),result.reason());
+                powerStopped(s);
+                HomeApplianceService.refresh(s.connection.level(),s.connection.television().getBlockPos());
+            });
+            if(!awaiting)st.stopping.remove(console,s);
+        }
+        retireNetplay(s);
+        if(s.hosted!=null){st.stopping.put(console,s);s.hosted.close();}
+        finishRepair(s);abortJoin(st,s,reason);for(var input:s.inputs)input.clear();
+        for(var p:recipients(server,s))SfcHomeNetwork.send(p,new SfcHomeNetwork.Stopped(s.id,s.epoch,reason));
+        if(!awaiting&&s.hosted==null&&s.flow!=null){boolean noServerSave=run==null||!s.saveEnabled;s.flow.finished(noServerSave,noServerSave?reason:"保存收尾未确认，旧档保留");}
+        HomeApplianceService.refresh(s.connection.level(),s.connection.television().getBlockPos());
+    }
     private static void detach(State st,Session s,Lease lease,String reason){
         if(s.ports[lease.port]!=lease)return;MinecraftServer server=s.connection.level().getServer();
         var netplay=NETPLAY.get(s);if(netplay!=null&&!s.host.player.equals(lease.player))netplay.room().revoke(lease.connection);
@@ -747,9 +849,9 @@ for(Lease l:s.ports.clone())if(l!=null){ServerPlayer p=server.getPlayerList().ge
     }
     private static void release(MinecraftServer server,Lease l,String reason){State st=state(server);if(st.leases.get(l.id)!=l)return;Session current=st.sessions.get(l.console.hardwareId());if(current!=null&&current.connection.console()==l.console){if(current.join!=null&&current.join.second==l)abortJoin(st,current,reason);detach(st,current,l,reason);}st.leases.remove(l.id);l.console.setControllerLeased(l.port,false);ServerPlayer p=server.getPlayerList().getPlayer(l.player);if(p!=null){removeControllerCopies(p,l.id);feedback(p,reason);}l.stack.setCount(0);}
     private static void releaseConsole(MinecraftServer server,SfcHomeConsoleBlockEntity c,String reason){State st=state(server);Session current=st.sessions.get(c.hardwareId());if(current!=null&&current.connection.console()==c)stop(st,c.hardwareId(),reason);for(Lease l:List.copyOf(st.leases.values()))if(l.console==c)release(server,l,reason);}
-    private static final class State{long nextSession,tick;UUID transfer;final SfcHomeStartPolicy.InteractionGate interactions=new SfcHomeStartPolicy.InteractionGate();final Map<UUID,Lease>leases=new HashMap<>();final Map<UUID,Session>sessions=new HashMap<>(),stopping=new HashMap<>();}
+    private static final class State{long nextSession,tick;UUID transfer;final SfcHomeStartPolicy.InteractionGate interactions=new SfcHomeStartPolicy.InteractionGate();final Map<UUID,Lease>leases=new HashMap<>();final Map<UUID,HomeLaunchServer.Key>launches=new HashMap<>();final Map<UUID,Session>sessions=new HashMap<>(),stopping=new HashMap<>();}
     private static final class Lease{final UUID id,player;final net.minecraft.network.Connection connection;final SfcHomeConsoleBlockEntity console;final int port;ItemStack stack;final SfcControllerAuthority authority;Lease(UUID id,ServerPlayer p,SfcHomeConsoleBlockEntity c,int port,ItemStack s){this.id=id;player=p.getUUID();connection=p.connection.getConnection();console=c;this.port=port;stack=s;authority=new SfcControllerAuthority(id,player,port);}}
     private static final class Host{final UUID id=UUID.randomUUID(),player;final net.minecraft.network.Connection connection;Host(ServerPlayer p){player=p.getUUID();connection=p.connection.getConnection();}}
-private static final class Session{final UUID watchSource=UUID.randomUUID();final long id,created;final int epoch;final HomeSystems.Connection connection;final String rom;final Host host;final Lease[] ports;final cn.piq.fcarcade.cabinet.CabinetSyncMode mode;final SfcInputTimeline[]inputs={new SfcInputTimeline(),new SfcInputTimeline()};final SfcInputHealth health=new SfcInputHealth();final SfcRepairLedger repairs=new SfcRepairLedger();final SfcHomeNetwork.Ready[]ready=new SfcHomeNetwork.Ready[2];SfcHomeNetwork.Ready hostReady;SfcHostedWorker hosted;int frame;final int[] mediaRecipient=new int[2];boolean multiplayer;Joining join;SfcFrameClock clock;Session(long id,int epoch,HomeSystems.Connection c,String rom,Host host,Lease[] ports,long tick,cn.piq.fcarcade.cabinet.CabinetSyncMode mode){this.id=id;this.epoch=epoch;connection=c;this.rom=rom;this.host=host;this.ports=ports;this.mode=Objects.requireNonNull(mode);created=tick;health.start(tick);}boolean playerMedia(){return mode==cn.piq.fcarcade.cabinet.CabinetSyncMode.MEDIA;}}
+private static final class Session{HomeLaunchServer.Handle flow;boolean saveEnabled;SfcPowerFeedback powerFeedback=new SfcPowerFeedback();final UUID watchSource=UUID.randomUUID();final long id,created;final int epoch;final HomeSystems.Connection connection;final String rom;final Host host;final Lease[] ports;final cn.piq.fcarcade.cabinet.CabinetSyncMode mode;final SfcInputTimeline[]inputs={new SfcInputTimeline(),new SfcInputTimeline()};final SfcInputHealth health=new SfcInputHealth();final SfcRepairLedger repairs=new SfcRepairLedger();final SfcHomeNetwork.Ready[]ready=new SfcHomeNetwork.Ready[2];SfcHomeNetwork.Ready hostReady;SfcHostedWorker hosted;int frame;final int[] mediaRecipient=new int[2];boolean multiplayer;Joining join;SfcFrameClock clock;Session(long id,int epoch,HomeSystems.Connection c,String rom,Host host,Lease[] ports,long tick,cn.piq.fcarcade.cabinet.CabinetSyncMode mode){this.id=id;this.epoch=epoch;connection=c;this.rom=rom;this.host=host;this.ports=ports;this.mode=Objects.requireNonNull(mode);created=tick;health.start(tick);}boolean playerMedia(){return mode==cn.piq.fcarcade.cabinet.CabinetSyncMode.MEDIA;}}
     private static final class Joining{final SfcJoinGate gate;final ItemStack card;final int port;Lease second;int sent;SfcHomeNetwork.Ready ready;Joining(SfcJoinGate gate,ItemStack card,int port){this.gate=gate;this.card=card.copy();this.port=port;}}
 }

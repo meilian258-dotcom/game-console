@@ -3,8 +3,8 @@ package cn.piq.sfcarcade.server;
 
 import cn.piq.sfcarcade.SfcArcadeMod;
 import cn.piq.sfcarcade.net.SfcNetwork;
-import cn.piq.sfcarcade.rom.SfcRomEntry;
 import cn.piq.sfcarcade.rom.SfcRomRepository;
+import cn.piq.sfcarcade.rom.LegacySfcContentPaths;
 import cn.piq.sfcarcade.world.SfcArcadeBlock;
 import cn.piq.sfcarcade.world.SfcArcadeBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -45,6 +45,15 @@ public final class SfcServerManager {
 
     private final MinecraftServer server;
     private final SfcRomRepository repository;
+    private final LegacySfcContentPaths contentPaths;
+    private final ThreadPoolExecutor libraryWorker = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<>(4), r -> { var t = new Thread(r, "PIQ-SFC-Content"); t.setDaemon(true); return t; },
+            new ThreadPoolExecutor.AbortPolicy());
+    private final Map<UUID, LibraryWork<?>> libraryRequests = new HashMap<>();
+    private Future<LegacySfcContentPaths.Report> preparation;
+    private boolean contentPrepared, closed;
+    private String preparationError = "";
+    private int preparationFailedTick;
     private final Map<UUID, OutgoingDownload> downloads = new HashMap<>();
     private final Map<UUID, IncomingUpload> uploads = new HashMap<>();
     private final Map<UUID, Integer> uploadRateTicks = new HashMap<>();
@@ -57,9 +66,108 @@ public final class SfcServerManager {
     private boolean downloadPermissionActive;
     private int sessionCleanupTicks;
 
+    private void pollPreparation() {
+        if (preparation == null || !preparation.isDone()) return;
+        try {
+            var report = preparation.get();
+            contentPrepared = true;
+            SfcArcadeMod.LOGGER.info("[PIQ SFC] Content ready: {} (copied {}, reused {}, rejected {})",
+                    contentPaths.root(), report.copied(), report.reused(), report.rejected());
+        } catch (InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException | CancellationException failure) {
+            preparationError = readable(failure.getCause() == null ? failure : failure.getCause());
+            preparationFailedTick = server.getTickCount();
+            SfcArcadeMod.LOGGER.error("[PIQ SFC] Content preparation failed, originals retained: {}", preparationError);
+        } finally { preparation = null; }
+    }
+
+    private boolean contentReady(ServerPlayer player) {
+        pollPreparation();
+        if (closed) return false;
+        if (contentPrepared) return true;
+        if (preparation == null && server.getTickCount() - preparationFailedTick >= 100) {
+            try {
+                preparation = libraryWorker.submit(contentPaths::prepare);
+                preparationError = "";
+            } catch (RejectedExecutionException rejected) {
+                preparationError = "SFC content worker is busy or stopped";
+                preparationFailedTick = server.getTickCount();
+            }
+        }
+        if (preparationError.isEmpty()) player.displayClientMessage(Component.translatable("message.piq_sfc_arcade.content_preparing"), true);
+        else fail(player, "message.piq_sfc_arcade.content_failed", preparationError);
+        return false;
+    }
+
+    private <T> void submitLibrary(ServerPlayer player, SfcArcadeBlockEntity machine, Callable<T> operation,
+                                  java.util.function.Consumer<T> completion, Runnable cleanup) {
+        if (closed || libraryRequests.size() >= 4 || libraryRequests.containsKey(player.getUUID())) {
+            cleanup.run();
+            player.displayClientMessage(Component.translatable("message.piq_sfc_arcade.transfer_busy"), true);
+            return;
+        }
+        var task = new ContentIoTask<>(operation);
+        var work = new LibraryWork<>(player, machine, task, completion, cleanup);
+        libraryRequests.put(player.getUUID(), work);
+        try {
+            libraryWorker.execute(task);
+            player.displayClientMessage(Component.translatable("message.piq_sfc_arcade.content_working"), true);
+        } catch (RejectedExecutionException rejected) {
+            task.cancel(); finishLibrary(work, false);
+            player.displayClientMessage(Component.translatable("message.piq_sfc_arcade.transfer_busy"), true);
+        }
+    }
+
+    private <T> void finishLibrary(LibraryWork<T> work, boolean apply) {
+        if (!apply) work.task.cancel();
+        // Keep the slot and upload-memory reservation while interrupted IO actually unwinds.
+        if (!work.task.done()) return;
+        boolean valid = apply && !work.task.cancelled() && work.current();
+        libraryRequests.remove(work.player.getUUID(), work);
+        try {
+            if (valid) {
+                if (work.task.error() != null) fail(work.player, "message.piq_sfc_arcade.content_failed", readable(work.task.error()));
+                else work.completion.accept(work.task.value());
+            }
+        } finally { work.cleanup.run(); }
+    }
+
+    private final class LibraryWork<T> {
+        final ServerPlayer player;
+        final Connection connection;
+        final SfcArcadeBlockEntity machine;
+        final String romHash, romName;
+        final int startedTick;
+        final ContentIoTask<T> task;
+        final java.util.function.Consumer<T> completion;
+        final Runnable cleanup;
+        LibraryWork(ServerPlayer player, SfcArcadeBlockEntity machine, ContentIoTask<T> task,
+                    java.util.function.Consumer<T> completion, Runnable cleanup) {
+            this.player = player; connection = player.connection.getConnection(); this.machine = machine;
+            romHash = machine.romHash(); romName = machine.romName(); startedTick = server.getTickCount();
+            this.task = task; this.completion = completion; this.cleanup = cleanup;
+        }
+        boolean current() {
+            BlockPos pos = machine.getBlockPos();
+            return !closed && server.isSameThread() && libraryRequests.get(player.getUUID()) == this
+                    && server.getPlayerList().getPlayer(player.getUUID()) == player
+                    && player.connection.getConnection() == connection && connection.isConnected()
+                    && !player.hasDisconnected() && player.isAlive() && !player.isSpectator() && player.hasPermissions(2)
+                    && player.serverLevel() == machine.getLevel() && player.serverLevel().hasChunkAt(pos)
+                    && !machine.isRemoved() && player.serverLevel().getBlockEntity(pos) == machine
+                    && player.serverLevel().getBlockState(pos).getBlock() instanceof SfcArcadeBlock
+                    && player.serverLevel().getWorldBorder().isWithinBounds(pos) && player.serverLevel().mayInteract(player, pos)
+                    && player.distanceToSqr(Vec3.atCenterOf(pos)) <= MAX_MACHINE_DISTANCE_SQUARED
+                    && romHash.equals(machine.romHash()) && romName.equals(machine.romName());
+        }
+    }
+
     private SfcServerManager(MinecraftServer server) {
         this.server = server;
-        repository = new SfcRomRepository(server.getServerDirectory().resolve("sfc-roms"));
+        contentPaths = new LegacySfcContentPaths(server.getServerDirectory());
+        repository = new SfcRomRepository(contentPaths.root());
+        preparation = libraryWorker.submit(contentPaths::prepare);
     }
 
     public static synchronized void register() {
@@ -77,16 +185,14 @@ public final class SfcServerManager {
         }
         SfcArcadeBlockEntity machine = validMachine(player, pos);
         if (machine == null) return;
-        try {
-            List<SfcNetwork.CatalogEntry> catalog = manager(player.server).repository.list().stream()
+        SfcServerManager manager = manager(player.server);
+        if (!manager.contentReady(player)) return;
+        SfcRomRepository repository = manager.repository;
+        manager.submitLibrary(player, machine, () -> repository.list().stream()
                     .map(entry -> new SfcNetwork.CatalogEntry(
                             entry.fileName(), entry.sha256(), entry.size()))
-                    .toList();
-            SfcNetwork.sendLibrary(player,
-                    new SfcNetwork.LibraryPayload(pos, machine.romHash(), catalog));
-        } catch (IOException exception) {
-            fail(player, "message.piq_sfc_arcade.library_error", exception.getMessage());
-        }
+                    .toList(), catalog -> SfcNetwork.sendLibrary(player,
+                    new SfcNetwork.LibraryPayload(pos, machine.romHash(), catalog)), () -> {});
     }
 
     public static void selectRom(ServerPlayer player, BlockPos pos, String sha256) {
@@ -102,18 +208,22 @@ public final class SfcServerManager {
                     "message.piq_sfc_arcade.configure_while_busy"), true);
             return;
         }
-        try {
-            SfcRomEntry entry = manager(player.server).repository.find(sha256);
+        SfcServerManager manager = manager(player.server);
+        if (!manager.contentReady(player)) return;
+        SfcRomRepository repository = manager.repository;
+        manager.submitLibrary(player, machine, () -> repository.find(sha256), entry -> {
             if (entry == null) {
                 fail(player, "message.piq_sfc_arcade.rom_missing_server", sha256);
+                return;
+            }
+            if (manager.isOccupied(player.serverLevel().dimension(), pos)) {
+                player.displayClientMessage(Component.translatable("message.piq_sfc_arcade.configure_while_busy"), true);
                 return;
             }
             machine.setRom(entry.sha256(), entry.fileName());
             player.displayClientMessage(Component.translatable(
                     "message.piq_sfc_arcade.configured", entry.fileName()), true);
-        } catch (IOException exception) {
-            fail(player, "message.piq_sfc_arcade.library_error", exception.getMessage());
-        }
+        }, () -> {});
     }
 
     public static void requestDownload(ServerPlayer player, String sha256) {
@@ -183,6 +293,7 @@ public final class SfcServerManager {
         SfcArcadeBlockEntity machine = validMachine(player, payload.pos());
         if (machine == null) return;
         SfcServerManager manager = manager(player.server);
+        if (!manager.contentReady(player)) return;
         if (manager.isOccupied(player.serverLevel().dimension(), payload.pos())) {
             player.displayClientMessage(Component.translatable(
                     "message.piq_sfc_arcade.configure_while_busy"), true);
@@ -190,14 +301,7 @@ public final class SfcServerManager {
         }
         try {
             validateUploadMetadata(payload);
-            SfcRomEntry existing = manager.repository.find(payload.sha256());
-            if (existing != null) {
-                machine.setRom(existing.sha256(), existing.fileName());
-                player.displayClientMessage(Component.translatable(
-                        "message.piq_sfc_arcade.configured", existing.fileName()), true);
-                return;
-            }
-            if (manager.uploads.containsKey(player.getUUID())) {
+            if (manager.uploads.containsKey(player.getUUID()) || manager.libraryRequests.containsKey(player.getUUID())) {
                 player.displayClientMessage(Component.translatable(
                         "message.piq_sfc_arcade.transfer_busy"), true);
                 return;
@@ -208,6 +312,7 @@ public final class SfcServerManager {
                 return;
             }
             manager.uploads.put(player.getUUID(), new IncomingUpload(
+                    player.connection.getConnection(), machine,
                     payload.pos().immutable(),
                     payload.fileName(),
                     payload.sha256(),
@@ -226,14 +331,21 @@ public final class SfcServerManager {
     ) {
         SfcServerManager manager = manager(player.server);
         UUID playerId = player.getUUID();
+        IncomingUpload upload = manager.uploads.get(playerId);
+        if (upload != null && upload.submitted) return; // Keep the quota until the worker has actually stopped.
         if (!player.hasPermissions(2)) {
             manager.removeUpload(playerId);
             player.displayClientMessage(Component.translatable(
                     "message.piq_sfc_arcade.op_only"), true);
             return;
         }
-        IncomingUpload upload = manager.uploads.get(playerId);
         if (upload == null || !upload.sha256.equals(payload.sha256())) return;
+        if (upload.connection != player.connection.getConnection() || !upload.connection.isConnected()
+                || upload.machine.getLevel() != player.serverLevel()
+                || !player.serverLevel().hasChunkAt(upload.pos)
+                || player.serverLevel().getBlockEntity(upload.pos) != upload.machine) {
+            manager.removeUpload(playerId); return;
+        }
         try {
             manager.checkUploadRate(playerId, player.server.getTickCount());
             byte[] data = payload.data();
@@ -259,12 +371,20 @@ public final class SfcServerManager {
                         "message.piq_sfc_arcade.configure_while_busy"), true);
                 return;
             }
-            SfcRomEntry stored = manager.repository.storeVerified(
-                    upload.fileName, upload.sha256, upload.bytes);
-            machine.setRom(stored.sha256(), stored.fileName());
-            manager.removeUpload(playerId);
-            player.displayClientMessage(Component.translatable(
-                    "message.piq_sfc_arcade.uploaded", stored.fileName()), true);
+            if (upload.submitted) return;
+            upload.submitted = true;
+            SfcRomRepository repository = manager.repository;
+            String fileName = upload.fileName, hash = upload.sha256;
+            byte[] bytes = upload.bytes;
+            manager.submitLibrary(player, machine, () -> repository.storeVerified(
+                    fileName, hash, bytes), stored -> {
+                if (manager.uploads.get(playerId) != upload) return;
+                if (!manager.isOccupied(player.serverLevel().dimension(), upload.pos)) {
+                    machine.setRom(stored.sha256(), stored.fileName());
+                    player.displayClientMessage(Component.translatable(
+                            "message.piq_sfc_arcade.uploaded", stored.fileName()), true);
+                } else player.displayClientMessage(Component.translatable("message.piq_sfc_arcade.configure_while_busy"), true);
+            }, () -> { if (manager.uploads.get(playerId) == upload) manager.removeUpload(playerId); });
         } catch (IOException | IllegalArgumentException exception) {
             manager.removeUpload(playerId);
             fail(player, "message.piq_sfc_arcade.upload_failed", readable(exception));
@@ -272,7 +392,10 @@ public final class SfcServerManager {
     }
 
     private static SfcArcadeBlockEntity validMachine(ServerPlayer player, BlockPos pos) {
-        if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)
+        if (player.hasDisconnected() || !player.connection.getConnection().isConnected()
+                || !player.isAlive() || player.isSpectator() || !player.serverLevel().hasChunkAt(pos)
+                || !player.serverLevel().getWorldBorder().isWithinBounds(pos) || !player.serverLevel().mayInteract(player, pos)
+                || player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)
                 > MAX_MACHINE_DISTANCE_SQUARED
                 || !(player.serverLevel().getBlockState(pos).getBlock() instanceof SfcArcadeBlock)
                 || !(player.serverLevel().getBlockEntity(pos) instanceof SfcArcadeBlockEntity machine)) {
@@ -292,6 +415,7 @@ public final class SfcServerManager {
             manager.stopSession(player, requested);
             return;
         }
+        if (!manager.contentReady(player)) { manager.sendInactive(player, pos); return; }
         SfcArcadeBlockEntity machine = validMachine(player, pos);
         if (machine == null) {
             manager.sendInactive(player, pos);
@@ -364,11 +488,19 @@ public final class SfcServerManager {
 
     private void tick(MinecraftServer server) {
         int tick = server.getTickCount();
+        pollPreparation();
+        for (LibraryWork<?> work : List.copyOf(libraryRequests.values())) {
+            if (tick - work.startedTick > 20 * 60 || !work.current()) {
+                if (!work.task.cancelled() && work.current()) fail(work.player, "message.piq_sfc_arcade.content_failed", "SFC content operation timed out");
+                finishLibrary(work, false); continue;
+            }
+            if (work.task.done()) finishLibrary(work, true);
+        }
         var uploadIterator = uploads.entrySet().iterator();
         while (uploadIterator.hasNext()) {
             var pending = uploadIterator.next();
-            if (server.getPlayerList().getPlayer(pending.getKey()) == null
-                    || tick - pending.getValue().lastActivityTick > UPLOAD_TIMEOUT_TICKS) {
+            if (!pending.getValue().submitted && (server.getPlayerList().getPlayer(pending.getKey()) == null
+                    || tick - pending.getValue().lastActivityTick > UPLOAD_TIMEOUT_TICKS)) {
                 uploadIterator.remove();
                 uploadRateTicks.remove(pending.getKey());
                 uploadRateCounts.remove(pending.getKey());
@@ -435,6 +567,12 @@ public final class SfcServerManager {
     private static void onServerStopped(ServerStoppedEvent event) {
         SfcServerManager manager = MANAGERS.remove(event.getServer());
         if (manager != null) {
+            manager.closed = true;
+            if (manager.preparation != null) manager.preparation.cancel(true);
+            for (LibraryWork<?> work : List.copyOf(manager.libraryRequests.values())) manager.finishLibrary(work, false);
+            manager.libraryWorker.shutdownNow();
+            // IO tasks contain only immutable names/paths/bytes, never player or world callbacks.
+            manager.libraryRequests.clear(); manager.uploads.clear();
             for(OutgoingDownload transfer:List.copyOf(manager.downloads.values()))manager.removeDownload(transfer);
             manager.downloadWorker.shutdownNow();
             for (Session session : manager.sessions.values().toArray(Session[]::new)) {
@@ -586,20 +724,25 @@ public final class SfcServerManager {
     }
 
     private static final class IncomingUpload {
+        private final Connection connection;
+        private final SfcArcadeBlockEntity machine;
         private final BlockPos pos;
         private final String fileName;
         private final String sha256;
         private final byte[] bytes;
         private int offset;
         private int lastActivityTick;
+        private boolean submitted;
 
         private IncomingUpload(
+                Connection connection, SfcArcadeBlockEntity machine,
                 BlockPos pos,
                 String fileName,
                 String sha256,
                 byte[] bytes,
                 int lastActivityTick
         ) {
+            this.connection = connection; this.machine = machine;
             this.pos = pos;
             this.fileName = fileName;
             this.sha256 = sha256;

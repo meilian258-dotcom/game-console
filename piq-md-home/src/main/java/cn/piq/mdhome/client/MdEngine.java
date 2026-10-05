@@ -53,7 +53,7 @@ public final class MdEngine implements PrivateEngine {
     }
     private MdEngine(Path rom,Path root,LibretroRuntimes.Backend backend,MdProfile.Core selected,boolean saving,
                      NetplayProcess.Persistence persistence,NetplaySaveState.Identity identity,boolean resume,Consumer<RetroFrame> mediaTap,boolean waitForAuthority){
-        Objects.requireNonNull(rom);Objects.requireNonNull(backend);Objects.requireNonNull(selected);
+        Objects.requireNonNull(rom);Objects.requireNonNull(backend);MdProfile.requireActive(selected);
         this.saving=saving;this.persistence=persistence;this.identity=identity;this.resume=resume;this.mediaTap=mediaTap;
         publicSession=persistence!=null;
         authorityGate=waitForAuthority;runtimeStarted=!authorityGate;paused=authorityGate;
@@ -134,12 +134,11 @@ public final class MdEngine implements PrivateEngine {
             }
             if(closing)return;core=LibretroRuntimes.create(MdProfile.profile(selected),MdProfile.class,backend);check(core.load(content),selected);
             // GX exposes full SRAM capacity only before the first run; retain bridge exact-size checks.
-            if(selected==MdProfile.Core.GENESIS_PLUS_GX&&saved!=null)
+            if(saved!=null)
                 core.restoreSaveMemory(new LibretroSaveMemory(MdSaves.startupRam(saved.sram(),core.saveMemory()),new byte[0]));
             core.run(List.of(new LibretroProcess.Controls(new int[]{0,0},0)),0);
             if(saved!=null){
                 if(core.saveMemory().rtc().length!=0)throw new IllegalStateException("MD RTC 待适配");
-                if(selected==MdProfile.Core.BLASTEM)core.restoreSaveMemory(new LibretroSaveMemory(saved.sram(),new byte[0]));
                 core.restore(saved.state());
                 if(!Arrays.equals(saved.sram(),core.saveMemory().ram()))throw new IllegalStateException("MD SRAM 恢复不一致");
             }
@@ -215,7 +214,8 @@ public final class MdEngine implements PrivateEngine {
         return e.getMessage()==null?e.getClass().getSimpleName():e.getMessage();
     }
     static void check(LibretroProcess.Info i,MdProfile.Core selected){
-        boolean rate=selected==MdProfile.Core.GENESIS_PLUS_GX?i.sampleRate()==44100:i.sampleRate()>=50000&&i.sampleRate()<=54000;
+        MdProfile.requireActive(selected);
+        boolean rate=i.sampleRate()==44100;
         if(i.width()<1||i.height()<1||i.width()>720||i.height()>576||!Double.isFinite(i.fps())||i.fps()<49||i.fps()>61||!rate
                 ||!Float.isFinite(i.aspect())||i.aspect()<=0||i.aspect()>4)throw new IllegalStateException("MD AV 格式不匹配");
     }

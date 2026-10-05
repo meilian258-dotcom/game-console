@@ -137,6 +137,15 @@ public final class LibretroJniRuntime implements LibretroRuntime {
         NativeLibretroBridge.extract(resourceOwner, artifact.resource(), artifact.sha256(), workspace.directory().resolve("core.dll"), artifact.maxBytes());
         return Files.createDirectory(workspace.directory().resolve("content"));
     }
+    /** Large trusted full-path cores stage bounded files without retaining ROM-sized byte arrays. */
+    @Override public LibretroProcess.Info loadFiles(LibretroContentFiles files,LibretroContentFiles.Check cancellation) {
+        check();Objects.requireNonNull(files);Objects.requireNonNull(cancellation);
+        if(!profile.fullPath()||(features&NO_GAME)!=0)throw new IllegalArgumentException("Verified files require a full-path game core");
+        try {
+            cancellation.run();Path root=prepare();byte[] identity=files.stage(root,cancellation);cancellation.run();
+            return open(root.resolve(files.mainName()),root,null,identity);
+        }catch(IOException|RuntimeException|LinkageError e){throw fail(e);}
+    }
     /** Named immutable content bundle for trusted ZIP/BIOS adapters; same staging limits as loadFiles. */
     @Override public LibretroProcess.Info loadBundle(String mainName,Map<String,byte[]> content) {
         check();Objects.requireNonNull(mainName);Objects.requireNonNull(content);

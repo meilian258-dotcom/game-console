@@ -26,6 +26,10 @@ public interface LibretroRuntime extends AutoCloseable {
     default LibretroProcess.Info loadBundle(String mainName,java.util.Map<String,byte[]> files) {
         throw new UnsupportedOperationException("Runtime has no named-content adapter");
     }
+    /** Optional file-backed named content; implementations must recheck identities while staging. */
+    default LibretroProcess.Info loadFiles(LibretroContentFiles files,LibretroContentFiles.Check check) {
+        throw new UnsupportedOperationException("Runtime has no verified-file adapter");
+    }
     LibretroProcess.Info info();
     String coreVersion();
     LibretroProcess.Output run(List<LibretroProcess.Controls> frames, int outputMask);

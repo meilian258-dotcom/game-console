@@ -28,6 +28,6 @@ class CabinetGameProfileSourceTest {
         for(String label:new String[]{"本地游戏","服务器游戏","支持人数：","屏幕标注：","显示比例：","保存到服务器","上传并使用"})assertTrue(s.contains(label),label);
         assertTrue(s.contains("profiles.getOrDefault(e.contentId(),CabinetGameProfile.EMPTY)"));
         assertTrue(s.contains("editProfile.revision()"));assertTrue(s.contains("不自动修改 PGM、DIP 或旋转"));
-        assertTrue(read("cabinet/CabinetGameNetwork").contains("cabinet-game-6"));
+        assertTrue(read("cabinet/CabinetGameNetwork").contains("cabinet-game-7"));
     }
 }

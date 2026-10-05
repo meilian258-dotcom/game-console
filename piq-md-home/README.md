@@ -1,5 +1,17 @@
 # 方块电玩：MD / Game Console: MD
 
+## 当前开发变更：BlastEm 退役（2026-10-04）
+
+本次按用户要求从整个模组的实际运行链退役 BlastEm；全仓当前调用均在 MD。MEDIA／私人单人继续固定使用原 **Genesis Plus GX**，JNI Netplay 继续使用原 **Genesis Plus GX PIQ Netplay**。两者的 DLL、输入合同和保存身份不变；不是再换一颗核心，也不把 JNI Netplay 改为串流。
+
+新包不再包含、加载或校验 `blastem_libretro.dll`。`/gameconsole-md` 查询当前核心；旧 `/gameconsole-md core blastem` 只显示退役原因并拒绝，不再列作可选项。未知核心也拒绝，不能静默回退 GX；没有新增持久化核心设置。私人 JNI／PROCESS 运行器仍可按原入口显式选择，二者不是 BlastEm 的替代别名。
+
+旧 BlastEm 存档、历史 JAR、原 DLL、源码和许可证据保留；当前版本不读取、搬迁、删除或转换这些档。需要继续旧进度时，先备份，再使用原配套历史版本；不要把旧状态文件手动复制到 GX 目录。构建只需要两颗固定 GX 输入，历史 `tools/build_core.py` 必须显式加 `--historical-only`，且不能写回当前资源目录。下方所有旧版 BlastEm 操作仅是历史说明。
+
+实现、回归与未验项见 [BlastEm 退役记录](design/BlastEm退役-20261004.md)。版本、最终包、安装配套及管理台由本批统一交付记录确定；此条源码变更本身不代表已生成新 JAR 或已完成 Minecraft 真人验收。
+
+## 历史候选：MD13 / NeoForge 兼容范围
+
 2026-10-04 **MD13 / NeoForge1.21.1兼容范围测试候选**：配套本批FC76.39，默认编译236、最低229；MC1.21.1/Java21、原核心/保存与FC最低依赖不变。229/236源码构建与回归通过，最终七包在229/235/236隔离专服正常启动/停止；图形客户端/多人/Iris未验，不标稳定。原236用户无需降级，其他MOD下界及MD对应源码分发要求仍有效。精确SHA、同批安装与未验项见[本轮范围与安装规则](../piq-fc-arcade/design/NeoForge兼容范围-20261004.md)，最新目录/管理台同步以另行回执为准。
 
 ## 历史候选：MD12 + FC76.36，多屏只读旁观（2026-10-03）
@@ -94,7 +106,7 @@ MD3 仍不是与 FC/SFC 完整体验对齐的家用附属：AV 已有连接业�
 
 游戏操作沿下方 alpha.2：老式电脑拷 MD 卡、AV 线接已开机电视、插卡、借1P手柄、点顶面电源。默认键位不变；适配新核心六键映射、44.1kHz音频转48kHz、动态画面比例和电池存档。**仍为私人单人，尚无 Minecraft MD Netplay、公共双人或旁观。**官方核心支持 Netplay 不代表本模组已经接好。
 
-新旧核心存档分开，绝不自动转换。需继续旧 BlastEm 进度：先关机并等保存完成，再执行 `/gameconsole-md core blastem`；恢复新默认用 `/gameconsole-md core genesis`，查询用 `/gameconsole-md`。此选择只在本机本次连接有效，退出服务器重置 Genesis。切换运行器仍用 `/gameconsole-private cartridge-runtime process` 或 `jni`；核心与运行器是两个独立选择，都须关机操作。
+历史 alpha.3 的新旧核心存档分开，绝不自动转换；该版通过 `/gameconsole-md core blastem` 选择旧档核心，`/gameconsole-md core genesis` 恢复 GX。**当前版本 BlastEm 已退役，旧命令仅拒绝并提示，见顶部说明**。历史核心偏好仅在本机本次连接有效；私人运行器 `/gameconsole-private cartridge-runtime process` 或 `jni` 仍是另一项独立选择。
 
 **许可限制：Genesis Plus GX 禁止商业用途**，不能把核心随本附属统一标为 GPL。完整许可、固定源码、制品SHA与当前验收在[MD3指南](design/MD3-GenesisPlusGX.md)。模型公开分发授权仍待核对；本包仅测试候选，不是已经可商用的正式发行。
 
@@ -149,7 +161,7 @@ BlastEm固定提交 `1e0de94dc7e669c0925a22c0fccf6cdc837af0a0`，实际报告 `1
 
 源码构建：Java21，在本目录用工作区主包 Gradle wrapper 执行 `--offline check jar`（依赖已缓存时）。也可用 Gradle9.2.1 与 `-PgameConsoleJar=/完整路径/主包76.24.jar`；当前主包仍有私有历史打包债务，不宣称可从空仓库构建整套模组。
 
-核心：`tools/build_core.py SOURCE_DIR LLVM-MINGW/bin OUTPUT_DIR`，官方源ZIP、GPL及嵌入的第三方许可随交付源码材料保留。源SHA `31ff70a654dfc44b4e9f642855060450475d1b7327b206082ef1f23f507bf5e9`；生成CPU源/配置C后编译，只有Windows zlib补全系统io.h包含参数，无删安全校验。未附ROM/BIOS；探针用原创68000程序。
+历史 BlastEm 核心重建证据：`tools/build_core.py --historical-only SOURCE_DIR LLVM-MINGW/bin OUTPUT_DIR`，不用于当前发行，输出不得放入当前资源目录。官方源ZIP、GPL及嵌入的第三方许可随历史交付源码材料保留。源SHA `31ff70a654dfc44b4e9f642855060450475d1b7327b206082ef1f23f507bf5e9`；生成CPU源/配置C后编译，只有Windows zlib补全系统io.h包含参数，无删安全校验。未附ROM/BIOS；探针用原创68000程序。
 
 模型来自用户 `MD2_挡板修正_双状态模型包.zip`（SHA `b23e8f7907c371c080a030a2674105608a4637be48a188ba27732d83967fb7ff`），保留原可编辑源、UV与纹理；双状态已烘焙挡板，不二次转90度。代码GPL-3.0-or-later；模型公开分发许可待服主确认。当前未额外渲染MD外接AV线实体，只复用真实AV连接/断开功能，不把未实现的线材展示说成完成。
 

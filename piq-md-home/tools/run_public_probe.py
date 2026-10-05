@@ -11,7 +11,7 @@ sources=[here/'MdPublicNativeProbe.java']
 overlay=len(sys.argv)>4 and sys.argv[4]=='overlay'
 if overlay:
     base=ROOT/'piq-md-home/src/main/java/cn/piq/mdhome'
-    sources += [base/'client/MdEngine.java',base/'client/MdPublicInputBuffer.java',base/'save/MdSaveCatalog.java']
+    sources += [base/'client/MdEngine.java',base/'client/MdProfile.java',base/'client/MdPublicInputBuffer.java',base/'save/MdSaveCatalog.java']
 jars={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [fc,md]}
 source_hash={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
 r=subprocess.run([str(java/'javac.exe'),'-encoding','UTF-8','-cp',cp,'-d',str(classes),*map(str,sources)],capture_output=True)

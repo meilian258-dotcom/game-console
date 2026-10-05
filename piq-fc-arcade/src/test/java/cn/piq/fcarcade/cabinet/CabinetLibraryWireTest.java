@@ -42,6 +42,22 @@ class CabinetLibraryWireTest {
         assertThrows(IllegalArgumentException.class,()->new CabinetGameNetwork.LibraryRequest(UUID.randomUUID(),UUID.randomUUID(),BACKEND,64,""));
         assertThrows(IllegalArgumentException.class,()->new CabinetGameNetwork.LibraryReply(UUID.randomUUID(),UUID.randomUUID(),BACKEND,true,"",63,0,8,java.util.stream.IntStream.range(0,8).mapToObj(CabinetLibraryWireTest::game).toList()));
     }
+    @Test void largeArcadeRomUsesActualCommandCodecAndPreservesFiveFileBoundaries(){
+        var files=new ArrayList<CabinetGameManifest.Entry>();files.add(new CabinetGameManifest.Entry("samsho5.zip","1".repeat(64),96*1024*1024));
+        for(String bios:List.of("pgm.zip","neogeo.zip","qsound.zip","qsound_hle.zip"))files.add(new CabinetGameManifest.Entry(bios,"a".repeat(64),8*1024*1024));
+        var manifest=new CabinetGameManifest(BACKEND.toString(),files);
+        var request=new CabinetGameNetwork.Command(UUID.randomUUID(),0,CabinetGameNetwork.OPEN,UUID.randomUUID(),BACKEND,manifest,0,0,new byte[0]);
+        var buffer=new RegistryFriendlyByteBuf(Unpooled.buffer(),RegistryAccess.EMPTY);
+        try{
+            CabinetGameNetwork.Command.CODEC.encode(buffer,request);var actual=CabinetGameNetwork.Command.CODEC.decode(buffer);
+            assertEquals(manifest,actual.manifest());assertEquals(0,buffer.readableBytes());
+            var ledger=new CabinetGameTransfer(actual.manifest().files().stream().mapToInt(CabinetGameManifest.Entry::size).toArray());
+            ledger.delivered(0);assertEquals(CabinetGameManifest.CHUNK,ledger.download(4,0));
+        }finally{buffer.release();}
+        assertThrows(IllegalArgumentException.class,()->new CabinetGameManifest(BACKEND.toString(),List.of(new CabinetGameManifest.Entry("game.sfc","1".repeat(64),64*1024*1024+1))));
+        assertThrows(IllegalArgumentException.class,()->new CabinetGameManifest(BACKEND.toString(),List.of(files.getFirst(),new CabinetGameManifest.Entry("neogeo.zip","2".repeat(64),64*1024*1024+1))));
+        assertThrows(IllegalArgumentException.class,()->new CabinetGameManifest(BACKEND.toString(),List.of(files.getFirst(),new CabinetGameManifest.Entry("neogeo.zip","2".repeat(64),32*1024*1024+1))));
+    }
     @Test void editsUseContainingPageAndRetriesRevalidateAuthorityWithoutBypassingTransport()throws Exception{
         String s=Files.readString(Path.of("src/main/java/cn/piq/fcarcade/cabinet/CabinetGameLibraryService.java"));
         assertTrue(s.contains("catalog.indexOf(game)/CabinetLibraryPage.SIZE"));

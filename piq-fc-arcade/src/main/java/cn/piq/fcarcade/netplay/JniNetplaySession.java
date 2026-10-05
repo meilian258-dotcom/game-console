@@ -124,6 +124,14 @@ public final class JniNetplaySession implements AutoCloseable {
         if(started||closed||!grant.host())throw new IllegalStateException("主持启动前绑定保存");
         persistence=Objects.requireNonNull(value);saveStatus="等待 JNI 试验存档";
     }
+    private cn.piq.retro.libretro.LibretroContentFiles fileContent;
+    public synchronized void fileContent(cn.piq.retro.libretro.LibretroContentFiles files) {
+        if(started||closing||closed||fileContent!=null||generic==null||!generic.jni().fullPath())throw new IllegalStateException("Verified file preparation state");
+        java.util.Objects.requireNonNull(files);
+        if(!generic.contentName().equals(files.mainName())||files.main().size()<16||files.main().size()>generic.maxRomBytes()
+                ||files.files().entrySet().stream().anyMatch(e->!NetplayProfile.safeName(e.getKey())||!e.getKey().equals(files.mainName())&&e.getValue().size()>16*1024*1024))throw new IllegalArgumentException("Verified file profile/budget mismatch");
+        fileContent=files;
+    }
     public synchronized void start() {
         if(started||closed)return;started=true;
         var thread=new Thread(this::run,"PIQ-FC-JNI-Netplay-owner");thread.setDaemon(true);thread.start();
@@ -186,24 +194,31 @@ public final class JniNetplaySession implements AutoCloseable {
     }
     private void run() {
         try {
-            byte[] rom=content.call();if(rom==null||rom.length<16||rom.length>(generic==null?NetplayProfile.fc():generic).maxRomBytes())throw new IOException("ROM 大小异常");
+            byte[] rom=fileContent==null?content.call():null;
+            if(fileContent==null&&(rom==null||rom.length<16||rom.length>(generic==null?NetplayProfile.fc():generic).maxRomBytes()))throw new IOException("ROM 大小异常");
             var extras=new TreeMap<String,byte[]>();var hashes=new TreeMap<String,String>();
-            var supplied=Objects.requireNonNull(auxiliary.call());
+            var supplied=fileContent==null?Objects.requireNonNull(auxiliary.call()):Map.<String,byte[]>of();
             if(supplied.size()>4||generic==null&&!supplied.isEmpty()||generic!=null&&!generic.jni().fullPath()&&!supplied.isEmpty())throw new IOException("此核心不支持该辅助文件清单");
-            long total=rom.length;var names=new HashSet<String>();
+            long total=rom==null?0:rom.length;var names=new HashSet<String>();
             for(var e:supplied.entrySet()) {
                 if(!NetplayProfile.safeName(e.getKey())||e.getKey().equalsIgnoreCase(generic.contentName())
                         ||!names.add(e.getKey().toLowerCase(Locale.ROOT))||e.getValue()==null||e.getValue().length<1||e.getValue().length>16*1024*1024)throw new IOException("辅助文件边界异常");
                 byte[] bytes=e.getValue().clone();total+=bytes.length;if(total>128L*1024*1024)throw new IOException("内容清单超过上限");
                 extras.put(e.getKey(),bytes);hashes.put(e.getKey(),NetplaySaveState.hash(bytes));
             }
-            identity=generic==null?FcNetplaySaves.jniIdentity(gunMode,NetplaySaveState.hash(rom)):NetplaySaveState.identity(generic,NetplaySaveState.hash(rom),hashes);
+            if(fileContent!=null)hashes.putAll(fileContent.auxiliaryHashes());
+            String romHash=fileContent==null?NetplaySaveState.hash(rom):fileContent.main().sha256();
+            identity=generic==null?FcNetplaySaves.jniIdentity(gunMode,romHash):NetplaySaveState.identity(generic,romHash,hashes);
             byte[] saved=null;
-            if(persistence!=null){saved=persistence.load(identity);if(saved!=null)NetplaySaveState.decode(saved,identity);if(!persistence.enabled())persistence=null;}
+            if(fileContent==null&&persistence!=null){saved=persistence.load(identity);if(saved!=null)NetplaySaveState.decode(saved,identity);if(!persistence.enabled())persistence=null;}
             if(closing)return;
             core=factory.get();LibretroProcess.Info info;
-            if(generic!=null&&generic.jni().fullPath()){extras.put(generic.contentName(),rom);info=core.loadBundle(generic.contentName(),extras);}
+            if(fileContent!=null)info=core.loadFiles(fileContent,()->{if(closing)throw new IOException("JNI content preparation cancelled");});
+            else if(generic!=null&&generic.jni().fullPath()){extras.put(generic.contentName(),rom);info=core.loadBundle(generic.contentName(),extras);}
             else info=core.load(rom);
+            // File selection and owner-thread staging may be separated in time. No save lease
+            // is opened until the staged bytes have passed the captured SHA-256 checks.
+            if(fileContent!=null&&persistence!=null){saved=persistence.load(identity);if(saved!=null)NetplaySaveState.decode(saved,identity);if(!persistence.enabled())persistence=null;}
             if((generic==null&&(info.width()!=256||info.height()!=240||core.rotation()!=0))||info.fps()<(generic==null?59:49)||info.fps()>61
                     ||!core.capabilities().contains(LibretroRuntime.Capability.STATE)
                     ||gunMode&&!core.capabilities().contains(LibretroRuntime.Capability.LIGHT_GUN))throw new IOException("需要可回滚核心与匹配输入设备/时序");

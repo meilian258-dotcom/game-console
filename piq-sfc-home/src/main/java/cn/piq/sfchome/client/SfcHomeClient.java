@@ -44,6 +44,13 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
     @Override public void netplay(SfcHomeNetwork.NetplayStart value){session(value.session());if(waiting==value.session()){
         cn.piq.fcarcade.client.watch.WatchClient.controlStarting(value.wire());waitingNetplay=value;
     }}
+    @Override public void netplayActivated(SfcHomeNetwork.NetplayActivated value){
+        var current=playback;
+        if(isCurrent(current)&&current.matches(value.sessionId(),value.epoch())){
+            try{current.activateNetplay(value);}
+            catch(RuntimeException failure){fail("SFC 开局授权已失效，原档保留",failure);}
+        }
+    }
     private static long waitingAt;
     private static Object sessionConnection;
     private static SfcStartupProgress startup;

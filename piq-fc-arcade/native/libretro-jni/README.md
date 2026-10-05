@@ -71,10 +71,15 @@ Features: `1 WGL_COMPAT`, `2 POINTER`, `4 MOUSE`, `8 KEYBOARD`,
 `64 LEGACY_INLINE_OPTIONS` (explicit trusted legacy profile only). Flags are an
 allowlist, not an assertion that the core implements every feature. NO_GAME
 requires empty `content`, a core declaration, then calls `retro_load_game(NULL)`.
-Ordinary content keeps its actual filename/extension, is at most 64 MiB, and is
-passed by memory or full path exactly as the core metadata declares. A bounded
-persistent content byte copy is also retained for extended game-info callbacks
-(required by Mesen even in full-path mode). NO_GAME
+Ordinary content keeps its actual filename/extension and is passed by memory or
+full path exactly as the trusted profile AND core metadata declare. Memory-mode
+content remains limited to 64 MiB; explicitly full-path content is at most 96 MiB.
+Zero-length content is rejected. A bounded persistent native content byte copy
+(64 or 96 MiB respectively) is still retained until unload for extended game-info
+callbacks, required by Mesen even in full-path mode. The Java file-bundle path
+avoids Java ROM array copies; it does not remove this native allocation or bound
+the emulator's own memory. Four 96 MiB sessions may retain 384 MiB of native
+content alone, in addition to core state/video/audio and the Java heap. NO_GAME
 does not authorize unbounded system files: the Java profile must bound them.
 
 `devices` has 1–4 entries. `optionPairs` contains alternating key/value strings,
@@ -182,6 +187,10 @@ The multi-session probe additionally checks four concurrent owners, independent
 software/WGL input and snapshots, capacity/stale generations, a stalled core and
 foreign-thread callback isolation. These tests do not make untrusted native DLLs
 safe, nor certify arbitrary asynchronous callbacks after a core has unloaded.
+The large-content probe runs with a 128 MiB Java heap and synthetic files only:
+64 MiB memory-mode, 64 MiB + 1 and 96 MiB full-path loads; zero/over-limit failures;
+profile/core mode mismatch; slot release; and Mesen-style persistent extended-info
+bytes still valid during a later frame. This measures Java heap, not total RAM.
 
 `tests/RealCoreProbe.java` is an additional independent native integration caller.
 Its arguments are bridge/core/content/private-work/name/fullPath/features/frames,

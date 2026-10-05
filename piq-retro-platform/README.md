@@ -3,6 +3,28 @@
 See the [branding and packaging policy](../source-control/BRANDING.md). Internal package names,
 API identities and build outputs remain compatible. This library is not a player-installable mod.
 
+## Bounded content files and server paths (FC76.40 candidate, 2026-10-04)
+
+`LibretroContentFiles.inspect(mainName, sources, mainLimit, auxiliaryLimit, check)` creates an
+immutable name/path/size/SHA manifest. It rejects links and unsafe names, checks bounded file counts
+and sizes, hashes with a 64 KiB buffer, and revalidates during staging. `stage(root, check)` requires
+an exclusively owned temporary destination; the caller owns cleanup after cancellation/failure.
+It is not permission to read arbitrary server paths or to upload local files automatically.
+`LibretroRuntime.loadFiles(files, check)` is a default optional method: unsupported backends reject
+it explicitly; JNI implements it without removing the existing byte-array constructors/methods.
+The main mod's Netplay adapters bind verified file contents before loading saved state.
+
+Limits are separate: five files and 128 MiB total, main content up to 96 MiB, generic auxiliary files
+up to 64 MiB; a backend may be stricter (FBNeo BIOS 16 MiB). JNI native full-path loading accepts
+96 MiB, memory loading remains 64 MiB. The ABI2 bridge retains a bounded native copy for extended
+game-info compatibility, so streaming Java staging is not a zero-copy or total-memory claim.
+
+`ServerContentPaths.instanceArea`, `worldArea` and `worldScope` compute paths only. They do no IO,
+authorization, quota enforcement or migration. SFC home retains its world scope; the old SFC cabinet
+uses the instance area. Adapters still own safe copy, conflicts, permissions and main-thread checks.
+Both new consumers require FC76.40+. See the [implementation and verified limits](../piq-fc-arcade/design/内容库收尾与核心退役-20261004.md).
+These are internal shared APIs, not a stable SDK or a claim that all content libraries are unified.
+
 ## Read-only native budget queries (FC76.36 candidate, 2026-10-03)
 
 `NativeLibretroBridge.freeSlotsIfLoaded()` reports the existing four-owner gate without loading a DLL or taking an owner lock. `LibretroJniRuntime.nativeSlotHeld()` checks the exact token/generation; it remains held until native teardown actually returns. These are budget snapshots, not reservations or permission to call a core off its owner thread. No ABI, core binary, save identity or four-slot limit changes. Public multi-source observer lifetimes live in the main mod, not this library; see the [first-batch contract and verification](../piq-fc-arcade/design/公共JNI多屏旁观第一批-20261003.md).

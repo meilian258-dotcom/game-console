@@ -1,8 +1,38 @@
 # 从 Git 源码构建：一期（FC 主包）
 
-## 2026-10-04：NeoForge 编译版与最低运行版分离（测试候选）
+## 当前补充：内容库收尾与旧核心退役（2026-10-04）
 
-当前七组件开发线仍是Minecraft1.21.1/Java21。共同 [neoforge-compat.properties](neoforge-compat.properties) 保留默认编译 `neo_version=21.1.236`，独立最低 `neo_min_version=21.1.229`。FC/SFC家用/MD/街机/电脑/PvZ使用 [共同Gradle策略](neoforge-compat.gradle)，`-Pneo_version=21.1.229`或235只指定编译测试目标，发行最低不跟着改变；拒绝非21.1、低于floor、其他MC与命令行最低值覆盖。GBA自建从同一策略展开最终元数据，但真实依赖目录仍须显式匹配本次测试版。
+本轮为 FC76.40、完整SFC47（家用47＋内部core10）、MD14、街机1.5.7；完整配套、最终制品及未验项见[本轮指南](../piq-fc-arcade/design/内容库收尾与核心退役-20261004.md)。这是源码与候选构建说明，不是部署/发布授权。默认编译NeoForge21.1.236、运行最低21.1.229、Minecraft1.21.1/Java21不变；core10现在也使用共同Gradle兼容策略，不再让旧core9元数据例外约束新包。
+
+FC主包新增公共 `ServerContentPaths`（纯路径/scope，无IO/迁移/授权）和可选文件式 `LibretroContentFiles` / `LibretroRuntime.loadFiles`（按文件暂存、身份复核、取消与大小边界）。SFC家用与历史独立柜调用公共路径；Native JNI Netplay经机柜/公共Netplay接入文件包。其他运行器的默认 `loadFiles` 明确不支持，不能仅因接口存在就声明全部核心可加载大ROM/BIOS。
+
+### SFC 源码输入与完整包边界
+
+先构建主包，再构建内部core10及家用薄包；附属不会嵌入另一份FC公共层：
+
+```powershell
+.\piq-fc-arcade\gradlew.bat -p piq-fc-arcade check jar --no-daemon
+.\piq-sfc-arcade\gradlew.bat -p piq-sfc-arcade '-PgameConsoleJar=../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.40.jar' check jar --no-daemon
+.\piq-sfc-home\gradlew.bat -p piq-sfc-home '-PgameConsoleJar=../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.40.jar' '-PsfcCoreJar=../piq-sfc-arcade/build/libs/piq_sfc_arcade-0.2.0-alpha.10.jar' check jar --no-daemon
+```
+
+SFC两处默认开发FC输入已为76.40，家用 `sfcCoreJar` 可显式指定，默认core10；发布依赖也要求FC≥76.40、家用要求core≥10，不允许缺新API的旧主包启动。路径相对于各Gradle项目目录；只有已具备完整Maven缓存时才加 `--offline`。本次没有重新编译WASM，普通Java内容目录维护不要运行 `native/build-wasm.ps1`。
+
+完整玩家包仍须经审计合并家用薄包、内部core10及批准的资源，保留 `piq_sfc_home`、`piq_sfc_arcade` 两个MOD ID；不要给玩家另装薄包或重复旧core9。重建前已将未修改源码独立构建与冻结core9逐条比较：52个class全部相同、无新增/缺失/改变，WASM原件SHA不变。core10仅放行内容路径/后台库操作/server-only选择等明确变更，以及依赖/版本和四个本地化键（1改3增）；模型、核心WASM及无关资源仍按白名单保护。冻结core9和审计基线JAR保留，不覆盖旧成品；不能继续把core9包内元数据覆写方案用作当前完整包的构建方法。
+
+本机正式core10 `check jar` 通过ABI、ROM仓库/复制迁移/取消生命周期及两项真实WASM smoke；家用47薄包517项测试（516通过、1跳过、0失败/错误）。完整日志为 `outputs/content-library-retirement-20261004/sfc-core10-check-jar.log`、`sfc-home47-check-jar.log`；基线记录在 `piq-sfc-arcade/build/reports/core9-source-baseline-20261004.json`。Windows符号链接创建探针无法执行，明确保留跳过；图形客户端/真人多人和完整合包验收不能用薄包测试替代。
+
+本轮产生的core9/core10/home47三个 `-audit20261004.jar` 已核对SHA后归档到 `outputs/content-library-retirement-20261004/audit-builds/`，不留在管理台扫描的 `build/libs` 冒充最新成品；原冻结core9、正式core10和home47薄包保留原位置。JNI桥如在同一批后续复核中变化，以总指南记录的最终FC哈希和最终重核结果为准，不用前一轮依赖哈希覆盖它。
+
+### BlastEm 不再是现行构建输入
+
+MD14当前只保留既有Genesis Plus GX与独立PIQ Netplay核心两颗固定输入。全仓现行BlastEm调用已退役，新MD包不得包含 `blastem_libretro.dll`；未知/退役核心标识必须明确拒绝，不回退为另一个核心。原DLL、对应源码、许可证、旧存档和历史JAR只作保留证据；历史重建工具 `piq-md-home/tools/build_core.py` 须明确 `--historical-only` 且不能输出到当前资源目录。退役不删除别的核心所用的JNI/进程运行器，不转换任何旧保存。
+
+以下章节保留对应历史构建批次；旧版本号/测试数字、core9冻结例外不作为本轮安装与构建合同。
+
+## 历史：NeoForge 编译版与最低运行版分离（2026-10-04上一批候选）
+
+该批七组件开发线为Minecraft1.21.1/Java21。共同 [neoforge-compat.properties](neoforge-compat.properties) 保留默认编译 `neo_version=21.1.236`，独立最低 `neo_min_version=21.1.229`。FC/SFC家用/MD/街机/电脑/PvZ使用 [共同Gradle策略](neoforge-compat.gradle)，`-Pneo_version=21.1.229`或235只指定编译测试目标，发行最低不跟着改变；拒绝非21.1、低于floor、其他MC与命令行最低值覆盖。GBA自建从同一策略展开最终元数据，但真实依赖目录仍须显式匹配该次测试版。
 
 开发版本为FC76.39/完整SFC46/MD13/街机1.5.6/GBA15/电脑12/PvZ12；完整SFC须保留冻结core9，只在新合包元数据中白名单调整其NeoForge下界。策略检查入口是 `python -B -m unittest discover -s source-control -p "test_neoforge_compat.py" -v`；[只读最终包检查器](neoforge_compat.py)支持七次 `--jar`，覆盖完整SFC的两个依赖owner，不代替Maven依赖/实际加载测试。
 

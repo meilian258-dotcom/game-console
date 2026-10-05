@@ -13,14 +13,13 @@ class MdPureTest {
         var p=MdProfile.profile();assertEquals("Genesis Plus GX",p.name());assertEquals(List.of(513,513),p.devices());
         for(String key:List.of("bios","lock_on","frameskip","overscan"))assertEquals("disabled",p.options().get("genesis_plus_gx_"+key));
         assertEquals(Set.of("windows-x64"),p.cores().keySet());assertTrue(p.fullPath());
-        var old=MdProfile.profile(MdProfile.Core.BLASTEM);assertEquals("off",old.options().get("blastem_megawifi"));assertEquals("md1va3",old.options().get("blastem_model"));
     }
     @Test void gxAllInputCombinationsPreserveBindings(){
         int[] expected={1,10,2,3,4,5,6,7,0,9,11,8};Set<Integer> seen=new HashSet<>();
         for(int mask=0;mask<4096;mask++){
             int mapped=0;for(int bit=0;bit<12;bit++)if((mask&(1<<bit))!=0)mapped|=1<<expected[bit];
             assertEquals(mapped,MdProfile.input(MdProfile.Core.GENESIS_PLUS_GX,mask));
-            assertEquals(mask,MdProfile.input(MdProfile.Core.BLASTEM,mask));seen.add(mapped);
+            seen.add(mapped);
         }
         assertEquals(4096,seen.size());assertThrows(IllegalArgumentException.class,()->MdProfile.input(MdProfile.Core.GENESIS_PLUS_GX,4096));
     }
@@ -35,12 +34,11 @@ class MdPureTest {
         assertThrows(IllegalStateException.class,()->MdSaves.startupRam(new byte[2],new cn.piq.retro.libretro.LibretroSaveMemory(new byte[2],new byte[0])));
         assertThrows(IllegalStateException.class,()->MdSaves.startupRam(new byte[0],new cn.piq.retro.libretro.LibretroSaveMemory(new byte[65536],new byte[1])));
     }
-    @Test void namespacesKeepLegacyAndSeparateNewContract(){
+    @Test void gxNamespacesRemainByteIdenticalAfterRetirement(){
         var jni=cn.piq.retro.libretro.LibretroRuntimes.Backend.JNI_TRIAL;
-        assertEquals("jni-v1/"+MdProfile.LEGACY_SHA,MdProfile.saveNamespace(MdProfile.Core.BLASTEM,jni));
-        var gx=MdProfile.saveNamespace(MdProfile.Core.GENESIS_PLUS_GX,jni);assertTrue(gx.startsWith("jni-v1/gx-v1/"+MdProfile.SHA+"/"));
-        assertNotEquals(gx,MdProfile.saveNamespace(MdProfile.Core.BLASTEM,jni));
-        for(var backend:cn.piq.retro.libretro.LibretroRuntimes.Backend.values())if(backend!=jni)assertNotEquals(gx,MdProfile.saveNamespace(MdProfile.Core.GENESIS_PLUS_GX,backend));
+        String suffix="gx-v1/9ffa10a115b20e1b49e9caf0b53f287c640ed4e5bb93f7ed9a23b416a4ccfdf7/bb0002f5733b81d3c561b46b1123fbc9e8eb012651a2fa5c578cc2074d360422";
+        assertEquals("jni-v1/"+suffix,MdProfile.saveNamespace(MdProfile.Core.GENESIS_PLUS_GX,jni));
+        assertEquals("process-v1/"+suffix,MdProfile.saveNamespace(MdProfile.Core.GENESIS_PLUS_GX,cn.piq.retro.libretro.LibretroRuntimes.Backend.PROCESS));
     }
     @Test void gxAudio44100IsChunkIndependent(){
         short[] wave=new short[22050];for(int i=0;i<wave.length;i++)wave[i]=(short)(i%1000);

@@ -14,6 +14,9 @@ final class SfcWorkbenchDisplay {
         return original;
     }
     static String current(String title){return title==null||title.isBlank()?"未命名卡带":title;}
+    /** The server resolves missing legacy metadata. Explicitness is not a single-player override. */
+    static String players(int maximum){return "人数："+(maximum==2?"双人":"单人");}
+    static int nextPlayers(int maximum){return maximum==2?1:2;}
     static String source(SfcCardLibrary.Row row){return row==null?"未选择":row.local()?"本地待上传":"服务器库";}
     static String[] details(String heading,String name,String source,int lines){
         if(lines<=0)return new String[0];

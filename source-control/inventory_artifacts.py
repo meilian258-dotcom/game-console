@@ -23,7 +23,7 @@ INPUTS = {
     'piq-fc-arcade/build/runtime-pack37-v1/piq-runtime-pack-v1.zip': 'Native arcade embeddedRuntimeArchive; override supported by build.gradle',
     'piq-sfc-home/src/main/resources/core/sfc-libretro/windows-x64/mesen-s_libretro.dll': 'SFC libretro core; component provenance/license files',
     'piq-gba/runtime/incoming-mgba-20260911-v1/mgba_libretro.dll': 'GBA fixed core; component runtime provenance',
-    'piq-md-home/src/main/resources/core/windows-x64/blastem_libretro.dll': 'MD core; component tools and third-party license/provenance',
+    'piq-md-home/src/main/resources/core/windows-x64/blastem_libretro.dll': 'Retired 2026-10-04: historical BlastEm provenance only; excluded from current build and runtime; original files and saves retained',
     'piq-pvz-addon/vendor/dist/cores/pvz_libretro.dll': 'PvZ core only; game content/main.pak is excluded',
     'piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.22.jar': 'Legacy compile input for SFC/native arcade/computer/PvZ; not an approved release claim',
     'piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.24.jar': 'MD default compile input; -PgameConsoleJar can override',

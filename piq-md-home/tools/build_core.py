@@ -1,10 +1,15 @@
-"""Build pinned unmodified BlastEm with LLVM-MinGW. No shell/make dependency.
-Usage: python build_core.py SOURCE_DIR TOOLCHAIN_BIN OUTPUT_DIR
+"""HISTORICAL ONLY: rebuild retired BlastEm for old-version provenance, never current MD.
+Usage: python build_core.py --historical-only SOURCE_DIR TOOLCHAIN_BIN OUTPUT_DIR
 Corresponds to Makefile Windows/x86_64/LIBRETRO with -O2 (no LTO).
 """
 import sys,subprocess,json,hashlib,concurrent.futures
 from pathlib import Path
-src,tc,out=map(lambda p:Path(p).resolve(),sys.argv[1:4]);out.mkdir(parents=True,exist_ok=True)
+if len(sys.argv)!=5 or sys.argv[1]!="--historical-only":
+    raise SystemExit("BlastEm 已退役；此脚本只保留历史源码重建证据。当前 MD 请使用 prepare_genesis.py 及 native-genesis-netplay/README.md。显式历史重建需 --historical-only。")
+src,tc,out=map(lambda p:Path(p).resolve(),sys.argv[2:5])
+if out.is_relative_to(Path(__file__).resolve().parents[1]/"src/main/resources"):
+    raise SystemExit("历史 BlastEm 重建不得输出到当前 MD 资源目录。")
+out.mkdir(parents=True,exist_ok=True)
 for stem in ['upd78k2','sh2']:
     result=subprocess.run([sys.executable,'cpu_dsl.py','-d','call',stem+'.cpu'],cwd=src,check=True,stdout=subprocess.PIPE)
     (src/(stem+'.c')).write_bytes(result.stdout)

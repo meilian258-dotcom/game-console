@@ -30,7 +30,7 @@ final class NativeRomStaging {
     }
 
     static long checkedTotal(long already,long bytes)throws IOException{
-        if(bytes<22||bytes>BridgeProtocol.MAX_ROM)throw new IOException("Each ROM/BIOS ZIP must be 22 bytes to 64 MiB");
+        if(bytes<22||bytes>BridgeProtocol.MAX_ROM)throw new IOException("旧 MAME 串流/进程模式的 ROM 和 BIOS ZIP 限 22 字节至 64 MiB；64–96 MiB 主游戏仅开放 FBNeo JNI Netplay");
         if(already<0||already>MAX_TOTAL_BYTES-bytes)throw new IOException("ROM plus allowed BIOS files exceed 128 MiB");
         return already+bytes;
     }

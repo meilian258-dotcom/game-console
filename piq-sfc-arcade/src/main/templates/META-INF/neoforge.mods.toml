@@ -15,20 +15,20 @@ description='''
 [[dependencies.${mod_id}]]
 modId="neoforge"
 type="required"
-versionRange="[${neo_version},)"
+versionRange="[${neo_min_version},22)"
 ordering="NONE"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
 modId="minecraft"
 type="required"
-versionRange="[${minecraft_version},1.22)"
+versionRange="[${minecraft_version},1.21.2)"
 ordering="NONE"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
 modId="piq_fc_arcade"
 type="required"
-versionRange="[0.31.0-alpha.41,0.32.0)"
+versionRange="[0.31.0-alpha.76.40,0.31.0-alpha.77)"
 ordering="AFTER"
 side="BOTH"

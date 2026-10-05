@@ -17,6 +17,8 @@ public final class SfcRomRepositorySelfTest {
 
     public static void main(String[] args) throws Exception {
         cn.piq.sfcarcade.server.SfcDownloadGateSelfTest.verify();
+        cn.piq.sfcarcade.server.ContentIoTaskSelfTest.verify();
+        SfcContentMigrationSelfTest.verify();
         Path root = Files.createTempDirectory("piq-sfc-rom-repository-");
         try {
             SfcRomRepository repository = new SfcRomRepository(root);
@@ -43,6 +45,15 @@ public final class SfcRomRepositorySelfTest {
 
             expectIOException(() -> repository.storeVerified(
                     "wrong-hash.sfc", "0".repeat(64), raw));
+            for (String unsafe : new String[]{"../escape.sfc", "a\\escape.sfc", "x:y.sfc", " padded.sfc ", "CON.sfc"})
+                expectIOException(() -> repository.storeVerified(unsafe, sha256, raw));
+            // An occupied suffix must not be overwritten, even when the requested base name also conflicts.
+            byte[] changed = raw.clone(); changed[0] ^= 1;
+            String otherHash = SfcRomImage.fromBytes(changed).sha256();
+            Path suffix = root.resolve("legal-test-" + otherHash.substring(0, 8) + ".sfc");
+            Files.write(suffix, raw);
+            expectIOException(() -> repository.storeVerified("legal-test.sfc", otherHash, changed));
+            require(Arrays.equals(raw, Files.readAllBytes(suffix)), "suffix collision overwrote existing ROM");
             System.out.println("SFC ROM repository self-test passed");
         } finally {
             try (var paths = Files.walk(root)) {

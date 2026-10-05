@@ -80,7 +80,7 @@ public final class HomeLaunchServer {
     private static <P> void act(Pending<P> p,Action action){
         if(action.operation()==SELECT&&p.flow.stage()==Stage.SAVE_SELECTION){
             var choice=action.choice();var row=p.rows.stream().filter(r->r.slot()==choice.slot()).findFirst().orElseThrow();
-            if(!row.version().equals(choice.version())||choice.resume()&&(!row.occupied()||!row.compatible())||choice.name().isBlank())throw new IllegalArgumentException("存档或版本已变化");
+            if(!row.accepts(choice))throw new IllegalArgumentException("存档或版本已变化，或此旧档不支持修改名称和人数标签");
             p.flow.select(choice.savePlayers());p.choice=choice;view(p,"正在校验所选存档…");select(p,choice);
         }else if((action.operation()==ALLOW||action.operation()==DENY)&&p.flow.stage()==Stage.JOIN_CONFIRM){p.flow.join(action.operation()==ALLOW);load(p);}
         else if(action.operation()==BACK&&p.flow.stage()==Stage.JOIN_CONFIRM&&p.definition.saveMode()!=0){p.flow.back();p.plan=null;p.choice=null;view(p,p.definition.saveHint());}

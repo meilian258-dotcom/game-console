@@ -10,9 +10,10 @@ public class MdNativeProbe {
     static int checks;
     static void check(boolean v,String s){checks++;if(!v)throw new AssertionError(s);System.out.println("OK "+s);}
     public static void main(String[] args)throws Exception{
-        Path out=Path.of(args[0]);Files.createDirectories(out.resolve("workspace"));RuntimeWorkspace.configure(out.resolve("workspace"));
         var backend=LibretroRuntimes.Backend.valueOf(args[1]);var selected=MdProfile.Core.valueOf(args[2]);
-        int batteryIndex=selected==MdProfile.Core.GENESIS_PLUS_GX?1:0;
+        MdProfile.requireActive(selected); // Fail before filesystem/runtime work; retired cores are not probe targets.
+        Path out=Path.of(args[0]);Files.createDirectories(out.resolve("workspace"));RuntimeWorkspace.configure(out.resolve("workspace"));
+        int batteryIndex=1;
         byte[] rom=MdRom.read(out.resolve("diagnostic.md"));
         try(var core=LibretroRuntimes.create(MdProfile.profile(selected),MdProfile.class,backend)){
             var info=core.load(rom);System.out.println("INFO "+info+" "+core.coreVersion());
@@ -34,7 +35,7 @@ public class MdNativeProbe {
             core.run(List.of(new LibretroProcess.Controls(new int[]{0,0},0)),3);core.restore(state);
             check(Arrays.equals(mem.ram(),core.saveMemory().ram()),"state SRAM restore");
             boolean exact=Arrays.equals(state,core.serialize());System.out.println("CAPABILITY exactStateRoundtrip="+exact);
-            if(selected==MdProfile.Core.GENESIS_PLUS_GX||Boolean.getBoolean("md.probe.rollback"))check(exact,"state byte roundtrip");
+            check(exact,"state byte roundtrip");
             Files.write(out.resolve("state.bin"),state);Files.write(out.resolve("ram.bin"),mem.ram());
             if(Boolean.getBoolean("md.probe.rollback")){
             var adapter=new RollbackTimeline.Core<LibretroProcess.Output>(){

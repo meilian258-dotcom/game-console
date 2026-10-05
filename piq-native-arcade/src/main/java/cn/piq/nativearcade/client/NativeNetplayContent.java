@@ -16,6 +16,23 @@ public final class NativeNetplayContent {
     public static final String CORE_SHA=cn.piq.nativearcade.NativeNetplayProfile.CORE_SHA;
     public static final String CORE_RESOURCE=cn.piq.nativearcade.NativeNetplayProfile.CORE_RESOURCE;
     private NativeNetplayContent(){}
+    /** JNI-only bounded named files. No ROM-sized Java arrays, no implicit content permission. */
+    public static CabinetBackend.NetplayContent loadFiles(Path rom)throws IOException{
+        Path source=rom.toAbsolutePath().normalize();String name=source.getFileName().toString().toLowerCase(Locale.ROOT);
+        if(!validGameName(name))throw new IOException("请选择原名的街机 ZIP（例如 dino.zip / kov.zip），不要选择 BIOS");
+        var paths=new TreeMap<String,Path>();paths.put(name,source);
+        for(String companion:new TreeSet<>(CabinetGameManifest.BIOS)){
+            Path path=source.getParent().resolve(companion);if(Files.exists(path,LinkOption.NOFOLLOW_LINKS))paths.put(companion,path);
+        }
+        var files=cn.piq.retro.libretro.LibretroContentFiles.inspect(name,paths,
+                cn.piq.retro.libretro.LibretroContentFiles.MAX_MAIN,16*1024*1024,()->{if(Thread.currentThread().isInterrupted())throw new IOException("游戏校验已取消");});
+        for(var entry:files.files().entrySet()){
+            if(entry.getValue().size()<22)throw new IOException("街机 ZIP 至少需要 22 字节："+entry.getKey());
+            byte[] magic;try(var in=Files.newInputStream(entry.getValue().source(),LinkOption.NOFOLLOW_LINKS)){magic=in.readNBytes(4);}
+            if(magic.length!=4||magic[0]!='P'||magic[1]!='K'||magic[2]!=3||magic[3]!=4)throw new IOException("不是有效的街机 ZIP："+entry.getKey());
+        }
+        return new CabinetBackend.NetplayContent(profile(name),files);
+    }
     public static CabinetBackend.NetplayContent load(Path rom)throws IOException{
         Path source=rom.toAbsolutePath().normalize();
         String name=source.getFileName().toString().toLowerCase(Locale.ROOT);

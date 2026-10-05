@@ -26,8 +26,7 @@ test {
 }
 def verifyCores = tasks.register('verifyCores') {
     doLast {
-        ['blastem_libretro.dll':'3e275e9656e389be11a2623a47a6b454b214a91966af984a2105fa7c8249d016',
-         'genesis_plus_gx_libretro.dll':'9ffa10a115b20e1b49e9caf0b53f287c640ed4e5bb93f7ed9a23b416a4ccfdf7',
+        ['genesis_plus_gx_libretro.dll':'9ffa10a115b20e1b49e9caf0b53f287c640ed4e5bb93f7ed9a23b416a4ccfdf7',
          'genesis_plus_gx_piq_netplay_libretro.dll':'8200a6d5e7c39f60afefd8e87e369d253f737de6a73bf8d920d2ab81888a5fb5'].each { name, sha ->
             def input = file('src/main/resources/core/windows-x64/' + name)
             if(!input.isFile() || input.length() > 32 * 1024 * 1024 ||
@@ -38,9 +37,18 @@ def verifyCores = tasks.register('verifyCores') {
 }
 processResources.dependsOn verifyCores
 tasks.named('processResources', ProcessResources) {
+    // Keep historical source/receipt/license files; never copy the retired executable into a new build.
+    exclude '**/blastem_libretro.dll'
+    doFirst {
+        // Copy tasks do not remove excluded files from a previous incremental build.
+        delete new File(destinationDir, 'core/windows-x64/blastem_libretro.dll')
+    }
     inputs.properties(version: project.version, neo_min_version: neo_min_version)
     filesMatching('META-INF/neoforge.mods.toml') {
         expand(version: project.version, neo_min_version: neo_min_version)
     }
 }
-jar { manifest { attributes 'Implementation-Title': 'Game Console MD', 'Implementation-Version': project.version } }
+jar {
+    exclude '**/blastem_libretro.dll'
+    manifest { attributes 'Implementation-Title': 'Game Console MD', 'Implementation-Version': project.version }
+}

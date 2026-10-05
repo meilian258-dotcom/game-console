@@ -12,7 +12,7 @@ public final class NativeNetplayProfile {
     public static NetplayProfile profile(String name){
         if(!validGameName(name))throw new IllegalArgumentException("Invalid arcade ZIP name");
         return new NetplayProfile(NativeNetplayProfile.class,CORE_RESOURCE,CORE_SHA,name,
-            Map.of(),1,48000,64*1024*1024,4).withJni(runtime()).withJniAspect(NetplayProfile.JniAspect.PRESENTED);
+            Map.of(),1,48000,cn.piq.retro.libretro.LibretroContentFiles.MAX_MAIN,4).withJni(runtime()).withJniAspect(NetplayProfile.JniAspect.PRESENTED);
     }
     public static cn.piq.retro.libretro.LibretroProfile runtime(){
         return new cn.piq.retro.libretro.LibretroProfile("FinalBurn Neo","zip",true,List.of(1,1,1,1),false,

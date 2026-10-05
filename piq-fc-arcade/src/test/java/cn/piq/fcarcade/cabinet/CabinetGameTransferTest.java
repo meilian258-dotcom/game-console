@@ -50,9 +50,32 @@ class CabinetGameTransferTest {
     }
     @Test void sizesAreBoundedAndCopied() {
         assertThrows(IllegalArgumentException.class,()->new CabinetGameTransfer(new int[0]));
-        assertThrows(IllegalArgumentException.class,()->new CabinetGameTransfer(new int[4]));
+        int[] tooMany=new int[CabinetGameManifest.MAX_FILES+1];java.util.Arrays.fill(tooMany,1);
+        assertThrows(IllegalArgumentException.class,()->new CabinetGameTransfer(tooMany));
         assertThrows(IllegalArgumentException.class,()->new CabinetGameTransfer(new int[]{0}));
         assertThrows(IllegalArgumentException.class,()->new CabinetGameTransfer(new int[]{CabinetGameManifest.MAX_FILE+1}));
+        assertThrows(IllegalArgumentException.class,()->new CabinetGameTransfer(new int[]{CabinetGameManifest.MAX_FILE,CabinetGameManifest.MAX_FILE,1}));
+        assertDoesNotThrow(()->new CabinetGameTransfer(new int[]{CabinetGameManifest.MAX_FILE,CabinetGameManifest.MAX_TOTAL-CabinetGameManifest.MAX_FILE}));
         int[] sizes={10};var t=new CabinetGameTransfer(sizes);sizes[0]=999;assertEquals(10,t.download(0,0));
+    }
+
+    @Test void everyDeclaredCompanionCanUseTheSameOpeningAndDownloadLedger() {
+        int[] sizes={CabinetGameManifest.CHUNK+1,22,23,24,25};
+        var t=new CabinetGameTransfer(sizes);t.delivered(0);int sequence=1;
+        for(int file=0;file<sizes.length;file++)for(int offset=0;offset<sizes[file];){
+            assertTrue(t.reserve(sequence,false));
+            int count=t.download(file,offset);assertEquals(Math.min(CabinetGameManifest.CHUNK,sizes[file]-offset),count);
+            t.delivered(sequence++);offset+=count;
+        }
+        assertTrue(t.reserve(sequence,true));t.delivered(sequence);assertEquals(0,t.pending());
+        assertFalse(t.reserve(sequence+1,false));
+        assertThrows(IllegalArgumentException.class,()->t.download(CabinetGameManifest.MAX_FILES,0));
+    }
+
+    @Test void fourthAndFifthFilesMayBeTheOnlyMissingCompanions() {
+        var t=open(22,23,24,25,26);
+        assertEquals(25,t.download(3,0));assertEquals(26,t.download(4,0));
+        assertThrows(IllegalArgumentException.class,()->t.download(2,0));
+        var allCached=open(22,23,24,25,26);assertTrue(allCached.reserve(1,true));allCached.delivered(1);
     }
 }

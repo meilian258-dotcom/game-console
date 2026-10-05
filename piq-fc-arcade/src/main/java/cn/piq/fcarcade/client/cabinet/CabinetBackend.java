@@ -18,7 +18,11 @@ public interface CabinetBackend {
     /** Mode-specific runtime availability; legacy adapters preserve their existing check. */
     default String syncUnavailableReason(){return unavailableReason();}
     default String netplayUnavailableReason(){return "此附属尚未接入 Netplay";}
-    record NetplayContent(cn.piq.fcarcade.netplay.NetplayProfile profile,byte[] rom,java.util.Map<String,byte[]> auxiliary){}
+    record NetplayContent(cn.piq.fcarcade.netplay.NetplayProfile profile,byte[] rom,java.util.Map<String,byte[]> auxiliary,
+                          cn.piq.retro.libretro.LibretroContentFiles files){
+        public NetplayContent(cn.piq.fcarcade.netplay.NetplayProfile profile,byte[] rom,java.util.Map<String,byte[]> auxiliary){this(profile,rom,auxiliary,null);}
+        public NetplayContent(cn.piq.fcarcade.netplay.NetplayProfile profile,cn.piq.retro.libretro.LibretroContentFiles files){this(profile,new byte[0],java.util.Map.of(),java.util.Objects.requireNonNull(files));}
+    }
     @FunctionalInterface interface NetplayFactory {NetplayContent open(Path rom)throws Exception;}
     /** Main-thread capture, off-thread bounded content validation. No new input authority. */
     default NetplayFactory prepareNetplayFactory(){throw new UnsupportedOperationException("Netplay unsupported");}

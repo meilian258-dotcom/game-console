@@ -18,6 +18,7 @@ final class CabinetNetplayEmulator implements RetroEmulator {
         process=new NetplayProcess(new NetplayProcess.Grant(wire,grant.ticket(),port==0,true,port),content::rom,
                 chunk->NetplayNetwork.upstream(connection,chunk),content.profile(),content::auxiliary,
                 grant.assignment().coinRequired()||cn.piq.fcarcade.cabinet.PgmServicePolicy.supportsBackend(grant.assignment().backend().toString()),grant.assignment().coinRequired());
+        if(content.files()!=null)process.fileContent(content.files());
         NetplayNetwork.bind(connection,process);process.start();
     }
     @Override public boolean isReady(){return !closed&&process.ready();}

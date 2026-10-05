@@ -23,7 +23,10 @@ public final class NetplayWatchContent {
         public Preparation{Objects.requireNonNull(load);Objects.requireNonNull(cancel);}
         public NetplayProcess open(NetplayProcess.Grant grant,CabinetBackend.NetplayContent content,Consumer<NetplayChunk> sender){
             if(grant.host()||grant.player()||grant.port()!=-1)throw new IllegalArgumentException("Observer authority");
-            return factory!=null?factory.open(grant,content,sender):new NetplayProcess(grant,()->content.rom(),sender,content.profile(),content::auxiliary,cabinetTopology);
+            if(factory!=null)return factory.open(grant,content,sender);
+            var process=new NetplayProcess(grant,()->content.rom(),sender,content.profile(),content::auxiliary,cabinetTopology);
+            if(content.files()!=null)process.fileContent(content.files());
+            return process;
         }
     }
     @FunctionalInterface public interface Provider {Preparation prepare(WatchNetwork.NetplayStart start,Connection connection)throws Exception;}
