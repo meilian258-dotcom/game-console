@@ -4,6 +4,8 @@
 
 本组件仍为测试候选。先看[统一玩家指南](../piq-fc-arcade/docs/玩家指南.md)了解安装、公共按键和联机术语；本页只说明 MD 的差异。
 
+[MD15 补丁测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/md15-test-20261007)仅供已持有配套 FC76.43 的用户使用，不含主包，不是首次安装完整套装。含两份 GX 对应源码与许可；本轮核查和安装边界见[说明](../piq-fc-arcade/design/JNI核心核查与MD15发布-20261007.md)。
+
 ## 安装条件
 
 - Minecraft 1.21.1、Java 21、NeoForge 21.1.229 及以上的 21.1 系列；其他模组可能要求更高版本。

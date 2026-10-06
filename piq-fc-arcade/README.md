@@ -11,7 +11,7 @@
 - 目标环境是 Minecraft 1.21.1、NeoForge 21.1 和 Java 21；当前最低声明为 NeoForge 21.1.229，不是 Forge 1.20.1 或其他 Minecraft 版本的安装包。
 - 客户端和服务器都要安装主模组，附属按同批配套清单安装。使用原生模拟器的运行端目前以 Windows x64 为支持目标，不能从服务端能够启动推断所有平台都能运行游戏。
 - 主包已经提供内部公共库，不要另装 `piq-retro-platform`。WaterFrames 是可选兼容对象，不是必装前置。
-- GitHub 当前提供源码，没有游戏 Release。网页的 Download ZIP 不是可放进 `mods` 的成品；已有测试包也不等于稳定版。
+- GitHub 提供源码和限定的 [MD15 补丁测试版](https://github.com/meilian258-dotcom/game-console/releases)，目前不提供完整主包发行。补丁需要已有配套 FC76.43；网页的 Code → Download ZIP 仍是源码，不能放进 `mods`，测试版也不等于稳定版。
 - 不附带商业游戏 ROM 或 BIOS。请自行准备有权使用的内容，服务器上传还需服主授权。
 
 ## 先玩一台 FC
