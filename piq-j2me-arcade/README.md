@@ -1,69 +1,47 @@
-# 方块电玩：Java ME / Game Console: Java ME
+# 方块电玩 Java ME 原型
 
-Player-facing names follow the [Game Console branding policy](../source-control/BRANDING.md).
-Stage reviewed builds as `game-console-j2me-<version>.jar`; preserve legacy mod/resource IDs,
-runtime paths, authors and old artifacts. The naming change does not add runtime capabilities.
+这是在 Minecraft 机柜上运行旧手机 Java ME／MIDP 游戏的独立原型。它使用 MicroEmulator，与 FC、MD 等 libretro 机器不是同一种运行方式。
 
-Independent Java ME/MIDP arcade prototype for Minecraft 1.21.1 and NeoForge
-21.1.236. It intentionally does not depend on `piq-fc-arcade`: the FC mod stays
-stable while the Java ME runtime is proven. Genuine shared session/library code
-can later move into a separate `piq-arcade-core` module.
+**本组件尚未接入当前方块电玩公共玩法，不属于推荐整套安装。** 单机运行实验不能视作多人街机、存档和游戏库已经完成。
 
-## Runtime boundary
+## 环境与安装边界
 
-Minecraft-facing code must not import MicroEmulator classes directly. Emulator
-integration belongs under `cn.piq.j2mearcade.core`, behind a small runtime
-interface that owns MIDlet loading, pixels, keypad input, audio and RMS data.
+- 原型开发环境为 Minecraft 1.21.1、NeoForge 21.1.236、Java 21。
+- 当前源码没有方块电玩主包依赖；不要为它另装 `piq-retro-platform`。使用兄弟项目的 Gradle wrapper 只是构建方式，不代表运行依赖。
+- 多人测试中的方块、物品、方块实体和选游戏消息需两端对应模组，但实际模拟器只在客户端运行。服务器没有公共游戏分发或多人同步服务。
+- MicroEmulator 2.0.4 的所需模块通过 jar-in-jar 打包。游戏文件由用户自备，不随 MOD、源码仓库或测试交付分发。
 
-The initial runtime candidate is MicroEmulator 2.0.4, a pure-Java Java ME
-implementation published under LGPL-compatible module licenses. Its license and
-notices must remain available when its binaries are distributed. User-supplied
-game JAR/JAD files are never bundled with this mod.
+只在独立测试实例中验证；不要把 GitHub 源码 ZIP 当成已经打包、可以放入 `mods` 的成品。
 
-FreeJ2ME remains a compatibility fallback, but is not embedded in this project
-because its official repository is GPLv3-or-later.
+## 如何测试一款游戏
 
-## Current prototype status
+1. 把合法取得的 Java ME 游戏 `.jar` 放进客户端实例的 `j2me-games/`。这里是**手机游戏 JAR**，不是 Minecraft MOD，不放入 `mods`。
+2. 放置 Java ME 机柜。管理员 Shift＋右键选择本机游戏；服务器校验管理员权限和距离后保存所选文件名。
+3. 普通右键启动已选游戏。画面显示在机柜上，控制界面提供方向、确认、数字键和两个手机软键。
+4. 同一客户端目前只拥有一个运行会话；启动另一台 Java ME 机器会替换本地会话，不是同时多开。
 
-- Minecraft 1.21.1, NeoForge 21.1.236, Java 21 and ModDevGradle 2.0.141.
-- Registers a block entity-backed J2ME arcade. Each machine stores its own
-  selected game filename; administrators change it with Shift+right-click and
-  ordinary right-click starts the configured game.
-- Scans and launches user-provided `.jar` files without adding them to
-  Minecraft's application classpath.
-- Reads `MIDlet-Name` and `MIDlet-1` from each game manifest with a 64 MiB limit.
-- Bundles the four required MicroEmulator 2.0.4 modules as jar-in-jar libraries.
-- Keeps the emulator client-side; a dedicated server only owns future session state.
-- Starts a real MIDP game in an isolated child-first game loader, captures its
-  changing LCD framebuffer and forwards virtual keypad input.
-- Provides an offline compatibility layer for common Nokia UI/DirectGraphics,
-  vibration/light and Nokia Sound APIs used by Series 40/60 games. Nokia Sound
-  lifecycle calls are accepted but audio output is still muted.
-- Provides the JSR-120 messaging API shape so games that merely reference SMS
-  classes can start. No SMS connection, send, receive, browser or external-app
-  action is permitted by the emulator.
-- Renders the LCD directly onto the arcade model in the world and opens a
-  transparent non-pausing controller screen that maps arrows, confirm, number
-  keys and both phone soft keys.
-- The supplied compatibility game remains external and is never packaged.
-- A single client currently owns one MicroEmulator runtime, so starting another
-  Java machine replaces the local session. Audio, RMS persistence, game-file
-  distribution and multiplayer synchronization are not implemented.
+游戏清单读取 JAR 内的 MIDlet 信息并有大小限制。游戏在独立的类加载器中运行，不加入 Minecraft 应用类路径，但这不是操作系统级安全沙箱；只运行可信内容。
 
-Run the complete automated verification from this directory with the sibling
-workspace wrapper:
+## 当前能做与不能做的事
+
+- 已有真实 MIDP 程序加载、LCD 帧捕获、虚拟数字键盘输入和世界屏幕显示。
+- 提供部分 Nokia UI、DirectGraphics、振动／灯光与 Sound API 的兼容接口，不代表所有机型和游戏行为一致。
+- Nokia Sound 生命周期调用可被接受，但音频输出仍静音；没有完整声音支持。
+- 尚无 RMS 持久保存、服务器游戏分发、公开旁观或多人输入同步，不承诺退出后继续游戏。
+- JSR-120 接口仅用于兼容引用；不允许实际发送或接收短信、打开外部程序或浏览器。
+
+FreeJ2ME 未内置，不能通过在配置里换个名字就启用。更广的游戏兼容性和公共层接入仍需单独开发验证。
+
+## 开发入口
+
+Minecraft 界面与 `cn.piq.j2mearcade.core` 运行适配分开；核心层负责加载、像素和键盘，后续音频与 RMS 也应在该边界处理。先读[方块电玩协作规范](../piq-fc-arcade/AGENTS.md)，不要把原型的独立流程作为新附属公共规范。
+
+在本组件目录使用 Java 21 和已准备的 Gradle 依赖：
 
 ```powershell
-& '..\piq-fc-arcade\gradlew.bat' -p . clean check
+& '..\piq-fc-arcade\gradlew.bat' -p . check
 ```
 
-An external compatibility game can be exercised without packaging it:
+外部游戏 smoke test 的显式参数和历史技术说明见[历史 README](README-history.md)。自动测试不能替代 Minecraft 实机兼容验收，也不会把测试游戏打入成品。
 
-```powershell
-& '..\piq-fc-arcade\gradlew.bat' -p . `
-  '-Pj2meTestJar=C:\path\to\owned-game.jar' realGameSmokeTest
-```
-
-For an in-game test, place owned Java ME game files under the instance's
-`j2me-games` folder. Game files must not be committed to this repository or
-bundled into the mod artifact.
+MicroEmulator 模块遵守各自 LGPL 等附带许可；保留原声明，不把模拟器许可当作手机游戏的分发授权。其他组件导航见[文档索引](../piq-fc-arcade/docs/README.md)。
