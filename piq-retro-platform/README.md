@@ -1,111 +1,51 @@
-# Game Console: Retro Platform — internal shared library
+# 方块电玩内部公共库
 
-See the [branding and packaging policy](../source-control/BRANDING.md). Internal package names,
-API identities and build outputs remain compatible. This library is not a player-installable mod.
+Retro Platform 是主模组与附属共用的 Java 源码库，负责核心运行边界、输入与音画数据、内容文件和会话状态等基础能力。
 
-## Bounded content files and server paths (FC76.40 candidate, 2026-10-04)
+**它不是玩家单独安装的模组。** 公共代码随主模组打包一次，附属编译时依赖主包；不要把 `piq_retro_internal` JAR 放进 `mods`，也不要在每个附属里再复制一套桥。
 
-`LibretroContentFiles.inspect(mainName, sources, mainLimit, auxiliaryLimit, check)` creates an
-immutable name/path/size/SHA manifest. It rejects links and unsafe names, checks bounded file counts
-and sizes, hashes with a 64 KiB buffer, and revalidates during staging. `stage(root, check)` requires
-an exclusively owned temporary destination; the caller owns cleanup after cancellation/failure.
-It is not permission to read arbitrary server paths or to upload local files automatically.
-`LibretroRuntime.loadFiles(files, check)` is a default optional method: unsupported backends reject
-it explicitly; JNI implements it without removing the existing byte-array constructors/methods.
-The main mod's Netplay adapters bind verified file contents before loading saved state.
+## 哪些职责放在这里
 
-Limits are separate: five files and 128 MiB total, main content up to 96 MiB, generic auxiliary files
-up to 64 MiB; a backend may be stricter (FBNeo BIOS 16 MiB). JNI native full-path loading accepts
-96 MiB, memory loading remains 64 MiB. The ABI2 bridge retains a bounded native copy for extended
-game-info compatibility, so streaming Java staging is not a zero-copy or total-memory claim.
+| 职责 | 当前入口 |
+| --- | --- |
+| 选择与调用核心运行器 | `LibretroRuntime`、`LibretroRuntimes`、`LibretroProfile` |
+| 带身份校验的内容暂存 | `LibretroContentFiles`、`RuntimeWorkspace` |
+| 路径与保存基础能力 | `ConsoleStorage`、`ServerContentPaths`、`LibretroMemoryStore` |
+| 开局和关闭的纯状态流程 | `DeviceSessionFlow` |
+| 输入与回滚基础结构 | 对应输入域及 `RollbackTimeline` |
 
-`ServerContentPaths.instanceArea`, `worldArea` and `worldScope` compute paths only. They do no IO,
-authorization, quota enforcement or migration. SFC home retains its world scope; the old SFC cabinet
-uses the instance area. Adapters still own safe copy, conflicts, permissions and main-thread checks.
-Both new consumers require FC76.40+. See the [implementation and verified limits](../piq-fc-arcade/design/内容库收尾与核心退役-20261004.md).
-These are internal shared APIs, not a stable SDK or a claim that all content libraries are unified.
+这些类型提供基础合同，不代替 Minecraft 世界权限、联网协议或界面。主模组负责玩家和设备会话、公共菜单、内容授权及旁观服务；附属负责自身核心、格式、BIOS、端口和保存适配。
 
-## Read-only native budget queries (FC76.36 candidate, 2026-10-03)
+本库不能反向依赖主模组或附属的实现类。内部类型可见不代表已经发布稳定 SDK；更改合同要检查已有调用方。
 
-`NativeLibretroBridge.freeSlotsIfLoaded()` reports the existing four-owner gate without loading a DLL or taking an owner lock. `LibretroJniRuntime.nativeSlotHeld()` checks the exact token/generation; it remains held until native teardown actually returns. These are budget snapshots, not reservations or permission to call a core off its owner thread. No ABI, core binary, save identity or four-slot limit changes. Public multi-source observer lifetimes live in the main mod, not this library; see the [first-batch contract and verification](../piq-fc-arcade/design/公共JNI多屏旁观第一批-20261003.md).
+## 附属如何接入
 
-## Shared launch lifecycle (FC76.34 candidate, 2026-10-03)
+1. 先看[制作规范](../piq-fc-arcade/design/机器制作与交互标准.md)，明确玩家应完成哪些操作。
+2. 对照[全组件流程与接口](../piq-fc-arcade/design/全组件运行流程与复用接口总览.md)，找到相近的实际调用方。
+3. 提供可信固定核心的 `LibretroProfile` 和附属自己的资源所属类，复用 `LibretroRuntimes`；不要另造原生桥或下载协议。
+4. 逐项实现并测试开局、各输入端口、保存恢复、取消、旁观及关闭。注册成功或单人能运行，不代表联机完成。
+5. 确实缺少公共能力时，再提出最小接口扩展及调用方回归范围。
 
-`cn.piq.retro.flow.DeviceSessionFlow` is a pure, versioned state machine for preparation,
-optional save selection, independent second-player permission, loading, READY and bounded shutdown.
-Content capacity, save player labels and session join permission are separate fields.
-It contains no world, network or storage implementation. The Minecraft adapter/UI belongs to the
-main mod's `HomeLaunchServer/Network/Screen`; MD10 uses it and FC retains its existing save editor
-before the shared confirmation. This does not migrate all legacy systems or establish a stable SDK.
-See the [adapter contract, compatibility and verification record](../piq-fc-arcade/design/公共流程与MD接入-20261003.md).
-Flash and PvZ are development-validation devices deferred by the user for this business migration;
-their existing code and prior JNI evidence remain intact.
+使用 libretro 前必须阅读其官方文档及目标核心说明。官方现成核心优先；自行编译或修改核心需要明确缺口和验证依据。
 
-## Client defaults (FC76.26, 2026-09-29)
+## 当前能力边界
 
-New confirmed migration target (2026-09-29): FC, SFC, GBA, native arcade, PvZ and MD must migrate their existing runtime modes to the shared JNI route, including existing light-gun support. Future emulator addons use JNI as their default integration target; Flash and Java ME are excluded from this migration. This is a development requirement, not a claim of completed adapters, multi-instance support or gun Netplay. See the [scope and acceptance plan](../piq-fc-arcade/design/JNI全面迁移-范围与验收.md). The following FC76.26 description remains the shipped baseline.
+- JNI 直接在游戏进程内调用原生核心；进程运行器是另一条调用路线。二者都不自动等于 Netplay。
+- 当前公共 JNI 平台为 Windows x64，最多持有四个原生会话；这是客户端资源上限，不是四个玩家席位，也不是允许一个玩家主持四台机器。
+- 主包的旁观服务按设备管理订阅，具体哪些机型和模式接入以技术总览为准。
+- `loadFiles` 是可选能力，未实现的运行器明确拒绝。路径计算不执行 IO，也不赋予读取或上传权限。
+- 核心、游戏、BIOS、选项和保存格式共同影响兼容。失败时不静默换核心，不用新核心试读旧档。
 
-User-requested JNI defaults now use `LibretroRuntimes.defaultBackend(adapted)` for existing Windows x64 client adapters, plus connection-scoped `JniClientPreference`. Explicit runtime factories and server/process constructors remain unchanged. This is not automatic save migration, silent failure fallback or support for every emulator/mode. Addons calling these new methods require FC76.26+. See [scope and install matrix](../piq-fc-arcade/design/FC76.26-JNI默认与自动旁观.md).
+详细参数和演进记录见[历史说明](README-history.md)。它保留早期单实例、旧 ABI 和旧默认值，仅供对应版本追溯，不能当作当前限制。
 
-## Historical Runtime API v1 / opt-in JNI (FC76.22, 2026-09-29)
+## 开发与验证
 
-FC76.24 extends this trial with a bounded generic two-digital-lane `RollbackTimeline`; the concrete FC Mesen network/session/permissions remain in the main mod, not in the shared library. GBA11 and MD1 reuse ABI1 without another bridge DLL. Only FC has the new JNI Netplay route; other systems must explicitly implement and validate their own capabilities. Main private provider adds default `acceptsFile/fileHint` methods so new cartridge formats need not be hardcoded in the main UI. See the [current trial guide](../piq-fc-arcade/design/FC76.24-GBA11-MD1-JNI试用说明.md).
+在仓库根执行：
 
-`LibretroRuntime` is the backend-neutral owner-thread boundary; `LibretroProcess` retains its original constructors and record types. `LibretroRuntimes.create(profile, ResourceOwner.class, PROCESS or JNI_TRIAL)` selects explicitly; defaults do not change. `LibretroMemoryStore` preserves its old process overloads and adds runtime overloads with identical format/identity validation. Main-mod-owned JNI ABI1 supports pinned Windows x64 software cores and opt-in WGL compatibility; one active native session per JVM. Unsupported capabilities, including real PvZ state rejection, are not advertised. This is a trial API, not an automatic Netplay migration or a stable SDK. See [scope, saves, capability limits and addon example](../piq-fc-arcade/design/通用JNI一期-FC76.22-使用与附属接入.md).
+```powershell
+.\piq-fc-arcade\gradlew.bat -p piq-retro-platform check jar
+```
 
-Developer entry: start with section 1 of the [shared production and interaction standard, Chinese](../piq-fc-arcade/design/机器制作与交互标准.md) for the complete target workflow and device-type branches. Consult the [component workflow and reuse map](../piq-fc-arcade/design/全组件运行流程与复用接口总览.md) for actual UI, source/API, runtime, save and cleanup paths and their gaps. Reusing a layout or registering an interface does not complete the business workflow.
+只在依赖完整缓存时加 `--offline`。这里的测试是基础库检查，不是全模组或真实多人验收；完整依赖准备见[构建指南](../source-control/BUILDING.md)。
 
-The [behavior and configuration details](../piq-fc-arcade/design/方块电玩功能行为与配置规范-v1.md) retain distance, permission and admin-terminal contracts. The [SFC-based guide](../piq-sfc-home/design/以SFC为蓝本-附属制作说明.md) is a historical SFC41 wiring and compatibility reference; its early process default and separate session/save paths are not the target for new addons. These documents do not establish a stable SDK or claim that the target workflow is implemented.
-
-Supplementary workflow: [production process](../piq-fc-arcade/design/方块电玩模组制作规范-v1.md), [feature brief](../piq-fc-arcade/design/功能制作说明模板.md), [acceptance checklist](../piq-fc-arcade/design/功能制作验收清单.md), [backend capability declaration](../piq-fc-arcade/design/附属能力声明模板.md).
-
-Shared Java API and input domain code for the FC main mod and its addons.
-This directory is a source/build boundary, NOT a separately installed Minecraft mod.
-The FC main JAR will contain this code once; addons compile against the FC main JAR.
-This library must never depend on the FC, SFC or arcade implementation modules.
-
-User decision (2026-09-10): the main mod includes FC, televisions, cabinets, writing UI and common
-extension APIs. SFC, native arcade and future systems are optional addons. There is no separate
-platform-mod installation step and no plan to require an FC addon just to play FC.
-
-The first stage preserves legacy block/item/backend IDs, frame protocols, save formats and emulator
-cores. Pure interfaces and input tests are groundwork, not proof that every old session has migrated
-or that real Xbox / PlayStation / Switch controllers have been tested.
-
-## JNI-first adapters (GC-110 development, 2026-09-29)
-
-New emulator adapters target `LibretroRuntimes` with a trusted `LibretroProfile` and
-the addon's resource-owner class; do not copy native bridge classes into an addon.
-Windows x64 is the currently implemented JNI platform, not a Linux support claim.
-ABI2 reserves up to four independent owner-thread sessions, each with a private core
-library and generation handle. A hung owner retains its reservation and files; do not
-force-unload it. `isJniBusy()` now means capacity unavailable, not "one core exists".
-Per-system limits and server authorization still apply independently.
-
-Named ZIP/BIOS content uses bounded `loadBundle` or the local-only `loadFiles` adapter:
-safe relative names, immutable copies and content identity checks remain mandatory.
-The optional trusted core artifact byte budget (maximum 512 MiB) only accommodates
-large pinned DLLs; it does not increase ROM/upload/state limits. No network-supplied
-DLL path, SHA override or core options may become a trusted profile.
-
-JNI is not a Netplay capability flag. Declare and test complete state restoration,
-all input ports, save ownership, clock, AV timing, cancellation and teardown first.
-Known FBNeo NeoGeo restore failures and the special process-isolated NeoGeo snapshot
-adapter remain unresolved. This working tree is not an installable full migration;
-see [scope and evidence](../piq-fc-arcade/design/JNI全面迁移-范围与验收.md).
-
-Build from this directory using `../piq-fc-arcade/gradlew.bat --offline check jar`.
-The resulting `piq_retro_internal` JAR is for development only: do not put it in `mods` or release bundles.
-No ROMs, BIOS, emulator native binaries or user data belong in this project.
-
-## Addon-owned libretro cores (FC67 / SFC37, 2026-09-23)
-
-An addon may call `new LibretroProcess(profile, AddonClass.class)`. The explicit class owns
-the native-core resource lookup across NeoForge named-module boundaries. The worker,
-manifest and JNA still come from the FC module. SHA256 validation, private extraction,
-timeouts and process cleanup are unchanged. The original constructor retains FC ownership
-for backward compatibility. Do not duplicate bridge classes or the worker inside addons.
-
-SFC37 is the first consumer (Windows x64 local candidate). Each addon supplies its own
-profile, identity, fixed native artifact and license; new hardware/API features may still
-require a bridge upgrade. This does not enable RetroArch Netplay or migrate save formats.
+[返回项目首页](../README.md) · [文档导航](../piq-fc-arcade/docs/README.md)

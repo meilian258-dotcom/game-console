@@ -1,46 +1,52 @@
-# 方块电玩 / Game Console
+# 方块电玩 Game Console
 
-在 Minecraft 中放置和操作游戏设备的模组项目。主模组内置 FC/NES、电视与公共设备能力，SFC、街机、GBA、MD、电脑程序等通过各自附属接入。
+方块电玩是一个 Minecraft 模组：把游戏机、电视、街机和掌机放进方块世界，插上卡带、拿起手柄游玩，也可以和附近的朋友一起玩或观看。
 
-面向 Minecraft 1.21.1、NeoForge 21.1 和 Java 21。当前七个配套包的最低 NeoForge 要求为 21.1.229，默认编译基线仍为 21.1.236；验证范围及安装限制见[NeoForge 兼容说明](piq-fc-arcade/design/NeoForge兼容范围-20261004.md)。当前是持续开发中的候选版本，**不是全部机型、联机方式和平台均已验证的稳定发行版，也不是稳定附属 SDK**。
+主模组已经包含 **FC/NES、电视、机柜和卡带制作等公共设备**。想玩 SFC、MD、GBA 或原生街机，再安装对应附属，不需要把所有组件都装上。
 
-## 从哪里开始
+项目仍在测试阶段。源码公开不等于所有功能都已稳定，也不代表每款游戏、光影或联机方式都兼容。
 
-制作目标以[机器与附属通用制作规范](piq-fc-arcade/design/机器制作与交互标准.md)为准：第 1 节规定完整统一流程及各设备类型分支。实际源码入口、界面、API、保存与缺口查[全组件运行流程与复用接口总览](piq-fc-arcade/design/全组件运行流程与复用接口总览.md)。规范不是已实现声明，历史版本指南不覆盖当前流程目标。
+## 我想开始使用
 
-2026-10-04 本次源码整合包含此前的 MD、公共开局、JNI Netplay、多屏旁观、服务端内容／BIOS 修复及版本兼容调整，不再是 2026-10-03 的单独规范同步。源码纳入不等于全部功能通过真人验收；各候选的已验证范围与待办仍以对应记录为准。
+先看[玩家指南](piq-fc-arcade/docs/玩家指南.md)，里面说明怎么获取安装包、选择附属、准备游戏，以及第一次开机的操作。
 
-后续本地候选FC76.40／完整SFC47／MD14／街机1.5.7已完成五文件内容传输、大ROM文件JNI及旧SFC目录收尾，退役BlastEm正常执行与打包入口；安装配套、验证边界和仍待公共化的接口见[内容库收尾与核心退役](piq-fc-arcade/design/内容库收尾与核心退役-20261004.md)。家用机不再要求补齐其他玩家所见的按钮动画，本人动画与持握、线材要求保留。
+- **游戏环境**：Minecraft 1.21.1、NeoForge 21.1.229 起、Java 21。当前原生游戏运行端以 Windows x64 为支持范围；其他平台不能照搬安装。
+- **多人服务器**：客户端和服务端安装配套版本的主模组及所用附属。
+- **游戏文件**：自行准备有权使用的 ROM；部分街机游戏还需要匹配的 BIOS。仓库不提供这些游戏内容。
+- **下载**：目前 GitHub 尚未发布可安装的 Release。请向维护者获取配套测试包；GitHub 的 Code → Download ZIP 下载的是源码，不能放进 `mods`。
 
-- 玩家：[主模组与当前版本说明](piq-fc-arcade/README.md)。按配套指南安装，不把各目录的最大版本号任意混搭。
-- 开发者：[Git 工作流](GIT_WORKFLOW.md)、[固定输入与构建](source-control/BUILDING.md)、[协作规范](piq-fc-arcade/AGENTS.md)。
-- 附属作者：先对照上述通用规范与技术总览，再查[公共层边界](piq-retro-platform/README.md)；[SFC 历史接入蓝本](piq-sfc-home/design/以SFC为蓝本-附属制作说明.md)仅作源码演进与兼容参考，不照搬其早期进程默认和独立业务链。
-- 名称与交付：[Game Console 命名规范](source-control/BRANDING.md)。中文品牌“方块电玩”，正式英文品牌“Game Console”。
+NeoForge 最低版本不是对所有更新版本或整个整合包的兼容保证。具体范围见[兼容说明](piq-fc-arcade/design/NeoForge兼容范围-20261004.md)。
 
-## 组件
+## 有哪些设备
 
-| 对外名称 | 源码目录 | 说明 |
-| --- | --- | --- |
-| Game Console | [piq-fc-arcade](piq-fc-arcade) | 主包，含 FC 和公共设备/服务 |
-| Game Console: SFC | [piq-sfc-home](piq-sfc-home) | 使用包含 SFC 核心的完整交付包；薄包不是完整安装包 |
-| Game Console: Arcade | [piq-native-arcade](piq-native-arcade) | 原生街机附属，各运行模式能力不同 |
-| Game Console: GBA | [piq-gba](piq-gba) | 掌机及单席机柜；不代表支持 GBA 通讯联机 |
-| Game Console: MD | [piq-md-home](piq-md-home) | 已接公共开局、显式 JNI Netplay、公开玩家串流、双手柄、旁观及服务器保存；仍为测试候选，真人多人等验收见组件记录 |
-| Game Console: Computer | [piq-computer](piq-computer) | 可组装电脑与程序接入 |
-| Game Console: PvZ | [piq-pvz-addon](piq-pvz-addon) | 自备游戏资源的运行适配 |
-| Game Console: Flash Box | [piq-flash-box](piq-flash-box) | 历史播放盒，有独立版本限制，不与当前主包随意混装 |
-| Game Console: Java ME | [piq-j2me-arcade](piq-j2me-arcade) | 独立原型，能力以组件说明为准 |
+| 想使用的设备 | 需要的组件 |
+| --- | --- |
+| FC/NES、电视和公共机柜 | [主模组](piq-fc-arcade/README.md) |
+| SFC 家用机 | 主模组 + [SFC 完整附属包](piq-sfc-home/README.md) |
+| MD 家用机 | 主模组 + [MD 附属](piq-md-home/README.md) |
+| GBA 掌机及对应机柜 | 主模组 + [GBA 附属](piq-gba/README.md) |
+| 原生街机游戏 | 主模组 + [街机附属](piq-native-arcade/README.md) |
+| 可组装电脑与程序 | 主模组 + [电脑附属](piq-computer/README.md)，再按程序说明准备内容 |
 
-`piq-retro-platform` 是随主包编译的内部源码库；`piq-sfc-arcade` 是 SFC 历史核心组件。它们不是供玩家额外安装的通用平台包。
+[Flash Box](piq-flash-box/README.md) 和 [PvZ](piq-pvz-addon/README.md) 暂作开发验证机型；[Java ME](piq-j2me-arcade/README.md) 是独立原型。它们不是新玩家必须安装的前置。
 
-## 兼容与内容边界
+源码中的 `piq-retro-platform` 和 `piq-sfc-arcade` 是内部组件，**不要看到一个源码目录就另装一个 JAR**。SFC 玩家使用包含所需核心的完整包。
 
-`piq_*` 模组/资源 ID、`cn.piq.*` Java 包名、配置和存档路径为兼容保留，不因对外更名而迁移。文件名变了也不能同时安装新旧两份同 ID 的 JAR。旧候选、版本记录和作者/第三方署名保留。
+## 我想参与开发
 
-仓库不提供商业 ROM、BIOS、PvZ `main.pak` 或玩家存档。各组件代码、模型、核心与第三方依赖有不同许可，见各自 LICENSE / THIRD_PARTY / ASSETS 资料；仓库可读不等于所有内容都可自由再分发。当前仍有素材和核心对应源码的公开发行审核待办。
+- [构建源码](source-control/BUILDING.md)：环境、固定运行库和构建顺序。当前还不是空环境一键编译全部附属。
+- [开发协作](GIT_WORKFLOW.md)：克隆、分支、提交与审查。
+- [制作新设备](piq-fc-arcade/design/机器制作与交互标准.md)：玩家应该得到怎样的操作体验。
+- [公共接口与现状](piq-fc-arcade/design/全组件运行流程与复用接口总览.md)：哪些可以复用，哪些仍需适配。
 
-## 仓库访问
+更多资料在[文档导航](piq-fc-arcade/docs/README.md)。各组件首页介绍当前用途，旧版本日志放在各自的 `README-history.md`，不必按日期逐篇阅读才能开始。
 
-当前地址：[meilian258-dotcom/game-console](https://github.com/meilian258-dotcom/game-console)，仍为**私有仓库**。仅发链接不会授予访问权限。需要仓库所有者邀请 GitHub 账号并由对方接受；个人私有仓库协作者具有读写权限，不是只读分享。暂不开放公开下载或自动发布。
+## 遇到问题
 
-克隆后依赖仍须按构建文档准备；不能把“能克隆”当成“所有附属从空环境一键构建”。
+请在 [Issues](https://github.com/meilian258-dotcom/game-console/issues) 描述问题，附上游戏和模组版本、单人或服务器、操作步骤，以及必要的日志片段。光影问题请同时写 Iris 和光影包名称；不要上传游戏 ROM、BIOS、令牌或个人存档。完整反馈清单见[玩家指南](piq-fc-arcade/docs/玩家指南.md#遇到问题时提供什么)。
+
+## 源码与许可
+
+仓库现已公开，任何人都可以阅读和克隆。主模组代码许可见 [LICENSE](piq-fc-arcade/LICENSE.md)，附属、模型和第三方核心分别遵循各自声明，不把全部素材统一视为 GPL。
+
+MD 模型与贴图由维护者原创，并已确认随本仓公开；这不改变第三方核心许可，也不自动授予所有素材任意再分发或商用权。第三方依赖见[主模组声明](piq-fc-arcade/THIRD_PARTY_NOTICES.md)及各组件说明。
