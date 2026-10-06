@@ -224,7 +224,24 @@ class InteractionModelsTest(unittest.TestCase):
                                 unit(transform((0, 0, -1), pose, left, True))), -.99)
             self.assertEqual([0, 2, 0], pose['translation'])
             self.assertEqual([1.2] * 3 if hand.startswith('first') else [.6] * 3, pose['scale'])
-        self.assertEqual({'rotation': [25, -35, 0], 'translation': [0, 0, 0], 'scale': [2.5] * 3}, stub['display']['gui'])
+        self.assertEqual({'rotation': [25, -35, 0], 'translation': [0, 0, 0],
+                          'scale': [2.5] * 3, 'right_rotation': [0, 180, 0]}, stub['display']['gui'])
+
+    def test_cartridge_gui_front_label_is_upright_unmirrored_and_faces_viewer(self):
+        stub, mesh = model('item/md_cartridge'), model('item/md_cartridge_mesh')
+        pose = stub['display']['gui']
+        label = next(e for e in mesh['elements'] if e['name'] == '游戏标签正面')
+        self.assertEqual({'north'}, set(label['faces']))
+        self.assertEqual(mesh['display']['gui'], pose)
+        front = unit(transform((0, 0, -1), pose, direction=True))
+        right = unit(transform((-1, 0, 0), pose, direction=True))
+        up = unit(transform((0, 1, 0), pose, direction=True))
+        self.assertGreater(front[2], .7)
+        self.assertGreater(right[0], .8)
+        self.assertGreater(up[1], .9)
+        self.assertGreater(right[0] * up[1] - right[1] * up[0], .7)
+        old = dict(pose, right_rotation=[0, 0, 0])
+        self.assertLess(transform((0, 0, -1), old, direction=True)[2], 0)
 
     def test_all_world_states_and_console_item_resolve_to_patched_models(self):
         variants = read(ASSETS / 'blockstates/md2.json')['variants']
@@ -259,6 +276,8 @@ class InteractionModelsTest(unittest.TestCase):
                 path.write_text(json.dumps(m), encoding='utf-8')
             shutil.copyfile(assets / 'models/item/md_cartridge_mesh.json', assets / 'models/item/md_cartridge.json')
             shutil.copyfile(assets / 'models/item/md_controller_mesh.json', assets / 'models/item/md_controller.json')
+            write_console = assets / 'models/item/md2.json'
+            write_console.write_text(json.dumps({'parent': 'piq_md_home:block/md2_empty'}), encoding='utf-8')
             for _ in range(2):
                 prepare(assets)
                 self.assertEqual(expected, {p.relative_to(assets): p.read_bytes() for p in paths})

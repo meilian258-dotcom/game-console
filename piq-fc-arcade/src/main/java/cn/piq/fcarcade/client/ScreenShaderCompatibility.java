@@ -58,12 +58,13 @@ final class ScreenShaderCompatibility {
     private static BooleanSupplier unavailable(Throwable failure) {
         warn(failure);
         // An installed but incompatible Iris API must not force our unknown shader back in.
-        // Vanilla eyes is a valid shader even with no active pack; this is a display-only fallback.
+        // The vanilla opaque entity shader is valid even with no active pack; display vertices
+        // retain FULL_BRIGHT light and NO_OVERLAY, with the normal samplers bound by the material.
         return () -> true;
     }
 
     private static void warn(Throwable failure) {
-        LOGGER.warn("PIQ screen: Iris API unavailable; using the vanilla fullbright screen shader", failure);
+        LOGGER.warn("PIQ screen: Iris API unavailable; using the vanilla opaque entity screen shader", failure);
     }
 
     private static void rethrowFatal(Throwable failure) {

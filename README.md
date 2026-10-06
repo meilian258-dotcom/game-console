@@ -13,7 +13,7 @@
 - **游戏环境**：Minecraft 1.21.1、NeoForge 21.1.229 起、Java 21。当前原生游戏运行端以 Windows x64 为支持范围；其他平台不能照搬安装。
 - **多人服务器**：客户端和服务端安装配套版本的主模组及所用附属。
 - **游戏文件**：自行准备有权使用的 ROM；部分街机游戏还需要匹配的 BIOS。仓库不提供这些游戏内容。
-- **下载**：目前 GitHub 尚未发布可安装的 Release。请向维护者获取配套测试包；GitHub 的 Code → Download ZIP 下载的是源码，不能放进 `mods`。
+- **下载**：[测试版下载](https://github.com/meilian258-dotcom/game-console/releases)目前仅提供给已有配套 FC76.43 用户的 MD15 补丁，不含主包，**不是新玩家首次安装套装**。完整公开安装包仍在补齐发行材料；GitHub 的 Code → Download ZIP 是源码，不能放进 `mods`。
 
 NeoForge 最低版本不是对所有更新版本或整个整合包的兼容保证。具体范围见[兼容说明](piq-fc-arcade/design/NeoForge兼容范围-20261004.md)。
 
