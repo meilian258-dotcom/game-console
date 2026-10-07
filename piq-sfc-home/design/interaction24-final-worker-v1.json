@@ -21,11 +21,11 @@
   "elapsed_seconds": 5.547,
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-interaction24-v1\\piq_fc_arcade-0.31.0-alpha.24.jar",
+      "path": "piq-fc-arcade\\build\\review-interaction24-v1\\piq_fc_arcade-0.31.0-alpha.24.jar",
       "sha256": "AE3185660442BA3BB38344165F3D60F736DB5DA3E63F2E4FE9D7DCC79C1F170B"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-interaction24-v1\\piq_sfc-0.1.0-alpha.13.jar",
+      "path": "piq-fc-arcade\\build\\review-interaction24-v1\\piq_sfc-0.1.0-alpha.13.jar",
       "sha256": "2DED10D744F22F7C32A988669C6E67E3A4744ECD6DB5799541EE3D6FDAD1FB15"
     }
   },

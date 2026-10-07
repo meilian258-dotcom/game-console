@@ -1,6 +1,6 @@
-# SFC 灰卡写卡设置交接 · 2026-09-10
+# SFC 灰卡写卡设置技术记录 · 2026-09-10
 
-修改者：`/root/fix_sfc_av`。本记录交由 root 合并进入 `Codex维护手册.md`，避免并行覆盖维护手册。
+日期：2026-09-10。范围：SFC 灰卡写入设置及校验。
 
 ## 功能与约定
 
@@ -52,18 +52,18 @@
 - `client/SfcCoverGeometry.java`（`Face`）
 - `client/SfcCartridgeRenderer.java`（`ItemModel / 匿名 IClientItemExtensions`）
 
-不修改 FC 生产源码、旧 SFC 核心、SFC 会话三文件、已有游戏 ROM、世界、已装 JAR。版本 / 构建 / 安装由 root 统一负责。资源文件零改动。
+不修改 FC 生产源码、旧 SFC 核心、SFC 会话三文件、已有游戏 ROM、世界、已装 JAR。资源文件零改动。
 
 ## 验证
 
-- root 已确认 `compileJava` 和整套 `check / jar` 成功；后续增加两条标签几何 JUnit 测试后由 root 再执行最终 check。
+- 已验证 `compileJava` 和整套 `check / jar` 成功；后续增加两条标签几何 JUnit 测试后须再执行最终 check。
 - `tools/check_sfc_card_metadata.py --report <新报告路径>`：独立 javac 编译 12 个实际生产源码对接真实 Minecraft / NeoForge API，不运行 Gradle。真实 ItemStack / NBT 保存重载、元数据原子拒绝、五种新操作 codec、Editor / 封面 codec、PNG 校验与安全存储、标签几何、模型包装变换共 **66 项通过**。报告：`design/sfc-card-metadata-real-20260910.json`。
 - `tools/check_sfc_card_editor.py --report <新报告路径>`：现有 **25 项通过**，包含真实草稿 / 列表 / 搜索 / 分页 / 最小布局 / 异步回调取消状态，界面接线部分属于源码契约检查。报告：`design/sfc-card-editor-settings-20260910.json`。
-- 原工具报告中的 `unchanged_boundary_sha256` 是该工具旧字段名，只是当前源码摘要快照，**本轮 Network / EditorService 已获授权修改，不代表相对上一版本未变**；最终严格差异审计由独立验包代理负责。
+- 原工具报告中的 `unchanged_boundary_sha256` 是该工具旧字段名，只是当前源码摘要快照，**本轮 Network / EditorService 已获授权修改，不代表相对上一版本未变**；最终仍需独立成品差异审计。
 - 新增 `SfcCoverGeometryTest` 两条 JUnit 测试覆盖 item 标签凹框、2:1 和插入模型精确变换。
 - 最终 alpha4 JAR 直接复验：工具增加 `--jar` 模式，只编译测试探针、不编译生产源码；**66 项再次通过**。报告 `design/sfc-card-metadata-jar4-20260910.json`；受测包 SHA-256 `EA95B35F946F8576FEDFB668DEACA1A7FC86F8111A015F0C962E7B1C80A74E4F`。
-- 应独立验包代理要求补充 `piq-fc-arcade/tools/probes/Alpha17SfcCoverProbe.java`，单独验证最终 JAR 的代码来源及两种标签实际几何，由总验包器调用；不修改 FC 生产代码。
+- 补充 `piq-fc-arcade/tools/probes/Alpha17SfcCoverProbe.java`，单独验证最终 JAR 的代码来源及两种标签实际几何，由总验包器调用；不修改 FC 生产代码。
 
 ## 未宣称完成的验证
 
-本代理未启动 Minecraft、未安装包、未做 GUI 截图 / 真实网络上传 / 保护插件现场 / 游戏内插卡封面观感验证。实际文件夹打开与完整手持 / 主机视觉仍需最终客户端实机确认，不能用纯 Java 探针替代。包中不附游戏与封面。
+本节未启动 Minecraft、未安装包、未做 GUI 截图 / 真实网络上传 / 保护插件现场 / 游戏内插卡封面观感验证。实际文件夹打开与完整手持 / 主机视觉仍需最终客户端实机确认，不能用纯 Java 探针替代。包中不附游戏与封面。

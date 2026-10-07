@@ -1,12 +1,12 @@
 # GBA 掌机可视接线（2026-09-12）
 
-修改者：cabinet_reuse_review；主代理统一写根维护手册。本文件仅记录本轮 GBA 可视组件，不修改 FC/SFC/Native。
+范围：GBA 可视组件，不修改 FC／SFC／Native。
 
 ## 已实现
 
-- `GbaHandheldLayout`：独立纯几何，保持用户原比例；屏面 `+Y`、顶部 `-Z`，第一/第三人称仅以 `Rx90` 归正，不镜像。屏幕为 3.6 × 2.4 原模型单位，对应 240 × 160。
-- `GbaHandheldRenderer`：原版模型烘焙缓存、9 分件、第一人称双手；另一手有物品时只绘持握手、不取消另一件物品。第三人称复用 FC 公开 `ControllerArmPoseParameters`，不修改 SFC 姿势。事件和 ClientExtensions 均由客户端订阅类注册，主代理无需补 renderer 调用。
-- 动态画面只在第一人称、`GbaHandheldClient.visualMatches(actualStack)` 与 `running()` 同时成立时显示；相同物品的副手/远端/背包/掉落不会复制玩家的游戏。真实屏面满亮、无 CRT 过滤；失去本地匹配则回原图。会话代理负责纹理最近邻过滤及生命周期。
+- `GbaHandheldLayout`：独立纯几何，保持原模型比例；屏面 `+Y`、顶部 `-Z`，第一/第三人称仅以 `Rx90` 归正，不镜像。屏幕为 3.6 × 2.4 原模型单位，对应 240 × 160。
+- `GbaHandheldRenderer`：原版模型烘焙缓存、9 分件、第一人称双手；另一手有物品时只绘持握手、不取消另一件物品。第三人称复用 FC 公开 `ControllerArmPoseParameters`，不修改 SFC 姿势。事件和 ClientExtensions 均由客户端订阅类注册。
+- 动态画面只在第一人称、`GbaHandheldClient.visualMatches(actualStack)` 与 `running()` 同时成立时显示；相同物品的副手/远端/背包/掉落不会复制玩家的游戏。真实屏面满亮、无 CRT 过滤；失去本地匹配则回原图。客户端会话实现负责纹理最近邻过滤及生命周期。
 - 按键采用 GBA/libretro 位：B0、Select2、Start3、上下左右4–7、A8、L10、R11。只改外观位移/倾斜，不执行输入或核心。
 - 中英各 3 条掌机物品/用法/本机限制文本。
 

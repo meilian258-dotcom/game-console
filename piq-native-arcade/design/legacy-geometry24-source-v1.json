@@ -3,11 +3,11 @@
   "mode": "compiled-workspace-production",
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.24.jar",
+      "path": "piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.24.jar",
       "sha256": "743EE9229816DA5D555E51585EC64CE53EC666A52E3D1E2DC5F886CC45F51901"
     },
     "native": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+      "path": "piq-fc-arcade\\build\\review-linked21-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
       "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A"
     }
   },

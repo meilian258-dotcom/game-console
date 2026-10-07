@@ -1,6 +1,6 @@
 # FC 23 / SFC 11 automatic spectator contract
 
-Implementation contract, not a multiplayer input API. Common types are in `cn.piq.fcarcade.cabinet`; client adapters are owned by root under `client.watch`.
+Implementation contract, not a multiplayer input API. Common types are in `cn.piq.fcarcade.cabinet`; client adapters are under `client.watch`.
 
 ## Common provider API (frozen)
 

@@ -1,9 +1,15 @@
 """Deterministic data-only importer for the two user supplied model kits."""
-import json, zipfile, hashlib, copy
+import argparse, json, zipfile, hashlib, copy
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 RES=ROOT/'src/main/resources'
 ASSET=RES/'assets/piq_computer'
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--model-dir', type=Path, required=True, help='Directory containing the two source model kit ZIPs')
+options=parser.parse_args()
+for filename in ('黑白可组装主机_模型套件.zip', '经典黑白键鼠_模型套件.zip'):
+    if not (options.model_dir/filename).is_file():
+        parser.error('Missing model kit in --model-dir: '+filename)
 def write(path,data):
     path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
@@ -14,7 +20,7 @@ def transform(value):
     return value
 report=[]
 for filename,ns in [('黑白可组装主机_模型套件.zip','modular_black_pc'),('经典黑白键鼠_模型套件.zip','classic_pc_peripherals')]:
-    archive=Path('C:/Users/13498/Desktop')/filename
+    archive=options.model_dir/filename
     with zipfile.ZipFile(archive) as z:
         prefix='minecraft_assets/assets/'+ns+'/'
         count=0

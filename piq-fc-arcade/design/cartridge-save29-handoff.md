@@ -1,7 +1,5 @@
 # FC29 cartridge save-mode restoration (2026-09-11)
 
-Owner: `/root/sfc_cabinet_provider`. FC runtime save-key/slot workflow is separately owned by `/root/fix_sfc_av`. No user save or ROM files touched.
-
 ## Real behavior
 
 The game-library tab restores a `当前卡存档：关闭/个人/机器` button in the existing detail action row. Panel dimensions, shared layout and cover-tab controls are unchanged. It is enabled only for the currently written server ROM when that exact ROM is the visible selection, not during scan/upload/another edit. Selecting a different game or filtering out the current selection cannot silently change its save mode. A new game must first be written to the card.
@@ -30,7 +28,7 @@ No new production source class, no edits to `ServerArcadeSessions`, no resource/
 
 Development command: `python tools/check_cartridge_save_mode.py --fc build/libs/piq_fc_arcade-0.31.0-alpha.29.jar --source --report design/cartridge-save29-source-v1.json`. Result: **13 JUnit tests + 23 actual Request constructor/wire-codec assertions passed**, no world/core. It compiles selected development production sources against the actual MC API; it is not final-JAR evidence.
 
-Final command: omit `--source`, supply frozen final `--fc`, choose a new report path. It compiles only tests/probes, verifies five production class origins from the input JAR and records exact input path/SHA. Expected codec assertion count is 28 (23 behavior + 5 origins). Full FC build is root-owned.
+Final command: omit `--source`, supply frozen final `--fc`, choose a new report path. It compiles only tests/probes, verifies five production class origins from the input JAR and records exact input path/SHA. Expected codec assertion count is 28 (23 behavior + 5 origins). Full FC build is a separate check.
 
 ## SFC saving boundary (important)
 

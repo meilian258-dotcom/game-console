@@ -1,10 +1,10 @@
-# GBA A 档试玩交接（2026-09-11）
+# GBA A 档试玩技术记录（2026-09-11）
 
-负责人：cabinet_reuse_review；独立复核：sfc_cabinet_provider。只修改新 `piq-gba`，另曾新增 FC 项目设计文件 `design/gba-feasibility-20260911.md`；FC / Native / SFC 既有生产代码、版本、JAR、模型、ROM 与存档均未修改。根维护手册由 root 统一留痕。
+2026-09-11。范围为 GBA 初始试玩后端与可行性设计；FC、Native、SFC 的既有生产代码、模型和保存格式不变。
 
 ## 最终候选
 
-目录：`G:/服务器/服务器Codex/piq-gba/build/preview-v4`
+历史构建目录：`build/preview-v4`（相对于 `piq-gba`）。
 
 | 文件 | SHA256 |
 |---|---|
@@ -22,7 +22,7 @@
 1. 仅 addon 放 `mods/piq_gba-0.1.0-alpha.1.jar`。
 2. 整个 `piq-gba/runtime` 放游戏实例根目录的同名路径。helper/JNA 不放 `mods`，DLL 仅被自有子 JVM 加载；不覆盖原 Native helper 或其运行库。
 3. 随附 `README.md`、`licenses-and-source` 全目录、构建报告与最终审计报告。MPL 对应完整源码约16MB，不能仅附下载链接而漏掉已准备的源/许可。PIQ 源 ZIP 含 Java、资源、所有构建/测试工具及说明。
-4. 上游完整源码 archive 的 `cinema/` 保留原有开源诊断测试 GB/GBA 二进制；这些没有被我们当游戏运行或安装。对用户说“不附商业游戏/BIOS”，不要说“源码里绝无 ROM 后缀”。运行文件夹本身没有游戏或 BIOS。
+4. 上游完整源码 archive 的 `cinema/` 保留开源诊断测试 GB/GBA 二进制；它们是开发夹具，不是商业游戏或 BIOS。运行文件夹本身不包含游戏或 BIOS。
 5. `preview-v1/v2/v3` 是保留的历史候选；只打包 v4，不把 incoming/vendor/build 整个工作目录一并装进实例。
 
 ## 实现接缝与限制
@@ -44,4 +44,4 @@ python piq-gba/tools/build_gba_preview.py --fc <主FC.jar> --output <piq-gba内�
 python piq-gba/tools/check_gba_final.py --fc <相同主FC.jar> --bundle <新目录> --report <不存在的新报告.json>
 ```
 
-`build` 编译新GBA；`check` 只编探针、禁止替代生产类。所有输出拒绝覆盖。未安装、未自动关机，交付由 root 决定。
+`build` 编译 GBA，`check` 只编译探针并禁止替代生产类；输出拒绝覆盖。此测试记录不代表安装或稳定发行。

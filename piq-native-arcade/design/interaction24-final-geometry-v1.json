@@ -3,11 +3,11 @@
   "mode": "final-jar-only",
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-interaction24-v1\\piq_fc_arcade-0.31.0-alpha.24.jar",
+      "path": "piq-fc-arcade\\build\\review-interaction24-v1\\piq_fc_arcade-0.31.0-alpha.24.jar",
       "sha256": "AE3185660442BA3BB38344165F3D60F736DB5DA3E63F2E4FE9D7DCC79C1F170B"
     },
     "native": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-interaction24-v1\\piq_native_arcade-0.1.0-alpha.8.jar",
+      "path": "piq-fc-arcade\\build\\review-interaction24-v1\\piq_native_arcade-0.1.0-alpha.8.jar",
       "sha256": "C57BA0EEF241BE2AB10BF5E82B33E6C8645F57B308BCA39A6A82DEC09DB66FEC"
     }
   },

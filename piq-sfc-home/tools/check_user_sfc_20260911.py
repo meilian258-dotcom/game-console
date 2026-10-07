@@ -2,6 +2,12 @@
 
 Does not compile Minecraft or start a game; hand volumes are diagnostic stand-ins.
 """
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import json,os,subprocess,tempfile,itertools,sys
 from pathlib import Path
 import numpy as np
@@ -12,10 +18,10 @@ from check_controller_slanted_pose import raster,FACES,hit,arm_triangles
 from check_sfc_hardware_mesh import arm_vertices
 from build_tv_remote_model import render_gui
 from check_controller_pose_pipeline import display_matrix
-ROOT=build.ROOT/'piq-sfc-home'; JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
+ROOT=build.ROOT/'piq-sfc-home'; JAVA=(java_home() / 'bin')
 
 def java():
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2'),('com.google.code.gson','2.10.1')]:
         deps.extend(p for p in (cache/group).rglob('*.jar') if version in p.parts and '-sources' not in p.name and '-javadoc' not in p.name)
     def run(cmd):

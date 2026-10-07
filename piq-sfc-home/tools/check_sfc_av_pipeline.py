@@ -1,5 +1,11 @@
 """Actual Java SFC AV mesh, six public FC television endpoints, offline geometry QA."""
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,io,json,re,subprocess,sys,tempfile
 from pathlib import Path
 from import_sfc_models import PROJECT,WORKSPACE,ASSETS,sha,encoded
@@ -10,7 +16,7 @@ from render_rocket_arcade_preview import Quad,collect_quads,render_view
 from import_subor_hardware import write_new
 from check_av_smooth_mesh import SOURCES as FC_SOURCES
 
-JDK=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
+JDK=(java_home() / 'bin')
 JAVA=PROJECT/'src/main/java/cn/piq/sfchome/client/SfcAvCableGeometry.java'
 PROBE=PROJECT/'tools/qa/SfcAvCableProbe.java'
 SOURCES=FC_SOURCES+[
@@ -84,7 +90,7 @@ def preview(data):
     tex={};objects=[]
     models=[(ASSETS/'models/block/sfc_console_inventory.json',np.array([0,0,0])),
       (FC/'src/main/resources/assets/piq_fc_arcade/models/block/home_retro_tv.json',np.array([-64,0,0]))]
-    mc=Path('C:/Users/13498/.gradle/caches/neoformruntime/artifacts/minecraft_1.21.1_client.jar')
+    mc=(gradle_home() / 'caches/neoformruntime/artifacts/minecraft_1.21.1_client.jar')
     import zipfile
     with zipfile.ZipFile(mc) as jar:
         for path,offset in models:

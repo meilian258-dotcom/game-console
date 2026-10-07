@@ -1,5 +1,5 @@
 *** Begin Patch
-*** Update File: G:/服务器/服务器Codex/piq-fc-arcade/src/main/java/cn/piq/fcarcade/home/HomeHardware.java
+*** Update File: piq-fc-arcade/src/main/java/cn/piq/fcarcade/home/HomeHardware.java
 @@
      public static void register() {
          HomeControllerService.register();

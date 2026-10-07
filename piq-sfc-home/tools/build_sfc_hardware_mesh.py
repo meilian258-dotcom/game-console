@@ -4,6 +4,12 @@ References: https://www.nintendo.co.jp/clvs/index.html (controller original layo
 NOT mini console dimensions) plus user-supplied original Japanese hardware photographs.
 """
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse, copy, hashlib, io, json, math, sys, zipfile
 from pathlib import Path
 import numpy as np
@@ -17,7 +23,7 @@ from check_controller_pose_pipeline import display_matrix, translation, rotation
 from build_tv_remote_model import render_gui
 ASSETS=PROJECT/'src/main/resources/assets/piq_sfc_home'
 OUT=PROJECT/'design/sfc-hardware-lowpoly-20260910-v1'
-MC=Path('C:/Users/13498/.gradle/caches/neoformruntime/artifacts/minecraft_1.21.1_client.jar')
+MC=(gradle_home() / 'caches/neoformruntime/artifacts/minecraft_1.21.1_client.jar')
 MATERIALS={'shell':'minecraft:block/iron_block','deck':'minecraft:block/smooth_stone',
  'metal':'minecraft:block/smooth_stone','pad_face':'minecraft:block/stone','dark':'piq_fc_arcade:block/home_retro_tv_dark',
  'black':'piq_fc_arcade:block/home_retro_tv_screen','rim':'piq_fc_arcade:block/home_retro_tv_rim',

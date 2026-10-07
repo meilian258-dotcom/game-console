@@ -10,13 +10,13 @@
 - native NES/SFC/ARCADE 的方向都为 bits 4..7。未锁时方向与实际 Minecraft 移动绑定重合就仅留给世界；不重合的方向仍给模拟器。游戏功能别名优先，始终捕获。锁时额外阻止运动/跳跃/蹲下/疾跑，不屏蔽无关 L/E/T/Q/热栏/鼠标。
 - 菜单、失焦、物理失效、授权变化、配置变化与 owner 交接都清零并重臂。未锁时正用于世界行走的方向键不阻止其它游戏功能重新就绪；锁定后这些键也必须先松开。
 - `KeyboardMappingState.clearCaptured` 仅清选中的 KeyMapping transient `isDown/clickCount`；包括 ToggleKeyMapping。原绑定和 `options.txt` 不改。
-- runtime/display/草稿共用 root 的 `effectiveLegacyKeys/effectiveLegacyExtras`。`displayLegacyKeys(Profile, KeyboardConfig)` 与 `displayLegacyExtraKeys(Profile[, KeyboardConfig])` 提供实际主键/额外键；旧鼠标主绑定保留负码展示。冲突 alias 本地替换提示不会误阻止保存有效设置。
+- runtime/display/草稿共用 `effectiveLegacyKeys/effectiveLegacyExtras`。`displayLegacyKeys(Profile, KeyboardConfig)` 与 `displayLegacyExtraKeys(Profile[, KeyboardConfig])` 提供实际主键/额外键；旧鼠标主绑定保留负码展示。冲突 alias 本地替换提示不会误阻止保存有效设置。
 
 ## 精确生产范围
 
 修改：`cn/piq/retro/client/KeyboardInput`、`KeyboardControlState`、`KeyboardRouting`、`KeyboardMappingState`。
 
-`KeyboardHandlerMixin` 和 `KeyMappingStateAccess` 源码未改；本轮仍用真实 Sponge 对它们及缓存的 Minecraft 1.21.1 / NeoForge 21.1.236 类进行变换验证。Config/Store/GUI 由 root 负责，FC/SFC/Native 桥由 `sfc_cabinet_provider` 负责。没有新增网络或模拟器核心代码。
+`KeyboardHandlerMixin` 和 `KeyMappingStateAccess` 源码未改；本轮仍用真实 Sponge 对它们及缓存的 Minecraft 1.21.1 / NeoForge 21.1.236 类进行变换验证。Config/Store/GUI 负责，FC/SFC/Native 桥由 `sfc_cabinet_provider` 负责。没有新增网络或模拟器核心代码。
 
 ## 验证
 

@@ -542,7 +542,7 @@
   },
   "previews": [
     {
-      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v1\\front.png",
+      "file": "piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v1\\front.png",
       "sha256": "27F5120273CF85485CDF518354EF23689012C9253B2509FCF5D10F81022A5310",
       "camera_from_center": [
         0.0,
@@ -553,7 +553,7 @@
       "sampling": "nearest texel at pixel center; Lanczos supersample resolve"
     },
     {
-      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v1\\front-angle.png",
+      "file": "piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v1\\front-angle.png",
       "sha256": "D28CA284907105ED506AF53E5DEA444C41712A21BE476CC90E51BC07A83A82F2",
       "camera_from_center": [
         0.5515413083678437,
@@ -564,7 +564,7 @@
       "sampling": "nearest texel at pixel center; Lanczos supersample resolve"
     },
     {
-      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v1\\rear-angle.png",
+      "file": "piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v1\\rear-angle.png",
       "sha256": "04C79C1063AAF6378F42CE5717D519624CED9362F77ABC7CDA371114608A64CA",
       "camera_from_center": [
         -0.5942283606769104,
@@ -575,7 +575,7 @@
       "sampling": "nearest texel at pixel center; Lanczos supersample resolve"
     },
     {
-      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v1\\controls.png",
+      "file": "piq-fc-arcade\\design\\refined-dual-zapper-20260911\\qa-v1\\controls.png",
       "sha256": "D0B8F0C383209DDDAFD0D5337C9858B67E79026E93C21AC639366315AC79F32A",
       "camera_from_center": [
         0.28066816183499277,

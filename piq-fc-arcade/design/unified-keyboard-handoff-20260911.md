@@ -1,7 +1,5 @@
 # Unified keyboard handoff
 
-Owner: `/root/fix_sfc_av`, 2026-09-11. Root owns the maintenance-manual entry, GUI, versions, builds and packaging. No game instances, commercial ROMs, servers or installed mod directories were touched.
-
 ## Shared API
 
 `cn.piq.retro.client.KeyboardConfig`: immutable NES/SFC/ARCADE configurations; LEGACY/NUMPAD/WASD/CUSTOM presets, per-system preserved custom arrays and F8/F7 defaults. Native NES bit order is A/B/Select/Start/Up/Down/Left/Right; SFC and arcade retain the existing 12-bit protocol. SFC B/A/Y/X/L/R is keypad 1/2/3/4/5/6 or J/K/L/I/O/P. ARCADE new presets instead map buttons 1/2/3/4/5/6 (bits 0/1/8/9/10/11) sequentially to those same physical keys. ARCADE LEGACY is unchanged.
@@ -28,6 +26,6 @@ Generic SFC cabinets preserve the old generic cabinet LEGACY keys, including O/P
 
 `tools/check_unified_keyboard.py --report <new-report>` compiles four pure production classes plus 47 JUnit tests. It checks quick press/release, no repeat resurrection, GUI/focus/toggle neutral rearming, alternate keyboard and mouse bindings, per-owner separation, native bit order, immutable per-profile settings, explicit save/roundtrip/CAS refusal/invalid and oversized files, and actual permission-first routing for settings/toggle/GUI/Escape. Additional existing host source contracts and actual ownership tests follow the new shared callback, without weakening current connection/owner/focus/Escape/GUI restrictions.
 
-It also compiles the input facade/Mixin/FC mappings/shared cabinet/Native client against cached real MC/NeoForge APIs. The actual KeyboardHandler descriptor is checked against `keyPress(JIIII)V`, and compiled injection descriptor, HEAD/cancellable annotation, client-only JSON and template registration are verified. ClientArcadeSession's old `NativeImage.pixels` access requires the normal project access transformer and is covered by root Gradle, not this raw-MC API fixture.
+It also compiles the input facade/Mixin/FC mappings/shared cabinet/Native client against cached real MC/NeoForge APIs. The actual KeyboardHandler descriptor is checked against `keyPress(JIIII)V`, and compiled injection descriptor, HEAD/cancellable annotation, client-only JSON and template registration are verified. ClientArcadeSession's old `NativeImage.pixels` access requires the normal project access transformer and is covered by the normal Gradle build, not this raw-MC API fixture.
 
 Evidence is source-based, not a final-JAR or live game result. Live Mixin transformation, an actual GLFW window/physical controller and dedicated-server multiplayer have not been exercised by this test. Root must perform final full builds and artifact validation; do not present these checks as live multiplayer gameplay.

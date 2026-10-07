@@ -3,9 +3,13 @@ param(
     [Parameter(Mandatory=$true)][string]$NativeJar,
     [Parameter(Mandatory=$true)][string]$ReportDirectory,
     [switch]$SourceOverlay,
-    [string]$DependencyCache='C:/Users/13498/.gradle/caches/modules-2/files-2.1'
+    [string]$DependencyCache=''
 )
 $ErrorActionPreference='Stop'
+if (-not $DependencyCache) {
+    $toolGradleHome = if ($env:GRADLE_USER_HOME) { $env:GRADLE_USER_HOME } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) '.gradle' }
+    $DependencyCache = Join-Path $toolGradleHome 'caches/modules-2/files-2.1'
+}
 $projectRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $workspaceRoot=[IO.Path]::GetFullPath((Join-Path $projectRoot '..'))
 $FcJar=(Resolve-Path -LiteralPath $FcJar).Path

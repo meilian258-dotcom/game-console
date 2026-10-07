@@ -1,6 +1,6 @@
 """Freeze the reviewed FC39/Native14/SFC23(core7)/GBA7 set; never install or run Gradle.
 
-1. --capture-inputs NEW.json: capture source hashes immediately BEFORE root's Gradle check/jar.
+1. --capture-inputs NEW.json: capture source hashes immediately BEFORE the Gradle check/jar.
 2. --report NEW.json: read-only resource/class/metadata preflight; no javac or output JARs.
 3. --freeze --source-witness NEW.json --source-witness-sha256 HASH [--output NEW_DIR]
    checks that witness, current compiler outputs and successful JUnit XML, compiles GBA
@@ -11,6 +11,12 @@ files and version/display metadata. Existing source-vs-release38 differences are
 reported, never written back. New or changed unapproved source resources fail closed.
 """
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 
 import argparse
 import copy
@@ -53,9 +59,9 @@ PARTS = {'fc': [('piq-fc-arcade', 'piq_fc_arcade', ('cn/piq/fcarcade/', 'cn/piq/
 META, MANIFEST = 'META-INF/neoforge.mods.toml', 'META-INF/MANIFEST.MF'
 LANG = {kind: {f'assets/{mod}/lang/{locale}.json': project + f'/src/main/resources/assets/{mod}/lang/{locale}.json'
                for project, mod, _ in parts for locale in ('zh_cn', 'en_us')} for kind, parts in PARTS.items()}
-JAVA = Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot')
-CACHE = Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
-MC = Path('C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
+JAVA = (java_home())
+CACHE = (gradle_home() / 'caches/modules-2/files-2.1')
+MC = (gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
 TEST_LIMITS = {'piq-fc-arcade': (1537, 8), 'piq-native-arcade': (80, 0), 'piq-sfc-home': (338, 0)}
 TEST_NOTES = ROOT / 'piq-fc-arcade/design/测试说明-同步与N锁定-20260914.md'
 LIMITS = [

@@ -1,6 +1,6 @@
 # Alpha26 键盘冲突与 Native 按钮编号交接
 
-负责人：fix_sfc_av；2026-09-11。根维护手册由 root 合并记录。未安装、未改用户配置、未运行 Minecraft。
+未安装、未改用户配置、未运行 Minecraft。
 
 ## 确认的原因
 

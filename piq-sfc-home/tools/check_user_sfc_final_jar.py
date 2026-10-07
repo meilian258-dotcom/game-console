@@ -3,14 +3,20 @@
 Only tests/probes are compiled; no production source directory is on javac's
 source path. Does not render, launch Minecraft, or load a simulator core.
 """
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,hashlib,json,os,subprocess,tempfile,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
+JAVA=(java_home() / 'bin')
 def sha(data):return hashlib.sha256(data).hexdigest().upper()
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--sfc',type=Path,required=True);parser.add_argument('--report',type=Path,required=True);args=parser.parse_args();jar=args.sfc.resolve()
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2'),('com.google.code.gson','2.10.1')]:
         deps.extend(p for p in (cache/group).rglob('*.jar') if version in p.parts and '-sources' not in p.name and '-javadoc' not in p.name)
     asset='assets/piq_sfc_home/meshes/sfc_hardware.json'

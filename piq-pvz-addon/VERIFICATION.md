@@ -2,7 +2,7 @@
 
 当前适用 `game_console_pvz-0.1.0-prototype.4.jar`。范围 `[0.31.0-alpha.70,0.31.0-alpha.73)`，接受FC70/71/72，拒绝69、73、正式0.31.0及未来版本。28项JUnit全部通过；最终JAR对比PvZ3仅META-INF/neoforge.mods.toml的自身版本及兼容上限变化，其余逐条字节相同。FC72对PvZ使用的外设、显示、注册API及Mixin目标准入进行比对，不更改这些接口。FC72新增的HomeSyncSaveHints只涉及FC菜单提示，不是PvZ依赖。
 
-不触碰main.pak/用户档案、不改变保存格式或性能实现，不加入Netplay。Minecraft内PvZ4启动仍待用户验收，不把既有v2性能报告当成v4实测。当前配套包在FC72测试r2目录，回执在outputs/netplay72。以下均为历史验证记录。
+不触碰main.pak/用户档案、不改变保存格式或性能实现，不加入Netplay。Minecraft内PvZ4启动仍待用户验收，不把既有v2性能报告当成v4实测。配套范围为 FC72 测试 r2。以下均为历史验证记录。
 
 # prototype.3 兼容修复验证记录（2026-09-24）
 
@@ -11,12 +11,12 @@
 - 新增3项针对生成元数据的Maven版本范围测试：FC70/FC71接受，FC69/FC72及以后拒绝。旧范围先复现FC71测试失败，修复后28项JUnit全部通过，无错误/跳过。初次离线解析新增测试依赖失败，正常解析后离线全套成功；测试依赖不进入成品。
 - 最终JAR相对PvZ2只允许`META-INF/neoforge.mods.toml`变更：自身版本2→3、FC依赖上限71→72（不含72）。打包脚本核对每个条目字节以及元数据与测试资源一致，不只检查源码文本。
 - FC71相对FC70仅策略class及两项版本元数据不同；附属使用的接口、两项Mixin目标及原生资源完全相同。v3所有生产Java/host/DLL/资产与v2逐字节一致，输入、存档路径和性能实现不变。
-- 完整校验记录与SHA在同包`verification.json`、`SHA256SUMS.txt`，原测试证据`outputs/pvz-prototype3/`。保留旧发行包；没有替换用户mods、访问游戏存档、部署、发布或重启。
+- 同包 `verification.json` 与 `SHA256SUMS.txt` 提供校验记录和 SHA；旧发行包保留，未修改实际游戏实例或存档。
 - 未进行Minecraft v3实际启动或游戏内验收；以下性能与恢复结果是历史v2独立探针，不冒充v3实机结果。不承诺任意未来FC版本兼容。当前复测按README安装FC71+PvZ3，先确认到达主菜单，再复测原播放盒、电视及保存。
 
 # 以下保留 prototype.2 历史验证记录（2026-09-24）
 
-本文件适用于 `game_console_pvz-0.1.0-prototype.2.jar`，不是 Minecraft 实机验收或稳定版声明。用户确认 prototype.1 能运行，但只有 PvZ 画面卡、Minecraft 走动正常；本轮不把这一反馈当作 prototype.2 已验收。
+本文件适用于 `game_console_pvz-0.1.0-prototype.2.jar`，不是 Minecraft 实机验收或稳定版声明。prototype.1 的已知现象为 PvZ 画面卡顿而 Minecraft 移动正常，不能据此认定 prototype.2 已验收。
 
 ## 已完成
 
@@ -25,7 +25,7 @@
 - 对最终 JAR 内的 Java 运行器执行独立探针：自身资源提取/固定哈希、真实子进程出帧、暂停/恢复、同档并发写入拒绝、正常关闭、再次启动均通过。
 - 静态核对 FC70 成品中的两个 Mixin 目标签名、既有 HomeSystems/显示/线材接口；没有修改主包、SFC或街机。
 - FC70 SHA256 保持 `5C6065AE57F0168B6119759D88C592591257E9C10A346A430D8BC5741C5A9124`。
-- 使用用户提供的原 DLL，SHA256 `7E4CAA5F801CF9B0FDB03E3E46D704447A49AA2198DC20A1E8369D73C303AD08`；自制 host SHA256 `190E520A1D36CC92F9A39E83D56AF1C287CC284E78ACC42A1E839953252895AF`。
+- 使用原 DLL，SHA256 `7E4CAA5F801CF9B0FDB03E3E46D704447A49AA2198DC20A1E8369D73C303AD08`；自制 host SHA256 `190E520A1D36CC92F9A39E83D56AF1C287CC284E78ACC42A1E839953252895AF`。
 - 最终JAR SHA256 `E33160D22C67190CB9FDAE381C104875D69BB4C05617F930EDCA05136FF79BEE`。
 
 ## 性能对照（独立运行器，不是 Minecraft 内 FPS）
@@ -61,4 +61,4 @@
 4. 进入冒险并种一株植物，点附属“结束并保存”；重新开始并 Continue 检查进度。
 5. 测试失焦、电视关机/开机、拆线、退出世界，确认没有卡键、残留声音或后台进程。异常请提供 `piq-pvz/logs/` 和 MC 日志。
 
-本轮没有安装到用户实例、部署/发布游戏版本、重启服务器或删除旧文件。原始过程证据位于工作区 `outputs/pvz-prototype2/`；上一版保留在 `outputs/pvz-prototype1/` 和原冻结包（截图包含用户测试游戏，仅留本机，不放交付ZIP）。
+验证未修改玩家实例、世界或旧存档；游戏测试截图不随交付包公开。

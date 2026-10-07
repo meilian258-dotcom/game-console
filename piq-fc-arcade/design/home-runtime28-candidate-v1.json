@@ -3,7 +3,7 @@
   "schema": "piq-home-runtime28-1",
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.28.jar",
+      "path": "piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.28.jar",
       "sha256": "FA6901DACE5BFE567258D841A433F6BC4A8F9DA4978DCD32D6A78AA1852DEE18"
     }
   },

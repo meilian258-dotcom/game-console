@@ -1,6 +1,6 @@
 # 自动手持捕获与光枪菜单接缝（alpha30 开发交接）
 
-本轮仅本地源码/测试。未安装、发布、启动真实 Minecraft、修改 ROM/存档、模型/核心或旧冻结包。根维护手册由 root 汇总。
+源码与离线测试记录；未启动真实 Minecraft，模型、核心与保存格式未变。
 
 ## 接口与行为
 
@@ -16,15 +16,15 @@
 
 FC 新增 stems：`client/ControllerCapture`（Provider、Candidate、两个匿名内类）、`client/ControllerCapturePolicy`（Held）、`client/HomeInputSequences`。
 
-FC 修改 stems：`client/ClientArcadeEvents`、`client/ClientArcadeSession`、`home/HomeRuntimeAuthority`、`home/HomeZapperService`、`server/ServerArcadeSessions`。没有生产资源或协议字段修改，没有旧 class 人为删除。最终内类精确条目由 root 冻结差分确认。
+FC 修改 stems：`client/ClientArcadeEvents`、`client/ClientArcadeSession`、`home/HomeRuntimeAuthority`、`home/HomeZapperService`、`server/ServerArcadeSessions`。没有生产资源或协议字段修改，没有旧 class 人为删除。最终内类精确条目冻结差分确认。
 
-SFC 仅修改 `client/SfcHomeClient` 及原 Setup/新 Setup 匿名 provider 内类；不改 server/net/Playback/core/模型。SFC 第三人称姿势属于 root 的独立范围。Native 无生产改动。
+SFC 仅修改 `client/SfcHomeClient` 及原 Setup/新 Setup 匿名 provider 内类；不改 server/net/Playback/core/模型。SFC 第三人称姿势不在该修改范围。Native 无生产改动。
 
 ## 验证与边界
 
 - 新增 FC JUnit：ControllerCapturePolicyTest 11、HomeInputSequencesTest 4、HomeGunKeyboardFallbackTest 14、ControllerCaptureSourceTest 3。
 - 原 HomeGunController29Test 14 保留执行。SFC 三份旧合同按七参/拆分谓词和自动 PARALLEL 更新，保留原连接/排他/6 格/精确租约语义，并在 SfcUnifiedKeyboardTest 新增2项 provider 与换手 source 合同。
 - `python tools/check_controller_capture30.py --source --report design/controller-capture30-source-v1.json`：43 个实际纯生产/JUnit 测试通过（不包含3个独立 source 合同）。报告明确 production-source，不作为最终 JAR 证据。
-- 最后补强普通非枪模式不接受 gun 来源标记后，`design/controller-capture30-source-v2.json` 同43测试全部通过；root 统一 `compileJava` 已过，未发现新MC API错误。生产已提交冻结，剩余统一全check/最终候选由root处理。
+- 最后补强普通非枪模式不接受 gun 来源标记后，`design/controller-capture30-source-v2.json` 同43测试全部通过；统一 `compileJava` 已过，未发现新MC API错误。生产已提交冻结，剩余统一全check/最终候选处理。
 - 最终用法：`python tools/check_controller_capture30.py --fc <冻结FC.jar> --report <新的JSON路径>`。只编 tests/probe，5 个纯生产类 CodeSource 必须是原 SHA 的输入 JAR，输入 path/SHA 写入报告。不能覆盖旧报告。
-- 真实 Minecraft 输入入口、服务端世界/保护插件、实际物理手柄、枪同时控制实玩仍未验收。pure receipt/租约/FIFO测试不是完整多人服务器测试。统一 Gradle 与最终 JAR 证据由 root 发起后补充。
+- 真实 Minecraft 输入入口、服务端世界/保护插件、实际物理手柄、枪同时控制实玩仍未验收。pure receipt/租约/FIFO测试不是完整多人服务器测试。统一 Gradle 与最终 JAR 证据发起后补充。

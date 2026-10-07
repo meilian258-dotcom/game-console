@@ -1,13 +1,11 @@
 # FC32 generic cabinet deterministic synchronization
 
-Owner: `/root/fix_sfc_av`. Local development only; no installation, ROM modification, publishing, or game-world launch.
-
 ## Implemented behavior
 
 - Server-owned 1/2/3/4-seat rooms retain existing consent, physical topology, protection, exact connection/member, distance, heartbeat, and removal checks. An immutable per-room choice selects media or deterministic local execution. Only an administrator may change an idle cabinet's saved choice; an active run is never reset or switched automatically.
 - `cabinet-room-4` adds the assignment mode; mandatory `cabinet-sync-1` carries the separate synchronization lane. Old media Ready/Input/Reset cannot bypass local-sync readiness.
 - Every participating client has one dedicated worker owning factory, step, state, and close calls. The server runs no emulator. It produces authoritative per-frame four-port masks using independent 32-edge FIFOs and a bounded 7,200-frame history. No prediction is used.
-- Hello compares server-authorized shared ROM hash/content manifest, core compatibility ID, frame rate, and complete initial-state SHA-256. ROM resolution runs off the Minecraft thread through the root-owned shared-game service.
+- Hello compares server-authorized shared ROM hash/content manifest, core compatibility ID, frame rate, and complete initial-state SHA-256. ROM resolution runs off the Minecraft thread through the shared-game service.
 - The host uploads a verified initial state before input/frame advance begins. Later host checkpoints do not pause or reload the host. Approved guests receive a bounded snapshot and authoritative history; their input is disabled until the matching complete restore transaction is acknowledged.
 - Full state hashes every 300 frames compare guests against the host. Only a divergent guest is restored. Repeated failed corrections release that guest. Host failure safely ends the room rather than silently resetting a running game. Guests leaving clear only their own current and queued inputs.
 - Media remains available to observers even in deterministic mode. Observers do not receive controller authority through this lane. MAME is not registered for local synchronization: real restore tests failed audio/state equivalence. Existing MAME media mode is retained.

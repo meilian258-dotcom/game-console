@@ -22,7 +22,7 @@
   },
   "sources_unchanged": true,
   "source_fingerprints": {
-    "G:\\服务器\\服务器Codex\\piq-native-arcade\\tools\\qa\\NativeStepMameProbe.java": {
+    "piq-native-arcade\\tools\\qa\\NativeStepMameProbe.java": {
       "sha256": "DCF1B78285E144290D3F35A085B8293492AE722A398DC0415152DFDE4E8327B0",
       "bytes": 5296,
       "mtime_ns": 1789180616164310500
@@ -32,12 +32,12 @@
       "bytes": 38316,
       "mtime_ns": 1789180955041658400
     },
-    "F:\\Minecraft\\HMCL\\versions\\1.21.1-NeoForge\\piq-native-arcade\\roms\\kof97.zip": {
+    "<game-dir>/piq-native-arcade\\roms\\kof97.zip": {
       "sha256": "804F892924D4650545D3EA2D19FB85670094DC46DB882FECAF3E03009E2C4B9F",
       "bytes": 28745740,
       "mtime_ns": 1789019872695917100
     },
-    "E:\\Dow\\rom\\WinKawaks1.65模拟器\\WinKawaks1.65\\roms\\neogeo\\neogeo.zip": {
+    "<rom-input-dir>/neogeo\\neogeo.zip": {
       "sha256": "E1FFD4AB180E2F6AA4A3AA4D2C6F991E19D8EF762BEC8B5A6283704A2EDC3BBC",
       "bytes": 953500,
       "mtime_ns": 1158274344000000000
@@ -47,17 +47,17 @@
       "bytes": 39840,
       "mtime_ns": 1789180481334585300
     },
-    "G:\\服务器\\服务器Codex\\piq-native-arcade-poc\\vendor\\mame_libretro.dll": {
+    "piq-native-arcade-poc\\vendor\\mame_libretro.dll": {
       "sha256": "6172A988AB67FE68F4177A6FC8FBB82619EB2044C330930F0F572F7B1EDC2301",
       "bytes": 372431360,
       "mtime_ns": 1788825946000000000
     },
-    "C:\\Users\\13498\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna\\5.14.0\\67bf3eaea4f0718cb376a181a629e5f88fa1c9dd\\jna-5.14.0.jar": {
+    "<gradle-user-home>/caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna\\5.14.0\\67bf3eaea4f0718cb376a181a629e5f88fa1c9dd\\jna-5.14.0.jar": {
       "sha256": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6",
       "bytes": 1878533,
       "mtime_ns": 1781245930305499200
     },
-    "G:\\服务器\\服务器Codex\\piq-native-arcade\\tools\\check_native_step_mame.py": {
+    "piq-native-arcade\\tools\\check_native_step_mame.py": {
       "sha256": "ADC05DA188BF64BD7306A22C63E8DF18B94D53B44DDFBA304C108D2BDE42FEBF",
       "bytes": 3871,
       "mtime_ns": 1789180869868837600

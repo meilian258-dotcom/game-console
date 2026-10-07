@@ -2,7 +2,7 @@
 
 本文件保留 2026-10-07 整理前的 README，供原型开发追溯。它不作当前推荐整套方块电玩的安装指引；请先读[Java ME 原型入口](README.md)。
 
-以下为原文。
+以下为历史技术记录。
 
 # 方块电玩：Java ME / Game Console: Java ME
 
@@ -67,7 +67,7 @@ An external compatibility game can be exercised without packaging it:
 
 ```powershell
 & '..\piq-fc-arcade\gradlew.bat' -p . `
-  '-Pj2meTestJar=C:\path\to\owned-game.jar' realGameSmokeTest
+  '-Pj2meTestJar=<owned-game.jar>' realGameSmokeTest
 ```
 
 For an in-game test, place owned Java ME game files under the instance's

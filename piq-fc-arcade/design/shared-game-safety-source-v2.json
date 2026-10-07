@@ -2,7 +2,7 @@
   "ok": true,
   "mode": "source-against-real-api",
   "production_compiled": true,
-  "jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.32.jar",
+  "jar": "piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.32.jar",
   "sha256": "F26A4F96DC8A9C6919B0681BE8F2BC3C5B97AF483D3DA7AEFC6B3222C00776E6",
   "unit": {
     "ok": true,

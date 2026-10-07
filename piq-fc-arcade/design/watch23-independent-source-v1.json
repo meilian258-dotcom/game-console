@@ -2,7 +2,7 @@
   "ok": true,
   "schema": "piq-watch23-independent-1",
   "production_origin": "compiled-workspace-production",
-  "production_path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\classes\\java\\main",
+  "production_path": "piq-fc-arcade\\build\\classes\\java\\main",
   "production_sha256": null,
   "production_class_hashes": {
     "cn/piq/fcarcade/ArcadeDigestPayload.class": "25E8831011B498AF501175BACB614BC3C3C7E8A638BFAF15D5230BD21D3447F1",

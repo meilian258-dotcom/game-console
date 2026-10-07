@@ -1,4 +1,10 @@
 """Two actual SFC cores: checkpoint/state repair while the healthy host advances; original ROM only."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse,json,os,shutil,sys,tempfile,time
 from pathlib import Path
 import run_sfc_playback_multiplayer_probe as q
@@ -11,7 +17,7 @@ def main():
     p.add_argument('--production-source',action='store_true');a=p.parse_args()
     if a.report.exists():raise ValueError('Use a new immutable evidence path')
     paths={k:getattr(a,k).resolve(strict=True)for k in ('fc','sfc')};before={k:q.sha(v)for k,v in paths.items()}
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[f for f in cache.rglob('*.jar')if not any(x in f.name for x in ('-sources','-javadoc','-userdev'))]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[f for f in cache.rglob('*.jar')if not any(x in f.name for x in ('-sources','-javadoc','-userdev'))]
     probes=[ROOT/'tools/qa/SfcRepairCoreProbe.java',ROOT.parent/'piq-fc-arcade/tools/qa/SfcTwoPortInputProbe.java',ROOT.parent/'piq-sfc-arcade/src/test/java/cn/piq/sfcarcade/core/SfcLegalTestRom.java']
     production=[ROOT/'src/main/java/cn/piq/sfchome'/s for s in ('client/SfcExecutionCore.java','client/SfcCheckpoints.java','server/SfcRepairLedger.java')]if a.production_source else []
     source={str(f.relative_to(ROOT.parent)):q.sha(f)for f in probes+production+[Path(__file__).resolve(),Path(q.__file__).resolve()]};began=time.monotonic()

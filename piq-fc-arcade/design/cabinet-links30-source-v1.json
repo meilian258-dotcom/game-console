@@ -4,7 +4,7 @@
   "production_compiled": true,
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-appliance29-v1\\piq_fc_arcade-0.31.0-alpha.29.jar",
+      "path": "piq-fc-arcade\\build\\review-appliance29-v1\\piq_fc_arcade-0.31.0-alpha.29.jar",
       "sha256": "80FD1512F69CCEB192EF78C02D5A3893924C835B322FC8CF9AF441FEB4B833C2"
     }
   },

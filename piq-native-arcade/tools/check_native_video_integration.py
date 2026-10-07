@@ -1,10 +1,16 @@
 """Real pure Java video geometry + local mapped NeoForge/Minecraft method signature audit."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 from pathlib import Path
 import argparse,json,subprocess,tempfile
 from check_native_cabinet import ROOT,FC,JDK,sha
 
 def inspect():
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
+    cache=(gradle_home() / 'caches/modules-2/files-2.1')
     jars=[next(cache.glob(p)) for p in ('org.junit.jupiter/junit-jupiter-api/5.13.4/*/*.jar','org.junit.platform/junit-platform-commons/1.13.4/*/*.jar','org.opentest4j/opentest4j/1.3.0/*/*.jar','org.apiguardian/apiguardian-api/1.1.2/*/*.jar')]
     sources=[FC/'src/main/java/cn/piq/fcarcade/layout'/n for n in ('RocketArcadeGeometry.java','DualCabinetGeometry.java','ScreenAspectFit.java')]
     sources += [ROOT/'src/main/java/cn/piq/nativearcade/layout'/n for n in ('NativeCabinetLayout.java','NativeVideoPresentation.java')]

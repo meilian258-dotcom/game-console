@@ -1,6 +1,6 @@
 # FC alpha26 光枪会话交接
 
-2026-09-11；Codex / sfc_cabinet_provider。仅本地源码、测试与新证据；不安装游戏、不改用户 ROM / 存档、不启动 Minecraft 或服务器、不改历史冻结包。
+2026-09-11，光枪会话的历史实现与测试记录，未完成 Minecraft 实机验收。
 
 ## 玩法及边界
 
@@ -46,7 +46,7 @@
 - `cn/piq/fcarcade/ArcadeZapperInputPayload`
 - `cn/piq/fcarcade/ArcadeZapperSessionPayload`
 
-本代理未删除旧 class、未改资源/版本/旧核心；最终 compiler 因方法修改产生的 synthetic method 在原 class 内。主代理改 ClientArcadeEvents 桥、版本、GUI；模型代理独占 HomeZapperItem/HomeZapperAim/client/zapper/资源，不纳入本代理白名单推断。
+此记录未删除旧 class、未改资源/版本/旧核心；最终 compiler 因方法修改产生的 synthetic method 在原 class 内。ClientArcadeEvents 桥、版本、GUI，以及 HomeZapperItem/HomeZapperAim/client/zapper/资源属于独立修改范围。
 
 ## 调用接口
 
@@ -58,7 +58,7 @@
 
 `FcNetwork.sendZapperInput(ArcadeZapperInputPayload)`：session/epoch/lease/sequence/x/y/offscreen/trigger/forceRelease。world ray 与扳机动画由模型代理实现；server 仍全部重新验证。
 
-`ClientArcadeSession.join(...,reset,NesCoreVariant)`、`authorizedZapper(binding)`、`visualZapperTrigger(binding)` 由主代理的 ClientArcadeEvents facade 调用。授权包括 P1、当前 Connection、worker ready、当前主手枪、共享键盘模式 enabled/armed；远端动画仅取已完成权威帧，不向核心补视觉输入。
+`ClientArcadeSession.join(...,reset,NesCoreVariant)`、`authorizedZapper(binding)`、`visualZapperTrigger(binding)` 由 ClientArcadeEvents facade 调用。授权包括 P1、当前 Connection、worker ready、当前主手枪、共享键盘模式 enabled/armed；远端动画仅取已完成权威帧，不向核心补视觉输入。
 
 ## 测试与执行
 
@@ -68,7 +68,7 @@
 - `tools/check_zapper_session26_final.py --fc <新最终FC.jar> --report <新报告.json>`：只编3个 probe 与10个纯测试，production CodeSource 必须 final JAR；实际双 `ClientNesWorker` + 原隔离WASM，原创诊断ROM，P1第60帧快照、P2延迟加入、90帧追帧逐帧RGBA/PCM/RAM/枪输入一致，P1共150帧且未重启。真实注册 NeoForge outer codecs、3600条最坏history、截断拒绝、实际 Connection/EmbeddedChannel 与生产异步handler。
 - 原 `tools/check_zapper_final.py --fc ... --report ...` 可继续跑原61核心诊断+4来源。
 
-完整 Gradle / 最终候选测试由 root 统一调度；最终执行结果另附新报告，不覆盖 alpha25 证据。新工具的报告绑定 exact input path+SHA 并校验运行前后字节不变。
+完整 Gradle / 最终候选测试统一调度；最终执行结果另附新报告，不覆盖 alpha25 证据。新工具的报告绑定 exact input path+SHA 并校验运行前后字节不变。
 
 尚未验证：真实 Minecraft 双端、真实屏幕帧率/世界鼠标操作、其他模组保护事件集成、实体光枪硬件、所有商业枪游戏。服务端世界授权部分有源码与纯合同，不冒称已构造真实 ServerPlayer/完整服务器。私有 ROM/帧/状态未进入工具或资源。
 

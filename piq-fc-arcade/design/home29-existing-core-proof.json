@@ -1,7 +1,7 @@
 {
   "ok": true,
   "fc": {
-    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-appliance28-v1\\piq_fc_arcade-0.31.0-alpha.28.jar",
+    "path": "piq-fc-arcade\\build\\review-appliance28-v1\\piq_fc_arcade-0.31.0-alpha.28.jar",
     "sha256": "BA563E2609CDD585FD2CAA6B989E6BA71E84916718B0A388F8CC2BD4C0E5CA78"
   },
   "probe": {

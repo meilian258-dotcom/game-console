@@ -1,6 +1,6 @@
 # SFC16：电源、后台运行与手柄租约分离
 
-负责人：`/root/sfc_cabinet_provider`；日期：2026-09-11。仅本地源码与离线验证，不安装、不运行 Minecraft、不修改用户 ROM/存档。
+日期：2026-09-11。范围：源码与离线验证，未运行 Minecraft 或修改游戏数据。
 
 ## 运行契约
 
@@ -11,7 +11,7 @@
 - 主机机身可归还，电视非按钮只提示；物理电源、重置、音量优先于柄归还。卡带和 AV/街机通讯线/光枪支架线/光枪保持其独立物品事务，不因瞄到按钮误开机。
 - 重置明确关闭旧 epoch 的各运行端，创建新 Host token 和新 epoch，保留现有控制器租约；全部输入队列、时钟、Ready、加入事务重新建立。旧帧/旧 Host 回调拒绝。重置是冷重置，不假称已恢复服务器存档。
 - Host 在线、同一维度、实际连接与玩家对象不变、AV/主机/ROM有效且区块加载时可继续后台运行，不要求站在8格内；每个控制租约仍按有效主机/已连接电视最近8格及完整权限事件复验。Host 退出、换维度、核心失败或硬件失效安全停机，首版无 Host 迁移。
-- 每人最多一个 SFC 后台 Host；经 root 明确确认，与 FC 可各一台后台，但玩家输入所有权仍互斥。
+- 每人最多一个 SFC 后台 Host；与 FC 可各一台后台，但玩家输入所有权仍互斥。
 
 ## 协议/API
 
@@ -22,7 +22,7 @@
 - Host 旁观媒体受 exact runtime/connection/token/descriptor 与服务器需求租约绑定，不要求主机仍在 Host 客户端可见区块内；接收旁观者仍验证本地实际电视结构。
 - 本机及旁观声音均乘 `HomeApplianceService.audioGain`；停机调用 `refresh` 更新电视信号。
 
-## 生产文件白名单（本代理）
+## 生产文件白名单
 
 所有路径以 `src/main/java/cn/piq/sfchome/` 为根，class stem包括相应内部类：
 
@@ -38,7 +38,7 @@
 - 新 `client/SfcControlGrantGate`
 - `world/SfcHomeConsoleBlock`（仅 useItemOn 和工具优先判断；shape不变）
 
-Root 另拥有 `SfcHomeMod`、新 `layout/SfcApplianceControls`、版本/依赖/元数据。所有模型/mesh/UV/PNG/核心6/写卡UI/存档格式不在本代理改动范围。未删除任何旧生产class文件。
+`SfcHomeMod`、`layout/SfcApplianceControls` 及版本依赖属于公共集成部分；本节不包含模型、mesh、UV、PNG、核心6、写卡 UI 或存档格式变更。未删除旧生产 class。
 
 ## 验证入口
 
@@ -51,7 +51,7 @@ Root 另拥有 `SfcHomeMod`、新 `layout/SfcApplianceControls`、版本/依赖/
 
 ## 冻结构建
 
-2026-09-11 本轮 `check jar` 已退出0：292 tests，0 failures，0 errors，0 skipped。thin JAR `build/libs/piq_sfc_home-0.1.0-alpha.16.jar` SHA-256 `83A4EA365ECEA8D71F6689D386862AF89543389D1E26A4820D52CF0AFCF8B2F3`。这不是发布用合并包；最终 JAR-only 核心探针须对 root 合并候选另出新报告，不用本次编译结果冒充真人联机测试。
+2026-09-11 本轮 `check jar` 已退出0：292 tests，0 failures，0 errors，0 skipped。thin JAR `build/libs/piq_sfc_home-0.1.0-alpha.16.jar` SHA-256 `83A4EA365ECEA8D71F6689D386862AF89543389D1E26A4820D52CF0AFCF8B2F3`。这不是发布用合并包；最终 JAR-only 核心探针须对 完整合并候选另出新报告，不用本次编译结果冒充真人联机测试。
 
 预检合并包 `piq-fc-arcade/build/review-appliance28-preflight-v1` 的 SFC SHA为 `5F3AD5427EF780D9A35DD00E8EF26577B6D091BBDEFB4DAE45EFEDED8A35E872`。`checks/sfc-runtime-preflight.json` 已通过790协调断言、823实际worker断言、320次真实record codec roundtrip和3661实际生产注册/外层codec/权限gate断言；184帧RGBA及PCM逐帧相同，24双口按键，Host无控制口持续到248帧，远端P1退后重新同步，另新epoch2重置8帧通过。报告SHA `EE45AF3815928FE89A1F6146E13371783E0AEA9BF5FB29108479609095AD15EA`。旁观实际worker38断言通过，报告 `checks/sfc-watch-preflight.json` SHA `4B9FFDB30BED755D48478E530B7BDF000B5C8B4A17DCE20E70B6625CE9D2BAE3`。预检首次工具缺Minecraft静态注册表bootstrap，已仅修工具并调用生产网络注册后通过；没有因此修改生产代码。最终FC包仍会变化，需对正式候选复跑，预检不是最终交付哈希证据。
 
@@ -59,4 +59,4 @@ Root 另拥有 `SfcHomeMod`、新 `layout/SfcApplianceControls`、版本/依赖/
 
 双JVM夹具的协调者替代服务器与真实网络；它不声称已执行 `ServerPlayer`、保护插件回调、真实世界点击或完整SFC服务器状态转换。Host平台回调/扬声器/备份为测试sink。仅原创65816诊断ROM，不读取商业游戏。实际玩家联机、物理手柄、音量听感、游戏内准星按钮点击仍待人工实机验收。核心冷启动成本仍存在。
 
-Root明确保留的失败关闭边界：重置后已经占口的远端重新Ready若出现ROM/core/FPS/初始状态不一致，整台安全停机，尚未实现隔离该坏端后继续重置。正常远端归还/离线/核心失败Leave仅退出本人；新加入候选不一致也只取消候选，不停Host。
+失败关闭边界：重置后已经占口的远端重新Ready若出现ROM/core/FPS/初始状态不一致，整台安全停机，尚未实现隔离该坏端后继续重置。正常远端归还/离线/核心失败Leave仅退出本人；新加入候选不一致也只取消候选，不停Host。

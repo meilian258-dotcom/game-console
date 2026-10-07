@@ -2,11 +2,17 @@
 With --fc, compiles only tests/probes and loads production only from that JAR.
 Without --fc, compiles the explicitly listed keyboard sources for bounded source QA.
 """
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse,json,os,shutil,tempfile,tomllib,zipfile
 from pathlib import Path
 import verify_retro_alpha19 as q
 ROOT=Path(__file__).resolve().parents[1]
-MIXIN=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar')
+MIXIN=(gradle_home() / 'caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar')
 CONFIG='piq_fc_keyboard.mixins.json'
 NAMES=['KeyboardConfig','KeyboardConfigStore','KeyboardControlState','KeyboardRouting','KeyboardInput','KeyboardMappingState']
 TESTS=['KeyboardConfigTest','KeyboardControlStateTest','KeyboardRoutingTest']

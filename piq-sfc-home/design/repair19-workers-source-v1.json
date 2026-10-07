@@ -4,11 +4,11 @@
   "production_compiled": true,
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.32.jar",
+      "path": "piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.32.jar",
       "sha256": "F26A4F96DC8A9C6919B0681BE8F2BC3C5B97AF483D3DA7AEFC6B3222C00776E6"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls30-v1\\piq_sfc-0.1.0-alpha.18.jar",
+      "path": "piq-fc-arcade\\build\\review-controls30-v1\\piq_sfc-0.1.0-alpha.18.jar",
       "sha256": "7BDF3B5BAB4722B35D85303CD2F18C9A7BEA640B3DB7B00C3E9CAFF24E1B49DB"
     }
   },

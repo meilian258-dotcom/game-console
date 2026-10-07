@@ -1,12 +1,18 @@
 """Actual production API compile, JDK-only production guards and queued real-context/codec tests."""
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,hashlib,json,os,shutil,subprocess,tempfile,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 FC=ROOT.parent/'制作Mod/03-街机模拟/PIQ-FC街机/alpha20-compact-vanilla-ui/piq_fc_arcade-0.31.0-alpha.20.jar'
 SFC=ROOT.parent/'制作Mod/03-街机模拟/PIQ-SFC家用/0.1.0-alpha.7/piq_sfc-0.1.0-alpha.7.jar'
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-MC=Path('C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
+JAVA=(java_home() / 'bin')
+MC=(gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
 def run(args):
     result=subprocess.run(list(map(str,args)),cwd=ROOT,capture_output=True,encoding='utf-8',errors='replace',timeout=60)
     if result.returncode:raise AssertionError(result.stdout+result.stderr)
@@ -14,7 +20,7 @@ def run(args):
 def main():
     sys.stdout.reconfigure(encoding='utf-8');p=argparse.ArgumentParser();p.add_argument('--report',required=True,type=Path);args=p.parse_args()
     if args.report.exists():raise ValueError('Refuse to overwrite prior evidence')
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[]
     manifest=json.loads((MC.parent.parent/'artifacts/minecraft_1.21.1_version_manifest.json').read_text())
     for lib in manifest['libraries']:
         parts=lib['name'].split(':')

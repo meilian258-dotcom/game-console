@@ -1,10 +1,16 @@
 """Bounded standalone Java21 tests/measurements; no Gradle, Minecraft, game directory or downloads."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse, hashlib, json, os, subprocess, tempfile, sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 HOME=ROOT.parent/'piq-sfc-home'
 RETRO=ROOT.parent/'piq-retro-platform'
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
+JAVA=(java_home() / 'bin')
 
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest().upper()
 def run(command,cwd):
@@ -18,7 +24,7 @@ def main():
     if args.report.exists():raise ValueError('Evidence report already exists')
     fc=ROOT.parent/'制作Mod/03-街机模拟/PIQ-FC街机/alpha20-compact-vanilla-ui/piq_fc_arcade-0.31.0-alpha.20.jar'
     sfc=ROOT.parent/'制作Mod/03-街机模拟/PIQ-SFC家用/0.1.0-alpha.8/piq_sfc-0.1.0-alpha.8.jar'
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2')]:
         deps.extend(p for p in (cache/group).rglob('*.jar') if version in p.parts and '-sources' not in p.name and '-javadoc' not in p.name)
     production=[RETRO/'src/main/java/cn/piq/retro/api'/n for n in ['RetroEmulator.java','RetroFrame.java']]

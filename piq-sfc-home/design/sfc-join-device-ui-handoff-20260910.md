@@ -1,6 +1,6 @@
-# SFC 家用双人申请与统一写卡界面交接
+# SFC 家用双人申请与统一写卡界面技术记录
 
-修改者：Codex 子代理 `/root/fix_sfc_av`；日期：2026-09-10。根代理统一版本、Gradle、最终包、维护手册与发布决定。本轮未安装、未改旧冻结交付物。
+日期：2026-09-10。本记录描述 SFC 双人申请与统一写卡界面；完整构建及最终包审计须另行完成。
 
 ## FC 原有体验核对
 
@@ -26,7 +26,7 @@
 
 SFC 主网络 registrar 从 2 升为 3；新增 `SfcJoinNetwork` 也使用 3。旧 Session/Ready/Input/Frames/ROM/Editor/Cover 的字段与 codec 不变；旧客户端不能与新服务端混用。新增 Offer / Allow / Approval / Decision / Capture / State / Upload / Applied / Result / ControllerInput。无模拟核心或本机库改动，无公共 FC 邀请接口改动。
 
-## 本代理生产修改名单
+## 生产修改名单
 
 修改：
 
@@ -45,7 +45,7 @@ SFC 主网络 registrar 从 2 升为 3；新增 `SfcJoinNetwork` 也使用 3。�
 - `client/SfcJoinClient.java`
 - `client/SfcJoinScreen.java`
 
-不含另一代理硬件 renderer / 模型资源工作。未修改版本/Gradle/注册物品/模拟核心/旧交付目录。
+不含硬件 renderer／模型资源变更。未修改版本/Gradle/注册物品/模拟核心/旧交付目录。
 
 ## 验证
 
@@ -54,13 +54,13 @@ SFC 主网络 registrar 从 2 升为 3；新增 `SfcJoinNetwork` 也使用 3。�
 3. `tools/check_sfc_join_packets.py --report <新路径>`：直接 javac 本轮 10 个 SFC 生产类及 2 个 FC 共享 UI 类，对真实 MC/NeoForge API 编译通过；生产 codec 37 项通过。通过真实 `NetworkRegistry.register` 注册生产 Upload codec，并调用真实 NeoForge 21.1.236 `ServerboundCustomPayloadPacket.STREAM_CODEC` 验证外层包，30 KiB 块 + 最宽 varint + 通道 ID 总计 **30856 B**，低于 32767。报告 `design/sfc-join-final-packets-20260910.json`。支持 `--jar <最终SFC包> --fc <最终FC包>` 仅编译 probe、直接验最终包。
 4. `tools/run_sfc_join_core_probe.py --report <新路径>`：两个同时存活的冻结 SFC6 `WasmSfcCore`，使用仓库原创 32 KiB 65816 诊断 ROM。P1 先跑 127 帧，导出 **1,294,513 B** 状态并通过当前 Gate 30 KiB 分片/哈希/身份门禁；P2 真实 loadState，然后继续 **240 帧**视频、音频与周期全状态一致；**792 断言**，比较 55,050,240 B 视频、383,368 个 PCM short。取消交易不改变 P1，P1 可以继续单独推进。报告 `design/sfc-live-join-final-two-core-20260910.json`。冻结核心 SHA `38FA46C5D283EAD9E1F6666D01398F495E2E1A3260A1517BE8EE959710963363` 不变。
 
-限制：以上不是 Minecraft 双客户端实机、不是保护插件实装联机测试，也未进行屏幕截图验收。真实核心探针证明 save/load 与后续帧连续性，但不直接执行 SfcPlayback 的游戏线程调度；游戏自身是否允许中途切换双人仍由该游戏决定。根代理应完整 Gradle check/jar 后再次用 `--jar` 跑协议外层探针。
+限制：以上不是 Minecraft 双客户端实机、不是保护插件实装联机测试，也未进行屏幕截图验收。真实核心探针证明 save/load 与后续帧连续性，但不直接执行 SfcPlayback 的游戏线程调度；游戏自身是否允许中途切换双人仍由该游戏决定。应完整 Gradle check/jar 后再次用 `--jar` 跑协议外层探针。
 
-状态：本代理范围生产已收口，交根代理整体编译/独立审计。后续只针对审查发现的缺陷做窄修复，并通知根代理。
+状态：局部生产源码完成；整体编译及独立成品审计仍待完成。
 
 ## 最终审查增补
 
-- 两个 Screen.init 已调用根代理新增的 `DeviceUi.prepare()`，仅共享安全合并 Modern UI 白名单，不覆盖未知配置。
+- 两个 Screen.init 已调用公共新增的 `DeviceUi.prepare()`，仅共享安全合并 Modern UI 白名单，不覆盖未知配置。
 - 修复原 SFC 全局 watchdog 把 P2 断流误当作整局故障的问题：P2 超时、超频、序号异常只释放 P2，P1 原局继续；P1 故障仍终止全局。`SfcInputHealth.expiredPort(int,long)` 公开只读查询，旧 `expired(long,boolean)` 保持兼容，重新批准 P2 后健康与 P2 序号重置。
 - 最新窄套变为 **24 项全部通过**：9 Gate、9 分端口健康、2 实际布局、4 接线契约。新报告 `design/sfc-join-final-p2-health-20260910.json`，不覆盖前面旧证据。
-- 最终纯 JAR 探针已提供 `piq-fc-arcade/tools/probes/Alpha18SfcJoinProbe.java`（package `cn.piq.sfchome.server`）；仅编译探针，通过 CodeSource 校验 SfcJoinGate/Phase 来自传入最终包，检查身份、批准、分片、摘要、两级超时、一次提交、取消；不启动 MC 或核心。根代理的独立审计负责调用。
+- 最终纯 JAR 探针已提供 `piq-fc-arcade/tools/probes/Alpha18SfcJoinProbe.java`（package `cn.piq.sfchome.server`）；仅编译探针，通过 CodeSource 校验 SfcJoinGate/Phase 来自传入最终包，检查身份、批准、分片、摘要、两级超时、一次提交、取消；不启动 MC 或核心。独立成品审计时调用。

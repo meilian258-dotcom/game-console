@@ -1,6 +1,6 @@
-# SFC17 physical controller handoff (2026-09-11)
+# SFC17 physical controller technical notes (2026-09-11)
 
-Owner: `/root/sfc_cabinet_provider`. Root owns versions, common APIs, lights/audio, packaging and the maintenance handbook. No user instance, saves, ROMs or delivered packages modified.
+Scope: SFC controller input and cable integration. Game instances, saves, ROMs and previously delivered packages remain unchanged.
 
 ## Behavior
 
@@ -21,9 +21,9 @@ All paths relative to `piq-sfc-home/src/main/java/cn/piq/sfchome/`:
 4. `client/SfcHomeClient.java`: only `ownsController()` adds the same console range gate; no background Host/watch distance changes.
 5. `world/SfcHomeConsoleBlockEntity.java`: visual-only player/lease UUID arrays, `controllerVisualPlayer(int)`/`controllerVisualLease(int)` getters, atomic `setControllerVisual`, existing NBT/updateTag transport; loaded server leases reset as before. The old setter's true semantics retained; false clears receipts.
 
-No new production classes. Allow these five class stems (and their already-existing nested classes). This does **not** include root/other-agent renderer changes. No model, PNG, render geometry, network, core, backup or UI class changed in SFC by this agent.
+No new production classes. Allow these five class stems and their existing nested classes; renderer changes require a separate audit. No model, PNG, render geometry, network, core, backup or UI class is changed by this patch.
 
-Visual receipts never authorize server input. Root's public inherited `visualPowered()` supplies the separate running light. Cable adapter is owned by `/root/cabinet_reuse_review`.
+Visual receipts never authorize server input. The public inherited `visualPowered()` supplies the separate running light; cable rendering uses the shared cable adapter.
 
 Actual controller-plug cable-end anchors in unrotated 1/16-block model units after the existing 1.5 scale:
 
@@ -33,11 +33,11 @@ Actual controller-plug cable-end anchors in unrotated 1/16-block model units aft
 
 ## Validation
 
-- Full SFC `gradlew.bat --offline check jar`: **309 tests, 0 failed/errors/skipped**, exit 0. Thin17 SHA256 `0706ACAF42F2D496D5364443191826FE6E71213097B19D12395A6084487DF94A` (development build, root will merge/freeze final).
+- Full SFC `gradlew.bat --offline check jar`: **309 tests, 0 failed/errors/skipped**, exit 0. Thin17 SHA256 `0706ACAF42F2D496D5364443191826FE6E71213097B19D12395A6084487DF94A` (development build, final merged-package verification is still required).
 - `tools/check_sfc_controller_cable.py`: 35 real pure-policy/queue/source-wiring tests, `design/controller-cable29-pure-v1.json`. This was the initial range-only source checkpoint, before the subsequently tested offline-loan change.
 - New `SfcOfflineControllerSourceTest` adds 7 wiring checks; updated `SfcJoinSourceTest` preserves candidate-runtime/budget/Host-frame safety while matching the explicitly requested physical-loan retention.
 - `tools/check_sfc_controller_receipts.py --fc ../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.29.jar --sfc build/libs/piq_sfc_home-0.1.0-alpha.17.jar --report design/controller-receipts29-actual-v1.json`: **2007 assertions**, actual NeoForge registration, real SFC item type (no substituted holder), actual ItemStack copy/cursor/Slot aliases and precise revocation, BE UUID NBT/updateTag roundtrip, actual client grant gate across shutdown/new sessions. Probe only was compiled; production loaded from input JAR with CodeSource checks. Full input paths/hashes recorded, inputs unchanged.
-- Real API probes do **not** start a Minecraft world, player, permission-plugin environment or network socket. They do not claim to execute full server `claim/stop/release` world transitions; those integration paths also have compiled source wiring guards. Existing dual-worker/Watch final-JAR regression may be rerun by root after final merge.
+- Real API probes do **not** start a Minecraft world, player, permission-plugin environment or network socket. They do not claim to execute full server `claim/stop/release` world transitions; those integration paths also have compiled source wiring guards. Existing dual-worker/Watch final-JAR regression may be rerun after final merge.
 
 ## Added/updated QA files
 

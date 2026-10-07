@@ -1,4 +1,10 @@
 """Run the same actual-MC probe against frozen alpha13 and current/new packaged consumer."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse
 import hashlib
 import json
@@ -11,9 +17,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DELIVERY = ROOT.parent / "制作Mod/03-街机模拟/PIQ-FC街机"
 OLD = DELIVERY / "piq_fc_arcade-0.31.0-alpha.13.jar"
 OLD_SHA = "681D1BE79DD87B67D64034FAE18CC022E942F6C6887E335A5CB70C05C87D2342"
-JAVA = Path("C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin")
-MC = Path("C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar")
-JOML = Path("C:/Users/13498/.gradle/caches/modules-2/files-2.1/org.joml/joml/1.10.5/22566d58af70ad3d72308bab63b8339906deb649/joml-1.10.5.jar")
+JAVA = (java_home() / 'bin')
+MC = (gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
+JOML = (gradle_home() / 'caches/modules-2/files-2.1/org.joml/joml/1.10.5/22566d58af70ad3d72308bab63b8339906deb649/joml-1.10.5.jar')
 PROBE = ROOT / "tools/qa/HomeVideoAspectProbe.java"
 
 def sha(path):

@@ -37,7 +37,7 @@
             }
           ],
           "module_name": "piq_fc_arcade",
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\alpha19-fml-fixture-x6q4zpj7\\fc-metadata-fixture.jar",
+          "jar": "<temp-dir>/alpha19-fml-fixture-x6q4zpj7\\fc-metadata-fixture.jar",
           "scanned_classes": 1175,
           "entry_points": [
             "piq_fc_arcade"
@@ -109,7 +109,7 @@
             }
           ],
           "module_name": "piq_sfc_arcade",
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\alpha19-fml-fixture-x6q4zpj7\\sfc-metadata-fixture.jar",
+          "jar": "<temp-dir>/alpha19-fml-fixture-x6q4zpj7\\sfc-metadata-fixture.jar",
           "scanned_classes": 170,
           "entry_points": [
             "piq_sfc_arcade",
@@ -148,7 +148,7 @@
             }
           ],
           "module_name": "piq_native_arcade",
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\alpha19-fml-fixture-x6q4zpj7\\native-metadata-fixture.jar",
+          "jar": "<temp-dir>/alpha19-fml-fixture-x6q4zpj7\\native-metadata-fixture.jar",
           "scanned_classes": 41,
           "entry_points": [
             "piq_native_arcade"

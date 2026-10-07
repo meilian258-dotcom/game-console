@@ -1,7 +1,7 @@
-# SFC compact cartridge workbench handoff
+# SFC compact cartridge workbench technical notes
 
-- Author: `/root/fix_sfc_av`, 2026-09-10; root merges this into the shared maintenance manual.
-- User scope: compact centered vanilla-style device UI, matching FC/SFC cartridge workbenches. No version, build configuration, server, network, emulator, model, packaging or installation change by this agent.
+- Date: 2026-09-10. Scope: compact SFC workbench UI.
+- User scope: compact centered vanilla-style device UI, matching FC/SFC cartridge workbenches. No version, build configuration, server, network, emulator, model, packaging or installation change by this patch.
 
 ## Production delta
 
@@ -21,7 +21,7 @@
 - Actual MC 1.21.1/NeoForge API local javac compilation succeeded without Gradle. The pure suite passed 36 tests (25 existing plus 11 new).
 - Compared the compiled screen with the exact frozen merged SFC6 JAR: 21 non-UI methods preserve instructions, including authorization, send, import/write transactions, update/tick, cleanup and close. UI methods and the explicitly directory-parameterized scan entry were excluded, not silently declared unchanged.
 - Exclusive report: `design/sfc-compact-workbench-validation-20260910.json`; includes source hashes and method count.
-- Production frozen for root integration. Root owns shared DeviceUi/layout and final Gradle/packaging/version decisions.
+- Production code is ready for integration; shared DeviceUi/layout changes and final Gradle/package validation remain separate.
 
 ## Limitations
 

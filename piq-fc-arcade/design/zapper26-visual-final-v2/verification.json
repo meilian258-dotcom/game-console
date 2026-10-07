@@ -2,7 +2,7 @@
   "ok": true,
   "schema": "piq-zapper-visual26-1",
   "mode": "final-jar-only",
-  "jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
+  "jar": "piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
   "sha256": "74E16FEF0F69C88191C0A64DA4FCCDEFD2F3B18B231FC56C97839E60B885FBE5",
   "production_compiled": false,
   "production_sources_compiled_only_pure": false,

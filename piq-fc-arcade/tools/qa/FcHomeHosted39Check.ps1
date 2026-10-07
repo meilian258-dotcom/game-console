@@ -1,5 +1,14 @@
-param([string]$Jdk='C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot', [string]$GradleCache='C:/Users/13498/.gradle/caches')
+param([string]$Jdk='', [string]$GradleCache='')
 $ErrorActionPreference='Stop'
+if (-not $Jdk) {
+    if ($env:JAVA_HOME) { $Jdk = $env:JAVA_HOME }
+    else { $Jdk = Split-Path -Parent (Split-Path -Parent (Get-Command javac -ErrorAction Stop).Source) }
+}
+if (-not (Test-Path -LiteralPath (Join-Path $Jdk 'bin/javac.exe'))) { throw 'JDK 21 not found; set -Jdk or JAVA_HOME.' }
+if (-not $GradleCache) {
+    $toolGradleHome = if ($env:GRADLE_USER_HOME) { $env:GRADLE_USER_HOME } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) '.gradle' }
+    $GradleCache = Join-Path $toolGradleHome 'caches'
+}
 $fcProject=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $fcOutput=Join-Path ([IO.Path]::GetTempPath()) ('piq-fc-home39-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $fcOutput | Out-Null

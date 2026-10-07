@@ -11,7 +11,7 @@
   "testsFailed": 0,
   "testsSkipped": 0,
   "testDurationMillis": 4493,
-  "classOutput": "C:/Users/13498/AppData/Local/Temp/piq-fc-home39-edf20dd816ef4fa2868bf3c944b54e02",
+  "classOutput": "<temp-dir>/piq-fc-home39-edf20dd816ef4fa2868bf3c944b54e02",
   "sourceSha256": {
     "server/FcHomeHostedNetwork.java": "17CBCC69343AF10CF067D5F9A0B7BB362ABFDFA40BE1512A4E71CF8D0C09F5FD",
     "server/FcHomeHostedRun.java": "C0CEE5244FBBD78E92857ECAB9159588D85FBFFC93D8B93C18EC65A7F580241F",

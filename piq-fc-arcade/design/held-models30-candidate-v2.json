@@ -6,21 +6,21 @@
   "compiled_only_probe": true,
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.30.jar",
+      "path": "piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.30.jar",
       "sha256": "32F96C167698ED90F6A8F0B289B5ED57AC086AD6651EFCD8AF45983BE78CDD77"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-sfc-home\\build\\libs\\piq_sfc_home-0.1.0-alpha.18.jar",
+      "path": "piq-sfc-home\\build\\libs\\piq_sfc_home-0.1.0-alpha.18.jar",
       "sha256": "320737C0DD74CD6A99C1D9AFE3C1676C3C9AE7EA3F7B637EEDA453511DB5B478"
     }
   },
   "baseline_jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-appliance29-v1\\piq_fc_arcade-0.31.0-alpha.29.jar",
+      "path": "piq-fc-arcade\\build\\review-appliance29-v1\\piq_fc_arcade-0.31.0-alpha.29.jar",
       "sha256": "80FD1512F69CCEB192EF78C02D5A3893924C835B322FC8CF9AF441FEB4B833C2"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-appliance29-v1\\piq_sfc-0.1.0-alpha.17.jar",
+      "path": "piq-fc-arcade\\build\\review-appliance29-v1\\piq_sfc-0.1.0-alpha.17.jar",
       "sha256": "9D033CDF969E53F7642C7AC52C69065231D497FF51A134C3DF952095B2971D2E"
     }
   },

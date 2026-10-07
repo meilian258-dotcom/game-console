@@ -1,4 +1,10 @@
 """Pure Java six-cell ownership/geometry and real inherited model QA. No Gradle or emulator."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 from pathlib import Path
 import argparse,hashlib,io,json,subprocess,sys,tempfile
 ROOT=Path(__file__).resolve().parents[1];FC=ROOT.parent/'piq-fc-arcade'
@@ -8,7 +14,7 @@ from PIL import Image,ImageDraw,ImageFont
 from render_rocket_arcade_preview import collect_quads,Quad,render_view
 from check_controller_pose_pipeline import rotation,translation,scale,points
 from import_subor_hardware import write_new
-JDK=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
+JDK=(java_home() / 'bin')
 OUT=ROOT.parent/'制作Mod/03-街机模拟/PIQ原生街机/原生机柜模块-alpha1/六格结构QA-v2'
 MODEL=FC/'src/main/resources/assets/piq_fc_arcade/models/block/dual_arcade_body.json'
 TEXTURE=FC/'src/main/resources/assets/piq_fc_arcade/textures/block/rocket_arcade_skin.png'
@@ -16,7 +22,7 @@ EXPECTED_MODEL='E7F0150F1E75C2DCA5D19549F8479579D4794A39F1198E718D297CEC74B1BEB8
 EXPECTED_TEXTURE='789512ED7F867C015C6666D40809845DE430E85834CCF7BA4E48BCA57DE815E8'
 def sha(b):return hashlib.sha256(b).hexdigest().upper()
 def java_tests():
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
+    cache=(gradle_home() / 'caches/modules-2/files-2.1')
     jars=[next(cache.glob(p)) for p in ('org.junit.jupiter/junit-jupiter-api/5.13.4/*/*.jar','org.junit.platform/junit-platform-commons/1.13.4/*/*.jar','org.opentest4j/opentest4j/1.3.0/*/*.jar','org.apiguardian/apiguardian-api/1.1.2/*/*.jar')]
     sources=[FC/'src/main/java/cn/piq/fcarcade/layout'/n for n in ('RocketArcadeGeometry.java','DualCabinetGeometry.java','ScreenAspectFit.java')]
     sources+=[FC/'src/main/java/cn/piq/fcarcade/world/DualCabinetFootprint.java']

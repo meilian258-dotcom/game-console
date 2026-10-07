@@ -4,15 +4,15 @@
   "production_compiled": false,
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_fc_arcade-0.31.0-alpha.21.jar",
+      "path": "piq-fc-arcade\\build\\review-linked21-v1\\piq_fc_arcade-0.31.0-alpha.21.jar",
       "sha256": "0147D49C542E82DDF2DD37CDAFFBDB135CDA20E11907B4060B471A2FBC0D3F93"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_sfc-0.1.0-alpha.9.jar",
+      "path": "piq-fc-arcade\\build\\review-linked21-v1\\piq_sfc-0.1.0-alpha.9.jar",
       "sha256": "F951146515D7F35257585A9DA7536453F1DFFA70285F51EDD612D65C771DF951"
     },
     "native": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+      "path": "piq-fc-arcade\\build\\review-linked21-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
       "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A"
     }
   },
@@ -322,7 +322,7 @@
             "piq_fc_arcade"
           ],
           "scanned_classes": 1254,
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\fc.jar",
+          "jar": "<temp-dir>/piq-alpha19-compat-0sudpc8p\\fc.jar",
           "module_name": "piq_fc_arcade",
           "mods": [
             {
@@ -361,7 +361,7 @@
             "piq_sfc_home"
           ],
           "scanned_classes": 183,
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\sfc.jar",
+          "jar": "<temp-dir>/piq-alpha19-compat-0sudpc8p\\sfc.jar",
           "module_name": "piq_sfc_arcade",
           "mods": [
             {
@@ -433,7 +433,7 @@
             "piq_native_arcade"
           ],
           "scanned_classes": 42,
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\native.jar",
+          "jar": "<temp-dir>/piq-alpha19-compat-0sudpc8p\\native.jar",
           "module_name": "piq_native_arcade",
           "mods": [
             {
@@ -478,22 +478,22 @@
     },
     "hash_checked_temporary_copies": {
       "fc": {
-        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_fc_arcade-0.31.0-alpha.21.jar",
-        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\fc.jar",
+        "original": "piq-fc-arcade\\build\\review-linked21-v1\\piq_fc_arcade-0.31.0-alpha.21.jar",
+        "temporary_probe_copy": "<temp-dir>/piq-alpha19-compat-0sudpc8p\\fc.jar",
         "sha256": "0147D49C542E82DDF2DD37CDAFFBDB135CDA20E11907B4060B471A2FBC0D3F93",
         "byte_identical_before": true,
         "byte_identical_after": true
       },
       "sfc": {
-        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_sfc-0.1.0-alpha.9.jar",
-        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\sfc.jar",
+        "original": "piq-fc-arcade\\build\\review-linked21-v1\\piq_sfc-0.1.0-alpha.9.jar",
+        "temporary_probe_copy": "<temp-dir>/piq-alpha19-compat-0sudpc8p\\sfc.jar",
         "sha256": "F951146515D7F35257585A9DA7536453F1DFFA70285F51EDD612D65C771DF951",
         "byte_identical_before": true,
         "byte_identical_after": true
       },
       "native": {
-        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
-        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-0sudpc8p\\native.jar",
+        "original": "piq-fc-arcade\\build\\review-linked21-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+        "temporary_probe_copy": "<temp-dir>/piq-alpha19-compat-0sudpc8p\\native.jar",
         "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A",
         "byte_identical_before": true,
         "byte_identical_after": true

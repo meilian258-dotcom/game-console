@@ -14,13 +14,13 @@
   },
   "old_sfc_jar_sha256": "38FA46C5D283EAD9E1F6666D01398F495E2E1A3260A1517BE8EE959710963363",
   "production_source_sha256": {
-    "G:\\服务器\\服务器Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcCoreLease.java": "5801FF96414544B84C409FAE09A186E0169D620334851B76E047EA382AB3F0B8",
-    "G:\\服务器\\服务器Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetInputs.java": "53B9903DD517596C44B63AF4F1D52C114AE542A94AC9A5227C60FA9C4EDB7193",
-    "G:\\服务器\\服务器Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetFrames.java": "A13F9827DFB8CB03398C8C6474595D670D54E576E88B078CB7DC83A1BA0B2EB4",
-    "G:\\服务器\\服务器Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetRom.java": "2755B1C8AF2105B51623AE5A796640D6485798A40C5BB51C53CB35A4046FFCF2",
-    "G:\\服务器\\服务器Codex\\piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetSession.java": "A358B143DE36568958078F198B9641C68FFACA9CDD9C0995F1F52A7775918B51",
-    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetFrame.java": "8FA1B7829E562FB74C0DF2A9C25012256681F79D52F6BA1FCB5FF833A2BF6B64",
-    "G:\\服务器\\服务器Codex\\piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetEmulator.java": "EC2584D477113A9DC4707A83533C6CB84B4EF323576B363373CEFDF2DBEE77FB"
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\SfcCoreLease.java": "5801FF96414544B84C409FAE09A186E0169D620334851B76E047EA382AB3F0B8",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetInputs.java": "53B9903DD517596C44B63AF4F1D52C114AE542A94AC9A5227C60FA9C4EDB7193",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetFrames.java": "A13F9827DFB8CB03398C8C6474595D670D54E576E88B078CB7DC83A1BA0B2EB4",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetRom.java": "2755B1C8AF2105B51623AE5A796640D6485798A40C5BB51C53CB35A4046FFCF2",
+    "piq-sfc-home\\src\\main\\java\\cn\\piq\\sfchome\\client\\cabinet\\SfcCabinetSession.java": "A358B143DE36568958078F198B9641C68FFACA9CDD9C0995F1F52A7775918B51",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetFrame.java": "8FA1B7829E562FB74C0DF2A9C25012256681F79D52F6BA1FCB5FF833A2BF6B64",
+    "piq-fc-arcade\\src\\main\\java\\cn\\piq\\fcarcade\\cabinet\\CabinetEmulator.java": "EC2584D477113A9DC4707A83533C6CB84B4EF323576B363373CEFDF2DBEE77FB"
   },
   "limits": [
     "No commercial ROM or Minecraft scene tested.",

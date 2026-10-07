@@ -9,14 +9,14 @@
     "ok": true,
     "minecraft_or_core_started": false,
     "production_classes": {
-      "SfcHardwareMeshData": "G:\\������\\������Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
-      "SfcControllerPoseLayout": "G:\\������\\������Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
-      "SfcButtonAnimation": "G:\\������\\������Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
-      "SfcCoverGeometry": "G:\\������\\������Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
-      "SfcAvCableGeometry": "G:\\������\\������Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar"
+      "SfcHardwareMeshData": "piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+      "SfcControllerPoseLayout": "piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+      "SfcButtonAnimation": "piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+      "SfcCoverGeometry": "piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+      "SfcAvCableGeometry": "piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar"
     }
   },
-  "final_jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
+  "final_jar": "piq-fc-arcade\\build\\review-user-models22-v1\\piq_sfc-0.1.0-alpha.10.jar",
   "final_jar_sha256": "A5892700D043D51A890E59D5EC57F3E34F9F828A49EED92BE1DA759C5782F882",
   "mesh_from_jar_sha256": "4B944A5A98CF926A38092BCDF3B8FA5E8D1B07631B116E554E7DD551B4D80E64",
   "compiled_test_probe_classes": [

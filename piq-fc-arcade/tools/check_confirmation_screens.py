@@ -3,6 +3,12 @@
 Does not instantiate Minecraft, render a frame, alter ModernUI configuration or build any core.
 """
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse
 import hashlib
 import json
@@ -15,8 +21,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKSPACE = ROOT.parent
-JAVA = Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-MC = Path('C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
+JAVA = (java_home() / 'bin')
+MC = (gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
 FC = WORKSPACE / '制作Mod/03-街机模拟/PIQ-FC街机/alpha18-device-ui-v2/piq_fc_arcade-0.31.0-alpha.18.jar'
 SFC = WORKSPACE / '制作Mod/03-街机模拟/PIQ-SFC家用/0.1.0-alpha.5/piq_sfc_home-0.1.0-alpha.5.jar'
 SOURCES = {
@@ -69,7 +75,7 @@ def main():
     if args.report:
         args.report.resolve().relative_to(WORKSPACE.resolve())
         require(not args.report.exists(), 'Do not overwrite a previous report')
-    cache = Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
+    cache = (gradle_home() / 'caches/modules-2/files-2.1')
     dependencies = [p for p in cache.rglob('*.jar') if not any(s in p.name for s in ('-sources', '-javadoc', '-userdev'))]
     checked = {}; preserved = {}
     with tempfile.TemporaryDirectory(prefix='piq-confirmation-order-') as td:

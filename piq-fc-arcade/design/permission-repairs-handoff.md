@@ -1,6 +1,6 @@
 # FC 权限与存档保护修复交接（2026-09-13）
 
-负责人：`/root/fix_sfc_av`。本文件供 root 统一记入维护手册、构建及最终验包；不是安装或发布记录。
+本文为权限修复的历史实现与验证记录。
 
 ## 修复范围
 
@@ -34,20 +34,20 @@
 
 最新源预检：`design/permission-repairs-source-v2.json`，SHA-256 `014B4D63F901E169275BA629E80ED8C8762D7E35E5F6B953B670E06A1CBEF50E`。**32 项真实 JUnit 测试通过，47 项真实编译 class 接线断言通过**。只定向编译四个授权生产源并链接真实 Minecraft／NeoForge API；未运行 Gradle 或启动 Minecraft。报告的 `production_compiled=true` 明确表示本轮是源预检，不冒充最终 JAR。
 
-迁移回归实际使用临时目录中的合成存档，检查源字节与 mtime 保留、活动空槽、回调期间新占用、正常迁移及原四遗留档场景。旧冻结 FC33 缺陷复现保留于 `outputs/mod-audit-20260913/fc/migration-diagnostic.json`，没有覆盖旧证据。权限测试使用可控回调，AV 测试执行真实 `HomeLinkLedger`；ASM 另核对实际生产入口、事实重验及权限事件接线。
+迁移回归实际使用临时目录中的合成存档，检查源字节与 mtime 保留、活动空槽、回调期间新占用、正常迁移及原四遗留档场景。权限测试使用可控回调，AV 测试执行真实 `HomeLinkLedger`；ASM 另核对实际生产入口、事实重验及权限事件接线。
 
-最终 JAR 复验命令（由 root 提供新冻结包，**不传 `--source`**）：
+最终 JAR 复验命令（提供新冻结包，**不传 `--source`**）：
 
 ```powershell
-& 'C:/Users/13498/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' tools/check_fc_permission_repairs.py --fc '<最终 FC JAR>' --report '<新的 final 报告路径>'
+python tools/check_fc_permission_repairs.py --fc '<最终 FC JAR>' --report '<新的 final 报告路径>'
 ```
 
 工作目录 `piq-fc-arcade`。工具最终模式只编 QA；报告 `mode=final-jar-only`、`production_compiled=false`，并绑定给定 JAR 的准确路径／SHA。已有报告不覆盖。
 
 ## 边界与后续
 
-- 已完成授权源／定向测试，可以由 root 统一全量构建。本组件生产和测试现冻结。
+- 已完成授权源／定向测试，可以统一全量构建。本组件生产和测试现冻结。
 - 未启动实际 Minecraft 世界／领地插件，未实际派发世界事件；不能以 ASM 和纯回调测试代替实服兼容验证。
 - 手动 AV 断线需要另一端已加载且当前有权限；不会为此强加载区块。区块卸载／设备移除等原有生命周期清理保持独立，玩家回收操作在两端可核验后进行。
 - 原始不含 BE 的旧块没有可保存的硬件 UUID；对其保护的是原块状态、结构和精确当前位置事实，不能声称新增了世界持久身份格式。
-- 此次未读取／修改用户 ROM 或存档，未安装、上传、发布或改变冻结 FC33 成品。根维护手册由 root 统一留痕。
+- 此次未读取／修改用户 ROM 或存档，未安装、上传、发布或改变冻结 FC33 成品。

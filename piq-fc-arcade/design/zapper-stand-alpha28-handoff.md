@@ -1,6 +1,6 @@
 # alpha28 光枪支架交接
 
-修改者：cabinet_reuse_review；2026-09-11。仅本地源码/验证，不安装，不改原模型或已交付包。根维护手册由 root 合并记录。
+仅本地源码/验证，不安装，不改原模型或已交付包。
 
 ## 用户操作
 
@@ -49,13 +49,13 @@
 | assets/piq_fc_arcade/blockstates/zapper_stand.json | E59C837E7E30E3C455005616AE2E0DCF086ABB4375456A791F51B75B72261C95 |
 | data/piq_fc_arcade/loot_table/blocks/zapper_stand.json | 0343F2ED72A2789DF1533DA87F98882CACA519E71B7158504AA1322C8B8D5210 |
 
-语言 21 项由 `design/zapper-stand28-lang.json` 交给 root 合入共享语言，未自行编辑共享文件。
+语言 21 项由 `design/zapper-stand28-lang.json` 用于共享语言集成。
 
 ## 验证 / 边界
 
 - `ZapperStandTest` 14 项：原对象转移、精确 receipt、旧 loan 拒绝、借出拆除不掉替身、存放拆除仅一次、持久化双所有权拒绝、连接一对一/16 格/128 对、BlockPos 有符号 12 位 Y 边界。
 - `ZapperStandGeometryTest` 4 项：原尺寸、四朝向、动态线 8–64 段、端点、有限坐标/最大跨度。
-- `tools/check_zapper_stand28.py --fc <jar> --report <new-path>`：只编译 tests/probes，真实成品类运行，逐字节检查七资产；`ZapperStandDataProbe` 真实 Minecraft SavedData/NBT 往返、畸形字段、512 行扫描与 128 对容量；`ZapperStandVisualProbe` 真实 MC ItemTransform 解析 + PoseStack 图标边界/原元素比较。最终候选报告待 root 冻结路径后运行。
+- `tools/check_zapper_stand28.py --fc <jar> --report <new-path>`：只编译 tests/probes，真实成品类运行，逐字节检查七资产；`ZapperStandDataProbe` 真实 Minecraft SavedData/NBT 往返、畸形字段、512 行扫描与 128 对容量；`ZapperStandVisualProbe` 真实 MC ItemTransform 解析 + PoseStack 图标边界/原元素比较。最终候选报告待最终候选固定后运行。
 - `design/zapper-stand28-preview-v2/stand-preview.png` 已实际查看：放回/取走没有重复枪，空架保留，原 UV 正常。是离线代码资产预览，不是 Minecraft 截图。
 
 动态连线是有界视觉绳段，不做碰撞/实体绳物理；借出端用当前玩家主手位置近似，不宣称第三人称每个骨骼点精确贴合。未知/不在主手时不画悬空到错误物体的线。连接端按主机已有插口坐标放置原插头。

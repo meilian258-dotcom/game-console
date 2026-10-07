@@ -1,6 +1,6 @@
 # SFC 家用接入统一键盘与操作模式
 
-修改者：Codex / sfc_cabinet_provider；2026-09-11。仅本地源码与离线测试，根维护记录由 root 合并。
+日期：2026-09-11。范围：源码与离线输入测试。
 
 ## 生产范围
 
@@ -24,4 +24,4 @@
 - 原有输入队列/心跳/邀请状态/发送合同另跑 41 项通过，报告 `design/unified-controls-sfc-network-v1.json`；与上述 25 项有发送策略测试重叠，不把两者直接当成独立新增数量。
 - 可复现：`tools/check_sfc_unified_input.py --report <新的报告路径>`；首轮报告为 `design/unified-controls-sfc-v1.json`，包含生产/测试源码 SHA。
 - 行为测试执行实际共享纯 Java 键盘状态和 SFC 焦点/发送策略；宿主生命周期部分是源合同检查。不是 GLFW 实体按键注入、Minecraft 客户端或真人联机实测。
-- 完整 SFC check 等待包含共享 API 的新 FC 依赖，由 root 协调；本记录不提前宣称完整构建成功。
+- 完整 SFC check 等待包含共享 API 的新 FC 依赖，本记录不提前宣称完整构建成功。

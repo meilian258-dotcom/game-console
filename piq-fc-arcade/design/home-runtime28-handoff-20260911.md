@@ -1,6 +1,6 @@
 # FC alpha28：家用电源与输入租约分离
 
-修改者：`/root/fix_sfc_av`；日期：2026-09-11。根维护手册、版本、冻结和交付由主代理汇总。本子任务不安装、不启动 Minecraft、不操作用户 ROM/存档或服务器。
+日期：2026-09-11。该项不安装、不启动 Minecraft、不操作用户 ROM/存档或服务器。
 
 ## 接口与职责
 
@@ -33,7 +33,7 @@ FC 网络版本 **33**，不与旧 32 混连。新增 C2S `ArcadeHomeInputPayloa
 
 普通电源读取/保存原 `machineKey(dimension, TV anchor, LOCKSTEP)`，光枪保持 `core|variantNamespace|player|hostUUID|machineKey` 隔离；只写当前 session.saveKey。旧个人槽选择、封存和存储实现未改，开电源不自动选择个人槽、不覆盖其 key。保存仅有服务端最近确认 snapshot，不宣称拔电能保存未确认最后一帧。
 
-## 本子任务生产范围
+## 该项生产范围
 
 新增：`home/HomeRuntimeAuthority`（含 `Control`）、`home/HomeConsoleRuntime`、`ArcadeHomeInputPayload`、`ArcadeHomeReadyPayload`。
 
@@ -62,4 +62,4 @@ python tools/check_home_runtime28.py --fc <final-fc28.jar> --report <new-report.
 - frame 90 snapshot 导入另一真实 worker，后 60 帧 RGBA / PCM / CPU RAM / 输入逐帧一致；显式 reset 各重建一次并拒旧 epoch。
 - 实际 NeoForge 注册与完整 outer packet codec：1261 断言，14 包，最大 143 bytes；协议 33、方向、租约、token、所有截断长度拒绝。
 
-限制：没有启动真实 Minecraft 世界/服务器/socket；没有执行完整容器/保护插件/按钮或 GUI 实机交互。探针是实际 worker/核心/codec 加真实纯授权状态协调，不伪称完整联机实测。根代理负责完整 Gradle、最终冻结与成包证据。当前生产可统一重构建，最终报告另新增，不覆盖候选报告。
+限制：没有启动真实 Minecraft 世界/服务器/socket；没有执行完整容器/保护插件/按钮或 GUI 实机交互。探针是实际 worker/核心/codec 加真实纯授权状态协调，不伪称完整联机实测。负责完整 Gradle、最终冻结与成包证据。当前生产可统一重构建，最终报告另新增，不覆盖候选报告。

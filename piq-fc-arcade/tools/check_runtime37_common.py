@@ -1,4 +1,10 @@
 """Compile only two fixture test classes and a launcher against a supplied final FC37 JAR."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse
 import hashlib
 import json
@@ -19,7 +25,7 @@ def digest(path):
 
 
 def junit_dependencies():
-    cache = Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
+    cache = (gradle_home() / 'caches/modules-2/files-2.1')
     specifications = [
         ('org.junit.jupiter', 'junit-jupiter-api', '5.13.4'),
         ('org.junit.jupiter', 'junit-jupiter-engine', '5.13.4'),

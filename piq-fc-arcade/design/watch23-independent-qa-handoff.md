@@ -1,7 +1,5 @@
 # FC23 automatic spectator independent QA
 
-Author: `/root/fix_sfc_av`; 2026-09-11. Root integrates maintenance-manual record.
-
 ## Scope
 
 No production, model, version, installation, ROM or frozen delivery changes. Added:
@@ -11,7 +9,7 @@ No production, model, version, installation, ROM or frozen delivery changes. Add
 - `tools/qa/Watch23WireProbe.java` — real production registration, real NeoForge outer codecs, actual Connection/EmbeddedChannel write completion, source-connection queued dispatch.
 - `tools/check_watch23_independent.py` — compiles tests/probe only against explicit compiled classes or an explicit final JAR; exclusive report creation and artifact hashes checked before/after.
 
-Runner additionally includes root's 2 `WatchMediaStreamTest` and 5 `WatchLeaseStateTest` cases (34 total). Earlier source reports are retained. The final invocation must use `--jar` and a new report path; `--classes` reports are not final-package evidence.
+Runner additionally includes 2 `WatchMediaStreamTest` and 5 `WatchLeaseStateTest` cases (34 total). Earlier source reports are retained. The final invocation must use `--jar` and a new report path; `--classes` reports are not final-package evidence.
 
 ## Concrete review findings
 

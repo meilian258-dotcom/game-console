@@ -533,7 +533,7 @@
   },
   "previews": [
     {
-      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\user-models-20260911\\dual-integration-qa-v3\\front.png",
+      "file": "piq-fc-arcade\\design\\user-models-20260911\\dual-integration-qa-v3\\front.png",
       "sha256": "8C81C1490E6841BE7FA6FD55FD105B9C1C00E98EB0C57B070624E80C397DEEB8",
       "camera_from_center": [
         0.0,
@@ -544,7 +544,7 @@
       "sampling": "nearest texel at pixel center; Lanczos supersample resolve"
     },
     {
-      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\user-models-20260911\\dual-integration-qa-v3\\front-angle.png",
+      "file": "piq-fc-arcade\\design\\user-models-20260911\\dual-integration-qa-v3\\front-angle.png",
       "sha256": "FFDFCA240CBF71D59806F1D3E9A634AB494DF5E20CF4FF1DCEC4FFA2CEA35A37",
       "camera_from_center": [
         0.5515413083678437,
@@ -555,7 +555,7 @@
       "sampling": "nearest texel at pixel center; Lanczos supersample resolve"
     },
     {
-      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\user-models-20260911\\dual-integration-qa-v3\\rear-angle.png",
+      "file": "piq-fc-arcade\\design\\user-models-20260911\\dual-integration-qa-v3\\rear-angle.png",
       "sha256": "926EDBB0D19239879DE61777F114A01D165B96A7911C6FD0D33265DC4614906A",
       "camera_from_center": [
         -0.5942283606769104,
@@ -566,7 +566,7 @@
       "sampling": "nearest texel at pixel center; Lanczos supersample resolve"
     },
     {
-      "file": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\user-models-20260911\\dual-integration-qa-v3\\controls.png",
+      "file": "piq-fc-arcade\\design\\user-models-20260911\\dual-integration-qa-v3\\controls.png",
       "sha256": "35D9D1EA65D63779F040E8E6BC2217F3F13B4D09718ACA64A2D90699DFD3504D",
       "camera_from_center": [
         0.28066816183499277,

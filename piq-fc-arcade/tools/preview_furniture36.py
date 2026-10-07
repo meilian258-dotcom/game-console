@@ -6,6 +6,12 @@ claims of in-game or resource-pack integration testing.
 """
 from __future__ import annotations
 
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
+
 from collections import defaultdict
 import hashlib
 import io
@@ -21,7 +27,7 @@ from prepare_furniture36 import (AREA_EPS, EPS, INPUT, MODELS, OUTPUT, area,
     bounds, compile_mesh, cross, dot, load_model, mul, norm, overlaps, role,
     split, sub, union_faces)
 
-MC_RESOURCES=Path("C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/stripClient_1c8e7d85886c0a45d98a9d38d082e6a9f34fe0f3_resourcesOutput.jar")
+MC_RESOURCES=(gradle_home() / 'caches/neoformruntime/intermediate_results/stripClient_1c8e7d85886c0a45d98a9d38d082e6a9f34fe0f3_resourcesOutput.jar')
 
 
 def poly_intersection(a,b,normal):

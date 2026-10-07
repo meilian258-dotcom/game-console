@@ -1,4 +1,10 @@
 """Final-JAR-only real SFC worker media failure/sequence test. Never compiles production."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse, json, os, shutil, subprocess, sys, tempfile, time
 from pathlib import Path
 from run_sfc_playback_multiplayer_probe import ROOT,JAVA,MC,sha,run
@@ -9,7 +15,7 @@ def main():
     a=p.parse_args()
     if a.report.exists():raise ValueError('Choose a new evidence path')
     jars={n:getattr(a,n).resolve(strict=True) for n in ('fc','sfc')};hashes={n:sha(f)for n,f in jars.items()}
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[]
     manifest=json.loads((MC.parent.parent/'artifacts/minecraft_1.21.1_version_manifest.json').read_text())
     for lib in manifest['libraries']:
         bits=lib['name'].split(':')

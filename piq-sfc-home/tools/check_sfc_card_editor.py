@@ -1,8 +1,14 @@
 """Run actual pure UI-state/layout tests without Gradle; GUI checks are source contracts, not game screenshots."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,hashlib,json,os,subprocess,tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
+JAVA=(java_home() / 'bin')
 def run(cmd):
     p=subprocess.run(list(map(str,cmd)),cwd=ROOT,capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=60)
     if p.returncode:raise AssertionError(p.stdout+'\n'+p.stderr)
@@ -10,7 +16,7 @@ def run(cmd):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--report',type=Path,required=True);args=parser.parse_args()
     if args.report.exists():raise ValueError('Do not overwrite prior QA reports')
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2')]:
         deps.extend(p for p in (cache/group).rglob('*.jar') if version in p.parts and '-sources' not in p.name and '-javadoc' not in p.name)
     source=ROOT/'src/main/java/cn/piq/sfchome/client'

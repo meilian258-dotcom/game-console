@@ -53,7 +53,7 @@
     "data/piq_fc_arcade/loot_table/blocks/zapper_stand.json": "0343F2ED72A2789DF1533DA87F98882CACA519E71B7158504AA1322C8B8D5210"
   },
   "preview": {
-    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\design\\zapper-stand28-preview-v2\\stand-preview.png",
+    "path": "piq-fc-arcade\\design\\zapper-stand28-preview-v2\\stand-preview.png",
     "sha256": "ED316D570CD065661607118251D5B87D60C0FD6101B12A825A1B130CCF86186E"
   },
   "limits": [

@@ -212,12 +212,12 @@
     ]
   },
   "input_sha256": {
-    "G:\\服务器\\服务器Codex\\piq-gba\\tools\\qa\\GbaHandheldLayoutProbe.java": "43A34355774741329BA6D8BECF6D9E5AAF8BDC7039FABBC51B1E307D7F700E12",
-    "G:\\服务器\\服务器Codex\\piq-gba\\tools\\qa\\GbaHandheldModelProbe.java": "3A646B0216459BFDDA5192CB3DCE28DF861E2FF92F9D022412A53411F4658407",
-    "G:\\服务器\\服务器Codex\\piq-gba\\tools\\check_gba_handheld_visual.py": "84967B449DA877544B85DC82011C4F69041DC14115FF20BB8E02E52024ACE34B",
-    "G:\\服务器\\服务器Codex\\piq-gba\\src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldLayout.java": "203EAD5C4DC6EF00396E9323DC25DFBF07EA0FAA3CA0466B7D2BD379F86633F8"
+    "piq-gba\\tools\\qa\\GbaHandheldLayoutProbe.java": "43A34355774741329BA6D8BECF6D9E5AAF8BDC7039FABBC51B1E307D7F700E12",
+    "piq-gba\\tools\\qa\\GbaHandheldModelProbe.java": "3A646B0216459BFDDA5192CB3DCE28DF861E2FF92F9D022412A53411F4658407",
+    "piq-gba\\tools\\check_gba_handheld_visual.py": "84967B449DA877544B85DC82011C4F69041DC14115FF20BB8E02E52024ACE34B",
+    "piq-gba\\src\\main\\java\\cn\\piq\\gba\\client\\GbaHandheldLayout.java": "203EAD5C4DC6EF00396E9323DC25DFBF07EA0FAA3CA0466B7D2BD379F86633F8"
   },
   "minecraft_started": false,
   "native_core_started": false,
-  "preview": "G:\\服务器\\服务器Codex\\piq-gba\\design\\gba-handheld-model-20260912\\qa-v2\\poses.png"
+  "preview": "piq-gba\\design\\gba-handheld-model-20260912\\qa-v2\\poses.png"
 }

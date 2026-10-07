@@ -185,7 +185,7 @@
       }
     ],
     "item_display_baseline": {
-      "path": "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-FC街机\\piq_fc_arcade-0.31.0-alpha.1.jar",
+      "path": "制作Mod\\03-街机模拟\\PIQ-FC街机\\piq_fc_arcade-0.31.0-alpha.1.jar",
       "sha256": "7574cdef4896467e7b94ce65c519e1db7d425d8686d8fc8c1bb964540fa1928a",
       "policy": "Inverse scale and rotated translation preserve all item-space vertices"
     }

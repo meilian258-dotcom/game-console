@@ -1,21 +1,21 @@
 # MD3 · Genesis Plus GX 适配与验证
 
-2026-09-30，像素匠 / Codex root。源码基线 5c22134，FC76.28 + MD2。
+2026-09-30，像素匠。源码基线 5c22134，FC76.28 + MD2。
 
 ## 需求与范围
 
-- 按群讨论使用 Genesis Plus GX；用户已明确接受其非商业许可限制，保留原许可与署名。
+- 使用 Genesis Plus GX，遵守其非商业许可限制并保留原许可证与署名。
 - 新默认仍使用公共 JNI，不自建原生桥或重写模拟器。
 - 保留实体拷卡、AV、电源、手柄租约；旧 BlastEm 核心与旧档不能被新核心覆写。
 - 验证新核心音画、按键映射、保存恢复及回滚能力；配置两个六键端口，实体仍只开放1P。官方 Netplay 支持不是 Minecraft 双人房间已完成；后者仍需独立接入/验收。
 - 将“每个新附属开工必须读文档、检索复用和现成方案”写成规范与验收项。
-- 本次不部署服务器/客户端、不推送、不发群消息，不扩展 CD/32X/光枪/额外机型，不迁移旧即时状态。
+- 不扩展 CD／32X／光枪或额外机型，不迁移旧即时状态。
 
 ## 开工检索与选型（2026-09-30）
 
 | 候选 / 来源 | 已核对内容 | 结论 |
 | --- | --- | --- |
-| [Genesis Plus GX 官方说明](https://docs.libretro.com/library/genesis_plus_gx/) | 官方标示 Netplay、保存、状态支持；44.1kHz；非商业许可；32X 不支持 | 用户选定新默认；能力仍需本模组实测 |
+| [Genesis Plus GX 官方说明](https://docs.libretro.com/library/genesis_plus_gx/) | 官方标示 Netplay、保存、状态支持；44.1kHz；非商业许可；32X 不支持 | 作为新默认；能力仍需本模组实测 |
 | [Libretro 上游源码](https://github.com/libretro/Genesis-Plus-GX)、[许可](https://github.com/libretro/Genesis-Plus-GX/blob/master/LICENSE.txt) | 标准 Libretro 软件画面、核心选项、六键手柄；许可禁止商业使用，含多个组件许可 | 优先采用官方未修改二进制，附许可及来源；不将核心改标 GPL |
 | [官方 Windows x64 制品](https://buildbot.libretro.com/nightly/windows/x86_64/latest/) | 有现成 genesis_plus_gx_libretro.dll.zip | 只用 latest 发现，锁定下载文件 SHA，核验核心版本后使用；无需先自行编译 |
 | 现有 BlastEm profile / MdEngine | 固定 SHA、私人保存、约53kHz输出，拷卡/开机/AV已实现 | 作为显式旧档兼容选择保留；新默认不共用旧状态 |
@@ -50,14 +50,14 @@ DLL SHA256：`9ffa10a115b20e1b49e9caf0b53f287c640ed4e5bb93f7ed9a23b416a4ccfdf7`�
 
 ## 验证与已知缺口
 
-证据根：维护机 `outputs/md-gx-20260930/`，早期失败尝试保留，不被新通过记录覆盖。
+以下为该版分层验证；失败尝试不计为通过。
 
 | 检查 | 结果与边界 |
 | --- | --- |
 | Gradle check/jar | 12项单元测试，0失败/错误/跳过；包括4096种映射组合、两采样率分块、旧档身份、新SRAM边界及既有控制几何。沿用既有NeoForge注解弃用警告 |
 | 最终JAR GX JNI / PROCESS | `gx-jni-v3`、`gx-process-v3`各28断言通过：真实音画/A输入、状态往返、SRAM写入/重开、空电池/无SRAM重开、启动取消及槽释放。诊断为原创68000程序，无商业游戏 |
 | 旧BlastEm JNI / PROCESS | `legacy-jni-v3`、`legacy-process-v3`各19断言通过，原保存命名空间不变；不是旧玩家所有档案实测，旧档仍应备份 |
-| 7包隔离专服 | `server-check` Done、正常stop与保存、退出0；原QA世界/文件/EULA恢复一致，仅localhost与新临时世界，未连玩家 |
+| 7包隔离专服 | `server-check` Done、正常stop与保存、退出0；未连接玩家 |
 | MC真人 | 未验：实际游戏兼容性、六键逐键手感、AV/拷卡/电源/核心选择命令、满背包、旧世界及长时间体验。1P诊断不是2P实体输入验收 |
 
 ### Netplay 门禁未通过，不开放入口

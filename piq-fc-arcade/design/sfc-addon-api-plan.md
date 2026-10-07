@@ -1,14 +1,14 @@
 # SFC 附属模块：家用硬件基座 API 计划
 
-日期：2026-09-10。作者：subor_slim；root 集成确认。
+日期：2026-09-10。
 
-状态：接口设计，尚未实施本页的 FC 生产改动。alpha.13 先独立冻结、打包；收到 root 放行后才实施服务端基座。SFC 核心 PoC、附属模块及客户端显示由 root 另行负责。本计划不是 SFC 可玩性、ROM 兼容性或联网实测报告。
+状态：接口设计，尚未实施本页的 FC 生产改动。SFC 核心、附属模块和客户端显示需分别实现。本计划不是 SFC 可玩性、ROM 兼容性或联网实测报告。
 
 ## 范围与当前源码证据
 
-目标是新 `piq-sfc-home` 家用附属模组复用 PIQ FC 的电视、AV 连线、受保护交互和生命周期；不复制整个 FC 模组，不把 SNES 数据伪装成 NES。原规划暂称 `piq-sfc-addon`，现按 root 确认使用 `piq-sfc-home`，避免和已有独立 `piq-sfc-arcade` 混淆。
+目标是新 `piq-sfc-home` 家用附属模组复用 PIQ FC 的电视、AV 连线、受保护交互和生命周期；不复制整个 FC 模组，不把 SNES 数据伪装成 NES。原规划暂称 `piq-sfc-addon`，现使用 `piq-sfc-home`，避免和已有独立 `piq-sfc-arcade` 混淆。
 
-已补读维护手册 2026-08-05 SFC 核心两阶段记录及 2026-08-06 alpha.6 记录，并核对现有 public API：`cn.piq.sfcarcade.core.wasm.WasmSfcCore`、`SfcCore`、`SfcControllerState`、`SfcFrameResult`、`cn.piq.sfcarcade.audio.SfcAudioPlayer` 和 `cn.piq.sfcarcade.rom.SfcRomRepository`。新附属拟依赖 FC alpha.14 小型硬件 API 与已有 `piq_sfc_arcade` alpha.6，只调用这些公开接口，不修改旧 SFC 负责人内部或撤掉旧街机。核心、立体声和 ROM 规范化不需要重新实现；新家用会话/卡片/控制器仍由附属自己管理。既有 SFC 工程标注 GPL-3.0-or-later，后续交付须保留其已有许可/依赖约定，不重复打包 Wasmtime。
+现有 public API：`cn.piq.sfcarcade.core.wasm.WasmSfcCore`、`SfcCore`、`SfcControllerState`、`SfcFrameResult`、`cn.piq.sfcarcade.audio.SfcAudioPlayer` 和 `cn.piq.sfcarcade.rom.SfcRomRepository`。新附属拟依赖 FC alpha.14 小型硬件 API 与已有 `piq_sfc_arcade` alpha.6，只调用这些公开接口，不修改旧 SFC 负责人内部或撤掉旧街机。核心、立体声和 ROM 规范化不需要重新实现；新家用会话/卡片/控制器仍由附属自己管理。既有 SFC 工程标注 GPL-3.0-or-later，后续交付须保留其已有许可/依赖约定，不重复打包 Wasmtime。
 
 当前不能只注册一个新机器就直接接入，原因如下：
 
@@ -28,7 +28,7 @@ FC 基座拥有：AV 账本和唯一连接、线材扣除/退款、电视实际�
 
 SFC 附属拥有：自己的主机/卡片/手柄注册、卡片槽事务、ROM 校验和目录、模拟核心、音频、12 键输入、玩家与控制器租约、会话协议、同步/存档、游戏暂停和退出流程。SFC 的会话必须绑定下述连接身份，但不能修改基座 link。
 
-本子任务只实施以下服务端 API 与 `HomeHardware` 的必要安全分支。客户端 `HomeVideoDisplay` 与可参数化线材外观由 root 分开设计，不能用本页冒充已存在的实现。
+该项只实施以下服务端 API 与 `HomeHardware` 的必要安全分支。客户端 `HomeVideoDisplay` 与可参数化线材外观分开设计，不能用本页冒充已存在的实现。
 
 ## 1. 外部主机 BE
 
@@ -132,7 +132,7 @@ getter 只表示硬件有效，不代表某个玩家有权控制。SFC 仍需自
 
 ## 3. 停止、卸载、拆除语义
 
-root 已确认：**卸载停播放但保留物理连接；拔线/拆除才关闭账本并唯一退款。**
+已确认：**卸载停播放但保留物理连接；拔线/拆除才关闭账本并唯一退款。**
 
 - 外部主机卸载：以传入的原 BE 身份调用 `onPlaybackStopped(..., UNLOADED)`；不要求此时还能查询到 TV，保持 link/NBT/已付线材状态。
 - TV 卸载：若对端 External 主机仍加载，通知其停止；若主机也已卸载，它自己的卸载回调已停止播放。SFC 每 tick 的 `isCurrent` 仍作为必要失效门禁。
@@ -160,7 +160,7 @@ FC 原有插卡、取卡、自动开局、手柄、ROM、存档、会话和网�
 
 ## 5. 客户端和电脑的后续接口边界
 
-root 负责一个公开、窄的 TV 画面绘制入口，输入是 TV anchor 与 addon 自有帧纹理/尺寸/显示比例；内部复用 TV 四朝向、偏移、黑边和扫描线。SFC 自己驱动 RenderLevelStageEvent，不插入 NES `ClientArcadeSession` 表。
+负责一个公开、窄的 TV 画面绘制入口，输入是 TV anchor 与 addon 自有帧纹理/尺寸/显示比例；内部复用 TV 四朝向、偏移、黑边和扫描线。SFC 自己驱动 RenderLevelStageEvent，不插入 NES `ClientArcadeSession` 表。
 
 双方客户端应按 system ID / 双端 UUID / link ID / SFC epoch 检查显示来源；连接或会话失效立即清纹理，不允许两系统同时占一块电视。
 
@@ -196,12 +196,12 @@ AV 几何的后续新增参数应为主机插口/向外方向/机壳范围描述
 
 ### 验证层级
 
-本子任务允许纯 javac、独立 JUnit 和源码布线测试；统一 Gradle、完整回归及打包只由 root 执行。后续还需要 Minecraft 实机验证：普通玩家权限、实际领地插件组合、双人加入/离开、TV 卸载、跨区块连线、拆卸和重登。离线 probe 不能写成真实联网测试。
+该项允许纯 javac、独立 JUnit 和源码布线测试；统一 Gradle、完整回归及打包只执行。后续还需要 Minecraft 实机验证：普通玩家权限、实际领地插件组合、双人加入/离开、TV 卸载、跨区块连线、拆卸和重登。离线 probe 不能写成真实联网测试。
 
 ## 7. 分阶段交付门槛
 
 1. alpha.13 独立冻结并交付，SFC 生产接入尚不混入。
 2. 复验既有 public SFC 核心/音频/ROM 仓库在新依赖组合下的 PoC，不另选或重造模拟核心；PoC 不要求改 FC。已有旧版本验证不能冒充新家用附属实测。
-3. root 放行后实施本页服务端基座和客户端窄接口，完成旧 FC 回归。
+3. 实施本页服务端基座和客户端窄接口，完成旧 FC 回归。
 4. addon 接一格 SFC 主机和现有 TV，再实现自己的卡片、手柄、输入/会话/存档。
 5. 明确测试版限制后再形成独立 addon 与对应 base 成品；不向旧 FC 包静默注入 SFC 协议，也不以新增功能为由改商业 ROM 分发范围。

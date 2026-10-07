@@ -1,6 +1,6 @@
-# GBA 个人掌机客户端交接（2026-09-12）
+# GBA 个人掌机客户端技术记录（2026-09-12）
 
-负责人：sfc_cabinet_provider。只新增 GBA 客户端/纯辅助/QA；根代理维护版本、物品注册、最终构建打包与维护手册，模型代理拥有模型和渲染器。
+范围：GBA 客户端、纯辅助逻辑与 QA。物品注册、模型渲染与最终构建须分别核对。
 
 ## 生产范围
 
@@ -10,7 +10,7 @@
 - `client/GbaHandheldGate.java`（内部类 `UseGate`）：纯实际连接/世界 identity、玩家/主手槽/组件/count/生存状态门禁；0xDFD 掩码；同按住右键不重复开关。
 - `client/GbaHandheldSelectionStore.java`：本机、世界/服务器+玩家隔离的 ROM 路径选择；8 KiB 上限、逐父目录拒重定向、单文件原子替换。
 
-没有修改旧 `GbaCabinetBackend`、bridge/helper/核心、服务器协议或资源。本轮 root 修改旧 backend 的 description，非本代理运行逻辑变更。没有新增或删除旧生产 class。
+旧 `GbaCabinetBackend` 仅有说明文本变化，bridge/helper/核心、服务器协议或资源不变；没有新增或删除旧生产 class。
 
 ## 公共只读显示 API
 
@@ -34,4 +34,4 @@
 
 `design/handheld-client-source-v6.json`：编译通过，纯门禁/真实临时目录选择存储 **4359 断言**（其中 4096 是全部 12-bit mask 枚举，不是 4359 种交互功能）。验证实际对象 identity、槽、玩家、组件/count事实、死亡/断线、50轮持按去重、本机存储隔离/Unicode/非法长度和路径。
 
-测试未启动 Minecraft 世界、窗口、音频设备、物理手柄或 native 核心。旧 bridge 的真核/存档测试由 root 最终复跑；此报告不等于游戏内掌机模型、小屏可读性、键盘/鼠标互动实测。没有安装、发布、修改用户 ROM/存档或关闭任何应用。
+测试未启动 Minecraft 世界、窗口、音频设备、物理手柄或原生核心；旧 bridge 的真实核心与存档回归仍需针对最终成品复跑。这不等于游戏内掌机模型、小屏可读性或键鼠互动实测。

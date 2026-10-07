@@ -7,8 +7,12 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 neoForge { version = neo_version; mods { piq_native_arcade { sourceSet(sourceSets.main) } } }
 repositories { mavenCentral() }
 def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.40.jar'))
+configurations {
+    nativeHelperJna { canBeConsumed = false; canBeResolved = true }
+}
 dependencies {
     implementation localModJars
+    nativeHelperJna('net.java.dev.jna:jna:5.14.0') { transitive = false }
     testImplementation platform('org.junit:junit-bom:5.13.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -50,16 +54,22 @@ def prepareEmbeddedRuntime = tasks.register('prepareEmbeddedRuntime17', Exec) {
 }
 // New versioned helper only. Preserve the old six payloads/provenance tree unchanged.
 def helper011 = layout.buildDirectory.file('helper48/piq-native-helper-v4.jar')
+def helperJavaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
 def buildHelper011 = tasks.register('buildNativeHelper011', Exec) {
-    inputs.file('tools/build_native_helper48.py')
+    inputs.files('tools/build_native_helper48.py', '../source-control/dev_tool_paths.py')
+    inputs.files(configurations.nativeHelperJna)
     inputs.files('src/main/java/cn/piq/nativearcade/bridge/BridgeProtocol.java',
             'src/main/java/cn/piq/nativearcade/bridge/NativeInputPorts.java',
             'src/main/java/cn/piq/nativearcade/bridge/NativeArcadeButtons.java',
             'helper/src/main/java/cn/piq/nativearcade/bridge/NativeCoreWorker.java')
     outputs.file(helper011)
     workingDir projectDir
-    commandLine providers.gradleProperty('embeddedRuntimePython').getOrElse('python'),
-            file('tools/build_native_helper48.py').absolutePath, '--output', helper011.get().asFile.absolutePath
+    doFirst {
+        commandLine providers.gradleProperty('embeddedRuntimePython').getOrElse('python'),
+                file('tools/build_native_helper48.py').absolutePath, '--output', helper011.get().asFile.absolutePath,
+                '--jna', configurations.nativeHelperJna.singleFile.absolutePath,
+                '--java-home', helperJavaLauncher.get().metadata.installationPath.asFile.absolutePath
+    }
 }
 def embeddedRuntime011 = layout.buildDirectory.dir('generated/embeddedRuntime011')
 def prepareRuntime011 = tasks.register('prepareEmbeddedRuntime011', Exec) {

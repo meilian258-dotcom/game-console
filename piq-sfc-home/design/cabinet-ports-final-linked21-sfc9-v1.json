@@ -4,15 +4,15 @@
   "mode": "final-jar-only",
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_fc_arcade-0.31.0-alpha.21.jar",
+      "path": "piq-fc-arcade\\build\\review-linked21-v1\\piq_fc_arcade-0.31.0-alpha.21.jar",
       "sha256": "0147D49C542E82DDF2DD37CDAFFBDB135CDA20E11907B4060B471A2FBC0D3F93"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_sfc-0.1.0-alpha.9.jar",
+      "path": "piq-fc-arcade\\build\\review-linked21-v1\\piq_sfc-0.1.0-alpha.9.jar",
       "sha256": "F951146515D7F35257585A9DA7536453F1DFFA70285F51EDD612D65C771DF951"
     },
     "baseline": {
-      "path": "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-SFC家用\\0.1.0-alpha.8\\piq_sfc-0.1.0-alpha.8.jar",
+      "path": "制作Mod\\03-街机模拟\\PIQ-SFC家用\\0.1.0-alpha.8\\piq_sfc-0.1.0-alpha.8.jar",
       "sha256": "3C678DC03EF9479564BC3F7005210E9DE868792A8D29DD0CDD62CAB3C79BC1E5"
     }
   },

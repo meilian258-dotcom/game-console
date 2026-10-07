@@ -1,6 +1,6 @@
 # FC33 / Native11：现有街机的实验本地同步
 
-2026-09-12，像素匠 root。用户已确认制作；只交测试文件，不安装、发布、重启或关机。不改原 ROM、BIOS、存档、模型或历史交付包。
+2026-09-12，像素匠。历史测试候选，不改变原 ROM、BIOS、存档和模型。
 
 ## 接入范围
 
@@ -19,10 +19,10 @@
 
 ## 分工与验证
 
-- root：合同/版本/依赖、源码与资产围栏、构建冻结、最终JAR核验、成套与源码包、手册。
-- cabinet_reuse_review：Native fixed profile/session/workspace/core、provider/common注册，真实逻辑0冷恢复/长序列音画状态检查。
-- fix_sfc_av：公共同步策略、服务端Hello/席位/设置/协议及授权测试。
-- sfc_cabinet_provider：兼容客户端API、worker取消/快照周期/有界上传重试、实验UI及生命周期测试。
+- 合同/版本/依赖、源码与资产围栏、构建冻结、最终JAR核验、成套与源码包、手册。
+- Native fixed profile/session/workspace/core、provider/common注册，真实逻辑0冷恢复/长序列音画状态检查。
+- 公共同步策略、服务端Hello/席位/设置/协议及授权测试。
+- 兼容客户端API、worker取消/快照周期/有界上传重试、实验UI及生命周期测试。
 - 必须真实两个独立原生进程验证；最终JAR再测，不把fake协议或离线测试当Minecraft公网真人联机通过。全套回归、旧SFC/GBA依赖、专服无client/native加载、所有模型资产不变后再交付。源码冻结期间停止编辑，变更后重新构建核验。
 
 状态（2026-09-12 13:56）：生产已冻结于 build/review-sync33-v1；FC33 SHA F36169E46B13CF46868851447B8518BC38C10967A03994AF26E89CE7B1E4FE00，Native11 SHA F582314F64A2DC556FAC1704719C04EE9E5A05154C146FA1C49FCAD9615E2C5E。全量构建和最终 JAR 的 Native 真核/实际通用 worker/SFC worker/公共注册/协议验证通过，成套测试包封装中。真实两台 Minecraft 联机仍待玩家验收。

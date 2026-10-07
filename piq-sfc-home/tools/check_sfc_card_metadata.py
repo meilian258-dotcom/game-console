@@ -1,9 +1,15 @@
 """Compile changed production classes against the real MC API, execute metadata/packet/PNG/geometry probes. No Gradle/game."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,hashlib,json,os,shutil,subprocess,tempfile,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-MC=Path('C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
+JAVA=(java_home() / 'bin')
+MC=(gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
 NAMES=['data/SfcCartridgeData','net/SfcHomeNetwork','server/SfcCoverStore','server/SfcCoverService','server/SfcCartridgeEditorService','client/SfcCardEditorLayout','client/SfcCardEditorScreen','client/SfcCartridgeCovers','client/SfcCoverGeometry','client/SfcCartridgeRenderer','client/SfcHardwareRenderer','item/SfcCartridgeItem']
 def invoke(command,cwd):
     p=subprocess.run(list(map(str,command)),cwd=cwd,capture_output=True,timeout=90)
@@ -13,7 +19,7 @@ def invoke(command,cwd):
 def main():
     sys.stdout.reconfigure(encoding='utf-8');parser=argparse.ArgumentParser();parser.add_argument('--report',type=Path,required=True);parser.add_argument('--jar',type=Path,help='Use this built SFC home JAR; compile probe only, no production source');args=parser.parse_args()
     if args.report.exists():raise ValueError('Refusing to overwrite prior report')
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');manifest=json.loads(Path('C:/Users/13498/.gradle/caches/neoformruntime/artifacts/minecraft_1.21.1_version_manifest.json').read_text());vanilla=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');manifest=json.loads((gradle_home() / 'caches/neoformruntime/artifacts/minecraft_1.21.1_version_manifest.json').read_text());vanilla=[]
     for lib in manifest['libraries']:
         pieces=lib['name'].split(':')
         if len(pieces)==3:vanilla.extend((cache/pieces[0]/pieces[1]/pieces[2]).rglob(pieces[1]+'-'+pieces[2]+'.jar'))

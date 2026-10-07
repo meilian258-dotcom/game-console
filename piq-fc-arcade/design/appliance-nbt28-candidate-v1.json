@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.28.jar",
+  "jar": "piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.28.jar",
   "sha256": "572E4FF3D750ED3C0E92E78C2DCBF137B5D5F4851059C8866CFA0E9212B50CF3",
   "probe": {
     "ok": true,

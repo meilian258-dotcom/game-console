@@ -24,7 +24,7 @@ Ruffle 固定为官方 nightly-2026-09-16；代码和运行库不包含任何商
 运行：`FlashBox.Helper.exe --swf <绝对路径.swf> --width 640 --height 480`
 
 默认使用不激活的屏幕外窗口提供真实 WebView 合成表面；不是最小化窗口。
-默认不会显示播放器，也不抢前台。`--preview` 仅供用户明确要求时打开独立可见调试窗口。
+默认不显示播放器，也不抢前台；显式指定 `--preview` 才打开独立可见调试窗口。
 游戏声音直接由本机 WebView 系统音频输出，未接 Minecraft 音量、距离或空间音效。
 退出会释放按键、浏览器并清理独立随机临时用户目录；首版不保存 Flash SharedObject 进度。
 已发现短启动立即退出时 WebView 可能暂锁其空目录，helper 会在stderr如实提示清理未完全结束；不会删除其他浏览器目录。
@@ -80,5 +80,5 @@ Ruffle 固定为官方 nightly-2026-09-16；代码和运行库不包含任何商
 `--metrics` 仅供短时诊断：stderr输出 `PERF_CAPTURE` 和 `PERF_WRITE` JSON，按seq统计捕获（包括WebView内部编码）、归一化、base64/JSON入队及管道写出耗时；默认关闭，不影响stdout协议。WebView内部截图和内部图片编码不能由此API再细分，不能将CapturePreview耗时全部声称为编码耗时。
 
 `performance_smoke.py` 的区域变化探针会受角色待机动画影响，不能作为可靠输入延迟结论；本次仅确认两组按键实际分别移动角色，不宣称输入延迟降低了多少毫秒。`protocol_performance_smoke.py` 检查长暂停心跳、慢读者丢旧帧、关闭不被输出反压阻塞及非法输入拒绝。
-本项目 `private-test` 中的用户SWF、截图和日志仅本地测试，禁止进入发布包。
+测试 SWF、截图和运行日志不得进入发布包。
 许可证：vendor/LICENSE_MIT、vendor/LICENSE_APACHE；WebView2 为 LICENSE-WebView2.txt。

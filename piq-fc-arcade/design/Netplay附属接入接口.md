@@ -76,7 +76,7 @@
 
 队列32项，合并相同按钮/扳机状态的连续移动、保留按键边缘。安全清除修订递增用于丢弃旧队列；超时750ms及溢出松开，并等待释放再重启输入。持枪者的 P1 菜单键只在实体 P1 空闲或持有正式 P1 租约时按既有规则路由。只对 FC 光枪启用，不改变 SFC/街机按键路径。完整主包/附属兼容及未验证项见 FC72 测试指南。新增主持只读 CRC 日志仅在已有快照捕获后观察，不更改哈希协议或掩盖失步。
 
-FC70/街机0.1.3补记：共用公开构造与SFC38调用保持兼容；街机新增固定FBNeo的可信profile，不接受任意DLL。CabinetGameManifest最多5文件（游戏+4份声明BIOS），游戏库协议为cabinet-game-4，其他协议未变。同目录PGM/QSound允许共享但不得自动扫描/搜寻或下载；辅助文件仍受16 MiB每份边界。构建脚本修正GET_AUDIO_VIDEO_ENABLE：PIQ的null驱动实为有效IPC显示，正常帧应允许输出，重演阶段继续抑制。不要移除快照CRC校验以掩盖差异；FBNeo CRC差异及画面序列补充验证见outputs/netplay70，不能混同完整确定性证明。FBNeo单独非商业许可另列，不由主模组GPL覆盖。以下为FC69接口基线。
+FC70/街机0.1.3补记：共用公开构造与SFC38调用保持兼容；街机新增固定FBNeo的可信profile，不接受任意DLL。CabinetGameManifest最多5文件（游戏+4份声明BIOS），游戏库协议为cabinet-game-4，其他协议未变。同目录PGM/QSound允许共享但不得自动扫描/搜寻或下载；辅助文件仍受16 MiB每份边界。构建脚本修正GET_AUDIO_VIDEO_ENABLE：PIQ的null驱动实为有效IPC显示，正常帧应允许输出，重演阶段继续抑制。不要移除快照CRC校验以掩盖差异；FBNeo 存在 CRC 差异，画面序列验证不能代替完整确定性证明。FBNeo单独非商业许可另列，不由主模组GPL覆盖。以下为FC69接口基线。
 
 适用 FC 0.31.0-alpha.69，2026-09-24。不是通用稳定 ABI，不表示任意 libretro 核心都能联机。现有调用方：SFC38 家用机、街机0.1.2 通用机柜后端。真实 Minecraft 多客户端验收待完成。
 
@@ -110,4 +110,4 @@ FC70/街机0.1.3补记：共用公开构造与SFC38调用保持兼容；街机�
 
 `SfcNetplayProfile` 提供附属核心身份；`SfcHomeServer` 维护会话到 relay 的映射，`SfcHomeNetwork.NetplayStart` 发获准身份，`SfcPlayback` 绑定并驱动共用进程。SFC 协议11；NTSC、主持 P1、另一玩家 P2，不读写实验存档。旧模式和音画旁观独立保留。GBA 尚未接入此接口。
 
-自动证据在 `outputs/netplay69`：真实多进程、生产 MC codec、资源模块边界及旧模式回归。只有实际 Minecraft 双机验收后才能扩大可用范围。
+自动验证覆盖：真实多进程、生产 MC codec、资源模块边界及旧模式回归。只有实际 Minecraft 双机验收后才能扩大可用范围。

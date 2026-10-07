@@ -1,4 +1,10 @@
 """Actual MC API and production-class AV regression; no Minecraft world/gameplay claim."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse
 import hashlib
 import json
@@ -11,8 +17,8 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 SFC=ROOT.parent/'piq-sfc-home'
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-MC=Path('C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
+JAVA=(java_home() / 'bin')
+MC=(gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
 FC_OLD=ROOT.parent/'制作Mod/03-街机模拟/PIQ-FC街机/piq_fc_arcade-0.31.0-alpha.14.jar'
 SFC_OLD=ROOT.parent/'制作Mod/03-街机模拟/PIQ-SFC家用/piq_sfc_home-0.1.0-alpha.1.jar'
 PROBE=ROOT/'tools/qa/ActualSfcCableDispatchProbe.java'
@@ -26,8 +32,8 @@ def invoke(command,temp):
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
     parser=argparse.ArgumentParser();parser.add_argument('--report',type=Path);args=parser.parse_args()
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
-    manifest=json.loads(Path('C:/Users/13498/.gradle/caches/neoformruntime/artifacts/minecraft_1.21.1_version_manifest.json').read_text())
+    cache=(gradle_home() / 'caches/modules-2/files-2.1')
+    manifest=json.loads((gradle_home() / 'caches/neoformruntime/artifacts/minecraft_1.21.1_version_manifest.json').read_text())
     vanilla=[]
     for lib in manifest['libraries']:
         pieces=lib['name'].split(':')

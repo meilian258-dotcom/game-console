@@ -65,4 +65,4 @@ Xbox、PS4/PS5 走 GLFW 的标准设备映射；Switch Pro 只有系统/GLFW 能
 
 内部库已有 `LocalInputSession` 仅新增 `(float deadzoneEnter, float deadzoneExit)` 构造器；原无参构造保留默认 .25/.18 行为。不改旧宿主、核心、网络、模型、资源或实例文件。
 
-新增测试 `GamepadMixerTest`、`GamepadConfigStoreTest`、`StandardGamepadStateTest`、`GamepadSettingsLayoutTest`、`GamepadClientSourceContractTest`。本机 Java21 独立编译通过；连同原输入领域测试使用本地 JUnit5.13.4 执行 53 项：52 通过，1 项因 Windows 不允许创建符号链接而中止，0 失败。覆盖所有 4096 键盘状态无手柄时原样保留、每系统映射、模拟的断开/失焦/代次、所有 GLFW 标准按钮、500 次快速边沿、原子配置与并发修改保护、320×240 起的布局边界，以及客户端采样/保存/渲染边界源码契约。Minecraft 类的实际 compileJava / 成品审计由 root 统一完成。
+新增测试 `GamepadMixerTest`、`GamepadConfigStoreTest`、`StandardGamepadStateTest`、`GamepadSettingsLayoutTest`、`GamepadClientSourceContractTest`。本机 Java21 独立编译通过；连同原输入领域测试使用本地 JUnit5.13.4 执行 53 项：52 通过，1 项因 Windows 不允许创建符号链接而中止，0 失败。覆盖所有 4096 键盘状态无手柄时原样保留、每系统映射、模拟的断开/失焦/代次、所有 GLFW 标准按钮、500 次快速边沿、原子配置与并发修改保护、320×240 起的布局边界，以及客户端采样/保存/渲染边界源码契约。Minecraft 类的实际 compileJava / 成品审计统一完成。

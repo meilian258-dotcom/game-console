@@ -88,8 +88,8 @@
     "minecraft_gameplay": false
   },
   "jars_read_only": {
-    "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-FC街机\\alpha20-compact-vanilla-ui\\piq_fc_arcade-0.31.0-alpha.20.jar": "CAC47CAE12E7183A76CF8874C6E8B8C4242435C01759C797EE78A5BD8A80C864",
-    "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-SFC家用\\0.1.0-alpha.8\\piq_sfc-0.1.0-alpha.8.jar": "3C678DC03EF9479564BC3F7005210E9DE868792A8D29DD0CDD62CAB3C79BC1E5"
+    "制作Mod\\03-街机模拟\\PIQ-FC街机\\alpha20-compact-vanilla-ui\\piq_fc_arcade-0.31.0-alpha.20.jar": "CAC47CAE12E7183A76CF8874C6E8B8C4242435C01759C797EE78A5BD8A80C864",
+    "制作Mod\\03-街机模拟\\PIQ-SFC家用\\0.1.0-alpha.8\\piq_sfc-0.1.0-alpha.8.jar": "3C678DC03EF9479564BC3F7005210E9DE868792A8D29DD0CDD62CAB3C79BC1E5"
   },
   "source_sha256": {
     "piq-retro-platform\\src\\main\\java\\cn\\piq\\retro\\api\\RetroEmulator.java": "199F68C2DBF15EAAE44A7860A00B79624971C125E5220928F20DF70CAA557D5A",

@@ -1,6 +1,6 @@
 # Git 工作流历史记录
 
-以下保留 2026-10-07 整理前的原说明，包含旧版本状态、命令和已过期的私有仓库描述，仅供追溯。当前入口请看[现行说明](../GIT_WORKFLOW.md)。
+以下记录早期版本的技术状态与构建边界，命令和版本仅用于历史追溯。当前入口请看[现行说明](../GIT_WORKFLOW.md)。
 
 # 方块电玩源码与 Git 工作流
 
@@ -12,9 +12,9 @@
 
 首个提交是真实的当前源码基线，**不是稳定版，也不保证等于任何已发布 JAR**。原来没有有效 Git 历史，因此不从旧 ZIP 伪造提交或版本标签。旧文件、成品、历史证据及素材草稿保留在原位置，今后的源码修改以提交及 diff 为准，不以“哪个备份目录较新”判断。新建其他组件必须先审核并更新根忽略白名单和 `source-control/audit.py`。
 
-最初接管只建立本地仓库。2026-09-29 经维护者明确选择并完成本机授权，现已接入 GitHub **私有**远端：[meilian258-dotcom/game-console](https://github.com/meilian258-dotcom/game-console)，`origin` 为 `https://github.com/meilian258-dotcom/game-console.git`，默认分支 `main`。同日按用户确认从 `block-arcade` 更名，仓库 ID 和历史保留；没有公开开源、发布游戏版本或改动服务器、客户端及模拟器功能。
+2026-09-29，仓库接入 GitHub，当时为私有仓库；同日从 `block-arcade` 更名为 `game-console`，提交历史保留。此处记录历史状态，当前仓库入口与访问方式见[现行工作流](../GIT_WORKFLOW.md)。
 
-Git 提交署名保留用户确认的 `Meilian <meilian258@gmail.com>`，仅仓库级配置；该邮箱已在提交元数据中，仓库协作者可见，以后公开仓库会一并公开。不要擅自改写历史或借用维护者身份；新协作者使用自己的署名。
+每位贡献者使用自己的 Git 提交署名，可选用 GitHub 提供的隐私邮箱；不要借用他人身份或为修改署名擅自改写历史。
 
 ## 获取源码与启用检查
 
@@ -29,13 +29,13 @@ python source-control/audit.py
 
 新克隆不会自动启用 Git hooks，必须执行 setup。它只配置当前仓库的 hooks/Python/显示及换行策略；不改全局配置，有其他 hooks 时会停止。已有署名可省略两个参数，不能借用他人署名。它不会下载或执行模拟器。
 
-获准访问的协作者可用 `git clone https://github.com/meilian258-dotcom/game-console.git` 获取代码。私有仓库需要自己的 GitHub 权限和本机登录，不能索取维护者令牌。原维护机仓库在 `G:\服务器\服务器Codex`。工作区专用的根 AGENTS/维护手册、服务凭据和其他项目没有纳入这个仓库；独立克隆以本文件、`piq-fc-arcade/AGENTS.md` 及各组件规范为入口，不需要复制维护机私有数据。
+源码入口为 [game-console](https://github.com/meilian258-dotcom/game-console)。独立克隆以 `piq-fc-arcade/AGENTS.md` 和各组件规范为入口，不需要任何维护机路径、凭据或其他项目数据。
 
 已克隆旧地址的协作者可执行 `git remote set-url origin https://github.com/meilian258-dotcom/game-console.git`。分享源码需所有者在 Settings → Collaborators → Add people 邀请并由对方接受；个人私有仓库的协作者拥有读写权限，不是只读分享。参考 [GitHub 权限说明](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/permission-levels-for-a-personal-account-repository)。对外正式名与交付文件名见[命名规范](../source-control/BRANDING.md)，内部兼容 ID 不改。
 
 ### PvZ 上游源码子模块
 
-自 2026-10-01 起，`piq-pvz-addon/vendor/PvZ-Portable` 通过 Git submodule 管理；来源为用户确认的 `https://github.com/KLuoNuoYa/PvZ-Portable.git` / `libretro`。父仓库保存固定 gitlink 提交，不在父仓库重复保存上游全量代码。
+自 2026-10-01 起，`piq-pvz-addon/vendor/PvZ-Portable` 通过 Git submodule 管理；来源为 `https://github.com/KLuoNuoYa/PvZ-Portable.git` / `libretro`。父仓库保存固定 gitlink 提交，不在父仓库重复保存上游全量代码。
 
 克隆或拉取含此变更的父仓库提交后，在仓库根执行：
 
@@ -53,13 +53,13 @@ git submodule status -- piq-pvz-addon/vendor/PvZ-Portable
 - 首次推送只包含经过检查的 `main` 及其祖先提交，不使用 `--all`、`--mirror` 或 `--force`；旧本地任务分支保留，不自动推送其他引用。
 - 凭据交给 Git Credential Manager 等标准凭据管理器。设备登录由用户在 GitHub 官方页面确认；不把密码、令牌或一次性验证码写进脚本、remote URL、文档或提交。
 - 每次推送前检查 `git remote -v`、工作区、待推提交与文件范围；首次接入核实仓库属于正确账号且为私有，推送后比对远端分支提交。不要以“网页上能打开”代替私有性和提交校验。
-- 独立克隆/对象及文件校验用于验证源码恢复。GitHub 备份**不包含**被忽略的运行库缓存、ROM/BIOS、玩家存档、世界、服务器凭据或本地管理台数据；这些仍需各自授权的独立备份。
+- 独立克隆/对象及文件校验用于验证源码恢复。源码仓库**不包含**被忽略的运行库缓存、ROM/BIOS、玩家存档、世界、服务器凭据或其他未纳入版本管理的项目资料；这些需按访问权限单独备份。
 - 本阶段未配置 GitHub Actions、强制 PR/分支保护或自动发布。后续功能分支可按评审流程合并，但不能把流程建议写成已经启用的服务端强制规则。
-- 当前附属构建仍有历史 JAR/工具链依赖。私有远端可恢复源码，不等于任意新电脑已经能完整构建全部附属。公开前需另做许可和隐私审查；本次私有建库授权不等于公开或邀请协作者授权。
+- 当前附属构建仍有历史 JAR/工具链依赖。源码仓库可恢复源码，不等于任意新电脑已经能完整构建全部附属。对外分发还需核对各组件许可、第三方资源来源与隐私边界。
 
 ## 一次修改的标准流程
 
-1. 先读共同 AGENTS、组件 README 和行为规范，检查 `git status`、当前分支与工作台编号。别人的未提交修改不是可清理的缓存；同一目录多人工作不得随意切换分支，需各自克隆或经确认使用独立工作树。
+1. 先读共同 AGENTS、组件 README 和行为规范，检查 `git status`、当前分支与变更范围。别人的未提交修改不是可清理的缓存；同一目录多人工作不得随意切换分支，需各自克隆或经确认使用独立工作树。
 2. 干净工作区从 `main` 创建短分支，例如 `git switch -c fix/GC-123-fc-input`；已有工作区有改动时先核对归属，不强制切换、覆盖或自动 stash。
 3. 写明确需求/不改范围/验收清单，按现有脚本构建测试。公共接口变化需检查依赖附属；只改文档也要校验链接、JSON 等。
 4. 只暂存本次负责的具体路径，例如 `git add piq-fc-arcade/src/main/java/某文件.java`。用 `git diff`、`git diff --cached --stat`、`git diff --cached` 逐项审查，不盲目提交整个工作区。
@@ -88,8 +88,8 @@ git submodule status -- piq-pvz-addon/vendor/PvZ-Portable
 
 ## 本次基线与恢复
 
-迁移证据在维护机 `outputs/git-migration-20260929/`，交付后包含审查报告、提交/独立克隆校验和 Git bundle。bundle 可使用 `git bundle verify <文件>` 检查，然后 `git clone <文件> <新的空目录>` 恢复已提交源码。它不包含忽略的制品和用户数据；同盘 bundle 也不是异地备份。
+可使用 `git bundle verify <文件>` 检查源码备份，再用 `git clone <文件> <新的空目录>` 恢复已提交源码。bundle 不包含忽略的制品与玩家数据；同盘 bundle 也不是异地备份。
 
-首次接管不生成新 MOD。构建一期生成的 FC76.24 同版本开发验证 JAR 单独留在 `outputs/build-standard-phase1-20260929/attempt3/`，不替换原交付，不提升稳定标记。此前报告的 FC JNI Netplay 精确恢复启动失败，以及新 FC 默认能力值检查问题，未在源码/构建迁移修复；Git 基线也不能覆盖这些待处理反馈。历史 README 中的测试/候选结论只对其注明版本及环境有效。
+首次接管不生成新 MOD。构建一期生成的 FC76.24 同版本开发验证 JAR 作为独立开发制品保留，不替换原交付，不提升稳定标记。此前报告的 FC JNI Netplay 精确恢复启动失败，以及新 FC 默认能力值检查问题，未在源码/构建迁移修复；Git 基线也不能覆盖这些待处理反馈。历史 README 中的测试/候选结论只对其注明版本及环境有效。
 
 实际克隆编译发现首次基线 `665b12c` 的 `**/world/` 忽略规则误排了 Java `world` 包。本期收窄为组件根运行世界目录，原样补纳 64 个既有 Java 源文件并增加回归测试；没有删除或重写历史。首版 bundle 保留作历史证据，完整恢复应使用包含此次补齐提交的新 bundle。首次源码哈希比对通过只证明当时选中文件一致，不证明源码清单完整。

@@ -8,7 +8,7 @@
     "sha256": "934FF65DC9A3229E62F39A8F26630B54473995BE631FCF9D277996765B2643AB"
   },
   "dll": {
-    "path": "G:\\服务器\\服务器Codex\\piq-native-arcade\\design\\fbneo-study\\vendor\\fbneo_libretro.dll",
+    "path": "piq-native-arcade\\design\\fbneo-study\\vendor\\fbneo_libretro.dll",
     "bytes": 61913629,
     "sha256": "52343F65453C0E1FC06B3AA818B48CA4FED18361F7F336A684E9E3CFFA5F5F3C"
   },

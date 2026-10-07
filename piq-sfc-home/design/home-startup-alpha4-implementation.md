@@ -1,6 +1,6 @@
-# SFC 家用手柄与启动状态：alpha4 交接
+# SFC 家用手柄与启动状态：alpha4 技术记录
 
-修改者：`sfc_cabinet_provider`，2026-09-10。维护手册总记录、完整构建、成品审计和安装由根代理统一执行。本文件只记录本代理负责的代码边界，不代替成品发布结论。
+日期：2026-09-10。此文记录 SFC alpha4 启动与手柄代码边界，不代替完整构建或成品验收。
 
 ## 交互与人数策略
 
@@ -26,7 +26,7 @@
 
 WASM 仍只在专属线程构造和关闭。旧核心正在退出时等待真实 `SfcCoreLease` 释放，而不是误报永久占用；关闭 UI/会话不提前释放实际核心生命周期锁。仅将加载器私有 ROM 字节数组的所有权移交给播放器，去掉主线程的额外大数组复制，未改变 ROM、模拟核心、复位或状态哈希算法。
 
-`startup-timing-20260910-v1.json` 已由根代理运行真实冻结 SFC alpha6 核心，使用项目原创 32 KiB 65816 诊断 ROM，不使用商业 ROM。一个新 JVM 内连续构造两次：
+`startup-timing-20260910-v1.json` 已运行真实冻结 SFC alpha6 核心，使用项目原创 32 KiB 65816 诊断 ROM，不使用商业 ROM。一个新 JVM 内连续构造两次：
 
 | 阶段 | 第一次 | 同 JVM 第二次 |
 | --- | ---: | ---: |
@@ -44,7 +44,7 @@ WASM 仍只在专属线程构造和关闭。旧核心正在退出时等待真实
 
 共享机柜 owner 防止 SFC 家用与通用机柜同时采键；对于没有接入该 owner 的旧 FC/NES 控制流程，使用公开 `ClientArcadeEvents.isControlling()`：接收 SFC 会话前拒绝，tick 启动/采键前退出 SFC，`acceptsInput()` 同时阻断两个 tick 之间的按键回调。没有改旧 FC/NES 控制内部。
 
-## 本代理生产边界
+## 生产改动范围
 
 修改：
 
@@ -57,14 +57,14 @@ WASM 仍只在专属线程构造和关闭。旧核心正在退出时等待真实
 - `server/SfcHomeStartPolicy.java`（`$Plan`、`$InteractionGate`）
 - `client/SfcStartupProgress.java`（`$Stage`）
 
-没有修改旧模拟核心、资源/模型、`SfcInputTimeline`、编辑器/卡带数据或网络 record；写卡人数/封面由另一个代理负责，调用其 `maxPlayers` 和 `hasExplicitPlayerCount`。
+没有修改旧模拟核心、资源/模型、`SfcInputTimeline`、编辑器/卡带数据或网络 record；写卡人数／封面使用独立编辑器接口，调用其 `maxPlayers` 和 `hasExplicitPlayerCount`。
 
 ## 验证与限制
 
 - `tools/check_sfc_home_startup.py`：21 项纯 Java JUnit 测试通过，报告 `home-startup-alpha4-qa-v2.json`；覆盖人数策略、同 tick 门禁、P2 时间线清零、阶段计时、旧 FC 控制排除及生命周期源码接线契约。v1 的 20 项旧报告保留。
-- 根代理已报告加旧 FC 门禁前的 SFC 完整 `compileJava`、`check`、`jar` 通过；门禁补丁交根代理重新统一构建。本代理未独立执行 Gradle。
+- 加旧 FC 门禁前的 SFC 完整 `compileJava`、`check`、`jar` 已通过；门禁补丁仍需完整构建复验。
 - `tools/run_sfc_startup_core_probe.py`：上述真实核心计时探针通过；仅编译探针和项目原创诊断 ROM fixture，不重编生产核心。
-- FC 工程 `tools/probes/Alpha17SfcStartupProbe.java` 提供最终 SFC JAR-only 探针，检查 5 个实际生产类的 protectionDomain 来源。已对一次本地候选 JAR 试跑 7121 条启动策略/门禁/阶段时钟断言通过；最终独立验包器须针对根代理最终冻结 JAR 重新执行。该探针不编译生产源码，不启动 Minecraft 或 native core。
+- FC 工程 `tools/probes/Alpha17SfcStartupProbe.java` 提供最终 SFC JAR-only 探针，检查 5 个实际生产类的 protectionDomain 来源。已对一次本地候选 JAR 试跑 7121 条启动策略/门禁/阶段时钟断言通过；最终独立验包器须针对最终冻结 JAR 重新执行。该探针不编译生产源码，不启动 Minecraft 或 native core。
 - 尚未实际运行 Minecraft 双客户端、对等网络断线/重连场景或商业 SFC 游戏。纯策略测试和源码契约不是完整游戏实测，需在用户实例中验收一次领取即开、明确双人等待/开始、P2 归还后 P1 持续运行。
 
-当前状态：生产交根代理冻结和独立验包；如根代理指出编译/审计失败，仅定点修复，不自行打包安装。
+当前状态：源码冻结阶段；最终成品构建和独立验包仍待完成。

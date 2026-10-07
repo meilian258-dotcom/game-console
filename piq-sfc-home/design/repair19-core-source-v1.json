@@ -4,11 +4,11 @@
   "production_compiled": true,
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-gba-server31-v2\\piq_fc_arcade-0.31.0-alpha.31.jar",
+      "path": "piq-fc-arcade\\build\\review-gba-server31-v2\\piq_fc_arcade-0.31.0-alpha.31.jar",
       "sha256": "EB71CBF7F4FD3940C2B840F3E74629D0E925902EB4D4195C97973B5A8A874E58"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls30-v1\\piq_sfc-0.1.0-alpha.18.jar",
+      "path": "piq-fc-arcade\\build\\review-controls30-v1\\piq_sfc-0.1.0-alpha.18.jar",
       "sha256": "7BDF3B5BAB4722B35D85303CD2F18C9A7BEA640B3DB7B00C3E9CAFF24E1B49DB"
     }
   },

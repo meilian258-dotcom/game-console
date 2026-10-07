@@ -4,13 +4,19 @@ Fonts and sample entries are illustrative; geometry comes only from the current 
 layout classes. This intentionally does not reuse the old dark-panel preview geometry.
 """
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse, hashlib, html, io, json, re, subprocess, sys, tempfile, zipfile
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT=Path(__file__).resolve().parents[1]
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-MC=Path('C:/Users/13498/.gradle/caches/neoformruntime/artifacts/minecraft_1.21.1_client.jar')
+JAVA=(java_home() / 'bin')
+MC=(gradle_home() / 'caches/neoformruntime/artifacts/minecraft_1.21.1_client.jar')
 FONT=ImageFont.truetype('C:/Windows/Fonts/msyh.ttc',9)
 TITLE=ImageFont.truetype('C:/Windows/Fonts/msyh.ttc',18)
 LINE_HEIGHT=9

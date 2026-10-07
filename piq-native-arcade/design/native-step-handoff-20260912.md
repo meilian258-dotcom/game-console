@@ -1,6 +1,6 @@
-# 独立逐帧 helper 交接
+# 独立逐帧 helper 技术记录
 
-2026-09-12，`sfc_cabinet_provider`。本分工生产与测试源已冻结；根代理负责整合、构建、维护手册和最终资格决定。没有改 SFC、旧 NativeCoreWorker / BridgeProtocol / 旧 helper、用户实例或 ROM。
+2026-09-12。生产与测试源码冻结阶段记录；完整构建与最终成品验收仍待完成。SFC、旧 NativeCoreWorker／BridgeProtocol／helper 及游戏内容不变。
 
 ## 精确新增生产范围
 
@@ -11,7 +11,7 @@
   - stem `NativeStepWorker`；内部 `States,Session`。编译产生的其他嵌套以实际产物清单为准，不通配放行旧 helper 类变化。
   - 源 SHA256 `3338E7CC62A6E876CDEC4A068BFFB9F789006496F8A3175A692DC075642E5A6A`。
 
-新 helper 应在固定旧 helper 内容上只追加上述新类。旧 Engine、回调、输入编号转换的 class 必须逐字节保持，原 `piq-native-helper.jar` 不覆盖。父端 NativeStepSession / 原 NativeProcessSession 三个包内占用接口由 root 实施，不是本分工修改。
+新 helper 在固定旧 helper 基础上仅追加上述新类；旧 Engine、回调和输入编号转换 class 必须逐字节不变，原 `piq-native-helper.jar` 不覆盖。父端 NativeStepSession／NativeProcessSession 的三个包内占用接口须单独核对。
 
 ## 已实施 IPC
 
@@ -35,7 +35,7 @@ Frame 携 `hasVideo/freshVideo`。首轮没有 callback 明示空图，不多执
    - 回调生产器是 fake core；旧 Engine 从固定旧 helper JAR 加载并验证 CodeSource。没有加载 DLL。
    - 覆盖一请求一帧、空闲不推进、首空画面、实际 FPS 变化、四口转换一次、PCM 不积攒、SAVE/LOAD 计数、错误命令/视频/状态、成功与异常 teardown。
 2. `tools/check_native_step_lifecycle.py --report design/native-step-lifecycle-source-v2.json`
-   - 308 断言，9 个隔离父 JVM 测例，21.625 秒。真实编译的 NativeStepSession + NativeProcessSession 与指定 SHA 的 fake-child JAR；不是替换父生产类。v1 原证据保留，v2 绑定 root 修复 watchdog 竞态后的父端源。
+   - 308 断言，9 个隔离父 JVM 测例，21.625 秒。真实编译的 NativeStepSession + NativeProcessSession 与指定 SHA 的 fake-child JAR；不是替换父生产类。v1 原证据保留，v2 绑定修复 watchdog 竞态后的父端源。
    - 真 15 秒无 HELLO / 命令超时、16.25 秒合法空闲、阻塞取消、双会话拒绝、错误 hash / ID / 尺寸 / EOF、非法本地参数不消耗 ID、真实子进程退出后释放共享槽、仅自有暂存清理、无关 sentinel 不被杀。
    - 每例都重新获取真实 slot 并成功 STEP；四口 48 个单一位经实际 pipe 往返。
    - 支持 `--mod <final native jar>`，该模式只编 probes / fake helper，生产仅从指定 JAR 加载并校验 CodeSource；报告写 `mode=final-jar-only, production_compiled=false` 与路径/SHA。源模式明确不标 final。
@@ -44,7 +44,7 @@ Frame 携 `hasVideo/freshVideo`。首轮没有 callback 明示空图，不多执
 
 ## 边界与待父端处理
 
-- 父端 watchdog 原有读取旧 deadline 后结束/新命令竞态；root 已将 start/endDeadline 和超时身份复核放在同一 lifecycle 锁内，复读确认。v2 的 308 断言全部重跑通过；不把它冒称纳秒级竞态穷举证明。
+- 父端 watchdog 原有读取旧 deadline 后结束/新命令竞态；现已将 start/endDeadline 和超时身份复核放在同一 lifecycle 锁内，复读确认。v2 的 308 断言全部重跑通过；不把它冒称纳秒级竞态穷举证明。
 - 生命周期报告只读 DLL/JNA 做固定身份校验，不加载；生成 22-byte 空 ZIP 不是游戏 ROM。
 - MAME raw-state / postload PCM 确定性仍是独立研究门槛。本 helper/IPC 测试通过不等于 MAME 可注册 `openSync`，不能忽略未知状态字节或声音不一致来通过。
 - 没有真人 Minecraft 双机、真实网络中途加入或实际游戏内验证；现有媒体默认未改。

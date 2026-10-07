@@ -1,6 +1,6 @@
 # Alpha.7 field-feedback corrections
 
-2026-09-09. Owner: 像素匠 / root, dual_lower, subor_slim, alpha7_audit.
+2026-09-09，像素匠。
 Scope: floating same-level AV trunk, over-thick SB926, over-tall dual cabinet only.
 
 ## Geometry contract

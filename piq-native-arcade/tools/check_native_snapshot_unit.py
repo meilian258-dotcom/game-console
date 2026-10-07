@@ -1,9 +1,15 @@
 """Narrow actual JUnit tests for the production profile, opaque envelope, paths and shared process lease."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,hashlib,json,os,subprocess,sys,tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-JDK=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-CACHE=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
+JDK=(java_home() / 'bin')
+CACHE=(gradle_home() / 'caches/modules-2/files-2.1')
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest().upper()
 def main():
  sys.stdout.reconfigure(encoding='utf-8');p=argparse.ArgumentParser(description=__doc__);p.add_argument('--native',type=Path);p.add_argument('--report',type=Path,required=True);a=p.parse_args();assert not a.report.exists(),'Refuse overwrite'

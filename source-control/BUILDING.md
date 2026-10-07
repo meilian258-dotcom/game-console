@@ -28,13 +28,13 @@ python source-control/setup.py
 单项导入示例；把文件路径换成你实际取得的文件：
 
 ```powershell
-python source-control/build_inputs.py import --id libretro-jni-abi2 --file "D:/approved/piq-libretro-jni.dll"
+python source-control/build_inputs.py import --id libretro-jni-abi2 --file "./approved/piq-libretro-jni.dll"
 python source-control/build_inputs.py check
 ```
 
 其余项目按锁文件中的 ID 分别导入。只有 `check` 确认全部必需输入齐全后，才继续构建。默认缓存为仓库根 `.build-inputs/`，不提交到 Git。
 
-已有完整缓存可在构建时通过 `-PpiqInputsDir=D:/approved/build-inputs` 指定。锁文件的 `legacyPath` 只用于维护者导入旧材料；普通协作者无需创建那些 `outputs` 目录，Gradle 也不会自动回退去找它们。
+已有完整缓存可在构建时通过 `-PpiqInputsDir=../approved/build-inputs` 指定（相对于所构建的组件目录）。锁文件的 `legacyPath` 只用于导入历史构建材料；无需创建这些历史目录，Gradle 不会自动回退读取它们。
 
 ## 构建主模组
 

@@ -1,5 +1,11 @@
 """Native one-block beige CRT workstation. Existing textures only; never paints PNGs."""
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse,io,json,zipfile
 from pathlib import Path
 import numpy as np
@@ -13,7 +19,7 @@ MODEL=ASSETS/'models/block/cartridge_computer.json'
 ITEM=ASSETS/'models/item/cartridge_computer.json'
 STATE=ASSETS/'blockstates/cartridge_computer.json'
 OUT=CATEGORY/'老式卡带电脑-alpha12'/'接缝校正-v2'
-MC=Path('C:/Users/13498/.gradle/caches/neoformruntime/artifacts/minecraft_1.21.1_client.jar')
+MC=(gradle_home() / 'caches/neoformruntime/artifacts/minecraft_1.21.1_client.jar')
 SCREEN=(3.05,5.55,11.95,12.225,6.15)
 TEXTURES=('screen','dark','rim','back','metal','red','white','yellow')
 

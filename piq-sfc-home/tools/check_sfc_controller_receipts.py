@@ -1,4 +1,10 @@
 """Actual registered SFC ItemStack/Slot/NBT probe. Compiles probe only, no production or game."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse,json,os,shutil,tempfile,sys
 from pathlib import Path
 from run_sfc_playback_multiplayer_probe import ROOT,JAVA,MC,run,sha
@@ -7,7 +13,7 @@ def main():
     sys.stdout.reconfigure(encoding='utf-8');parser=argparse.ArgumentParser();parser.add_argument('--fc',type=Path,required=True);parser.add_argument('--sfc',type=Path,required=True);parser.add_argument('--report',type=Path,required=True);args=parser.parse_args()
     if args.report.exists():raise ValueError('Reports are immutable')
     jars={key:{'path':str(path.resolve()),'sha256':sha(path)}for key,path in [('fc',args.fc),('sfc',args.sfc)]}
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[]
     manifest=json.loads((MC.parent.parent/'artifacts/minecraft_1.21.1_version_manifest.json').read_text())
     for lib in manifest['libraries']:
         parts=lib['name'].split(':')

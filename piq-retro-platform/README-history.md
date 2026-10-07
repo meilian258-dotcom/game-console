@@ -1,6 +1,6 @@
 # 公共库历史说明
 
-以下保留 2026-10-07 整理前的原说明，包含旧版本状态、命令和已过期的私有仓库描述，仅供追溯。当前入口请看[现行说明](README.md)。
+以下记录早期版本的技术状态与构建边界，命令和版本仅用于历史追溯。当前入口请看[现行说明](README.md)。
 
 # Game Console: Retro Platform — internal shared library
 
@@ -76,7 +76,7 @@ The first stage preserves legacy block/item/backend IDs, frame protocols, save f
 cores. Pure interfaces and input tests are groundwork, not proof that every old session has migrated
 or that real Xbox / PlayStation / Switch controllers have been tested.
 
-## JNI-first adapters (GC-110 development, 2026-09-29)
+## JNI-first adapters (development, 2026-09-29)
 
 New emulator adapters target `LibretroRuntimes` with a trusted `LibretroProfile` and
 the addon's resource-owner class; do not copy native bridge classes into an addon.
