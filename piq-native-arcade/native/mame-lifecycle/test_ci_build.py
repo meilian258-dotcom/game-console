@@ -81,14 +81,10 @@ class ExtractionTests(unittest.TestCase):
         fixture = Path(self.tmp.name).resolve()
         self.root = fixture / "prepare"
         (self.root / "inputs").mkdir(parents=True)
-        self.archive = self.root / "inputs/base.tar.xz"
+        self.archive = self.root / "inputs/base.sfx.exe"
         self.archive.write_bytes(b"authenticated archive fixture; never extracted")
         self.base = {"filename": self.archive.name, "bytes": self.archive.stat().st_size,
                      "sha256": build.sha(self.archive)}
-        self.system = fixture / "system"
-        self.tar = self.system / "System32/tar.exe"
-        self.tar.parent.mkdir(parents=True)
-        self.tar.write_bytes(b"non-executable extractor fixture")
 
     def layout(self):
         for name in ("usr/bin/bash.exe", "usr/bin/pacman.exe", "usr/bin/msys-2.0.dll",
@@ -105,8 +101,7 @@ class ExtractionTests(unittest.TestCase):
             if outcome is not None:
                 raise outcome
             return subprocess.CompletedProcess(command, 0)
-        with patch.dict(os.environ, {"SystemRoot": str(self.system)}), \
-                patch.object(ci.subprocess, "run", side_effect=run) as mocked, \
+        with patch.object(ci.subprocess, "run", side_effect=run) as mocked, \
                 patch("sys.stdout", new_callable=io.StringIO):
             result = ci.extract_base(self.root, self.base)
         return result, mocked
@@ -114,17 +109,19 @@ class ExtractionTests(unittest.TestCase):
     def finished(self):
         return json.loads((self.root / "toolchain-extract-finished.json").read_text(encoding="utf-8"))
 
-    def test_bounded_verbose_extraction_records_hashes_and_layout(self):
+    def test_bounded_sfx_extraction_records_hashes_and_layout(self):
         result, run = self.invoke(layout=True)
         self.assertEqual(result, self.finished())
         self.assertEqual(result["status"], "complete")
         self.assertEqual(result["archive_sha256"], self.base["sha256"])
-        self.assertEqual(result["sha256"], build.sha(self.tar))
+        self.assertEqual(result["sha256"], build.sha(self.archive))
+        self.assertEqual(result["kind"], "official MSYS2 base SFX")
         self.assertEqual(result["log_sha256"], build.sha(self.root / "msys-extract.log"))
         self.assertTrue(result["child_reaped"])
         self.assertEqual(run.call_count, 1)
-        self.assertEqual(run.call_args.args[0],
-                         [str(self.tar), "-xvf", str(self.archive), "-C", str(self.root)])
+        self.assertEqual(run.call_args.args[0], [str(self.archive), "-y"])
+        self.assertTrue(self.archive.is_absolute())
+        self.assertEqual(run.call_args.kwargs["cwd"], self.root)
         self.assertEqual(run.call_args.kwargs["timeout"], 1200)
         self.assertEqual(run.call_args.kwargs["stdin"], subprocess.DEVNULL)
         self.assertEqual(run.call_args.kwargs["stderr"], subprocess.STDOUT)
@@ -174,7 +171,7 @@ class ExtractionTests(unittest.TestCase):
 
     @unittest.skipUnless(os.name == "nt", "Windows subprocess.run timeout cleanup path")
     def test_stdlib_timeout_kills_only_owned_popen_and_finishes_communication(self):
-        # Exercise the real subprocess.run wrapper with a fake Popen, not tar.
+        # Exercise the real subprocess.run wrapper with a fake Popen, not SFX.
         process = MagicMock()
         process.__enter__.return_value = process
         events = []
@@ -196,8 +193,7 @@ class ExtractionTests(unittest.TestCase):
 
         process.communicate.side_effect = communicate
         process.__exit__.side_effect = lambda *args: process.wait()
-        with patch.dict(os.environ, {"SystemRoot": str(self.system)}), \
-                patch.object(ci.subprocess, "Popen", return_value=process) as popen, \
+        with patch.object(ci.subprocess, "Popen", return_value=process) as popen, \
                 patch.object(ci, "save", side_effect=save), \
                 patch("sys.stdout", new_callable=io.StringIO), self.assertRaises(subprocess.TimeoutExpired):
             ci.extract_base(self.root, self.base)
@@ -270,6 +266,10 @@ class LockAndIsolationTests(unittest.TestCase):
 
     def test_complete_lock_and_pins(self):
         lock = ci.load_lock()
+        self.assertEqual(lock["base"]["filename"], "msys2-base-x86_64-20260927.sfx.exe")
+        self.assertEqual(lock["base"]["bytes"], 43117824)
+        self.assertEqual(lock["base"]["sha256"],
+                         "AD336CCCFDA47758B5E15CDA993FBBA421115CB0B126697DAEF1EE4DFE37209F")
         self.assertEqual(len(lock["packages"]), 38)
         self.assertEqual(len(lock["base_manifest"]), 85)
         self.assertEqual(sum(p["bytes"] for p in lock["packages"]), 120404498)

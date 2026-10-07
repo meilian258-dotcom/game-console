@@ -188,14 +188,15 @@ def extract_base(root: Path, base: dict) -> dict:
         raise ValueError("Pinned MSYS2 base changed before extraction")
     if (root / "msys64").exists():
         raise FileExistsError("MSYS2 extraction target already exists; no retry/reuse")
-    tar = Path(os.environ["SystemRoot"]) / "System32/tar.exe"
     log = root / "msys-extract.log"
-    command = [str(tar), "-xvf", str(archive), "-C", str(root)]
-    record = {"schema": "piq-mame-ci-extraction-1", "kind": "Windows System32 bsdtar",
-              "status": "extracting", "started_utc": stamp(), "sha256": sha(tar),
+    # Same fixed-release SFX invocation as msys2/setup-msys2. It only unpacks
+    # under cwd; unlike the GUI installer it adds no Windows integration.
+    command = [str(archive), "-y"]
+    record = {"schema": "piq-mame-ci-extraction-1", "kind": "official MSYS2 base SFX",
+              "status": "extracting", "started_utc": stamp(), "sha256": sha(archive),
               "archive": archive.name, "archive_sha256": base["sha256"].upper(),
               "archive_bytes": base["bytes"], "timeout_seconds": EXTRACT_TIMEOUT_SECONDS,
-              "command": command, "log": log.name, "timed_out": False,
+              "command": command, "cwd": str(root), "log": log.name, "timed_out": False,
               "child_reaped": False}
     save(root / "toolchain-extract-started.json", record)
     print(json.dumps({"stage": "msys-extract", "status": "started",
@@ -203,10 +204,10 @@ def extract_base(root: Path, base: dict) -> dict:
     began = time.monotonic()
     try:
         with log.open("xb") as output:
-            # File-backed verbose output cannot fill a PIPE or consume unbounded
+            # File-backed output cannot fill a PIPE or consume unbounded
             # Python memory. subprocess.run kills and waits for its own child
             # before re-raising TimeoutExpired; do not add a broad process kill.
-            result = subprocess.run(command, check=True, timeout=EXTRACT_TIMEOUT_SECONDS,
+            result = subprocess.run(command, cwd=root, check=True, timeout=EXTRACT_TIMEOUT_SECONDS,
                                     stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT,
                                     creationflags=getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0))
         record.update(exit_code=result.returncode, child_reaped=True)

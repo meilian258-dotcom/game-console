@@ -89,8 +89,8 @@ Clean GitHub-hosted Windows build
 ---------------------------------
 This route is independent of local build objects and caches. The exact same
 MAME commit, archive SHA and lifecycle patch are used. ci-toolchain-lock.json
-pins the official MSYS2 base 2026-09-27 (SHA-256
-EA2F31A0B6ADE63914CE441FFB022F0F6AA96982BFEFA2326460A26D5FB01322),
+pins the official MSYS2 base 2026-09-27 SFX (43,117,824 bytes; SHA-256
+AD336CCCFDA47758B5E15CDA993FBBA421115CB0B126697DAEF1EE4DFE37209F),
 its 85-package manifest and a 38-package dependency closure from the official
 MSYS2 repositories. Each additional package has its own URL, version, size and
 SHA. The native toolchain remains MINGW64: GCC 16.2.0-4, Python 3.14.8-1 and
@@ -101,8 +101,11 @@ Do not use rolling pacman -S/-Sy/-Su or setup-msys2's default latest release /
 install options. ci_prepare.py requires a new directory under RUNNER_TEMP on
 a GitHub-hosted Windows runner (not a self-hosted or local machine). It:
 * downloads the pinned official base and source ZIP, checking size and SHA;
-* extracts with Windows System32 bsdtar into a new, task-owned MSYS2 instance,
-  with a 1,200-second extraction timeout and noninteractive, file-backed verbose
+* extracts the authenticated base SFX with -y and cwd set to the new, task-owned
+  preparation root, as the official setup-msys2 action does; this is the same
+  base release as its tar.xz archive, without Windows integration or a dependency
+  on the runner's preinstalled 7-Zip; retains the 1,200-second extraction timeout
+  and noninteractive, file-backed
   output in msys-extract.log; retains extractor/archive hashes, elapsed time,
   exit/timeout status in toolchain-extract-started/finished.json, and checks the
   expected msys64 layout before initialization;
@@ -138,8 +141,10 @@ PowerShell steps from the repository checkout:
     --toolchain-receipt "$ciRoot/toolchain-receipt.json"
 Check LASTEXITCODE after each native command, or put them in separate workflow
 steps. Preparation/build failures stop the job; no automatic rebuild occurs.
-The extraction timeout is a bounded diagnostic budget, not a proven runtime:
-an initial hosted extraction exceeded 300 seconds without a recorded tar error.
+The extraction timeout is a bounded diagnostic budget, not a proven runtime.
+The SFX replaces System32 bsdtar after slow hosted tar.xz extraction; the base
+release and complete package manifest are unchanged. Its speed still requires
+hosted validation; the timeout is not increased again.
 Python's subprocess.run kills and waits for its direct child before reporting
 TimeoutExpired. This is not an arbitrary descendant-process cleanup guarantee.
 Partial extraction and logs are retained, never retried or reused; initialization
@@ -201,6 +206,8 @@ https://docs.github.com/en/actions/reference/limits
 https://www.msys2.org/docs/package-management/
 https://github.com/msys2/msys2-installer/releases/tag/2026-09-27
 https://github.com/msys2/setup-msys2
+https://github.com/msys2/setup-msys2/blob/d34ca6fb9f66412423e0ade249ca8a35b3715726/main.js
+https://www.msys2.org/docs/installer/
 https://docs.python.org/3.12/library/subprocess.html#subprocess.run
 https://gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
 https://docs.mamedev.org/initialsetup/compilingmame.html

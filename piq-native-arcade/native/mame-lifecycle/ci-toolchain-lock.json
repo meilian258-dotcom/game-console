@@ -4,10 +4,10 @@
   "verified_at_utc": "2026-10-07T16:12:47+00:00",
   "upstream_release_url": "https://github.com/msys2/msys2-installer/releases/tag/2026-09-27",
   "base": {
-    "url": "https://github.com/msys2/msys2-installer/releases/download/2026-09-27/msys2-base-x86_64-20260927.tar.xz",
-    "filename": "msys2-base-x86_64-20260927.tar.xz",
-    "bytes": 42860696,
-    "sha256": "EA2F31A0B6ADE63914CE441FFB022F0F6AA96982BFEFA2326460A26D5FB01322",
+    "url": "https://github.com/msys2/msys2-installer/releases/download/2026-09-27/msys2-base-x86_64-20260927.sfx.exe",
+    "filename": "msys2-base-x86_64-20260927.sfx.exe",
+    "bytes": 43117824,
+    "sha256": "AD336CCCFDA47758B5E15CDA993FBBA421115CB0B126697DAEF1EE4DFE37209F",
     "manifest_url": "https://github.com/msys2/msys2-installer/releases/download/2026-09-27/msys2-base-x86_64-20260927.packages.txt",
     "manifest_sha256": "97D3BDC7A8DFF9663A1CB5DCD5DF3883F2197CF69747B8AE75E76ECFE4D86A94"
   },
