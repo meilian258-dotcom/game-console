@@ -318,14 +318,39 @@ class LockAndIsolationTests(unittest.TestCase):
     def test_offline_keyring_disables_even_explicit_network_import(self):
         config = self.root / "etc/pacman.d/gnupg/gpg.conf"
         config.parent.mkdir(parents=True)
-        original = b"no-greeting\n"
+        # Exact five-line initialization output from the pinned pacman package;
+        # the digest also matches the failed hosted run's before_sha256 receipt.
+        original = (b"no-greeting\nno-permission-warning\nkeyserver-options timeout=10\n"
+                    b"keyserver-options import-clean\nkeyserver-options no-self-sigs-only\n")
         config.write_bytes(original)
         receipt = ci.enforce_offline_keyring(self.root)
         actual = config.read_bytes()
         self.assertTrue(actual.startswith(original))
-        for option in (b"no-auto-key-retrieve", b"no-auto-key-import", b"auto-key-locate clear", b"disable-dirmngr"):
-            self.assertIn(option, actual.splitlines())
-        self.assertNotEqual(receipt["before_sha256"], receipt["after_sha256"])
+        options = ["lock-never", "no-auto-key-retrieve", "no-auto-key-import",
+                   "auto-key-locate clear", "disable-dirmngr"]
+        for option in options:
+            self.assertEqual(actual.splitlines().count(option.encode("ascii")), 1)
+        self.assertEqual(receipt["before_sha256"],
+                         "588CE84F80E9B421FD01C4EA58D40ADF5EDAFED0A26958A03B6115E3AFCF1E4A")
+        self.assertEqual(receipt["after_sha256"], build.sha(config))
+        self.assertEqual(receipt["added_options"], options)
+        repeated = ci.enforce_offline_keyring(self.root)
+        self.assertEqual(config.read_bytes(), actual)
+        self.assertEqual(repeated["before_sha256"], receipt["after_sha256"])
+        self.assertEqual(repeated["after_sha256"], receipt["after_sha256"])
+        self.assertEqual(repeated["added_options"], [])
+
+    def test_offline_keyring_preserves_existing_options_and_line_endings(self):
+        config = self.root / "etc/pacman.d/gnupg/gpg.conf"
+        config.parent.mkdir(parents=True)
+        original = b"no-greeting\r\n lock-never \r\nno-auto-key-import"
+        config.write_bytes(original)
+        receipt = ci.enforce_offline_keyring(self.root)
+        actual = config.read_bytes()
+        self.assertTrue(actual.startswith(original + b"\n"))
+        self.assertNotIn("lock-never", receipt["added_options"])
+        self.assertNotIn("no-auto-key-import", receipt["added_options"])
+        self.assertEqual([line.strip() for line in actual.splitlines()].count(b"lock-never"), 1)
 
     def test_ci_rejects_resume_before_reading_receipt(self):
         args = argparse.Namespace(resume=True, prepare_only=False, jobs=4, toolchain_receipt=None)
@@ -395,6 +420,11 @@ class LockAndIsolationTests(unittest.TestCase):
         self.assertNotIn("BASH_ENV", env)
         self.assertNotIn("PYTHONPATH", env)
         self.assertNotIn("injected", env["PATH"])
+        self.assertEqual(run.call_args.args[0],
+                         [str(self.root / "usr/bin/bash.exe"), "--noprofile", "--norc", "-c", "set -eu\nfixture"])
+        self.assertEqual(run.call_args.kwargs["cwd"], self.root)
+        self.assertEqual(env["PATH"], str(self.root / "usr/bin") + os.pathsep + str(Path("C:/Windows/System32")))
+        self.assertEqual(env["MSYSTEM"], "MSYS")
 
 
 class BuildCommandTests(unittest.TestCase):

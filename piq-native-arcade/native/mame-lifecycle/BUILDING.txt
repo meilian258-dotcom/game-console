@@ -115,6 +115,11 @@ a GitHub-hosted Windows runner (not a self-hosted or local machine). It:
   every local signature with pacman-key --verify before installation, then
   installs the packages together with pacman -U using a repository-free
   configuration and Required signatures (noconfirm alone is not an offline gate);
+  adds the lock-never option required by the pinned MSYS2 pacman-key verifier
+  but omitted by its initialization; this disables GPG file locking only in
+  the fresh, private keyring used serially by this preparation, not signature
+  verification or trust checks; preserves existing configuration and records
+  added options and before/after hashes, without reinitialization or chmod;
 * refuses missing dependencies, expired/untrusted signatures or package drift;
   it does not refresh the keyring or relax checks to bypass a failure;
 * compares the complete installed package manifest with the lock, verifies

@@ -143,15 +143,24 @@ def disable_key_refresh(msys: Path) -> dict:
 def enforce_offline_keyring(msys: Path) -> dict:
     # --noconfirm alone may approve pacman's explicit missing-key import.
     # Disable GnuPG network access as well as automatic lookup in this new root.
+    # MSYS2 pacman 6.1.0-25 requires lock-never for --verify but does not add it
+    # during --init. This keyring is private to this CI run and used serially;
+    # this is not a policy for shared keyrings and does not change signature trust.
     config = msys / "etc/pacman.d/gnupg/gpg.conf"
     original = config.read_bytes()
-    options = b"\nno-auto-key-retrieve\nno-auto-key-import\nauto-key-locate clear\ndisable-dirmngr\n"
-    changed = original + options
-    config.write_bytes(changed)
+    options = (b"lock-never", b"no-auto-key-retrieve", b"no-auto-key-import",
+               b"auto-key-locate clear", b"disable-dirmngr")
+    existing = {line.strip() for line in original.splitlines()}
+    added = [option for option in options if option not in existing]
+    changed = original
+    if added:
+        changed += (b"" if not original or original.endswith(b"\n") else b"\n") + b"\n".join(added) + b"\n"
+        config.write_bytes(changed)
     return {"file": "etc/pacman.d/gnupg/gpg.conf",
             "before_sha256": hashlib.sha256(original).hexdigest().upper(),
             "after_sha256": hashlib.sha256(changed).hexdigest().upper(),
-            "change": "disable automatic key import/retrieval and Dirmngr network access"}
+            "added_options": [option.decode("ascii") for option in added],
+            "change": "enable serial private-keyring verification; disable automatic key import/retrieval and Dirmngr network access"}
 
 
 def run_shell(msys: Path, command: str, log: Path, *, login=False) -> str:
