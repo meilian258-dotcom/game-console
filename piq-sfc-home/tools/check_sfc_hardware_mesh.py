@@ -2,6 +2,12 @@
 
 No Minecraft/native runtime. Arms are documented vanilla-volume skin-color stand-ins.
 """
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,io,itertools,json,math,os,subprocess,tempfile
 from pathlib import Path
 import numpy as np
@@ -10,10 +16,10 @@ import build_sfc_hardware_mesh as build
 from check_controller_pose_pipeline import translation,rotation,scale,points,projected_bounds
 from check_controller_slanted_pose import raster,FACES,hit,arm_triangles,project
 ROOT=build.PROJECT
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
+JAVA=(java_home() / 'bin')
 
 def java_probe(path):
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2'),('com.google.code.gson','2.10.1')]:
         deps.extend(p for p in (cache/group).rglob('*.jar') if version in p.parts and '-sources' not in p.name and '-javadoc' not in p.name)
     if not any('gson' in p.name for p in deps):deps.append(next((cache/'com.google.code.gson/gson').rglob('gson-*.jar')))

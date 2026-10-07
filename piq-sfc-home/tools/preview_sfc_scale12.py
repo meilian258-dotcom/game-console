@@ -1,4 +1,10 @@
 """Render actual post-load Java vertex transforms, never edits a model or PNG asset."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse, hashlib, json, os, subprocess, tempfile, sys, zipfile
 from pathlib import Path
 import numpy as np
@@ -7,7 +13,7 @@ import import_user_sfc_20260911 as base
 from check_controller_pose_pipeline import display_matrix,translation,points
 from build_tv_remote_model import render_gui
 ROOT=base.ROOT/'piq-sfc-home'
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
+JAVA=(java_home() / 'bin')
 BASELINE=base.ROOT/'piq-fc-arcade/build/review-watch23-v1/piq_sfc-0.1.0-alpha.11.jar'
 
 def derived_item_bytes(original,kind):
@@ -19,7 +25,7 @@ def derived_item_bytes(original,kind):
     return (json.dumps(item,ensure_ascii=False,separators=(',',':'))+'\n').encode('utf-8')
 
 def actual_java():
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2'),('com.google.code.gson','2.10.1')]:
         deps.extend(f for f in (cache/group).rglob('*.jar') if version in f.parts and '-sources'not in f.name and '-javadoc'not in f.name)
     paths=[ROOT/'src/main/java/cn/piq/sfchome/client'/(n+'.java')for n in ('SfcHardwareMeshData','SfcButtonAnimation','SfcAvCableGeometry')]

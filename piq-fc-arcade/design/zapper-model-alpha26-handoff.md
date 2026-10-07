@@ -1,6 +1,6 @@
 # 光枪物品、姿势与瞄准交接（alpha26）
 
-修改者：cabinet_reuse_review / 像素匠协作子任务。日期：2026-09-11。
+日期：2026-09-11。
 状态：生产冻结；最终 v2 成品验证通过。未启动 Minecraft、安装或修改用户 ROM/存档。
 
 ## 生产范围
@@ -16,7 +16,7 @@
 - `client/zapper/ZapperClient`、`ZapperClient$1`、`$RemoteAnimation`。
 - `client/zapper/ZapperItemRenderer`、`ZapperItemRenderer$1`、`$2`、`$Cached`。
 
-`HomeZapperService` / `ZapperBinding` / `ZapperData` / network / worker 由会话代理负责，`ClientArcadeEvents` facade 和注册由 root 负责，不混入此清单。
+`HomeZapperService` / `ZapperBinding` / `ZapperData` / network / worker 由会话代理负责，`ClientArcadeEvents` facade 和注册负责，不混入此清单。
 
 ## 资源与原模型保护
 

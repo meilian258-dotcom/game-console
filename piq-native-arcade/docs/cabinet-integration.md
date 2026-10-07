@@ -1,6 +1,6 @@
 # Native cabinet module contract — 0.1.0-alpha.1
 
-Owner: dual_lower. Local module only; does not itself establish working MAME emulation, game compatibility or multiplayer support. Root integrates the client/core and performs the only Gradle build.
+This record covers the local cabinet module only; it does not establish MAME emulation, game compatibility or multiplayer support. Client/core integration and a complete Gradle build require separate verification.
 
 ## Registration and state
 
@@ -26,7 +26,7 @@ The client-only listener must require the same integrated server as `Minecraft.g
 
 `NativeCabinetRenderer` is client-only MOD subscriber, registers the anchor BER, native item BEWLR, and standalone model `piq_fc_arcade:block/dual_arcade_body`. Only the anchor draws the physical body. Baked quads cache by actual model object to invalidate on reload. All existing textures/resources remain in the FC dependency.
 
-Root installs `NativeCabinetRenderer.setVideoRenderer(VideoRenderer)` where `render(cabinet,partial,poses,buffers,light,overlay)` receives the ORIGINAL ANCHOR-LOCAL world-axis pose, outside the cabinet model yaw/Y-rebase. Callback is wrapped in push/pop. Default callback draws nothing, leaving the actual black glass. The item renderer never calls video.
+Register `NativeCabinetRenderer.setVideoRenderer(VideoRenderer)` in the client integration. Its `render(cabinet,partial,poses,buffers,light,overlay)` receives the ORIGINAL ANCHOR-LOCAL world-axis pose, outside the cabinet model yaw/Y-rebase. The callback is wrapped in push/pop. The default callback draws nothing, leaving the black glass; the item renderer never calls video.
 
 `NativeCabinetRenderer.turns(cabinet)` returns 0..3. Public pure `NativeCabinetLayout.bounds(turns)`, `.screen(turns)`, `.frame(turns,coreDar)` and `.occupancy(turns)` delegate to FC frozen geometry. Returned points are already in final block units, including the screen's normal offset; DO NOT apply body Y rebase or yaw to these points again. Use core display-aspect metadata, including vertical games and non-square pixels; never stretch/crop based solely on raster dimensions.
 

@@ -1,8 +1,14 @@
 """Compile selected production sources against real MC API; or --jar compiles probe ONLY. No Gradle/game."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,hashlib,json,os,shutil,subprocess,tempfile,sys
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1];JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-MC=Path('C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
+ROOT=Path(__file__).resolve().parents[1];JAVA=(java_home() / 'bin')
+MC=(gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
 NAMES=['net/SfcHomeNetwork','net/SfcJoinNetwork','server/SfcJoinGate','server/SfcHomeServer','server/SfcHomeStartPolicy','client/SfcHomeClient','client/SfcPlayback','client/SfcJoinClient','client/SfcJoinScreen','client/SfcCardEditorScreen']
 def run(args,cwd):
     p=subprocess.run(list(map(str,args)),cwd=cwd,capture_output=True,timeout=120);out=p.stdout.decode('utf-8','replace')+'\n'+p.stderr.decode('utf-8','replace')
@@ -11,7 +17,7 @@ def run(args,cwd):
 def main():
     sys.stdout.reconfigure(encoding='utf-8');parser=argparse.ArgumentParser();parser.add_argument('--report',required=True,type=Path);parser.add_argument('--jar',type=Path);parser.add_argument('--fc',type=Path);args=parser.parse_args()
     if args.report.exists():raise ValueError('Old reports must stay frozen')
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');manifest=json.loads((MC.parent.parent/'artifacts/minecraft_1.21.1_version_manifest.json').read_text());vanilla=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');manifest=json.loads((MC.parent.parent/'artifacts/minecraft_1.21.1_version_manifest.json').read_text());vanilla=[]
     for lib in manifest['libraries']:
         parts=lib['name'].split(':')
         if len(parts)==3:vanilla.extend((cache/parts[0]/parts[1]/parts[2]).rglob(parts[1]+'-'+parts[2]+'.jar'))

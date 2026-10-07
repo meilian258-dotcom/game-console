@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "final_jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-linked21-v1\\piq_fc_arcade-0.31.0-alpha.21.jar",
+  "final_jar": "piq-fc-arcade\\build\\review-linked21-v1\\piq_fc_arcade-0.31.0-alpha.21.jar",
   "final_jar_sha256": "0147D49C542E82DDF2DD37CDAFFBDB135CDA20E11907B4060B471A2FBC0D3F93",
   "exact_tested_source_class_match": true,
   "comparison_javac_flags": [

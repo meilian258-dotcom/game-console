@@ -1,9 +1,15 @@
 """Compile the private helper without Gradle or loading a native library in this Python process."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 from pathlib import Path
 import argparse,subprocess,tempfile,hashlib,json
 ROOT=Path(__file__).resolve().parents[1]
-JDK=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-JNA=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/5.14.0/67bf3eaea4f0718cb376a181a629e5f88fa1c9dd/jna-5.14.0.jar')
+JDK=(java_home() / 'bin')
+JNA=(gradle_home() / 'caches/modules-2/files-2.1/net.java.dev.jna/jna/5.14.0/67bf3eaea4f0718cb376a181a629e5f88fa1c9dd/jna-5.14.0.jar')
 def build(output):
     output=Path(output).resolve()
     if output.exists():raise FileExistsError(output)

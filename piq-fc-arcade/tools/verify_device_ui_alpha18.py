@@ -5,6 +5,12 @@ test probes are compiled, against delivered JARs with an empty sourcepath.
 """
 from __future__ import annotations
 
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
+
 import argparse
 from collections import Counter
 from datetime import datetime, timezone
@@ -494,7 +500,7 @@ def inspect(paths, hashes, javap):
     report["sfc_new_cover_geometry_probe"] = packaged_probe(paths["sfc"], javap, "Alpha17SfcCoverProbe.java", "cn.piq.sfchome.client.Alpha17SfcCoverProbe", 20)
     report["sfc_join_transaction_probe"] = packaged_probe(paths["sfc"], javap, "Alpha18SfcJoinProbe.java", "cn.piq.sfchome.server.Alpha18SfcJoinProbe", 380)
     report["sfc_per_port_health_probe"] = packaged_probe(paths["sfc"], javap, "Alpha18SfcHealthProbe.java", "cn.piq.sfchome.server.Alpha18SfcHealthProbe", 35000)
-    gson_candidates=sorted(Path("C:/Users/13498/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson").rglob("gson-2.10.1.jar"))
+    gson_candidates=sorted((gradle_home() / 'caches/modules-2/files-2.1/com.google.code.gson/gson').rglob("gson-2.10.1.jar"))
     require(bool(gson_candidates),"Cached Gson dependency is required for final-JAR mesh probe")
     gson=gson_candidates[0]
     report["sfc_hardware_mesh_and_pose_probe"] = packaged_probe(paths["sfc"], javap, "Alpha18SfcHardwareProbe.java", "cn.piq.sfchome.client.Alpha18SfcHardwareProbe", 500000,(gson,))
@@ -526,7 +532,7 @@ def main():
     for key in CONTRACTS:
         parser.add_argument("--" + key + "-jar", type=Path, required=True)
         parser.add_argument("--" + key + "-sha256", required=True)
-    parser.add_argument("--javap", type=Path, default=Path("C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin/javap.exe"))
+    parser.add_argument("--javap", type=Path, default=(java_home() / 'bin/javap.exe'))
     parser.add_argument("--report", type=Path)
     parser.add_argument("--check-only", action="store_true")
     args = parser.parse_args()

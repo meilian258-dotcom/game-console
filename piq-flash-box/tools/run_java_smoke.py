@@ -1,4 +1,10 @@
 """Smoke frozen Java bridge against frozen helper in a new isolated game directory."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse, hashlib, json, pathlib, shutil, subprocess, time, zipfile
 parser = argparse.ArgumentParser()
 parser.add_argument('--version', choices=['0.1.0-prototype.1','0.1.0-prototype.2','0.1.0-prototype.3'], default='0.1.0-prototype.3')
@@ -6,8 +12,8 @@ options = parser.parse_args()
 WORK = pathlib.Path(__file__).resolve().parents[2]
 PROJECT = WORK / "piq-flash-box"
 JAR = PROJECT / ("build/libs/game_console_flash_box-" + options.version + ".jar")
-GSON = pathlib.Path(r"C:\Users\13498\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.11.0\527175ca6d81050b53bdd4c457a6d6e017626b0e\gson-2.11.0.jar")
-JDK = pathlib.Path(r"C:\Program Files\Microsoft\jdk-21.0.11.10-hotspot\bin")
+GSON = (gradle_home() / 'caches/modules-2/files-2.1/com.google.code.gson/gson/2.11.0/527175ca6d81050b53bdd4c457a6d6e017626b0e/gson-2.11.0.jar')
+JDK = (java_home() / 'bin')
 SWF = PROJECT / "runtime/private-test/the-forest-temple.swf"
 PUBLISH = PROJECT / {'0.1.0-prototype.1':'runtime/bin/Release/net6.0-windows/win-x64/publish',
     '0.1.0-prototype.2':'runtime/publish-0.1.1', '0.1.0-prototype.3':'runtime/publish-0.1.2'}[options.version]

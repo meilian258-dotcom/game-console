@@ -3,15 +3,15 @@
   "schema": "piq-controls26-final-1",
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
+      "path": "piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
       "sha256": "74E16FEF0F69C88191C0A64DA4FCCDEFD2F3B18B231FC56C97839E60B885FBE5"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_sfc-0.1.0-alpha.15.jar",
+      "path": "piq-fc-arcade\\build\\review-controls26-v2\\piq_sfc-0.1.0-alpha.15.jar",
       "sha256": "EC4BAF1CE1819BAA85229B2873AA9B97A70B19340E6B7EA23CB43FD479BC63C6"
     },
     "native": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_native_arcade-0.1.0-alpha.10.jar",
+      "path": "piq-fc-arcade\\build\\review-controls26-v2\\piq_native_arcade-0.1.0-alpha.10.jar",
       "sha256": "F4011CBDE8DC3F3F3FA44FD03077638421C7D3334B33A55AFFB0E78C740C2453"
     }
   },
@@ -74,17 +74,17 @@
   },
   "temporary_copies": {
     "fc": {
-      "path": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-controls26-final-ud13jkds\\fc.jar",
+      "path": "<temp-dir>/piq-controls26-final-ud13jkds\\fc.jar",
       "sha256": "74E16FEF0F69C88191C0A64DA4FCCDEFD2F3B18B231FC56C97839E60B885FBE5",
       "byte_identical_before_and_after": true
     },
     "sfc": {
-      "path": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-controls26-final-ud13jkds\\sfc.jar",
+      "path": "<temp-dir>/piq-controls26-final-ud13jkds\\sfc.jar",
       "sha256": "EC4BAF1CE1819BAA85229B2873AA9B97A70B19340E6B7EA23CB43FD479BC63C6",
       "byte_identical_before_and_after": true
     },
     "native": {
-      "path": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-controls26-final-ud13jkds\\native.jar",
+      "path": "<temp-dir>/piq-controls26-final-ud13jkds\\native.jar",
       "sha256": "F4011CBDE8DC3F3F3FA44FD03077638421C7D3334B33A55AFFB0E78C740C2453",
       "byte_identical_before_and_after": true
     }
@@ -152,7 +152,7 @@
             "piq_fc_arcade"
           ],
           "scanned_classes": 1363,
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-3o4qgd1h\\fc.jar"
+          "jar": "<temp-dir>/piq-alpha19-compat-3o4qgd1h\\fc.jar"
         },
         {
           "module_name": "piq_sfc_arcade",
@@ -225,7 +225,7 @@
             "piq_sfc_home"
           ],
           "scanned_classes": 199,
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-3o4qgd1h\\sfc.jar"
+          "jar": "<temp-dir>/piq-alpha19-compat-3o4qgd1h\\sfc.jar"
         },
         {
           "module_name": "piq_native_arcade",
@@ -263,7 +263,7 @@
             "piq_native_arcade"
           ],
           "scanned_classes": 43,
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-3o4qgd1h\\native.jar"
+          "jar": "<temp-dir>/piq-alpha19-compat-3o4qgd1h\\native.jar"
         }
       ],
       "minecraft_or_native_core_started": false,
@@ -284,22 +284,22 @@
     },
     "hash_checked_temporary_copies": {
       "fc": {
-        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
-        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-3o4qgd1h\\fc.jar",
+        "original": "piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
+        "temporary_probe_copy": "<temp-dir>/piq-alpha19-compat-3o4qgd1h\\fc.jar",
         "sha256": "74E16FEF0F69C88191C0A64DA4FCCDEFD2F3B18B231FC56C97839E60B885FBE5",
         "byte_identical_before": true,
         "byte_identical_after": true
       },
       "sfc": {
-        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_sfc-0.1.0-alpha.15.jar",
-        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-3o4qgd1h\\sfc.jar",
+        "original": "piq-fc-arcade\\build\\review-controls26-v2\\piq_sfc-0.1.0-alpha.15.jar",
+        "temporary_probe_copy": "<temp-dir>/piq-alpha19-compat-3o4qgd1h\\sfc.jar",
         "sha256": "EC4BAF1CE1819BAA85229B2873AA9B97A70B19340E6B7EA23CB43FD479BC63C6",
         "byte_identical_before": true,
         "byte_identical_after": true
       },
       "native": {
-        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_native_arcade-0.1.0-alpha.10.jar",
-        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-3o4qgd1h\\native.jar",
+        "original": "piq-fc-arcade\\build\\review-controls26-v2\\piq_native_arcade-0.1.0-alpha.10.jar",
+        "temporary_probe_copy": "<temp-dir>/piq-alpha19-compat-3o4qgd1h\\native.jar",
         "sha256": "F4011CBDE8DC3F3F3FA44FD03077638421C7D3334B33A55AFFB0E78C740C2453",
         "byte_identical_before": true,
         "byte_identical_after": true
@@ -313,7 +313,7 @@
     "mode": "final-jar-only",
     "production_compiled": false,
     "input": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
+      "path": "piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
       "sha256": "74E16FEF0F69C88191C0A64DA4FCCDEFD2F3B18B231FC56C97839E60B885FBE5"
     },
     "behavior": {
@@ -338,7 +338,7 @@
       "gui_key_gates": 3,
       "cancel_return_before_vanilla": true,
       "host": "read-only-classpath-service",
-      "transformer_origin": "file:/C:/Users/13498/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar"
+      "transformer_origin": "<gradle-user-home>/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar"
     },
     "mapping_transform_and_queue": {
       "ok": true,
@@ -369,7 +369,7 @@
     "logs": {
       "compile": "",
       "behavior": "{\"passed_tests\":57,\"minecraft_started\":false,\"mode\":\"actual-production-pure-state-machines\"}\n",
-      "head": "{\"ok\":true,\"assertions\":40,\"actual_mixin_transformer\":true,\"minecraft_started\":false,\"minecraft_classes_defined\":0,\"target_sha256\":\"08EFB37D5916C857C38A047BE0C731E1A42C00370D39AE341C0C1EC316F400FC\",\"downstream_minecraft_sha256\":\"495F5DC97D07476E23835FCDD034019A020A58B980F7C764D4953CE4ED16D283\",\"mixin_sha256\":\"E73ED989506FD84AB750D0ECF5ED1639D1D9C413E233385C9AA51A0D13727E24\",\"transformed_sha256\":\"1AB1D86379F2D8A683A87882530D0629757F7CA19442841B4B85360552DEBDF3\",\"prefix_instructions\":18,\"original_instructions_preserved\":382,\"router_before_keymapping_click\":true,\"vanilla_gui_uses_consumed_clicks\":true,\"gui_key_gates\":3,\"cancel_return_before_vanilla\":true,\"host\":\"read-only-classpath-service\",\"transformer_origin\":\"file:/C:/Users/13498/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar\"}\n",
+      "head": "{\"ok\":true,\"assertions\":40,\"actual_mixin_transformer\":true,\"minecraft_started\":false,\"minecraft_classes_defined\":0,\"target_sha256\":\"08EFB37D5916C857C38A047BE0C731E1A42C00370D39AE341C0C1EC316F400FC\",\"downstream_minecraft_sha256\":\"495F5DC97D07476E23835FCDD034019A020A58B980F7C764D4953CE4ED16D283\",\"mixin_sha256\":\"E73ED989506FD84AB750D0ECF5ED1639D1D9C413E233385C9AA51A0D13727E24\",\"transformed_sha256\":\"1AB1D86379F2D8A683A87882530D0629757F7CA19442841B4B85360552DEBDF3\",\"prefix_instructions\":18,\"original_instructions_preserved\":382,\"router_before_keymapping_click\":true,\"vanilla_gui_uses_consumed_clicks\":true,\"gui_key_gates\":3,\"cancel_return_before_vanilla\":true,\"host\":\"read-only-classpath-service\",\"transformer_origin\":\"<gradle-user-home>/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar\"}\n",
       "mapping": "WARN StatusConsoleListener Advanced terminal features are not available in this environment\n{\"ok\":true,\"assertions\":77,\"actual_mixin_transformer\":true,\"actual_keymapping_instances\":true,\"actual_toggle_failure_reproduced\":true,\"advancements_click_gate_verified\":true,\"keyboard_queue_clear_and_mouse_preservation\":true,\"minecraft_started\":false,\"target_sha256\":\"65A4705D3E365D9ACAB956DE24701253CB400F908A00F099029B7F61B74BEC4F\",\"accessor_sha256\":\"B28E1EFE717F433C16AE98F7A0D312F78A01DFAA2546AB167AED18A3C9B30FE4\",\"transformed_sha256\":\"09DEB7D234EE4582133B32D0EFAA5CC201327B372C2EDA8BE60D256225EEC08A\",\"helper_sha256\":\"39056A6460674EC1C6C9550247212B052C2E90C37E892DFBDCBAF742B6445391\"}\n"
     },
     "limits": [

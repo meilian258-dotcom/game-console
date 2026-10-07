@@ -21,11 +21,11 @@
   "elapsed_seconds": 5.312,
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
+      "path": "piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
       "sha256": "74E16FEF0F69C88191C0A64DA4FCCDEFD2F3B18B231FC56C97839E60B885FBE5"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_sfc-0.1.0-alpha.15.jar",
+      "path": "piq-fc-arcade\\build\\review-controls26-v2\\piq_sfc-0.1.0-alpha.15.jar",
       "sha256": "EC4BAF1CE1819BAA85229B2873AA9B97A70B19340E6B7EA23CB43FD479BC63C6"
     }
   },

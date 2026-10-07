@@ -1,10 +1,16 @@
 """Isolated production room-ledger tests and real-Minecraft network API probe; never starts a game."""
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,hashlib,json,os,subprocess,tempfile,sys,shutil
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-MC=Path('C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
+JAVA=(java_home() / 'bin')
+MC=(gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
 FC=ROOT.parent/'制作Mod/03-街机模拟/PIQ-FC街机/alpha20-compact-vanilla-ui/piq_fc_arcade-0.31.0-alpha.20.jar'
 def run(args):
     p=subprocess.run(list(map(str,args)),cwd=ROOT,capture_output=True,encoding='utf-8',errors='replace',timeout=60)
@@ -13,7 +19,7 @@ def run(args):
 def main():
     sys.stdout.reconfigure(encoding='utf-8');p=argparse.ArgumentParser();p.add_argument('--pure',action='store_true');p.add_argument('--report',required=True,type=Path);a=p.parse_args()
     if a.report.exists():raise ValueError('Refuse to overwrite prior evidence')
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');junit=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');junit=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2')]:
         junit.extend(f for f in (cache/group).rglob('*.jar')if version in f.parts and '-sources'not in f.name and '-javadoc'not in f.name)
     src=ROOT/'src/main/java/cn/piq/fcarcade/cabinet';test=ROOT/'src/test/java/cn/piq/fcarcade/cabinet'

@@ -1,8 +1,8 @@
 {
   "passed": true,
   "frozen_jars_sha256": {
-    "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-SFC街机\\piq_sfc_arcade-0.2.0-alpha.6.jar": "38FA46C5D283EAD9E1F6666D01398F495E2E1A3260A1517BE8EE959710963363",
-    "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-FC街机\\alpha16-rom-browser\\piq_fc_arcade-0.31.0-alpha.16.jar": "9E02D350DAED8450F6C27651BC61F019C5229C4AED86FC9F398137F9BA049ADE"
+    "制作Mod\\03-街机模拟\\PIQ-SFC街机\\piq_sfc_arcade-0.2.0-alpha.6.jar": "38FA46C5D283EAD9E1F6666D01398F495E2E1A3260A1517BE8EE959710963363",
+    "制作Mod\\03-街机模拟\\PIQ-FC街机\\alpha16-rom-browser\\piq_fc_arcade-0.31.0-alpha.16.jar": "9E02D350DAED8450F6C27651BC61F019C5229C4AED86FC9F398137F9BA049ADE"
   },
   "actual": {
     "passed": true,

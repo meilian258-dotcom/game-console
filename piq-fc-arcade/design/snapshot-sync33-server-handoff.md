@@ -1,7 +1,5 @@
 # FC33 fixed-snapshot server admission handoff
 
-Owner: `/root/fix_sfc_av`, 2026-09-12. Production source is ready for root's fenced build. No Gradle build, installation, publication, runtime DLL change, ROM write, or manual edit was performed by this subtask.
-
 ## Public API
 
 `CabinetBackends.registerSync(ResourceLocation)` retains strict initial-state equality and the backend's existing network capacity.

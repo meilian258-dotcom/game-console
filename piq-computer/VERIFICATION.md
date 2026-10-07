@@ -1,25 +1,25 @@
 # 可组装电脑 prototype.4 固定视角验证
 
-2026-09-26：电脑4配套FC76/PvZ8/Flash0.1.2。48项全过，真实MouseHandler签名、位移累计/边界及原射线/释放测试保留。实际PvZ/Flash适配器在隔离迁移后出图和正常退出，PvZ七点截图可达四角附近；真实Minecraft锁定右键/Mixin与视角手感待验，不标稳定。所有数据是隔离测试，未安装/发布或迁移玩家存档。完整证据和已知长路径限制见 `../outputs/storage76/VERIFICATION.md` 及 FC76当前指南。
+2026-09-26：电脑4配套FC76/PvZ8/Flash0.1.2。48项全过，真实MouseHandler签名、位移累计／边界及原射线／释放测试保留。实际PvZ/Flash适配器在隔离迁移后出图并正常退出，PvZ七点截图可达四角附近；真实Minecraft锁定右键／Mixin与视角手感待验，不标稳定。隔离数据迁移测试不代表玩家存档迁移验收；长路径限制见 FC76 指南。
 
 ## 历史：prototype.3
 
-日期2026-09-26，像素匠（Codex root）。仅电脑附属改动，FC75/PvZ7/Flash0.1.2冻结依赖保持；不安装/发布/重启，不改实际游戏或存档。Minecraft实机仍待验。
+日期2026-09-26，像素匠。仅电脑附属改动，FC75/PvZ7/Flash0.1.2冻结依赖保持；不安装/发布/重启，不改实际游戏或存档。Minecraft实机仍待验。
 
 - 成品：`game_console_computer-0.1.0-prototype.3.jar`，374943字节，SHA256 `830a3e49b151e39a7447b2bf437776a37e81f0d615500d11b194c3edb9531ff7`。
-- 根因：ComputerWorldInput用ArcadeStructure.resolve判断遮挡命中是否属于电视；该接口不解析家用电视代理，故只允许主方块（用户图中右下）区域。不是PvZ负坐标被截断；旧版本真实运行器七点输入探针也可到达四角。
+- 根因：ComputerWorldInput用ArcadeStructure.resolve判断遮挡命中是否属于电视；该接口不解析家用电视代理，故只允许主方块区域。不是PvZ负坐标被截断；旧版本真实运行器七点输入探针也可到达四角。
 - 修复：新增ComputerScreenRay，通过HomeTvStructure.resolveAnchor仅跳过本电视精确归属的壳体；复用ZapperAimGeometry有界遍历，逐格检查其它真实碰撞体与已加载状态，保持8格限制。不会因先撞到自己电视而漏掉后方的其它障碍。输入、游戏/存档格式、注册资源、协议computer-hardware-2不变。PvZ/Flash/硬件页共用此路径。
-- 最终`check jar --rerun-tasks --offline --max-workers=2`通过：42测试、零失败/错误/跳过，源码指纹前后一致。证据`outputs/computer-pointer3/build-final/`。
+- 最终`check jar --rerun-tasks --offline --max-workers=2`通过：42测试、零失败/错误/跳过，源码指纹前后一致。
 - 5个新增测试含：主方块豁免旧逻辑的左上失败复现；2/3格LCD×桌面/壁挂×4朝向的784个画面网格采样均可见且UV正确；外来/未获归属壳体、墙壁及未加载区块仍阻挡；忽略自己壳体后继续检查；画外和超过8格拒绝；生产入口调用精确归属校验的接线检查。测试世界为回调提供的电视碰撞场景，不是启动Minecraft，也未将源码接线检查描述为真实NBT世界验收。
-- 真实PvZ原生进程：旧电脑2和最终电脑3分别加载相同PvZ7，隔离测试目录、静音，输入中心/四角附近/内侧共7点，图像输出正常并正常退出；核心与鼠标转换未改。不进入用户实例，不使用用户实际存档。帧图见`outputs/computer-pointer3/{before,final-runtime}`。
+- 真实PvZ原生进程：旧电脑2和最终电脑3分别加载相同PvZ7，隔离测试目录、静音，输入中心/四角附近/内侧共7点，图像输出正常并正常退出；核心与鼠标转换未改。不进入用户实例，不使用用户实际存档。
 - 本补丁ZIP仅电脑JAR、文档与对应源代码；已有prototype.2完整包的依赖沿用，不重复包含PvZ/Flash运行器或游戏数据。旧版完整交付保留。
-- 待用户确认：真实Minecraft屏幕四角、不同视角、墙壁遮挡、Esc退出，以及Flash的同路径点击。旁观/鼠标交接/DOS没有新增，不标稳定。
+- 待实机验证：真实Minecraft屏幕四角、不同视角、墙壁遮挡、Esc退出，以及Flash的同路径点击。旁观/鼠标交接/DOS没有新增，不标稳定。
 
 ## 以下为 prototype.2 历史记录（不是本次新验证）
 
 # 可组装电脑 prototype.2 验证记录
 
-日期：2026-09-26；修改者：像素匠（Codex root）。**本地测试候选；自动测试及独立运行器通过，Minecraft 实机待验。** 没有安装用户实例、发布、部署、重启服务器或改动玩家世界/原存档。
+日期：2026-09-26；修改者：像素匠。**本地测试候选；自动测试及独立运行器通过，Minecraft 实机待验。** 没有安装用户实例、发布、部署、重启服务器或改动玩家世界/原存档。
 
 ## 成品
 
@@ -27,7 +27,7 @@
 - SHA256：`e6f4632fa71244579143291a00677d7c9b239dea6a8878ef91351123d0c08503`。
 - MC1.21.1 / NeoForge21.1.236 / Java21 / 冻结FC75。FC JAR保持 `6F0D0C41F2A922BC108D0CDFC329D4FACA18BC4B287030B9D1CBAC68C6E7305A`，不重建主包或其它附属。
 - PvZ可选复用原prototype.7；Flash复用0.1.2原运行器，不安装不兼容FC75的Flash8。协议 `computer-hardware-2`，双方电脑附属同版。
-- 交付：`制作Mod/03-街机模拟/方块电玩-可组装电脑-prototype2-20260926/`及同名ZIP。说明见README；原prototype.1保留。
+- 交付为 prototype.2 测试候选，安装边界见 README；prototype.1 作为历史版本保留。
 
 ## 本轮实现
 
@@ -37,7 +37,7 @@
 
 ## 自动检查
 
-最终 `check jar --rerun-tasks --offline --max-workers=2` 退出0，构建前后源码指纹一致；原始日志/XML：`outputs/computer-prototype2/build-final/`。
+最终 `check jar --rerun-tasks --offline --max-workers=2` 退出0，构建前后源码指纹一致。
 
 **37测试，0失败/错误/跳过**：原装配7、租约8、真实MC Codec3、注册/资源5；新增输入捕获5、共享几何4、程序选择/隔离与Flash边界5。
 
@@ -52,7 +52,7 @@
 
 ## 最终JAR独立真实运行验证
 
-证据：`outputs/computer-prototype2/runtime-final/receipt.json`绑定上述最终SHA。运行生产ProgramBackend适配器、真实子进程，隔离game目录；不是模拟返回值，也不是Minecraft窗口测试。
+验证使用与上述最终 SHA 对应的生产 ProgramBackend 适配器及真实子进程，运行于隔离 game 目录；不是模拟返回值，也不是 Minecraft 窗口测试。
 
 - Flash：已有森林冰火人 `the-forest-temple.swf`（SHA `83c59cd2e3ba63d86f1ddf6dd22bdeefa8d5964985fdd0e92d4c5161d99236e9`），收到520帧、436种帧内容；鼠标进入关卡、发送两组按键/松键；暂停窗口帧哈希保持一致，恢复后继续，退出确认。已查看真实帧图。这里只测工作区定位到的一个旧样本，不称所有Flash游戏可运行。
 - PvZ：已有main.pak（SHA `5878326408285cb01f83b4fa4edcc66d65e727f6d6ee88563b5b3b287dd259fc`），收到1228帧、1121种内容；进入主菜单/新用户页，发送坐标/按键/暂停恢复并正常退出。没有做关卡通关、植物操作全覆盖或存档重进持久性验收。暂停期间不发送画面，因此记录pauseStable=false表示未采样到静态心跳，不冒充已验证音画同步。
@@ -68,4 +68,4 @@
 5. DOS、任意Flash键盘输入、Flash持久存档、跨平台运行器、航空载具适配未完成。公开发行前仍需资产许可、运行时升级及完整Minecraft验收。本版不标稳定。
 # 2026-09-26 电脑5串流候选
 
-74项电脑测试＋28项PvZ测试通过，最终源码围栏一致；真实固定Flash/PvZ运行器的JPEG封包/音频旁路/退出探针通过。细节、精确版本、未验收项见 `outputs/computer-stream5/VERIFICATION.md` 与当前 `design/电脑5-串流使用说明.md`。Minecraft真实多人、交接/迟到旁观/光影仍待验，不标稳定。下面保留历史验证。
+74项电脑测试＋28项PvZ测试通过，最终源码一致性检查通过；真实固定Flash/PvZ运行器的JPEG封包、音频旁路和退出探针通过。版本与未验收项见 `design/电脑5-串流使用说明.md`。Minecraft真实多人、交接／迟到旁观／光影仍待验，不标稳定。下面保留历史验证。

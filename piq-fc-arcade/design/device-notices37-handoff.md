@@ -1,7 +1,5 @@
 # FC37 设备提示清理交接
 
-修改者：furniture_render 子代理（根任务统一维护手册留痕），2026-09-13。
-
 ## 范围
 
 - FC、SFC、Native、GBA 常规开关机/领取归还/启动阶段/按键方案提示不再占用 actionbar/chat。

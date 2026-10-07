@@ -1,6 +1,6 @@
 # 内置输入领域 API（2026-09-10）
 
-维护：`sfc_cabinet_provider`。此目录是由 FC 主模组唯一承载的内部 Java21 源码库，不是需要用户额外安装的模组。这里不包含 GLFW、Minecraft、驱动、JNI、SDL 或本机设备枚举；实际设备采样与 UI 配置由主集成层负责。
+此目录是由 FC 主模组唯一承载的内部 Java21 源码库，不是需要额外安装的模组。这里不包含 GLFW、Minecraft、驱动、JNI、SDL 或本机设备枚举；实际设备采样与 UI 配置由主集成层负责。
 
 ## 本轮文件边界
 
@@ -13,7 +13,7 @@
 - `InputMappings.java`。
 - `LocalInputSession.java`。
 
-对应新增五个 JUnit 测试类：`GamepadStateTest`、`InputMappingsTest`、`InputProfileTest`、`StickDeadzoneTest`、`LocalInputSessionTest`。主集成者的 `InputOwnership` 不属于本子任务改动。
+对应新增五个 JUnit 测试类：`GamepadStateTest`、`InputMappingsTest`、`InputProfileTest`、`StickDeadzoneTest`、`LocalInputSessionTest`。`InputOwnership` 属于独立的输入所有权组件。
 
 ## 坐标、设备与按键
 

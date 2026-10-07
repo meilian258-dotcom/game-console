@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "jar": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
+  "jar": "piq-fc-arcade\\build\\review-controls26-v2\\piq_fc_arcade-0.31.0-alpha.26.jar",
   "sha256": "74E16FEF0F69C88191C0A64DA4FCCDEFD2F3B18B231FC56C97839E60B885FBE5",
   "probe": {
     "ok": true,
@@ -18,7 +18,7 @@
   },
   "compiled_only_probes_and_tests": true,
   "vanilla_resources": {
-    "path": "C:\\Users\\13498\\.gradle\\caches\\neoformruntime\\intermediate_results\\stripClient_1c8e7d85886c0a45d98a9d38d082e6a9f34fe0f3_resourcesOutput.jar",
+    "path": "<gradle-user-home>/caches\\neoformruntime\\intermediate_results\\stripClient_1c8e7d85886c0a45d98a9d38d082e6a9f34fe0f3_resourcesOutput.jar",
     "sha256": "8E9CF6F4B6EAFB1C6BF745A67A61DD1736F31865CAD409E5B2BEC918667DAB5E"
   },
   "source_sha256": {

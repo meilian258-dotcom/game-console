@@ -1,6 +1,6 @@
 # FBNeo JNI state-v3 修复源
 
-2026-09-30，Game Console / 方块电玩 GC-110。这里只维护模拟器适配，不包含游戏 ROM、BIOS 或玩家存档。
+2026-09-30，Game Console / 方块电玩街机适配。这里只维护模拟器适配，不包含游戏 ROM、BIOS 或玩家存档。
 
 ## 来源与许可
 

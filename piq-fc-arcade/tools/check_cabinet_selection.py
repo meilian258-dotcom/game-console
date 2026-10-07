@@ -1,4 +1,10 @@
 """Compile actual configured-cabinet flow and run bounded store/intent tests, without Minecraft."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse,json,os,re,shutil,tempfile,hashlib
 from pathlib import Path
 from check_confirmation_screens import ROOT,WORKSPACE,JAVA,MC,FC,require,run,code,methods,method
@@ -12,9 +18,9 @@ def main():
            'client/cabinet/CabinetMenuScreen','client/cabinet/CabinetSetupScreen','client/ui/DeviceScreen']
     sources=[source_root/(name+'.java') for name in names]+sorted((WORKSPACE/'piq-retro-platform/src/main/java/cn/piq/retro/api').glob('*.java'))
     tests=[ROOT/'src/test/java/cn/piq/fcarcade/cabinet'/(name+'.java') for name in ['CabinetConfigureIntentTest','CabinetRomBindingsTest']]
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');all_jars=list(cache.rglob('*.jar'))
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');all_jars=list(cache.rglob('*.jar'))
     dependencies=[p for p in all_jars if re.match(r'(junit-jupiter-(api|engine)-5\.11\.4|junit-platform-(launcher|engine|commons)-1\.11\.4|apiguardian-api-1\.1\.2|opentest4j-1\.3\.0)\.jar$',p.name)]
-    manifest=json.loads(Path('C:/Users/13498/.gradle/caches/neoformruntime/artifacts/minecraft_1.21.1_version_manifest.json').read_text())
+    manifest=json.loads((gradle_home() / 'caches/neoformruntime/artifacts/minecraft_1.21.1_version_manifest.json').read_text())
     for library in manifest['libraries']:
         parts=library['name'].split(':')
         if len(parts)==3:dependencies.extend((cache/parts[0]/parts[1]/parts[2]).rglob(parts[1]+'-'+parts[2]+'.jar'))

@@ -8,4 +8,4 @@ Client SPI: CabinetBackend creates an asynchronous CabinetEmulator with bounded 
 
 Targets KOF97/Dino require actual user ROM sets and supporting BIOS/device files. No commercial game is bundled or claimed tested without evidence. Generic single-ZIP diagnostic success is not these games' compatibility acceptance.
 
-Work split: fix_sfc_av owns FC AV item/SFC console click handling and tests; cabinet_reuse_review owns common SPI/network/BE/use routing; sfc_cabinet_provider owns SFC client adapter and tab merge; root owns host client/creative/native adapter/build/package/install handoff. No active game hot-swap; any install needs game exit and recoverable backups.
+No active-game hot-swap; installation requires game exit and recoverable backups.

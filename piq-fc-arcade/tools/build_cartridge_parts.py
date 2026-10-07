@@ -1,5 +1,11 @@
 """Deterministic 3D PCB variants and two detached hollow shell halves; no new bitmap."""
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import copy
 import io
 import json
@@ -13,7 +19,7 @@ from render_rocket_arcade_preview import collect_quads, render_view
 OUT = CATEGORY / '卡带拆壳模型-alpha9' / '第二版'
 SOURCE = ASSETS / 'models/block/home_fc_cartridge.json'
 ATLAS = ASSETS / 'textures/block/home_fc_cartridge_skin.png'
-MC_JAR = Path('C:/Users/13498/.gradle/caches/neoformruntime/artifacts/minecraft_1.21.1_client.jar')
+MC_JAR = (gradle_home() / 'caches/neoformruntime/artifacts/minecraft_1.21.1_client.jar')
 MATERIALS = {'pcb':'green_concrete','edge':'lime_terracotta','trace':'lime_concrete',
              'chip':'black_concrete','pin':'light_gray_concrete','gold':'yellow_terracotta',
              'ceramic':'orange_terracotta','mark':'white_concrete'}

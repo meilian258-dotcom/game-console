@@ -10,7 +10,8 @@ if (Test-Path -LiteralPath $ReportDirectory) { throw 'Refuse to overwrite existi
 $reportRoot = New-Item -ItemType Directory -Path $ReportDirectory
 $classes = New-Item -ItemType Directory -Path (Join-Path $reportRoot 'classes')
 $empty = New-Item -ItemType Directory -Path (Join-Path $reportRoot 'empty')
-$junitCache = 'C:/Users/13498/.gradle/caches/modules-2/files-2.1'
+$toolGradleHome = if ($env:GRADLE_USER_HOME) { $env:GRADLE_USER_HOME } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) '.gradle' }
+$junitCache = Join-Path $toolGradleHome 'caches/modules-2/files-2.1'
 $jars = @()
 foreach ($dependency in @(@('org.junit.platform','1.13.4'),@('org.junit.jupiter','5.13.4'),@('org.opentest4j','1.3.0'),@('org.apiguardian','1.1.2'))) {
     $jars += Get-ChildItem -LiteralPath (Join-Path $junitCache $dependency[0]) -Filter '*.jar' -Recurse |

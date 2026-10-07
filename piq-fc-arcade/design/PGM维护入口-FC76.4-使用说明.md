@@ -22,4 +22,4 @@
 
 本包不包含前一项街机/SFC 下载续传改进，也不修复新反馈的 Netplay 竖屏旋转。已查到旋转信息未从原生帧传到 Java：`NetplayProcess.Frame` 无 rotation，`CabinetNetplayEmulator` 和 `WatchClient` 写死 0；需另行补齐整个显示链路，不能靠更换 ROM 或在所有游戏上统一转 90 度处理。
 
-自动检查、最终包/独立原生探针结果见 [验证记录](../../outputs/arcade-service764/VERIFICATION.md)。未通过 Minecraft 四客户端现场验收，不标稳定。包内不含游戏/BIOS/用户数据。
+未通过 Minecraft 四客户端现场验收，不标稳定。包内不含游戏/BIOS/用户数据。

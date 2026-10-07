@@ -1,6 +1,6 @@
 # MAME 单步 helper / CabinetSyncCore 接入只读审查
 
-2026-09-12，`sfc_cabinet_provider`。已读根维护手册“像素匠”最新 MAME 研究与 FC32 记录。只读现有源和已完成研究报告；本轮没有启动核心、用户游戏、构建或修改生产。根代理统一维护记录。
+2026-09-12。基于现有源码与 MAME 研究报告的只读审查，未重新启动核心、构建或修改生产代码。
 
 ## 结论
 
@@ -91,7 +91,7 @@ PCM 数组是 short 数量（偶数），不是 stereo frame 数；两种 audio 
 
 建议追加验证顺序：
 
-1. 先由研究代理定位非确定 state 字段与音频 postload；比较“原轨迹vs恢复”、“两端同一状态共同恢复”，以及明确有效选项。只有解释了实际可观测影响才考虑规范化，不能无依据去字节。
+1. 先定位非确定 state 字段与音频 postload；比较“原轨迹vs恢复”、“两端同一状态共同恢复”，以及明确有效选项。只有解释了实际可观测影响才考虑规范化，不能无依据去字节。
 2. 单步IPC独立测试：恰好一请求一run、首轮无视频、同帧快按序列、4口一热位 / 独立释放、可变 PCM、空闲>15秒不杀、截断/大包/乱序/旧generation、读写堵塞/close及新旧media互斥。
 3. 真实两个子进程：cold bootstrap identity，随机及游戏实际输入，运行状态保存/单端恢复/中途加入/取消重试，RGBA+几何+完整PCM+实际状态验证；读写保存/restore不得跨线程。按游戏/driver/profile/依赖范围列资格，不宣称所有 MAME driver。
 4. 最后通过真实 `CabinetSyncWorker.Factory -> Native openSync`，再做独立最终 helper/JAR/DLL SHA 绑定与真实网络包回压/权限验证。无真实 Minecraft双机时必须继续标明边界。

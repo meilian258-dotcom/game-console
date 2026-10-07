@@ -24,7 +24,7 @@
     "jna-5.14.0.jar": "34ED1E1F27FA896BCA50DBC4E99CF3732967CEC387A7A0D5E3486C09673FE8C6"
   },
   "firmware": {
-    "path": "C:\\Users\\13498\\AppData\\Local\\Temp\\native-four-ports-2z5olppi\\invaders.zip",
+    "path": "<temp-dir>/native-four-ports-2z5olppi\\invaders.zip",
     "zip_sha256": "10E62BBACBF6E79EFB6DB6F7A65EA1EDFB65653EAB60B41E80DBCB4673A5276C",
     "original_firmware_sha256": "554C673E65D5957DA0BC1DF0CEB986CBAC5500D407AE2D780FEAB4F8D2EED810",
     "notice": "Original diagnostics, not Space Invaders game code. Expected checksum warnings are intentional."

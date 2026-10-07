@@ -1,6 +1,6 @@
 # SFC8 server multiplayer review and repair
 
-Author: fix_sfc_av, 2026-09-10. Root maintains the shared maintenance manual.
+Date: 2026-09-10. Scope: SFC8 server multiplayer verification.
 
 ## Actual defect and repair
 
@@ -16,7 +16,7 @@ New pure production `SfcControllerAuthority` is also used in `validLease`: actua
 - Candidate readiness starts bounded state capture; commit requires candidate identity, token, exact frame/hash and full state delivery. The P2 port is published only after commit.
 - Every stage revalidates current console/TV/link/card, player eligibility and interaction permissions. One server-global transfer budget is released on success, abort, removal or departure.
 - P2 return/disconnect/invalid input/watchdog failure removes only P2. P1's input timeline/frame is retained. P1 physical return cascades to P2. A client error `Leave` stops the session but intentionally retains P1's leased hand item for explicit return, as before.
-- `SfcJoinGate`, `SfcInputTimeline`, `SfcInputHealth` and their algorithms were not changed. Core/model/asset/version/build files were not edited by this agent.
+- `SfcJoinGate`, `SfcInputTimeline`, `SfcInputHealth` and their algorithms were not changed. Core/model/asset/version/build files were not edited by this patch.
 - A suspected NaN comparison weakness in joinReady was ruled out: the actual Ready record constructor rejects non-finite FPS before the server method. It is not reported as a network vulnerability and no redundant helper was added.
 
 ## Changed production classes
@@ -25,7 +25,7 @@ New pure production `SfcControllerAuthority` is also used in `validLease`: actua
 - `cn.piq.sfchome.server.SfcHomeServer$Lease` (new immutable authority field)
 - New `cn.piq.sfchome.server.SfcControllerAuthority`
 
-Other HomeServer nested classes may acquire compiler Nest/InnerClasses attribute changes but are not algorithmically changed. Root handles final class-delta auditing.
+Other HomeServer nested classes may acquire compiler Nest/InnerClasses attribute changes but are not algorithmically changed. Final class-delta auditing remains required.
 
 ## Validation
 
@@ -33,4 +33,4 @@ New `SfcControllerAuthorityTest` has 9 tests: actor+lease for both ports, invali
 
 `tools/check_sfc_controller_authority.py` compiles actual pure production authority/gate/timeline/watchdog and runs those tests plus existing join/queue/watchdog regressions. Final result: **45 tests passed**, 0 failures/skips/aborts. Report: `design/sfc8-server-authority-20260910.json`. The runner's initial expected total 43 was corrected to the actual 45 after every test had passed; no production failure or test was suppressed.
 
-Root independently compiles the production server against the actual Minecraft API and runs the complete build. These pure behavioral checks do not instantiate a Minecraft server, exercise protection plugins, or prove live two-player networking. No game, instance install, world/save/ROM write, server operation or publishing was performed.
+The production server must be compiled against the actual Minecraft API and the complete build must be verified separately. These pure behavioral checks do not instantiate a Minecraft server, exercise protection plugins, or prove live two-player networking. No game, instance install, world/save/ROM write, server operation or publishing was performed.

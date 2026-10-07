@@ -4,10 +4,10 @@
 
 ## 分工与边界
 
-- root：新手柄物品注册、协议23/alpha.3、原手柄模型机械拆分和渲染接线、语言、通用标签图、集成验证和最终资源白名单。
-- fix_server：Home/ServerArcadeSessions、实体手柄唯一借用、P1/P2审批与转交、清理和纯逻辑测试；四个服务器存储入口调用统一API。
-- client_worker：ROM库/卡带菜单自适应居中布局、文件夹按钮、仅FC界面无模糊路径、删除确认/编辑身份回归。
-- spectator_settings：piq-fc统一分类路径、安全一次复制迁移、旧数据保留/新路径权威、后台IO与目录消费者测试。
+- 新手柄物品注册、协议23/alpha.3、原手柄模型机械拆分和渲染接线、语言、通用标签图、集成验证和最终资源白名单。
+- Home/ServerArcadeSessions、实体手柄唯一借用、P1/P2审批与转交、清理和纯逻辑测试；四个服务器存储入口调用统一API。
+- ROM库/卡带菜单自适应居中布局、文件夹按钮、仅FC界面无模糊路径、删除确认/编辑身份回归。
+- piq-fc统一分类路径、安全一次复制迁移、旧数据保留/新路径权威、后台IO与目录消费者测试。
 
 ## 手柄约定
 
@@ -27,7 +27,7 @@ ROM库/卡带菜单max760×460逻辑像素，居中、随窗口宽高分栏或�
 
 ## 默认标签
 
-内置image_gen已生成通用FC/手柄图案，完整原图和prompt在 `design/cartridge-default-alpha3/`。原图SHA `E0B67298F946D1F80830A48D77527B287C29C773E8838A675825847890D1D761`。2026-09-08后续用户明确批准程序后处理；normalize_cartridge_label.py已完成整幅NEAREST512×256及原UV标签/4px边缘组合。新skin SHA `EBD76E0B5A56FC36C3F474CC0E4345377506E6AEA7B2EC14D8FECFECA246CCDA`，区域外RGBA逐像素不变、其他UV岛不相交、有效自定义合成结果不变。原图/旧皮肤备份保留；新标签、完整皮肤、话术和实际原模型预览已复制到指定成品分类的通用卡带封面-alpha3。
+内置image_gen已生成通用FC/手柄图案，完整原图和prompt在 `design/cartridge-default-alpha3/`。原图SHA `E0B67298F946D1F80830A48D77527B287C29C773E8838A675825847890D1D761`。2026-09-08完成后处理；normalize_cartridge_label.py已完成整幅NEAREST512×256及原UV标签/4px边缘组合。新skin SHA `EBD76E0B5A56FC36C3F474CC0E4345377506E6AEA7B2EC14D8FECFECA246CCDA`，区域外RGBA逐像素不变、其他UV岛不相交、有效自定义合成结果不变。原图/旧皮肤备份保留；新标签、完整皮肤、话术和实际原模型预览已复制到指定成品分类的通用卡带封面-alpha3。
 
 ## 当前状态
 
@@ -43,6 +43,6 @@ ROM库/卡带菜单max760×460逻辑像素，居中、随窗口宽高分栏或�
 
 1. 最终候选：指定分类 `piq_fc_arcade-0.31.0-alpha.3.jar`，28,808,034字节/1155条目，SHA `1758B328069F2E68001AE10CF06E04A7704BC4A1C2200308CA3ABA1DC78F22B9`；协议23，双端更新。使用说明和校验清单已交付，无安装上传发布授权，不启停游戏/服务器。
 2. 已冻结独立32项 `tools/home-fc-alpha3-final-reviewed-assets.json`，SHA `79546C62BB8D3A0282DF9AF16D870AE190CDA4DFD3D420916B8909EE6011C5F5`。旧清单不改；Package脚本新增明确alpha3文件名/hash/数量分支，43项其他外观必须等固定beta3，仍仅在候选恢复两张旧草稿。原始build/libs不可交付。
-3. `tools/verify_home_fc_final_jar.py`独立审核最终JAR，报告 `家用FC-0.31.0-alpha.3-模型预览/final-jar-validation.json` SHA `AFD303418D854846D1E2C299108E13CC9B77BEB324FF8B14265F5A4005712EFE`；检查器只做静态资源/字节码/格式检查，root另执行最终JAR原生加载，二者不要混称。
+3. `tools/verify_home_fc_final_jar.py`独立审核最终JAR，报告 `家用FC-0.31.0-alpha.3-模型预览/final-jar-validation.json` SHA `AFD303418D854846D1E2C299108E13CC9B77BEB324FF8B14265F5A4005712EFE`；检查器只做静态资源/字节码/格式检查，另执行最终JAR原生加载，二者不要混称。
 4. 封面复现用 `tools/normalize_cartridge_label.py --apply`，严格校验原生成图、alpha2JAR/旧皮肤哈希；不覆盖任何独立修改的皮肤，只允许已批准的同一变换。原图、归档PNG、模型不改；6项处理测试和家用资源合同含新hash与区域外逐像素不变式。
 5. 后续需Minecraft手测：P1/P2领取和审批、正常整理背包、P2 Q/GUI丢弃转交、P1退出停本机、两台机器互不影响、复制/过期手柄无权、拆机/拔线/重启清理、受保护区域拒绝操作，以及当前整合包文字清晰和目录第一次迁移。自动测试不能代替这些场景。

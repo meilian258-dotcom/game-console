@@ -9,11 +9,11 @@
   "native_core_started": false,
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.29.jar",
+      "path": "piq-fc-arcade\\build\\libs\\piq_fc_arcade-0.31.0-alpha.29.jar",
       "sha256": "5E4B1EB6D60781DFBE0C9BF6C8EC471633CB29C560CD6C7B27C899C3C0659DDA"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-sfc-home\\build\\libs\\piq_sfc_home-0.1.0-alpha.17.jar",
+      "path": "piq-sfc-home\\build\\libs\\piq_sfc_home-0.1.0-alpha.17.jar",
       "sha256": "0706ACAF42F2D496D5364443191826FE6E71213097B19D12395A6084487DF94A"
     }
   },

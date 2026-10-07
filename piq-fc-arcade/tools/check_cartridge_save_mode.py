@@ -1,9 +1,15 @@
 """Actual metadata disk roundtrip + save-mode wire codec. --source for development; default input-JAR-only."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,hashlib,json,os,shutil,subprocess,tempfile,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-MC=Path('C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
+JAVA=(java_home() / 'bin')
+MC=(gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest().upper()
 def run(command):
     p=subprocess.run(list(map(str,command)),cwd=ROOT,capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=90)
@@ -12,7 +18,7 @@ def run(command):
 def main():
     sys.stdout.reconfigure(encoding='utf-8');parser=argparse.ArgumentParser();parser.add_argument('--fc',type=Path,required=True);parser.add_argument('--report',type=Path,required=True);parser.add_argument('--source',action='store_true');a=parser.parse_args()
     if a.report.exists():raise ValueError('Old reports stay frozen')
-    before=sha(a.fc);cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[];junit=[]
+    before=sha(a.fc);cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[];junit=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2')]:junit.extend(p for p in(cache/group).rglob('*.jar')if version in p.parts and not any(x in p.name for x in ('-sources','-javadoc')))
     manifest=json.loads((MC.parent.parent/'artifacts/minecraft_1.21.1_version_manifest.json').read_text())
     for lib in manifest['libraries']:

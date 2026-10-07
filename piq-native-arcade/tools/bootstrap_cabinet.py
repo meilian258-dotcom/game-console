@@ -1,11 +1,17 @@
 """One-time reviewed FC lifecycle port. Uses apply_patch; refuses every existing destination.
 Only standalone project files are added. Frozen FC sources/resources are never modified.
 """
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import executable
+
 from pathlib import Path
 import re,subprocess
 ROOT=Path(__file__).resolve().parents[1]
 FC=ROOT.parent/'piq-fc-arcade'
-CODEX='C:/Users/13498/AppData/Local/OpenAI/Codex/bin/7a4cbea4d249f245/codex.exe'
+CODEX=executable('codex', 'CODEX_EXECUTABLE')
 
 def add(path,text):
     p=ROOT/path

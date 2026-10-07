@@ -1,12 +1,18 @@
 """Pure-Java client cabinet cleanup/layout/input regression plus honest static GUI wiring checks."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,hashlib,json,os,subprocess,tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
+JAVA=(java_home() / 'bin')
 def main():
     a=argparse.ArgumentParser();a.add_argument('--report',type=Path,required=True);args=a.parse_args()
     if args.report.exists():raise ValueError('Do not overwrite a prior report')
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2')]:
         deps.extend(p for p in (cache/group).rglob('*.jar') if version in p.parts and '-sources' not in p.name and '-javadoc' not in p.name)
     production=[ROOT/'src/main/java/cn/piq/fcarcade'/n for n in ('cabinet/CabinetFrame.java','cabinet/CabinetEmulator.java',

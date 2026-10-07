@@ -1,6 +1,6 @@
-# SFC 审查修复交接 · 2026-09-13
+# SFC 审查修复技术记录 · 2026-09-13
 
-状态：本子任务生产与 `src/test` 已冻结；root 统一版本、完整构建、合包、最终 JAR 回归和维护手册记录。没有安装、发布、运行 Minecraft、读取用户 ROM/存档或改变原模型/WASM。
+状态：生产与 `src/test` 源码冻结阶段记录；完整构建、合包和最终 JAR 回归仍待完成。未运行 Minecraft，原模型与 WASM 不变。
 
 ## 已修两项
 
@@ -25,7 +25,7 @@
 - 修改 `piq-sfc-arcade/src/main/java/cn/piq/sfcarcade/net/SfcNetwork.java`：仅 DownloadRequest handler 在 enqueue 前捕获实际 source/player。旧协议 **`3` 保留**，没有改变旧下载包或正常 `.sfc/.smc` 传输格式。
 - 修改 `piq-sfc-arcade/src/main/java/cn/piq/sfcarcade/rom/SfcRomRepository.java`：新增 `readNamedVerified(fileName,sha)` 精确文件有界读取，下载不调用 `find/list`。原目录维护/上传逻辑不改。
 
-没有删除生产类、没有新增或修改 assets/data/WASM；没有修改 SfcHomeServer、SfcRepairClient、watch、模型渲染、存档格式或 FC 主项目生产。root 的版本/依赖元数据变更另算。
+没有删除生产类、没有新增或修改 assets/data/WASM；没有修改 SfcHomeServer、SfcRepairClient、watch、模型渲染、存档格式或 FC 主项目生产。版本／依赖元数据变更须单独核对。
 
 ## 测试、工具与结果
 
@@ -41,11 +41,11 @@ python piq-sfc-home/tools/check_sfc_repair_workers.py --fc <冻结FC33> --sfc <�
 ```
 
 - 最新 v2：8 个修改/新增生产源在独立临时目录成功编译；**266** 真 WASM worker/ledger 诊断断言、**10,016** 下载 gate/真实单文件 IO 断言通过。10,000 次未知摘要权限回调 0、文件读取 0；正常授权读取和带 512B copier header 的 `.smc` 精确成功。
-- 真积压：600 帧真实快照，旧目标 720，权威 head 920。现在 760 帧仍不 ACK；实际 **916** 才 ACK，服务器接受已追上 ACK、拒 720 和未来 921。旧审查失败证据 `outputs/mod-audit-20260913/sfc/diagnostics-v1.json` 与原探针完整保留。
+- 真积压：600 帧真实快照，旧目标 720，权威 head 920。现在 760 帧仍不 ACK；实际 **916** 才 ACK，服务器接受已追上 ACK、拒 720 和未来 921。旧失败结果不计为通过。
 - 双 JVM 原回归：**134** 协调断言、**4,287** worker 断言、**672** 真实 codec 往返；Host 连续 **1,208** 帧未重启，修复期间前进 120 帧，恢复的 120 帧完整 RGBA/立体声 PCM 相等，下一周期完整状态相等；取消异常端不停止 Host；真实通用 SFC factory/openSync 也通过。
 - 首次局部编译仅测试文件误引用了 package-private 原创 ROM 测试类，已改为自含合成下载数据；该次未运行核心，也未生成成功报告。之后编译/运行均成功，没有用修改生产来绕过测试。
 
-以上均为 **production-source** 验证，明确不是最终成品证据；root 新最终包就绪后执行同工具但移除 `--production-source`，再跑原双 JVM 回归。未执行全项目 Gradle。
+以上均为 **production-source** 验证，明确不是最终成品证据；最终包就绪后执行同工具但移除 `--production-source`，再跑原双 JVM 回归。未执行全项目 Gradle。
 
 ## 未实机边界
 

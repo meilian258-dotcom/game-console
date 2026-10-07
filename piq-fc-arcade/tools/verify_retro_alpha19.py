@@ -5,6 +5,12 @@ cores, connect sockets, install files or accept an EULA. Only explicit probes
 are compiled against the supplied JARs and the cached real NeoForge libraries.
 """
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse
 from collections import Counter
 import hashlib
@@ -26,9 +32,9 @@ TOOLS=Path(__file__).resolve().parent
 DELIVERY=ROOT/"制作Mod/03-街机模拟"
 META="META-INF/neoforge.mods.toml"
 MANIFEST="META-INF/MANIFEST.MF"
-JAVA=Path("C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin")
-MC=Path("C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar")
-CACHE=Path("C:/Users/13498/.gradle/caches/modules-2/files-2.1")
+JAVA=(java_home() / 'bin')
+MC=(gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
+CACHE=(gradle_home() / 'caches/modules-2/files-2.1')
 BASELINES={
     "fc":(DELIVERY/"PIQ-FC街机/alpha18-device-ui-v2/piq_fc_arcade-0.31.0-alpha.18.jar","E4A9FC00A492A1E8C7FC4E89D9534A1FBE6A389B64438C393E52D6163AACEC47"),
     "sfc":(DELIVERY/"PIQ-SFC家用/0.1.0-alpha.5/piq_sfc_home-0.1.0-alpha.5.jar","82578C8DEF9567B1408D8B7F384E8DCC92D388498091ADC0EC308D56AF5D811C"),

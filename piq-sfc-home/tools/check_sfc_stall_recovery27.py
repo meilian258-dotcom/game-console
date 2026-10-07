@@ -1,4 +1,10 @@
 """Compile the two changed pacing/worker sources and run an original-ROM WASM stall regression."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse,json,os,shutil,tempfile,time
 from pathlib import Path
 import run_sfc_playback_multiplayer_probe as q
@@ -11,7 +17,7 @@ def main():
     a=p.parse_args()
     if a.report.exists():raise ValueError('Use a new evidence path')
     jars={key:getattr(a,key).resolve(strict=True) for key in ('fc','sfc')};before={key:q.sha(path) for key,path in jars.items()}
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
+    cache=(gradle_home() / 'caches/modules-2/files-2.1')
     manifest=json.loads((q.MC.parent.parent/'artifacts/minecraft_1.21.1_version_manifest.json').read_text())
     deps=[]
     for library in manifest['libraries']:

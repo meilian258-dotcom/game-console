@@ -4,16 +4,16 @@
   "visual_only": true,
   "jars": {
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_sfc-0.1.0-alpha.12.jar",
+      "path": "piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_sfc-0.1.0-alpha.12.jar",
       "sha256": "EEE8BDCC710BEEBEBF58CF85CA1B19B2D314FE4DA9EBE8D36470B62BD383E8D1"
     },
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
+      "path": "piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
       "sha256": "B7BF04BEEA5F58E8E9C0DFA23E1BD8F2CAF6B11455085D843F568B42D9021686"
     }
   },
   "baseline_sfc11": {
-    "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-v1\\piq_sfc-0.1.0-alpha.11.jar",
+    "path": "piq-fc-arcade\\build\\review-watch23-v1\\piq_sfc-0.1.0-alpha.11.jar",
     "sha256": "ADF7172C0997983A61C0566AAEE4AE6F19C7D574D6D5B1971490EB69F4B92393"
   },
   "strict_scope": {
@@ -270,7 +270,7 @@
             }
           ],
           "module_name": "piq_fc_arcade",
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\fc.jar",
+          "jar": "<temp-dir>/piq-alpha19-compat-mtys2yy4\\fc.jar",
           "scanned_classes": 1291,
           "entry_points": [
             "piq_fc_arcade"
@@ -342,7 +342,7 @@
             }
           ],
           "module_name": "piq_sfc_arcade",
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\sfc.jar",
+          "jar": "<temp-dir>/piq-alpha19-compat-mtys2yy4\\sfc.jar",
           "scanned_classes": 196,
           "entry_points": [
             "piq_sfc_arcade",
@@ -381,7 +381,7 @@
             }
           ],
           "module_name": "piq_native_arcade",
-          "jar": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\native.jar",
+          "jar": "<temp-dir>/piq-alpha19-compat-mtys2yy4\\native.jar",
           "scanned_classes": 42,
           "entry_points": [
             "piq_native_arcade"
@@ -399,22 +399,22 @@
     },
     "hash_checked_temporary_copies": {
       "fc": {
-        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
-        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\fc.jar",
+        "original": "piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
+        "temporary_probe_copy": "<temp-dir>/piq-alpha19-compat-mtys2yy4\\fc.jar",
         "sha256": "B7BF04BEEA5F58E8E9C0DFA23E1BD8F2CAF6B11455085D843F568B42D9021686",
         "byte_identical_before": true,
         "byte_identical_after": true
       },
       "sfc": {
-        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_sfc-0.1.0-alpha.12.jar",
-        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\sfc.jar",
+        "original": "piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_sfc-0.1.0-alpha.12.jar",
+        "temporary_probe_copy": "<temp-dir>/piq-alpha19-compat-mtys2yy4\\sfc.jar",
         "sha256": "EEE8BDCC710BEEBEBF58CF85CA1B19B2D314FE4DA9EBE8D36470B62BD383E8D1",
         "byte_identical_before": true,
         "byte_identical_after": true
       },
       "native": {
-        "original": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
-        "temporary_probe_copy": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-alpha19-compat-mtys2yy4\\native.jar",
+        "original": "piq-fc-arcade\\build\\review-watch23-scale12-v1\\piq_native_arcade-0.1.0-alpha.7.jar",
+        "temporary_probe_copy": "<temp-dir>/piq-alpha19-compat-mtys2yy4\\native.jar",
         "sha256": "8BE543D920BB3D49627F440CBE02EBD66AA2BB4370EA249202EF1F1066E1608A",
         "byte_identical_before": true,
         "byte_identical_after": true

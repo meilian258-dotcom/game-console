@@ -1,6 +1,6 @@
 # 独立 NES Zapper 核心实验（未接游戏内光枪）
 
-修改者：Codex / sfc_cabinet_provider；2026-09-11。本轮仅隔离核心能力与离线验证，不改旧会话、同步包、用户实例、ROM、持久存档或模型。
+本轮仅隔离核心能力与离线验证，不改旧会话、同步包、用户实例、ROM、持久存档或模型。
 
 ## 调用与隔离
 
@@ -41,6 +41,6 @@ String stateNamespace(); // 旧核心 nes-legacy-v1
 
 1. 独立 release WASM 实际编译成功（首次 11.42 秒）。本机 `cargo test --lib --features zapper` 因缺 MSVC `link.exe` 无法链接，8 个 Rust 单元测试没有冒称执行通过；没有为此安装系统工具。
 2. `tools/check_zapper_core.py --fc <含运行时的现有FC包> --report <新报告>` 编译新桥/探针，真正运行独立 WASM 和内存生成的原创诊断 ROM。61 项断言通过：亮区/暗场/屏外、扳机独立、P2 D0 保留、消隐期光感到期、重置、实际状态回放、旧/新状态互拒、错误 ROM/模块/指针/截断/尾随拒绝且不修改活跃状态。证据 `design/zapper-core-diagnostic-v1.json`。
-3. 用户指定私有《打鸭子》ROM 原路径只读；`tools/check_zapper_private_pair.py` 对照两实例各 720 帧，frame 661 瞄准 (98,138) 与屏外射击，六个射击前帧完全一致。瞄准后的计分区域变化，屏外仍零分，命中标记不同；人工查看对应真实模拟器帧为 001000 对 000000。10 断言通过，ROM 前后 SHA 一致，证据 `design/zapper-private-smoke-v1.json`。
+3. 《打鸭子》ROM 作为只读测试输入，不随报告分发；`tools/check_zapper_private_pair.py` 对照两实例各 720 帧，frame 661 瞄准 (98,138) 与屏外射击，六个射击前帧完全一致。瞄准后的计分区域变化，屏外仍零分，命中标记不同；人工查看对应真实模拟器帧为 001000 对 000000。10 断言通过，ROM 前后 SHA 一致，证据 `design/zapper-private-smoke-v1.json`。
 
 私有 ROM SHA `6412CFDEAF5618C8352E1F8FB7DC226D8C280D5ECFA1FD3250858F1EC48E5907`。没有写出 ROM 或 raw-memory 状态。`design/zapper-private/**` 的画面仅为本地私测，**不得放进 MOD 或交付 ZIP**；公开报告只含摘要/坐标/结果。不把这些离线核心测试称为 Minecraft、网络权限、实体光枪或所有游戏实测。

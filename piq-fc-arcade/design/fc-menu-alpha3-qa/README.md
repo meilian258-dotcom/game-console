@@ -14,7 +14,7 @@ PNG/JPEG 由 `src/test/java/cn/piq/fcarcade/client/FcMenuLayoutQa.java` 直接�
 
 ## ModernUI 本机静态核验
 
-只读核验文件：`客户端/versions/[PIQ]你好,新蒸程v1.7.1/mods/[现代化 UI] ModernUI-NeoForge-1.21.1-3.13.0.1-universal.jar`。
+只读核验文件：`ModernUI-NeoForge-1.21.1-3.13.0.1-universal.jar`。
 
 使用本机 JDK 21 的 `javap -p -c` 查看 `icyllis.modernui.mc.BlurHandler`、`icyllis.modernui.mc.mixin.MixinScreen`、`icyllis.modernui.mc.mixin.MixinGameRenderer`，另以 `javap -p -v` 查看混入注解：
 
@@ -27,9 +27,9 @@ PNG/JPEG 由 `src/test/java/cn/piq/fcarcade/client/FcMenuLayoutQa.java` 直接�
 
 ## 21 项标准 JUnit 回归
 
-`FcMenuLayoutTest` 的 21 个方法均有标准 `@Test`，常规 Gradle check 会自动发现；main 只是多代理开发期间的独立断言运行器，不替代 JUnit 注册。
+`FcMenuLayoutTest` 的 21 个方法均有标准 `@Test`，常规 Gradle check 会自动发现；main 只是独立断言运行器，不替代 JUnit 注册。
 
-本轮仅用本机 javac/java 和已有 JUnit 5.13.4 API、platform-commons、opentest4j、apiguardian 编译运行：FcMenuLayout.java、FcMenuState.java、FcMenuLayoutTest.java。最后一次实际结果为 `Passed 21 FC menu geometry/source-contract checks (standalone assertion runner).` 未由本代理运行 Gradle。
+本轮仅用本机 javac/java 和已有 JUnit 5.13.4 API、platform-commons、opentest4j、apiguardian 编译运行：FcMenuLayout.java、FcMenuState.java、FcMenuLayoutTest.java。最后一次实际结果为 `Passed 21 FC menu geometry/source-contract checks (standalone assertion runner).` 该轮未运行 Gradle。
 
 覆盖：72 种宽高 × 3 种布局的行/面板/详情/动作边界，指定截图尺寸比例留白，512×278 确保六行及完整五操作/40 条七页，中等窗口分栏，多尺寸两排底部入口不与正文相交，最小窗口两文件夹按钮与翻页，列表为空/变短，连续 resize 按 ROM SHA/封面文件名锚定，独立标签页锚点，32 项有界关闭 token 拒表，迟到旧 OPEN 不重开、同卡新 token 正常接受，主副手槽/UUID/alive 校验，后台 revision/connection/屏幕身份拒绝迟到覆盖，刷新 OPEN 不取消在途上传，ModernUI 公有名单保留/私有名单拒绝覆盖，以及渲染与固定路径源契约。
 

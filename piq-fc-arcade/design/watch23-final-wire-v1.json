@@ -2,7 +2,7 @@
   "ok": true,
   "schema": "piq-watch23-independent-1",
   "production_origin": "final-jar-only",
-  "production_path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
+  "production_path": "piq-fc-arcade\\build\\review-watch23-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
   "production_sha256": {
     "piq_fc_arcade-0.31.0-alpha.23.jar": "B7BF04BEEA5F58E8E9C0DFA23E1BD8F2CAF6B11455085D843F568B42D9021686"
   },

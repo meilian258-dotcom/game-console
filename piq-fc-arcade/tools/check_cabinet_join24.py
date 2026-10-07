@@ -1,4 +1,10 @@
 """Compile only the explicit new consent sources/tests against real cached MC APIs; no Gradle/game."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse, hashlib, json, os, shutil, tempfile
 from pathlib import Path
 import check_cabinet_rooms as common
@@ -10,7 +16,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--report',type=Path,required=True)
     parser.add_argument('--pure',action='store_true');args=parser.parse_args()
     if args.report.exists():raise ValueError('Refuse existing evidence')
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');junit=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');junit=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2')]:
         junit.extend(f for f in (cache/group).rglob('*.jar')if version in f.parts and '-sources'not in f.name and '-javadoc'not in f.name)
     src=ROOT/'src/main/java/cn/piq/fcarcade/cabinet';test=ROOT/'src/test/java/cn/piq/fcarcade/cabinet/CabinetJoinGateTest.java'

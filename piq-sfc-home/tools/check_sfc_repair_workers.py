@@ -1,4 +1,10 @@
 """Real house Playback repair + generic CabinetSyncWorker/openSync in two JVMs; not a Minecraft network test."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse,json,os,shutil,sys,tempfile,time,uuid
 from pathlib import Path
 import run_sfc_playback_multiplayer_probe as q
@@ -95,7 +101,7 @@ def main():
     p.add_argument('--production-source',action='store_true');a=p.parse_args()
     if a.report.exists():raise ValueError('Use a new immutable evidence path')
     paths={k:getattr(a,k).resolve(strict=True)for k in ('fc','sfc')};before={k:q.sha(v)for k,v in paths.items()}
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');manifest=json.loads((q.MC.parent.parent/'artifacts/minecraft_1.21.1_version_manifest.json').read_text());deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');manifest=json.loads((q.MC.parent.parent/'artifacts/minecraft_1.21.1_version_manifest.json').read_text());deps=[]
     for lib in manifest['libraries']:
         parts=lib['name'].split(':')
         if len(parts)==3:deps.extend((cache/parts[0]/parts[1]/parts[2]).rglob(parts[1]+'-'+parts[2]+'.jar'))

@@ -1,7 +1,7 @@
-# Native alpha7 四端口链路交接
+# Native alpha7 四端口链路技术记录
 
-修改者：Codex `/root/fix_sfc_av`。记录时间：2026-09-10 23:48 Asia/Shanghai。
-状态：本子任务生产源码冻结，等待根代理统一 FC21/Native7 构建及最终 JAR 复验；未安装、未发布、未修改用户运行库。
+日期：2026-09-10。
+状态：本记录对应生产源码冻结阶段；FC21／Native7 完整构建与最终 JAR 复验仍待完成，运行库未变。
 
 ## 实现边界
 
@@ -10,7 +10,7 @@
 - 新 `NativeInputPorts` 为每口各 128 条边沿 FIFO，每个模拟帧各口最多消费一条，溢出整批拒绝；单口释放清该口 held/latest/全部排队边沿，不丢其他端口边沿。
 - 父进程待发送队列为 128 条正常输入加 4 个控制预留槽。释放单口保留其他口的已有排队状态，同时把被释放口从旧快照中清零，随后发送专用释放命令。
 - helper 在 `retro_run` 前取四口一致快照；真实输入回调允许 port 0..3，max-users 返回 4。原有 ABGR、DAR/旋转、48 kHz PCM、帧上限、MAME ABI 和 DLL 均不改。
-- `NativeCabinetBackend` 转发三项新 API；generic backend 声明可注册 4 口网络能力。服务器房间、租约、视频音频转发由 FC21 根代理实现，不由 Native 附属绕过验证。
+- `NativeCabinetBackend` 转发三项新 API；generic backend 声明可注册 4 口网络能力。服务器房间、租约、视频音频转发由 FC21 主包实现，不由 Native 附属绕过验证。
 - **旧独立 Native block/GUI 仍只允许 Windows x64、未发布局域网的单人世界**；`NativeArcadeClient.supported/current`、身份验证及实际使用入口没有改变。
 - 保持仅一个活跃本地原生子进程、精确 PID 关闭、15 秒无帧 watchdog；进程隔离不等于 OS 安全沙箱。
 
@@ -30,7 +30,7 @@ Native JAR：
 
 ## 本轮新 runtime
 
-路径：`build/native-four-port7/runtime/`（QA/待根代理冻结交付，不是实例目录）。
+路径：`build/native-four-port7/runtime/`（QA／待最终成品验收，不是实例目录）。
 
 | 文件 | SHA-256 |
 |---|---|

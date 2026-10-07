@@ -1,9 +1,15 @@
 """Pure production receipt / two-lease sequence / gun keyboard route regression; no Minecraft world."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse, hashlib, json, os, shutil, subprocess, sys, tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-CACHE=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
+JAVA=(java_home() / 'bin')
+CACHE=(gradle_home() / 'caches/modules-2/files-2.1')
 PRODUCTION=['client/ControllerCapturePolicy','client/HomeInputSequences','home/HomeRuntimeAuthority','session/LockstepState','session/ControllerInputTransitions','session/ZapperInput','session/ZapperInputQueue']
 TESTS=['client/ControllerCapturePolicyTest','client/HomeInputSequencesTest','home/HomeGunKeyboardFallbackTest','home/HomeGunController29Test']
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest().upper()

@@ -1,10 +1,10 @@
 # SFC 自由网格重制 / alpha5 候选
 
-负责人：`sfc_cabinet_provider`，2026-09-10。父任务统一维护手册、构建、版本和交付；本组件没有运行 Gradle、安装 MOD 或修改游戏实例。
+日期：2026-09-10。范围：SFC 硬件模型；未执行 Gradle 构建或 Minecraft 实机验证。
 
 ## 参考与实现
 
-核对任天堂官方 [ニンテンドークラシックミニ スーパーファミコン](https://www.nintendo.co.jp/clvs/index.html) 及其 [控制器图片](https://www.nintendo.co.jp/clvs/img/top/block_01-image.jpg)，并与用户提供的日版原机照片对照。官方页面说明控制器尺寸与按钮布局复刻原版；迷你主机尺寸不是原机尺寸，本实现没有将两者混同。
+核对任天堂官方 [ニンテンドークラシックミニ スーパーファミコン](https://www.nintendo.co.jp/clvs/index.html) 及其 [控制器图片](https://www.nintendo.co.jp/clvs/img/top/block_01-image.jpg)，并与日版原机照片对照。官方页面说明控制器尺寸与按钮布局复刻原版；迷你主机尺寸不是原机尺寸，本实现没有将两者混同。
 
 主机使用连续倒角壳、分层浅灰外壳、中灰顶板、实体卡槽、EJECT/POWER/RESET、前面双七孔端口、后面 AV 三孔。手柄使用连续曲线轮廓而非逐行方块拼接，SELECT/START 为正确的斜条，X 蓝上 / Y 绿左 / A 红右 / B 黄下，顶部只有 L/R。灰卡使用同一倒角语言和原封面坐标。所有字样由几何面组成，没有照片贴脸，没有新增或编辑 PNG。
 

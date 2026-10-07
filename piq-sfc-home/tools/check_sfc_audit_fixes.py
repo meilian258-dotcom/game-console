@@ -1,4 +1,10 @@
 """SFC audit-fix regression: actual Playback/WASM + exact-file download gate/IO. No Minecraft game."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse,json,os,shutil,sys,tempfile,time
 from pathlib import Path
 import run_sfc_playback_multiplayer_probe as q
@@ -14,7 +20,7 @@ def main():
     production=[ROOT/n for n in source_names]if a.production_source else []
     tests=[ROOT/'piq-sfc-home/tools/qa/SfcRepairBacklogFixedProbe.java',ROOT/'piq-sfc-home/tools/qa/SfcDownloadSendProbe.java',ROOT/'piq-fc-arcade/tools/qa/SfcTwoPortInputProbe.java',ROOT/'piq-sfc-arcade/src/test/java/cn/piq/sfcarcade/core/SfcLegalTestRom.java',ROOT/'piq-sfc-arcade/src/test/java/cn/piq/sfcarcade/server/SfcDownloadGateSelfTest.java']
     fence={str(f.relative_to(ROOT)):q.sha(f)for f in production+tests+[Path(__file__),Path(q.__file__)]}
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');manifest=json.loads((q.MC.parent.parent/'artifacts/minecraft_1.21.1_version_manifest.json').read_text());deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');manifest=json.loads((q.MC.parent.parent/'artifacts/minecraft_1.21.1_version_manifest.json').read_text());deps=[]
     for lib in manifest['libraries']:
         parts=lib['name'].split(':')
         if len(parts)==3:deps.extend((cache/parts[0]/parts[1]/parts[2]).rglob(parts[1]+'-'+parts[2]+'.jar'))

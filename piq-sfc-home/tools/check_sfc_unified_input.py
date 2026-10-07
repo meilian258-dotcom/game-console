@@ -1,4 +1,10 @@
 """Run the actual shared pure keyboard state and SFC wiring contracts, without Minecraft."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse
 import hashlib
 import json
@@ -9,7 +15,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 FC = ROOT.parent / "piq-fc-arcade"
-JAVA = Path("C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin")
+JAVA = (java_home() / 'bin')
 
 
 def run(command):
@@ -26,7 +32,7 @@ def main():
     args = parser.parse_args()
     if args.report.exists():
         raise ValueError("Refusing to overwrite previous evidence")
-    cache = Path("C:/Users/13498/.gradle/caches/modules-2/files-2.1")
+    cache = (gradle_home() / 'caches/modules-2/files-2.1')
     deps = []
     for group, version in [("org.junit.platform", "1.13.4"), ("org.junit.jupiter", "5.13.4"),
                            ("org.opentest4j", "1.3.0"), ("org.apiguardian", "1.1.2")]:

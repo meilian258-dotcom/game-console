@@ -3,6 +3,12 @@
 Never compiles production, starts Minecraft, accesses user ROMs/worlds or opens sockets.
 The host-failure cases use the existing original in-memory QA homebrew generator.
 """
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse
 import json
 import os
@@ -22,7 +28,7 @@ def main():
         raise ValueError('Choose a new evidence path; existing evidence is never overwritten')
     jars = {name: getattr(args, name).resolve(strict=True) for name in ('fc', 'sfc', 'core')}
     hashes = {name: sha(path) for name, path in jars.items()}
-    cache = Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
+    cache = (gradle_home() / 'caches/modules-2/files-2.1')
     dependencies = []
     manifest = json.loads((MC.parent.parent / 'artifacts/minecraft_1.21.1_version_manifest.json').read_text())
     for library in manifest['libraries']:

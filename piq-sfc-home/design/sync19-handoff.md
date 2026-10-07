@@ -1,6 +1,6 @@
-# SFC alpha19 同步交接（2026-09-12）
+# SFC alpha19 同步技术记录（2026-09-12）
 
-状态：生产与 JUnit 源已冻结；根代理完整构建 SFC 333 项全过，FC 1363 项（7 skip）无失败。以下四个最终 JAR 探针全部通过。无安装、发布、游戏实例操作。
+状态：生产与 JUnit 源已冻结；完整构建 SFC 333 项全过，FC 1363 项（7 skip）无失败。以下四个最终 JAR 探针全部通过。无安装、发布、游戏实例操作。
 
 ## 行为
 
@@ -69,7 +69,7 @@ metadata：`gradle.properties` 版本 alpha19；`build.gradle` 依赖本地 FC32
 - FC32：`090781E86821275A82E786494B9F98CF905B8CC8EED1478C3F06356ADDAFD16B`
 - 合并 SFC19：`DC50C9378C83E38907C259373CE92B06FAD403B3779D0E4B6772D94AA0343BC3`
 
-最终命令（根代理提供冻结 FC / 合并 SFC 路径，报告必须用新文件且自动绑定输入 path/SHA）：
+最终命令（使用冻结 FC／合并 SFC 路径，报告必须用新文件且自动绑定输入 path/SHA）：
 
 ```text
 python tools/check_sfc_repair_core.py --fc <final-fc> --sfc <final-sfc> --report <new-report>

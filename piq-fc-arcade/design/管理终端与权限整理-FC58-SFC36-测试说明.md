@@ -10,7 +10,7 @@ SFC36 成品合并原 core9，不再叠装旧独立 piq_sfc_home / piq_sfc_arcad
 
 两端安装依据：FC 的共同物品/设备注册、AdminTerminalNetwork / CartridgeNetwork 协议及服务端鉴权对应客户端界面；SFC 的共同硬件、SfcHomeNetwork 与服务端卡带管理对应 SfcCardEditorScreen。Flash 的共同硬件和授权协议仍需要双方安装，运行器只放实际执行 SWF 的 Windows 客户端。不是仅依据依赖声明的 side 推断。
 
-本轮新增物品与协议，必须完整重启，两端不能混装旧版。回退需要恢复旧 JAR 和升级前世界备份。本轮没有自动安装、上传、发布或重启。
+本轮新增物品与协议，必须完整重启，两端不能混装旧版。回退需要恢复旧 JAR 和升级前世界备份。
 
 ## 管理终端
 

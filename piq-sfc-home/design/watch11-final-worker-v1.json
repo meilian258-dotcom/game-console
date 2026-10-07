@@ -19,11 +19,11 @@
   "elapsed_seconds": 6.563,
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
+      "path": "piq-fc-arcade\\build\\review-watch23-v1\\piq_fc_arcade-0.31.0-alpha.23.jar",
       "sha256": "B7BF04BEEA5F58E8E9C0DFA23E1BD8F2CAF6B11455085D843F568B42D9021686"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-watch23-v1\\piq_sfc-0.1.0-alpha.11.jar",
+      "path": "piq-fc-arcade\\build\\review-watch23-v1\\piq_sfc-0.1.0-alpha.11.jar",
       "sha256": "ADF7172C0997983A61C0566AAEE4AE6F19C7D574D6D5B1971490EB69F4B92393"
     }
   },

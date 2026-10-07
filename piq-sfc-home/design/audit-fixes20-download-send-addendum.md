@@ -1,6 +1,6 @@
-# SFC20 下载发送权限补充交接
+# SFC20 下载发送权限补充技术记录
 
-2026-09-13，`/root/fix_sfc_av` 经 root 授权，补交叉审查发现的发送窗口；原 SFC20 handoff 及 v1/v2/v3 报告不覆盖。
+日期：2026-09-13。补充审查发现的下载发送权限窗口；原 SFC20 审查结果保留。
 
 ## 唯一生产文件
 
@@ -30,10 +30,10 @@ SHA-256：`C9B79ED4A42F85E012EE41B84DA4121C716DD2CE9C5C5D130537204BC22630C5`。
 - 原 266 项真实 WASM 修复积压断言通过，目标 720／head 920 时实际 916 才 ACK。
 - 源预检真实 API 编译成功。首次仅新 QA 的 `var` 多变量声明语法错误，修正 QA 后通过；未修改生产来规避测试。v3 成功后额外加入发送异常隔离和 3 个断言，v4 为最新冻结证据。
 
-最终包由 root 统一构建；仍用现工具，只移除 `--production-source`，它只编 QA 并核真实生产来源：
+最终包须完成构建；仍用现工具，只移除 `--production-source`，它只编 QA 并核真实生产来源：
 
 ```text
 python tools/check_sfc_audit_fixes.py --fc <final FC> --sfc <final merged SFC> --report <new report>
 ```
 
-本组件现在生产／工具冻结，可以统一构建。未运行 Gradle、Minecraft、真实权限插件、网络服务器或用户 ROM；纯回调与 ASM 不冒充实际世界事件验收。维护手册由 root 汇总。
+本组件现在生产／工具冻结，可以统一构建。未运行 Gradle、Minecraft、真实权限插件、网络服务器或用户 ROM；纯回调与 ASM 不冒充实际世界事件验收。

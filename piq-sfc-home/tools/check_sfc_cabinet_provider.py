@@ -1,11 +1,17 @@
 """Compile provider pure-Java production classes, unit tests and original-firmware adapter probe; no Gradle/game launch."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse, hashlib, json, os, subprocess, tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 FC=ROOT.parent/'piq-fc-arcade'
 SFC_JAR=ROOT.parent/'制作Mod/03-街机模拟/PIQ-SFC街机/piq_sfc_arcade-0.2.0-alpha.6.jar'
 FC_JAR=ROOT.parent/'制作Mod/03-街机模拟/PIQ-FC街机/piq_fc_arcade-0.31.0-alpha.14.jar'
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
+JAVA=(java_home() / 'bin')
 def run(cmd,cwd):
     p=subprocess.run(list(map(str,cmd)),cwd=cwd,capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=60)
     if p.returncode:raise AssertionError(p.stdout+'\n'+p.stderr)
@@ -15,7 +21,7 @@ def main():
     a.add_argument('--home-jar',type=Path);a.add_argument('--fc-jar',type=Path);args=a.parse_args()
     if bool(args.home_jar)!=bool(args.fc_jar):raise ValueError('Final JAR mode requires both --home-jar and --fc-jar')
     if args.report.exists():raise ValueError('Do not overwrite an existing report')
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
+    cache=(gradle_home() / 'caches/modules-2/files-2.1')
     dependencies=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2')]:
         dependencies.extend(p for p in (cache/group).rglob('*.jar') if version in p.parts and '-sources' not in p.name and '-javadoc' not in p.name)

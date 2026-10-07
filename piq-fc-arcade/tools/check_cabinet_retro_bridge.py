@@ -1,5 +1,11 @@
 """Actual API compile, old-addon ABI probe and unchanged-host-bytecode checks; no game/Gradle/core."""
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse
 import hashlib
 import json
@@ -37,8 +43,8 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--report',type=Path);args=parser.parse_args()
     if args.report:
         args.report.resolve().relative_to(WORKSPACE.resolve());require(not args.report.exists(),'Do not overwrite a report')
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
-    manifest=json.loads(Path('C:/Users/13498/.gradle/caches/neoformruntime/artifacts/minecraft_1.21.1_version_manifest.json').read_text())
+    cache=(gradle_home() / 'caches/modules-2/files-2.1')
+    manifest=json.loads((gradle_home() / 'caches/neoformruntime/artifacts/minecraft_1.21.1_version_manifest.json').read_text())
     dependencies=[]
     for library in manifest['libraries']:
         parts=library['name'].split(':')

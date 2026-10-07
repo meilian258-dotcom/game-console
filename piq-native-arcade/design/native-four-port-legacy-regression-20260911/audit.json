@@ -4,12 +4,12 @@
   "parent_jar_sha256": null,
   "unicode_runtime_classpath": true,
   "helper": {
-    "file": "G:\\服务器\\服务器Codex\\piq-native-arcade\\build\\native-four-port7\\runtime\\piq-native-helper.jar",
+    "file": "piq-native-arcade\\build\\native-four-port7\\runtime\\piq-native-helper.jar",
     "sha256": "229268989AD4E263277FDF0BD5D49E59F69EEB3E980B948DD1D3628182437120",
     "bytes": 19022
   },
   "firmware": {
-    "path": "C:\\Users\\13498\\AppData\\Local\\Temp\\piq-bridge-check-qcmmvqu3\\中文 测试 runtime\\invaders.zip",
+    "path": "<temp-dir>/piq-bridge-check-qcmmvqu3\\中文 测试 runtime\\invaders.zip",
     "zip_sha256": "10E62BBACBF6E79EFB6DB6F7A65EA1EDFB65653EAB60B41E80DBCB4673A5276C",
     "original_firmware_sha256": "554C673E65D5957DA0BC1DF0CEB986CBAC5500D407AE2D780FEAB4F8D2EED810",
     "notice": "Original diagnostics, not Space Invaders game code. Expected checksum warnings are intentional."

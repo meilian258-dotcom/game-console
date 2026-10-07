@@ -1,6 +1,6 @@
 # 固定 RTC 的最后一组有界复验
 
-记录者 cabinet_reuse_review；2026-09-12 10:39（UTC+8）。这是在 `README-20260912.md` 之后，经根代理明确批准的最后一次扩展；原失败报告和原说明保留，不覆盖。
+日期：2026-09-12。此项在 `README-20260912.md` 的测试基础上验证固定 RTC；原失败结果仍有效。
 
 ## 结论：固定初态重放通过，不等于任意快照恢复通过
 
@@ -10,7 +10,7 @@
 mame -rtc 20000101000000 -verbose -rp "<本次临时目录>" <kof97或mslug2>
 ```
 
-没有调用 Windows shell 执行 `.cmd`，没有读取用户提供的命令或配置，也没有改 DLL/helper。生产 `read_config` 仍为 disabled。双方原生日志均确认 RTC 解析成功，并显示 `base_time=946656000`、`2000-01-01 00:00:00`。参数入口依据固定版本 [retro_init.cpp](https://github.com/libretro/mame/blob/4fc9a9312baaf34963847f884961ad9793fbbc1d/src/osd/libretro/libretro-internal/retro_init.cpp) 的 cmd 内容解析和 [machine.cpp](https://github.com/libretro/mame/blob/4fc9a9312baaf34963847f884961ad9793fbbc1d/src/emu/machine.cpp#L157) 的 RTC 参数处理。
+没有调用 Windows shell 执行 `.cmd`，没有读取命令或配置，也没有改 DLL/helper。生产 `read_config` 仍为 disabled。双方原生日志均确认 RTC 解析成功，并显示 `base_time=946656000`、`2000-01-01 00:00:00`。参数入口依据固定版本 [retro_init.cpp](https://github.com/libretro/mame/blob/4fc9a9312baaf34963847f884961ad9793fbbc1d/src/osd/libretro/libretro-internal/retro_init.cpp) 的 cmd 内容解析和 [machine.cpp](https://github.com/libretro/mame/blob/4fc9a9312baaf34963847f884961ad9793fbbc1d/src/emu/machine.cpp#L157) 的 RTC 参数处理。
 
 每游戏仅一对依次新建、互相独立的 QA JVM：先运行 32 次 `retro_run`，双方加载同一份第 32 帧初态，然后执行同一份 12,000 帧输入。每帧比较全部 RGB、PCM 及输出头；初态和每 600 帧比较全部 1,029,356 字节状态。
 

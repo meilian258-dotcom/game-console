@@ -3,7 +3,7 @@
   "schema": "piq-zapper-session26-final-1",
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-fc-arcade\\build\\review-controls26-v1\\piq_fc_arcade-0.31.0-alpha.26.jar",
+      "path": "piq-fc-arcade\\build\\review-controls26-v1\\piq_fc_arcade-0.31.0-alpha.26.jar",
       "sha256": "A712BECB54CDB242757604C55A4D6719CB90B24EBB73636FC244F2B51977581A"
     }
   },

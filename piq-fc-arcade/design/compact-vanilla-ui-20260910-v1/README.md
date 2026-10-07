@@ -1,6 +1,6 @@
 # 紧凑原版 GUI 独立离线预览
 
-修改者：sfc_cabinet_provider，2026-09-10。按 root 分配只新增预览工具和本目录，不修改生产、旧预览或任何资源 PNG。
+该设计只新增预览工具和本目录，不修改生产、旧预览或任何资源 PNG。
 
 `tools/preview_compact_vanilla_ui.py` 直接编译执行当前 `DeviceLayout`、`CartridgeWorkbenchLayout` 与独立 `tools/qa/CompactVanillaUiLayoutDump.java`。Java 输出实际 Browser 矩形、列表行、primary 和全部 14 个工作台控件矩形，Python 不重复计算这些布局。
 

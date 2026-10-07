@@ -1,9 +1,15 @@
 """Direct Java21 execution of real LocalRomLibrary and JUnit fixtures, without Gradle/Minecraft."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 from pathlib import Path
 import argparse,hashlib,json,os,subprocess,tempfile
 ROOT=Path(__file__).resolve().parents[1]
-JDK=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-CACHE=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
+JDK=(java_home() / 'bin')
+CACHE=(gradle_home() / 'caches/modules-2/files-2.1')
 def run():
     deps=[]
     for group,name,version in [('org.junit.jupiter','junit-jupiter-api','5.13.4'),('org.junit.platform','junit-platform-commons','1.13.4'),('org.opentest4j','opentest4j','1.3.0'),('org.apiguardian','apiguardian-api','1.1.2')]:

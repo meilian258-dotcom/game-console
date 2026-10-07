@@ -1,6 +1,6 @@
 # alpha30 单柜通讯线交接
 
-修改者：`/root/fix_sfc_av`。2026-09-11。本轮仅本地制作，未安装、发布、启动游戏、修改用户 ROM/存档。
+2026-09-11。实现与离线验证记录；未进行游戏内测试。
 
 ## 行为与边界
 
@@ -36,7 +36,7 @@
 - `cn/piq/fcarcade/client/CabinetDataCableRenderer$Key.class`
 - `cn/piq/fcarcade/client/CabinetDataCableRenderer$Cached.class`
 
-没有新增/更改模型、贴图或其它资产；使用原版 gray_concrete 纹理。未改 helper、核心、ROM、音画/输入网络执行算法。根代理汇总版本与维护手册。
+没有新增/更改模型、贴图或其它资产；使用原版 gray_concrete 纹理。未改 helper、核心、ROM、音画/输入网络执行算法。
 
 ## 验证
 
@@ -51,5 +51,3 @@
 ```text
 python tools/check_cabinet_links30.py --fc <final-fc30.jar> --report <exclusive-new-path.json>
 ```
-
-生产及 src 测试已通知 root 冻结，可以开始 source-fenced 全量构建；后续仅工具与独立报告可写。

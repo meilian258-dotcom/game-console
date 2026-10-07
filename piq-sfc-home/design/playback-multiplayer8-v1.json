@@ -50,11 +50,11 @@
   },
   "jars": {
     "fc": {
-      "path": "G:\\服务器\\服务器Codex\\制作Mod\\03-街机模拟\\PIQ-FC街机\\alpha20-compact-vanilla-ui\\piq_fc_arcade-0.31.0-alpha.20.jar",
+      "path": "制作Mod\\03-街机模拟\\PIQ-FC街机\\alpha20-compact-vanilla-ui\\piq_fc_arcade-0.31.0-alpha.20.jar",
       "sha256": "CAC47CAE12E7183A76CF8874C6E8B8C4242435C01759C797EE78A5BD8A80C864"
     },
     "sfc": {
-      "path": "G:\\服务器\\服务器Codex\\piq-sfc-home\\build\\review-multiplayer8-v1\\piq_sfc-0.1.0-alpha.8.jar",
+      "path": "piq-sfc-home\\build\\review-multiplayer8-v1\\piq_sfc-0.1.0-alpha.8.jar",
       "sha256": "3C678DC03EF9479564BC3F7005210E9DE868792A8D29DD0CDD62CAB3C79BC1E5"
     }
   },

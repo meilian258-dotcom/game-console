@@ -1,4 +1,10 @@
 """Exact final-class comparison with tested source, then execute only final-JAR codec classes."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home
+
 import argparse,hashlib,json,os,shutil,tempfile,zipfile
 from pathlib import Path
 from check_cabinet_media_fallback import ROOT,JAVA,run,result
@@ -12,7 +18,7 @@ def main():
         if sha(path)!=previous['source_sha256'][str(path.relative_to(ROOT.parent))]:raise ValueError('Tested source changed')
     names=['cn/piq/fcarcade/cabinet/CabinetMediaCodec.class','cn/piq/fcarcade/cabinet/CabinetMediaCodec$Encoded.class','cn/piq/retro/api/RetroFrame.class']
     with zipfile.ZipFile(a.jar)as jar:actual={name:jar.read(name)for name in names}
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');deps=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');deps=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2')]:
         deps.extend(x for x in(cache/group).rglob('*.jar')if version in x.parts and '-sources'not in x.name and '-javadoc'not in x.name)
     with tempfile.TemporaryDirectory(prefix='final-codec21-')as folder:

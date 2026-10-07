@@ -1,5 +1,11 @@
 """Real user-model/production-Java geometry and UV preview; not a game screenshot."""
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse,copy,io,json,os,subprocess,tempfile
 from pathlib import Path
 import numpy as np
@@ -8,7 +14,7 @@ from import_user_dual_model import ROOT,SOURCE,ASSETS,TEXTURE,EXPECTED,derive,sh
 from render_rocket_arcade_preview import Quad,collect_quads,render_view,font
 from check_controller_pose_pipeline import translation,rotation as matrix_rotation,scale,points,display_matrix
 
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
+JAVA=(java_home() / 'bin')
 
 def run(args):
     p=subprocess.run(list(map(str,args)),cwd=ROOT,capture_output=True,encoding='utf-8',errors='replace',timeout=60)
@@ -16,7 +22,7 @@ def run(args):
     return p.stdout
 
 def production():
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1');junit=[]
+    cache=(gradle_home() / 'caches/modules-2/files-2.1');junit=[]
     for group,version in [('org.junit.platform','1.13.4'),('org.junit.jupiter','5.13.4'),('org.opentest4j','1.3.0'),('org.apiguardian','1.1.2')]:
         junit.extend(f for f in (cache/group).rglob('*.jar')if version in f.parts and '-sources'not in f.name and '-javadoc'not in f.name)
     names=['RocketArcadeGeometry','DualCabinetGeometry','DualCabinetControls','ScreenAspectFit','DualScreenPresentation','CabinetVideoGeometry','ArcadeScreenBounds','ArcadeDisplayStyle']

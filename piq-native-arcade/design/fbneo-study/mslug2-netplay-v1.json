@@ -13,7 +13,7 @@
       "sha256": "934FF65DC9A3229E62F39A8F26630B54473995BE631FCF9D277996765B2643AB"
     },
     "dll": {
-      "path": "G:\\服务器\\服务器Codex\\piq-native-arcade\\design\\fbneo-study\\vendor\\fbneo_libretro.dll",
+      "path": "piq-native-arcade\\design\\fbneo-study\\vendor\\fbneo_libretro.dll",
       "bytes": 61913629,
       "sha256": "52343F65453C0E1FC06B3AA818B48CA4FED18361F7F336A684E9E3CFFA5F5F3C"
     },
@@ -33,12 +33,12 @@
     "purpose": "Local isolated determinism research only; non-commercial licensing requires separate distribution review."
   },
   "inputs": {
-    "F:\\Minecraft\\HMCL\\versions\\1.21.1-NeoForge\\piq-native-arcade\\roms\\mslug2.zip": {
+    "<game-dir>/piq-native-arcade\\roms\\mslug2.zip": {
       "sha256": "1A82D65E88050FDC75DBCEA180E48802D54C67A4748558FC4BD51C0103D56E4A",
       "bytes": 17473893,
       "mtime_ns": 1777530796963932400
     },
-    "E:\\Dow\\rom\\WinKawaks1.65模拟器\\WinKawaks1.65\\roms\\neogeo\\neogeo.zip": {
+    "<rom-input-dir>/neogeo\\neogeo.zip": {
       "sha256": "E1FFD4AB180E2F6AA4A3AA4D2C6F991E19D8EF762BEC8B5A6283704A2EDC3BBC",
       "bytes": 953500,
       "mtime_ns": 1158274344000000000

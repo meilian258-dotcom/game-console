@@ -15,9 +15,9 @@
     "piq-gba/src/main/java/cn/piq/gba/client/GbaHandheldScreen.java",
     "piq-gba/src/main/java/cn/piq/gba/client/GbaHandheldSyncInfoScreen.java"
   ],
-  "compiler": "C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin/javac.exe --release 21 -proc:none",
+  "compiler": "<java-install-dir>/jdk-21.0.11.10-hotspot/bin/javac.exe --release 21 -proc:none",
   "baseline_jars": "piq-fc-arcade/build/review-release38-v1",
-  "class_output": "C:/Users/13498/AppData/Local/Temp/piq-hosted39-57fcccdb6ea34aa8b46dcd9f3ab0a48a",
+  "class_output": "<temp-dir>/piq-hosted39-57fcccdb6ea34aa8b46dcd9f3ab0a48a",
   "tests": {"found": 20, "started": 20, "passed": 20, "failed": 0, "skipped": 0, "elapsed_ms": 6865},
   "prior_launcher_issues": ["Missing Netty classpath entry", "Old DataFixer classpath priority; corrected with MC 1.21.1 manifest"],
   "client_imports_in_new_server_packages": 0,

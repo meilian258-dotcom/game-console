@@ -2,11 +2,11 @@
 
 本文件保留 2026-10-07 整理前的 README，供版本、兼容性和故障追溯。下方的“当前”、依赖、目录和运行器属于各自历史版本，不作现行安装指引；请先读[当前 PvZ 入口](README.md)。
 
-以下为原文。
+以下为历史技术记录。
 
 # 方块电玩：PvZ / Game Console: PvZ
 
-2026-10-04 **PvZ prototype.12 / NeoForge1.21.1兼容范围测试候选**：配套本批FC76.39及需要PvZ的电脑12，无反向Computer依赖。默认编译236/最低229、MC1.21.1/Java21；229/236源码构建与回归通过，最终七包在229/235/236隔离专服正常启动/停止。图形客户端/多人/Iris未验，不标稳定。原236用户无需降级，其他MOD下界仍有效；原核心/自备内容/保存不变，仅随包第三方说明纳入已提交的来源登记，旧版权许可正文完整保留、无DLL更新。七SHA、该文档例外及同批安装见[本轮范围与安装规则](../piq-fc-arcade/design/NeoForge兼容范围-20261004.md)，最新目录/管理台同步以另行回执为准。
+2026-10-04 **PvZ prototype.12 / NeoForge1.21.1兼容范围测试候选**：配套本批FC76.39及需要PvZ的电脑12，无反向Computer依赖。默认编译236/最低229、MC1.21.1/Java21；229/236源码构建与回归通过，最终七包在229/235/236隔离专服正常启动/停止。图形客户端/多人/Iris未验，不标稳定。原236用户无需降级，其他MOD下界仍有效；原核心/自备内容/保存不变，仅随包第三方说明纳入已提交的来源登记，旧版权许可正文完整保留、无DLL更新。七SHA、该文档例外及同批安装见[本轮范围与安装规则](../piq-fc-arcade/design/NeoForge兼容范围-20261004.md)。
 
 历史 prototype.11 / 通用 JNI 一期。交付使用 `game-console-pvz-版本.jar`，见[命名规范](../source-control/BRANDING.md)。仅统一对外品牌，固定核心、玩家自备游戏资源、存档和兼容 ID 均不变；原交付包不覆盖。
 
@@ -79,8 +79,8 @@ prototype.7 仅更新 FC75 加载兼容范围；没有替换 PvZ DLL、保存格
 
 - `native/pvz_host.cpp` 是专门用于评估 libretro 硬件渲染的新子进程，使用 Windows WGL。旧公共软件 worker、FC/SFC/街机核心均未改动，不复制原公共 Java 桥。
 - 模组通过 `ExternalHomeConsoleBlockEntity`、`HomeSystems`、`HomeVideoDisplay` 和既有线材接口接入；本机两项 mixin 仅在这一台已就绪电视隐藏闲置画面/无信号音，不改服务端电源状态。
-- 原生程序与 DLL 从附属自身资源读取，固定 SHA256 校验后放独占临时目录。没有从服务器接收或按用户指定路径执行 DLL；临时目录与原游戏文件、持久保存目录分开。子进程隔离不等于操作系统安全沙箱。
-- 构建：Java21 下运行 `../piq-fc-arcade/gradlew.bat --offline check jar`。`tools/build_native.py` 使用工作区固定 LLVM 工具链重建 host 并生成 SHA 收据；更新 host 时必须同步固定 SHA 并重跑验证。原 DLL 原样取自用户提供包，未宣称与包内源码可重现一致。
+- 原生程序与 DLL 从附属自身资源读取，固定 SHA256 校验后放独占临时目录。没有从服务器接收或按外部指定路径执行 DLL；临时目录与原游戏文件、持久保存目录分开。子进程隔离不等于操作系统安全沙箱。
+- 构建：Java21 下运行 `../piq-fc-arcade/gradlew.bat --offline check jar`。`tools/build_native.py` 使用工作区固定 LLVM 工具链重建 host 并生成 SHA 收据；更新 host 时必须同步固定 SHA 并重跑验证。原 DLL 保持历史输入原样，未宣称与包内源码可重现一致。
 - 附带的 `piq-pvz-addon-source.zip` 仅包含本附属源码和 libretro 头文件，不是上游完整源码包。重建需本工作区的 Gradle/FC70/LLVM 环境，并将原包的 `dist/cores/pvz_libretro.dll` 复制到 `src/main/resources/core/pvz/`，构建 host、核对并同步固定 SHA 后再构建 JAR。上游完整源码仍在你提供的原始7z中，公开分发前须另行完成来源与依赖清单核对。
 
 本附属原创及复用的主模组接口适配代码：GPL-3.0-or-later。第三方核心/框架/依赖各自遵循原许可，见 `THIRD_PARTY.md`，不改授为 GPL。本地试验交付不代表 CurseForge 等公开分发审核已完成。

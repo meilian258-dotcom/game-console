@@ -1,9 +1,15 @@
 """Compile the actual changed FC UI against real MC APIs; execute pure/source regression tests only."""
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse, hashlib, json, os, shutil, subprocess, tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-JAVA=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin')
-MC=Path('C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
+JAVA=(java_home() / 'bin')
+MC=(gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar')
 UI=ROOT/'src/main/java/cn/piq/fcarcade/client'
 NAMES=['ui/DeviceUi','ui/DeviceLayout','ui/DeviceConfirmScreen','FcMenuLayout','FcMenuState','ClientCartridgeEditor','RomLibraryScreen','RomRenameScreen','FcRomDeleteScreen','rom/LocalRomPickerLayout','rom/LocalRomPickerScreen','cabinet/CabinetMenuLayout','cabinet/CabinetMenuScreen']
 TESTS=['ui.DeviceLayoutTest','rom.LocalRomPickerLayoutTest','rom.LocalRomPickerSafetyTest','cabinet.CabinetMenuLayoutTest','cabinet.CabinetClientSafetyTest','FcMenuLayoutTest']
@@ -16,8 +22,8 @@ def run(command,cwd):
     return output
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--report',type=Path);args=parser.parse_args()
-    cache=Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1')
-    manifest=json.loads(Path('C:/Users/13498/.gradle/caches/neoformruntime/artifacts/minecraft_1.21.1_version_manifest.json').read_text())
+    cache=(gradle_home() / 'caches/modules-2/files-2.1')
+    manifest=json.loads((gradle_home() / 'caches/neoformruntime/artifacts/minecraft_1.21.1_version_manifest.json').read_text())
     dependencies=[]
     for lib in manifest['libraries']:
         p=lib['name'].split(':')

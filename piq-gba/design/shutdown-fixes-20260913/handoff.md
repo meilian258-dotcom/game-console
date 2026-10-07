@@ -1,11 +1,11 @@
 # GBA 退出存档修复独立复核 · 2026-09-13
 
-主代理新增 JVM shutdown hook / 应用退出显式 shutdown 的方案可解决旧 daemon owner 在正常 System.exit 时来不及保存的问题。独立复核进一步修复以下时序风险，仅修改获授权的两个源文件，不改 helper/DLL、版本、资源、存档格式或隔离命名。
+新增 JVM shutdown hook / 应用退出显式 shutdown 的方案可解决旧 daemon owner 在正常 System.exit 时来不及保存的问题。独立复核进一步修复以下时序风险，仅修改获授权的两个源文件，不改 helper/DLL、版本、资源、存档格式或隔离命名。
 
 ## 精确生产范围
 
 - `src/main/java/cn/piq/gba/bridge/GbaProcessSession.java`：ProcessBuilder.start 移出 LAUNCH_LOCK；session 仍在启动前登记，晚到子进程发布后立即检查关闭并仅回收自身。首次 shutdown 确定共同 5 秒保存 + 总 6 秒收尾期限，之后显式调用/JVM hook 不重新计时。真正仍存活的子进程保留 ACTIVE/临时 runtime，由独立 exact-child reaper 等到死亡再完成清理。新增 package-private `ChildLauncher` 和构造重载仅提供可控竞态测试缝；公开构造仍调用真实 ProcessBuilder.start，原 runtime SHA/ROM 上限/存档校验保持。
-- `src/main/java/cn/piq/gba/client/GbaHandheldClient.java`：stop 先请求 core/audio 异步关闭，再释放输入/纹理，避免可选清理异常跳过存档。保留主代理原 shutdown 的 finally 调用 bridge.shutdown。
+- `src/main/java/cn/piq/gba/client/GbaHandheldClient.java`：stop 先请求 core/audio 异步关闭，再释放输入/纹理，避免可选清理异常跳过存档。保留原 shutdown 的 finally 调用 bridge.shutdown。
 
 新增 class 仅 `GbaProcessSession$ChildLauncher`；两个 outer class 修改。现有 Frame、Binding/Play 等嵌套可能仅重编行号差异，未改其字段/行为。没有新增 native 或资源。
 

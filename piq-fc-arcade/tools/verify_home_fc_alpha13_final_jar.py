@@ -6,6 +6,12 @@ Old alpha10/9/8 audit code, manifests and reports are not changed or impersonate
 Packaged pure-Java probes run input/pose/layout code, not Minecraft or a native core.
 """
 from __future__ import annotations
+
+import sys as _dev_sys
+from pathlib import Path as _DevPath
+_dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
+from dev_tool_paths import gradle_home, java_home
+
 import argparse, hashlib, json, re, struct, subprocess, tempfile, zipfile
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
@@ -181,8 +187,8 @@ def packaged_probe(jar,javap):
 def packaged_vertex_probe(jar,javap):
     """Compile only QA capture code; both production shading classes come from the final JAR."""
     dependencies=[
-        Path('C:/Users/13498/.gradle/caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar'),
-        Path('C:/Users/13498/.gradle/caches/modules-2/files-2.1/org.joml/joml/1.10.5/22566d58af70ad3d72308bab63b8339906deb649/joml-1.10.5.jar')]
+        (gradle_home() / 'caches/neoformruntime/intermediate_results/sourcesAndCompiledWithNeoForge_e75ff7a3db3c8d7760682f321018318019b04f3c_output.jar'),
+        (gradle_home() / 'caches/modules-2/files-2.1/org.joml/joml/1.10.5/22566d58af70ad3d72308bab63b8339906deb649/joml-1.10.5.jar')]
     require(all(p.is_file() for p in dependencies),'Actual cached Minecraft/JOML API dependencies required')
     require(old.file_sha(dependencies[0])=='8D45CC055677C4BCEC93E4831F510691989E4A413DBF6CC6DB57817BC2B96333','Minecraft test API changed')
     cp=';'.join(str(p) for p in [jar,*dependencies])
@@ -261,7 +267,7 @@ def inspect(jar,expected_jar,javap):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--jar',type=Path,required=True);parser.add_argument('--jar-sha256',required=True)
-    parser.add_argument('--javap',type=Path,default=Path('C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot/bin/javap.exe'));parser.add_argument('--report',type=Path);parser.add_argument('--check-only',action='store_true');args=parser.parse_args()
+    parser.add_argument('--javap',type=Path,default=(java_home() / 'bin/javap.exe'));parser.add_argument('--report',type=Path);parser.add_argument('--check-only',action='store_true');args=parser.parse_args()
     if not args.check_only:
         require(args.report is not None,'Use --report or --check-only')
         args.report.resolve().relative_to((old.DELIVERY/'家用FC-0.31.0-alpha.13-模型预览').resolve());require(not args.report.exists(),'Never overwrite an existing audit report')

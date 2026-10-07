@@ -1,6 +1,6 @@
 # alpha28 电源 / 显示 / 控制器分离
 
-2026-09-11，用户明确同意制作。仅源码、验证与新测试包，不安装 HMCL，不改 ROM/用户存档/历史交付，不发布，不关机。
+2026-09-11，设备电源、运行与控制分离的历史设计。
 
 ## 行为
 
@@ -15,10 +15,10 @@
 
 ## 分工 / 接口
 
-- root：HomeApplianceService、HomeHardware 路由、HomeSystems API、电视状态/显示/音量、实体按钮点击/提示、版本和合包。
-- fix_sfc_av：FC Host 与 Controller 解耦、HomeConsoleRuntime、HomeZapperService、FC 服务端/客户端与网络；不改 root 文件。
-- sfc_cabinet_provider：SFC 同等状态分离、运行/控制协议、共享入口适配和测试。
-- cabinet_reuse_review：光枪支架 Block/BE/Item/绑定/模型/线/唯一物品、Mod 注册；直接与 FC 代理协调枪服务，不改共享语言文件。
+- HomeApplianceService、HomeHardware 路由、HomeSystems API、电视状态/显示/音量、实体按钮点击/提示、版本和合包。
+- FC Host 与 Controller 解耦、HomeConsoleRuntime、HomeZapperService、FC 服务端/客户端与网络。
+- SFC 同等状态分离、运行/控制协议、共享入口适配和测试。
+- 光枪支架 Block/BE/Item/绑定/模型/线/唯一物品、Mod 注册；直接与 FC 代理协调枪服务，不改共享语言文件。
 
 HomeSystems.ServerHooks 新增 default：
 `boolean onPowerOn(ServerPlayer, Connection)`、`void onPowerOff(ServerLevel, ExternalHomeConsoleBlockEntity)`、`void onReset(ServerPlayer, Connection)`、`void onController(ServerPlayer, Connection, int)`、`boolean isRunning(ServerLevel, ExternalHomeConsoleBlockEntity)`。
