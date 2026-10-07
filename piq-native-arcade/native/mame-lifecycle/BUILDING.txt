@@ -97,11 +97,17 @@ This route is independent of local build objects and caches. The exact same
 MAME commit, archive SHA and lifecycle patch are used. ci-toolchain-lock.json
 pins the official MSYS2 base 2026-09-27 SFX (43,117,824 bytes; SHA-256
 AD336CCCFDA47758B5E15CDA993FBBA421115CB0B126697DAEF1EE4DFE37209F),
-its 85-package manifest and a 38-package dependency closure from the official
+its 85-package manifest and a 40-package dependency closure from the official
 MSYS2 repositories. Each additional package has its own URL, version, size and
 SHA. The native toolchain remains MINGW64: GCC 16.2.0-4, Python 3.14.8-1 and
 Make 4.4.1-3. These revisions differ from the historical local toolchain; the
 cloud binary must be independently validated. There is no silent UCRT switch.
+
+The Windows libretro source also includes SDL2 headers from input_common.cpp:
+retroprefix.h defines SDLMAME_WIN32 even for the OSD_RETRO configuration.
+The lock includes SDL2 2.32.10-1 and its vulkan-loader 1~1.4.363.0-1 dependency.
+These are build inputs, not an instruction to bundle either runtime DLL in the
+core candidate. The final core import table determines runtime requirements.
 
 Do not use rolling pacman -S/-Sy/-Su or setup-msys2's default latest release /
 install options. ci_prepare.py requires a new directory under RUNNER_TEMP on
@@ -132,7 +138,9 @@ a GitHub-hosted Windows runner (not a self-hosted or local machine). It:
   shell: upstream checks those paths even with platform=win; this does not
   change the runner's installation, the local build environment or MAME sources;
 * compares the complete installed package manifest with the lock, verifies
-  actual compiler/Python/Make versions, and hashes key executables/version.h.
+  actual compiler/Python/Make versions, checks SDL2 dependency files and compiles
+  a bounded header-only syntax probe before the full build; no probe executable
+  is linked or run; hashes key tool and dependency files for drift detection.
 
 CI prerequisites: Windows x64 hosted runner, existing native Python 3.11+ and
 Git, checkout with core.autocrlf=input so the patch bytes remain pinned. No
@@ -184,11 +192,17 @@ bytes). A historical completed tree was only a driver subset, not a full-build
 measurement. There is no measured complete full-build peak yet: 10 GiB is a
 conservative CI trial budget based on current objects, source/toolchain,
 archives, link output and source package, not a proven peak-space guarantee.
-Package downloads total 120,404,498 bytes and declared extra installed size is
-853,292,822 bytes, plus the MSYS2 base and source. Build heartbeat output every
+Package downloads total 122,177,555 bytes and declared extra installed size is
+863,890,509 bytes, plus the MSYS2 base and source. Build heartbeat output every
 30 seconds records elapsed time, log growth and remaining disk; disk exhaustion
 or compiler errors remain failures. Do not delete unrelated runner tools to
 make a preflight pass.
+
+On a failed hosted build, the console shows the first compiler error found in
+the first 8 MiB of that build's log (up to 4 KiB of context), plus the last
+16 KiB / 60 lines. Parallel sub-makes may continue after an earlier error, so
+the log tail alone is not a reliable root-cause summary. The full log remains
+in the explicit evidence allowlist; this adds no other log or local directory.
 
 CI artifacts and validation status
 -----------------------------------
@@ -209,15 +223,18 @@ game data or any local diagnostic directory. Keep artifact retention short.
 These hosted-run logs contain only runner paths; local logs require a separate
 privacy review and must not be fed to this workflow.
 
-Offline helper tests are not a cloud installation/build result. The initial
-clean-runner package installation, full link, PE imports/exports, embedded-path
-scan and real lifecycle behavior all remain to be validated by the workflow and
+Offline helper tests are not a cloud installation/build result. A clean runner
+verified and installed the original toolchain packages, then failed compilation
+because the original lock omitted SDL2/SDL.h. The expanded dependency closure
+still requires hosted validation. Full linking, PE imports/exports, embedded-path
+scan and real lifecycle behavior remain to be validated by the workflow and
 isolated candidate tests. Do not fill runtime.json with a predicted DLL hash.
 
 Official references (checked 2026-10-08):
 https://docs.github.com/en/actions/reference/runners/github-hosted-runners
 https://docs.github.com/en/actions/reference/limits
 https://www.msys2.org/docs/package-management/
+https://packages.msys2.org/packages/mingw-w64-x86_64-SDL2
 https://github.com/msys2/msys2-installer/releases/tag/2026-09-27
 https://github.com/msys2/setup-msys2
 https://github.com/msys2/setup-msys2/blob/d34ca6fb9f66412423e0ade249ca8a35b3715726/main.js

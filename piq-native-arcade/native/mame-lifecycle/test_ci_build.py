@@ -236,6 +236,137 @@ class ExtractionTests(unittest.TestCase):
         self.assertEqual(failed["status"], "failed")
 
 
+class BuildDependencyTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(prefix="piq-dependencies-test-")
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name).resolve()
+        self.msys = self.root / "msys64"
+        self.lock = ci.load_lock()
+        for name in ci.BUILD_DEPENDENCY_FILES:
+            path = self.msys / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"inert installed dependency fixture")
+        self.versions = (self.lock["gcc_version"] + "\nPython " + self.lock["python_version"]
+                         + "\nGNU Make " + self.lock["make_version"] + "\n")
+
+    def invoke(self, *, exit_code=0, stdout=None, outcome=None):
+        completed = subprocess.CompletedProcess([], exit_code, self.versions if stdout is None else stdout)
+        with patch.dict(os.environ, {"SystemRoot": "C:/Windows"}), \
+                patch.object(ci.subprocess, "run", return_value=completed, side_effect=outcome) as run:
+            result = ci.check_build_dependencies(self.msys, self.root, self.lock)
+        return result, run
+
+    def test_preflight_is_bounded_header_syntax_only_and_uses_existing_log(self):
+        result, run = self.invoke()
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["timeout_seconds"], 60)
+        self.assertEqual(result["log"], "tool-versions.txt")
+        self.assertEqual(result["log_sha256"], build.sha(self.root / "tool-versions.txt"))
+        self.assertEqual(set(result["files"]), set(ci.BUILD_DEPENDENCY_FILES))
+        self.assertEqual(run.call_count, 1)
+        self.assertEqual(run.call_args.kwargs["timeout"], 60)
+        command = run.call_args.args[0][-1]
+        self.assertIn("timeout --signal=TERM --kill-after=5s 50s g++", command)
+        self.assertIn("-std=gnu++17 -fsyntax-only -x c++ -", command)
+        self.assertIn("#include <SDL2/SDL.h>", command)
+        self.assertIn("SDL_MAJOR_VERSION != 2 || SDL_MINOR_VERSION != 32 || SDL_PATCHLEVEL != 10", command)
+        for forbidden in ("make -f", "-o ", "-lSDL", "./probe", "NO_USE_", "taskkill", "pkill"):
+            self.assertNotIn(forbidden, command)
+
+    def test_each_missing_or_empty_installed_dependency_fails_before_process(self):
+        for name in ci.BUILD_DEPENDENCY_FILES:
+            path = self.msys / name
+            for missing in (True, False):
+                with self.subTest(file=name, missing=missing):
+                    if missing:
+                        path.unlink()
+                    else:
+                        path.write_bytes(b"")
+                    with patch.object(ci.subprocess, "run") as run, \
+                            self.assertRaisesRegex(ValueError, "Missing installed build dependency"):
+                        ci.check_build_dependencies(self.msys, self.root, self.lock)
+                    run.assert_not_called()
+                    path.write_bytes(b"restored inert fixture")
+        self.assertFalse((self.root / "tool-versions.txt").exists())
+
+    def test_compiler_failure_is_not_a_pass_and_retains_diagnostic(self):
+        with self.assertRaisesRegex(RuntimeError, "preparation failed"):
+            self.invoke(exit_code=1, stdout="fixture: SDL2/SDL.h missing\n")
+        self.assertIn("SDL2/SDL.h missing", (self.root / "tool-versions.txt").read_text())
+
+    def test_preflight_timeout_preserves_partial_log(self):
+        with self.assertRaises(subprocess.TimeoutExpired):
+            self.invoke(outcome=subprocess.TimeoutExpired("fixture", 60, output=b"checking headers\n"))
+        log = (self.root / "tool-versions.txt").read_text()
+        self.assertIn("checking headers", log)
+        self.assertIn("not reusable", log)
+
+    def test_zero_exit_does_not_hide_wrong_compiler_version(self):
+        with self.assertRaisesRegex(ValueError, "tool versions"):
+            self.invoke(stdout="incorrect compiler\n")
+
+    def test_existing_tool_hash_gate_covers_new_dependency_drift(self):
+        names = ("usr/bin/bash.exe", "usr/bin/make.exe", "usr/bin/msys-2.0.dll",
+                 "mingw64/bin/gcc.exe", "mingw64/bin/g++.exe", "mingw64/bin/ar.exe",
+                 "mingw64/bin/ld.exe", "mingw64/bin/python3.exe",
+                 "mingw64/lib/gcc/x86_64-w64-mingw32/16.2.0/cc1plus.exe",
+                 "mingw64/include/c++/16.2.0/bits/version.h")
+        for name in names:
+            path = self.msys / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"inert compiler fixture")
+        before = ci.tool_files(self.msys)
+        self.assertEqual(len(before), 18)
+        self.assertTrue(set(ci.BUILD_DEPENDENCY_FILES).issubset(before))
+        changed = "mingw64/include/SDL2/SDL.h"
+        (self.msys / changed).write_bytes(b"drifted header fixture")
+        after = ci.tool_files(self.msys)
+        self.assertEqual({name for name in before if before[name] != after[name]}, {changed})
+
+    def test_failed_preflight_never_downloads_mame_or_marks_toolchain_ready(self):
+        target = self.root / "fresh"
+        expected = self.lock["base_manifest"] | {p["name"]: p["version"] for p in self.lock["packages"]}
+
+        def manifest(packages):
+            return "\n".join(name + " " + version for name, version in packages.items()) + "\n"
+
+        def download(url, path, *args, **kwargs):
+            path.write_text(manifest(self.lock["base_manifest"]) if path.name == "base-packages.txt" else "fixture",
+                            encoding="utf-8")
+            return {"fixture": path.name}
+
+        def shell(msys, command, log, **kwargs):
+            packages = expected if log.name == "packages-after.txt" else self.lock["base_manifest"]
+            output = manifest(packages) if command == "pacman -Q" else "fixture output\n"
+            log.write_text(output, encoding="utf-8")
+            return output
+
+        with patch("sys.argv", ["ci_prepare.py", "--root", str(target)]), \
+                patch.object(ci, "require_hosted_ci"), \
+                patch.object(ci.shutil, "disk_usage", return_value=SimpleNamespace(free=20 * ci.GIB)), \
+                patch.object(ci, "download", side_effect=download) as fetch, \
+                patch.object(ci, "extract_base", return_value={"status": "complete"}), \
+                patch.object(ci, "disable_key_refresh", return_value={}), \
+                patch.object(ci, "enforce_offline_keyring", return_value={}), \
+                patch.object(ci, "run_shell", side_effect=shell) as commands, \
+                patch.object(ci, "check_build_dependencies", side_effect=RuntimeError("fixture preflight failure")), \
+                self.assertRaisesRegex(RuntimeError, "preflight failure"):
+            ci.main()
+        self.assertEqual(fetch.call_count, 2 + 2 * len(self.lock["packages"]))
+        self.assertNotIn(ci.SOURCE_URL, [call.args[0] for call in fetch.call_args_list])
+        signatures = next(call.args[1] for call in commands.call_args_list
+                          if call.args[2].name == "packages-signatures.log")
+        self.assertEqual(signatures.count("pacman-key --verify "), 40)
+        for package in ("mingw-w64-x86_64-SDL2", "mingw-w64-x86_64-vulkan-loader"):
+            self.assertIn(package, signatures)
+        config = (target / "pacman-ci.conf").read_text()
+        self.assertIn("LocalFileSigLevel = Required", config)
+        self.assertIn("RemoteFileSigLevel = Required", config)
+        self.assertFalse((target / "toolchain-receipt.json").exists())
+        self.assertEqual(json.loads((target / "toolchain-failed.json").read_text())["status"], "failed")
+
+
 class LockAndIsolationTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix="piq-ci-test-")
@@ -273,13 +404,38 @@ class LockAndIsolationTests(unittest.TestCase):
         self.assertEqual(lock["base"]["bytes"], 43117824)
         self.assertEqual(lock["base"]["sha256"],
                          "AD336CCCFDA47758B5E15CDA993FBBA421115CB0B126697DAEF1EE4DFE37209F")
-        self.assertEqual(len(lock["packages"]), 38)
+        self.assertEqual(len(lock["packages"]), 40)
         self.assertEqual(len(lock["base_manifest"]), 85)
-        self.assertEqual(sum(p["bytes"] for p in lock["packages"]), 120404498)
+        self.assertEqual(sum(p["bytes"] for p in lock["packages"]), 122177555)
         self.assertEqual(lock["gcc_version"], "16.2.0")
         self.assertEqual(lock["python_version"], "3.14.8")
         self.assertEqual(build.sha(build.PATCH), build.PATCH_SHA256)
         self.assertEqual(ci.SOURCE_URL, f"https://github.com/libretro/mame/archive/{build.COMMIT}.zip")
+
+    def test_sdl2_pins_add_only_runtime_dependency_closure_not_package_build_tools(self):
+        packages = {p["name"]: p for p in ci.load_lock()["packages"]}
+        expected = {
+            "mingw-w64-x86_64-SDL2": ("2.32.10-1", 1549601,
+                "5991AFBCFEB2F8B838AB80B2270D713A727199CA392715677A7C1931A0D9ECEF"),
+            "mingw-w64-x86_64-vulkan-loader": ("1~1.4.363.0-1", 223456,
+                "281FA31B1A023485D4FD04A092A8B5E9CA2F59804DF7FCF9F2D4E5AAA5438AF0"),
+        }
+        for name, (version, size, digest) in expected.items():
+            item = packages[name]
+            self.assertEqual((item["version"], item["bytes"], item["sha256"]), (version, size, digest))
+            self.assertEqual(item["url"], "https://repo.msys2.org/mingw/mingw64/" + item["filename"])
+        self.assertTrue(ci.REQUIRED_BUILD_PACKAGES.issubset(packages))
+        for package in ("vulkan-headers", "cmake", "ninja", "pkgconf", "sdl2-compat"):
+            self.assertNotIn("mingw-w64-x86_64-" + package, packages)
+
+    def test_same_size_lock_cannot_substitute_required_sdl2_dependency(self):
+        for name in ci.REQUIRED_BUILD_PACKAGES:
+            lock = ci.load_lock()
+            next(p for p in lock["packages"] if p["name"] == name)["name"] = "unexpected-package"
+            target = self.root / "substituted-lock.json"
+            target.write_text(json.dumps(lock), encoding="utf-8")
+            with self.subTest(package=name), self.assertRaisesRegex(ValueError, "dependency closure"):
+                ci.load_lock(target)
 
     def test_duplicate_lock_rejected(self):
         lock = ci.load_lock()
@@ -388,7 +544,7 @@ class LockAndIsolationTests(unittest.TestCase):
         key_config.write_bytes(b"test offline configuration")
         record = {"schema": "piq-mame-ci-toolchain-receipt-1", "status": "ready",
                   "lock_sha256": ci.sha(ci.LOCK), "cache_reused": False,
-                  "preparer_sha256": build.sha(Path(ci.__file__)), "offline_signature_checks": 38,
+                  "preparer_sha256": build.sha(Path(ci.__file__)), "offline_signature_checks": len(lock["packages"]),
                   "offline_keyring_policy": {"after_sha256": build.sha(key_config)},
                   "msys_root": str(args.msys_root), "tool_files": {"g++": "fake-test-hash"},
                   "packages": lock["base_manifest"] | {p["name"]: p["version"] for p in lock["packages"]}}

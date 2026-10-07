@@ -6,6 +6,7 @@ receipts contain local paths and are private diagnostics, not release files.
 from __future__ import annotations
 
 import argparse
+from collections import deque
 import datetime
 import hashlib
 import json
@@ -45,6 +46,42 @@ def save(path: Path, value) -> None:
 
 def stamp() -> str:
     return datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+
+def failure_excerpt(path: Path) -> str:
+    """Read only this build's log, with bounded scanning, context and tail."""
+    before = deque(maxlen=3)
+    first = b""
+    markers = (b": fatal error:", b": error:", b"undefined reference to", b"collect2:")
+    overlap = b""
+    overlap_size = max(map(len, markers)) - 1
+    with path.open("rb") as stream:
+        remaining = 8 * 1024**2
+        while remaining > 0:
+            line = stream.readline(min(4096, remaining))
+            if not line:
+                break
+            remaining -= len(line)
+            searchable = overlap + line
+            offsets = [offset for marker in markers
+                       if (offset := searchable.find(marker)) >= 0]
+            if offsets:
+                # Parallel sub-makes can continue long after the first failure.
+                # Keep the error itself even if preceding lines were unusually long.
+                context = b"".join(before) + line
+                position = len(context) - len(searchable) + min(offsets)
+                first = context[max(0, position - 1024):position + 2048] + stream.read(1024)
+                break
+            before.append(line)
+            overlap = searchable[-overlap_size:]
+        stream.seek(0, os.SEEK_END)
+        stream.seek(max(0, stream.tell() - 16384))
+        tail = stream.read(16384).decode("utf-8", "replace")
+    sections = []
+    if first:
+        sections.append("First compiler error context:\n" + first.decode("utf-8", "replace"))
+    sections.append("Build log tail:\n" + "\n".join(tail.splitlines()[-60:]))
+    return "\n".join(sections)
 
 
 def prepare(args, root: Path) -> dict:
@@ -236,11 +273,7 @@ def main() -> None:
     metadata.update(exit_code=result, finished_utc=stamp(), log_sha256=sha(log_path))
     if result != 0 and args.ci_clean:
         # This exact hosted-build log is already in the allowlisted evidence.
-        # Surface a bounded tail without requiring the entire source artifact download.
-        with log_path.open("rb") as failed_log:
-            failed_log.seek(max(0, log_path.stat().st_size - 16384))
-            tail = failed_log.read(16384).decode("utf-8", "replace")
-        print("\n".join(tail.splitlines()[-60:]), flush=True)
+        print(failure_excerpt(log_path), flush=True)
     artifacts = []
     for dll in (root / "mame").glob("*libretro*.dll"):
         artifacts.append({"path": str(dll), "bytes": dll.stat().st_size, "sha256": sha(dll)})

@@ -12,7 +12,8 @@ import zipfile
 from build_candidate import CHANGED, COMMIT, PATCH, PATCH_SHA256, SOURCE_FILES, SOURCE_SHA256, sha
 
 HELPERS = ("lifecycle-4fc9a931.patch", "build_candidate.py", "package_source.py",
-           "ci_prepare.py", "ci-toolchain-lock.json", "test_ci_build.py", "BUILDING.txt", "LICENSE")
+           "ci_prepare.py", "ci-toolchain-lock.json", "test_ci_build.py",
+           "test_build_diagnostics.py", "BUILDING.txt", "LICENSE")
 
 
 def main() -> None:

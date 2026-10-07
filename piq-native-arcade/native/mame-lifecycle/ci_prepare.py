@@ -26,6 +26,19 @@ SOURCE_URL = f"https://github.com/libretro/mame/archive/{COMMIT}.zip"
 SOURCE_BYTES = 234551686
 GIB = 1024**3
 EXTRACT_TIMEOUT_SECONDS = 1200
+DEPENDENCY_TIMEOUT_SECONDS = 60
+# Installed build inputs only, not a claim that the resulting core imports SDL
+# or Vulkan. Final core import validation remains a separate release gate.
+BUILD_DEPENDENCY_FILES = (
+    "mingw64/include/SDL2/SDL.h", "mingw64/include/SDL2/SDL_config.h",
+    "mingw64/include/SDL2/SDL_version.h", "mingw64/lib/libSDL2.a",
+    "mingw64/lib/libSDL2.dll.a", "mingw64/bin/SDL2.dll",
+    "mingw64/lib/libvulkan-1.dll.a", "mingw64/bin/vulkan-1.dll",
+)
+REQUIRED_BUILD_PACKAGES = {
+    "mingw-w64-x86_64-SDL2", "mingw-w64-x86_64-vulkan-loader",
+    "mingw-w64-x86_64-cc-libs", "mingw-w64-x86_64-libiconv",
+}
 
 
 def require_hosted_ci(root: Path, env=None) -> None:
@@ -88,8 +101,10 @@ def load_lock(path=LOCK) -> dict:
     if lock["schema"] != "piq-mame-ci-toolchain-1" or lock["environment"] != "MINGW64":
         raise ValueError("Unexpected toolchain lock schema/environment")
     packages = lock["packages"]
-    if len(packages) != 38 or len({p["name"] for p in packages}) != len(packages):
+    if len(packages) != 40 or len({p["name"] for p in packages}) != len(packages):
         raise ValueError("Unexpected or duplicate locked package set")
+    if not REQUIRED_BUILD_PACKAGES.issubset({p["name"] for p in packages}):
+        raise ValueError("Missing locked SDL2 build dependency closure")
     for item in [lock["base"], *packages]:
         validate_url(item["url"])
         if (Path(item["filename"]).name != item["filename"] or "\\" in item["filename"]
@@ -124,7 +139,43 @@ def tool_files(msys: Path) -> dict[str, str]:
               (msys / "mingw64/include/c++").glob("*/bits/version.h")]
     if len(names) != 10:
         raise ValueError("Expected exactly one pinned C++ library version header")
+    names += list(BUILD_DEPENDENCY_FILES)
     return {name: sha(msys / name) for name in names}
+
+
+def check_build_dependencies(msys: Path, root: Path, lock: dict) -> dict:
+    """Fail before the full MAME build; never link or execute a probe binary."""
+    missing = [name for name in BUILD_DEPENDENCY_FILES
+               if not (msys / name).is_file() or (msys / name).stat().st_size == 0]
+    if missing:
+        raise ValueError("Missing installed build dependency: " + ", ".join(missing))
+    # The nested timeout owns only this syntax-check process group, including
+    # cc1plus. Its TERM/KILL deadline precedes the outer 60-second shell budget.
+    # This checks the same <SDL2/SDL.h> spelling used by MAME's Windows input
+    # sources, without adding SDL link flags or changing MAME feature macros.
+    command = "\n".join([
+        "export PATH=/mingw64/bin:/usr/bin", "gcc -dumpfullversion",
+        "python3 --version", "make --version",
+        "test \"$(gcc -dumpmachine)\" = x86_64-w64-mingw32",
+        "python3 -c 'import sys; assert sys.platform == \"win32\"'",
+        "timeout --signal=TERM --kill-after=5s 50s g++ -std=gnu++17 -fsyntax-only -x c++ - <<'PIQ_SDL2_PREFLIGHT'",
+        "#include <SDL2/SDL.h>",
+        "#if SDL_MAJOR_VERSION != 2 || SDL_MINOR_VERSION != 32 || SDL_PATCHLEVEL != 10",
+        '#error Unexpected locked SDL2 header version', "#endif",
+        "static_assert(sizeof(SDL_Event) > 0, \"SDL_Event must be available\");",
+        "PIQ_SDL2_PREFLIGHT",
+        "printf '%s\\n' 'PIQ SDL2 2.32.10 header preflight passed; no binary linked or executed'",
+    ])
+    log = root / "tool-versions.txt"
+    versions = run_shell(msys, command, log, timeout_seconds=DEPENDENCY_TIMEOUT_SECONDS)
+    if (not versions.startswith(lock["gcc_version"] + "\nPython " + lock["python_version"] + "\n")
+            or "GNU Make " + lock["make_version"] not in versions):
+        raise ValueError("Executed tool versions differ from lock")
+    return {"schema": "piq-mame-build-dependencies-1", "status": "passed",
+            "check": "SDL2 2.32.10 header syntax only; no linked or executed probe",
+            "timeout_seconds": DEPENDENCY_TIMEOUT_SECONDS,
+            "log": log.name, "log_sha256": sha(log),
+            "files": {name: sha(msys / name) for name in BUILD_DEPENDENCY_FILES}}
 
 
 def disable_key_refresh(msys: Path) -> dict:
@@ -165,7 +216,7 @@ def enforce_offline_keyring(msys: Path) -> dict:
             "change": "enable serial private-keyring verification; disable automatic key import/retrieval and Dirmngr network access"}
 
 
-def run_shell(msys: Path, command: str, log: Path, *, login=False) -> str:
+def run_shell(msys: Path, command: str, log: Path, *, login=False, timeout_seconds=600) -> str:
     env = os.environ.copy()
     for key in ("BASH_ENV", "ENV", "CDPATH", "PROMPT_COMMAND", "PYTHONHOME", "PYTHONPATH"):
         env.pop(key, None)
@@ -177,7 +228,7 @@ def run_shell(msys: Path, command: str, log: Path, *, login=False) -> str:
     try:
         result = subprocess.run(args, env=env, cwd=msys, text=True, encoding="utf-8",
                                 errors="replace", stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                timeout=600, creationflags=getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0))
+                                timeout=timeout_seconds, creationflags=getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0))
     except subprocess.TimeoutExpired as exc:
         captured = exc.stdout or b""
         if isinstance(captured, bytes):
@@ -302,13 +353,7 @@ def main() -> None:
         expected = lock["base_manifest"] | {p["name"]: p["version"] for p in lock["packages"]}
         if parse_manifest(after) != expected:
             raise ValueError("Installed package set/version differs from complete lock")
-        versions = run_shell(msys, "export PATH=/mingw64/bin:/usr/bin\n"
-                             "gcc -dumpfullversion\npython3 --version\nmake --version\n"
-                             "test \"$(gcc -dumpmachine)\" = x86_64-w64-mingw32\n"
-                             "python3 -c 'import sys; assert sys.platform == \"win32\"'", root / "tool-versions.txt")
-        if (not versions.startswith(lock["gcc_version"] + "\nPython " + lock["python_version"] + "\n")
-                or "GNU Make " + lock["make_version"] not in versions):
-            raise ValueError("Executed tool versions differ from lock")
+        receipt["build_dependencies"] = check_build_dependencies(msys, root, lock)
         receipt["downloads"].append(download(SOURCE_URL, inputs / "mame-upstream.zip", SOURCE_SHA256, SOURCE_BYTES))
         receipt.update(status="ready", finished_utc=stamp(), msys_root=str(msys),
                        packages=expected, tool_files=tool_files(msys),
