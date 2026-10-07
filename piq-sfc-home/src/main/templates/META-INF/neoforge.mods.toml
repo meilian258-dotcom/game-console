@@ -33,6 +33,6 @@ side="BOTH"
 [[dependencies.piq_sfc_home]]
 modId="piq_sfc_arcade"
 type="required"
-versionRange="[0.2.0-alpha.10,0.3.0)"
+versionRange="[0.2.0-alpha.11,0.3.0)"
 ordering="AFTER"
 side="BOTH"

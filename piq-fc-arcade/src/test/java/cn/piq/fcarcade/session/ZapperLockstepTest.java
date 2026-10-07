@@ -35,5 +35,5 @@ class ZapperLockstepTest {
         assertFalse(t.canRecordFrames(1));assertEquals(3600,t.snapshot().size());var suffix=t.snapshotAfter(1770);assertEquals(values.subList(1770,3600),suffix.stream().map(LockstepInputRun::zapperState).toList());
         t.discardThrough(1770);assertEquals(suffix,t.snapshot());assertTrue(t.canRecordFrames(1770));}
     @Test void legacyOverloadsStayCanonicalNeutral(){assertEquals(ZapperInput.NEUTRAL,new LockstepInputRun(3,1,2).zapperState());assertEquals(ZapperInput.NEUTRAL,new LockstepState.FrameStep(1,1,1,2).zapperState());}
-    @Test void variantsNeverShareStateNamespace(){assertNotEquals(NesCoreVariant.LEGACY.stateNamespace(),NesCoreVariant.ZAPPER_V1.stateNamespace());assertTrue(NesCoreVariant.ZAPPER_V1.stateNamespace().contains("c8d8824e"));assertThrows(IllegalArgumentException.class,()->NesCoreVariant.fromNetwork(5));}
+    @Test void variantsNeverShareStateNamespace(){assertNotEquals(NesCoreVariant.LEGACY.stateNamespace(),NesCoreVariant.ZAPPER_V1.stateNamespace());assertTrue(NesCoreVariant.ZAPPER_V1.stateNamespace().contains("b8b2a725"));assertThrows(IllegalArgumentException.class,()->NesCoreVariant.fromNetwork(5));}
 }

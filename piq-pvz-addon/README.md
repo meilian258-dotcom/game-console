@@ -4,6 +4,8 @@
 
 **目前是开发验证机型，暂不按正式机型推进完整功能。** 玩 FC、SFC、MD 或街机不需要安装它。模组不含 `main.pak`、原游戏素材或游戏授权。
 
+`0.1.0-prototype.12 public-r1` 是公开发行资料修订，只补充来源、许可和配套核心源码，运行代码、模型与固定原生组件不变。JAR 总哈希与原 prototype.12 不同，但模组版本仍为 prototype.12；同一实例只安装一个修订。通过电脑启动时搭配 **Computer prototype.12**，不要混用旧电脑原型。
+
 ## 安装条件
 
 - Minecraft 1.21.1、Java 21、NeoForge 21.1.229 及以上的 21.1 系列，以及配套的方块电玩主包。
@@ -42,6 +44,8 @@ git submodule update --init --checkout -- piq-pvz-addon/vendor/PvZ-Portable
 父仓库保存的是具体提交，不自动跟随上游最新版。GitHub 父仓库源码 ZIP 不包含子模块内容；不要用 `--remote` 代替固定版本恢复，也不要强制覆盖自己的修改。
 
 子模块接入没有自动更新当前交付 DLL；不能把上游最新能力当作这个候选已经支持。来源、升级与核对规则见[子模块说明](design/PvZ源码子模块.md)。
+
+公开实验修订另提供 `game-console-pvz-core-source-prototype12-public-r1.zip`，包含与原核心同一来源归档保存的移植源树、构建脚本、libopenmpt 源码和许可，不含游戏数据。该源树与上述较新的开发子模块不同，详见[第三方来源](THIRD_PARTY.md)。
 
 ## 开发与许可
 

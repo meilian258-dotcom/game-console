@@ -47,9 +47,9 @@
     "nes-zapper-wasm": {
       "filename": "nes_zapper_v1.wasm",
       "bytes": 70996,
-      "sha256": "c8d8824e5caf727678c642e6b0539deaa7c0084f33524d96779d90c7b5da79ef",
+      "sha256": "b8b2a72543fa49f286e645bf4e5b13840485c2ceddb66a4734f01b08c25ff64c",
       "legacyPath": "piq-fc-arcade/src/main/resources/core/nes_zapper_v1.wasm",
-      "purpose": "Legacy WASM core retained; not a game ROM"
+      "purpose": "Legacy Zapper WASM: FC76.44 diagnostic-path privacy derivative, executable sections unchanged; new module/save identity, no old-save migration; not a game ROM"
     },
     "nes-wasm": {
       "filename": "nes_rust_wasm_bg.wasm",

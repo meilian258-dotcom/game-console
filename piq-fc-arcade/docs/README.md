@@ -13,7 +13,7 @@
 | 什么是串流、JNI Netplay 和旁观 | [模式区别](玩家指南.md#联机和观看有什么区别) |
 | 闪退、光影、菜单或游戏不能运行 | [反馈清单](玩家指南.md#遇到问题时提供什么) |
 
-[GitHub 测试版](https://github.com/meilian258-dotcom/game-console/releases)目前提供 MD15 更新补丁及对应源码、许可证，需配套 FC `0.31.0-alpha.76.43`；不含 FC 主包，不是首次安装的完整套装。安装范围与已知限制见[MD15 测试包说明](../design/JNI核心核查与MD15发布-20261007.md)。
+[GitHub 整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)提供主模组与当前配套附属共 7 个独立 JAR。首次安装与升级请看[本套版本、安装步骤及限制](整套测试版-20261007.md)；旧 MD15 补丁仅保留作历史下载。
 
 ## 我想编译或贡献代码
 

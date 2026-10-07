@@ -9,7 +9,7 @@
 - 客户端和服务器都安装配套的方块电玩主模组与 `game-console-arcade-版本.jar`，不需要为了街机再装 SFC。
 - 目标为 Minecraft 1.21.1、NeoForge 21.1.229 或以上兼容的 21.1 版本、Java 21。实际执行原生核心的一端需要 Windows x64；服务器托管也受此条件约束。
 - 所需固定核心和辅助运行库由对应成品提供，不要求玩家另装 RetroArch，也不要将运行库 JAR 当作模组放进 `mods`。
-- GitHub 当前提供源码，没有游戏 Release；Download ZIP 不是可安装成品。测试包必须按同批清单配套，不随意替换 DLL。
+- 从 [GitHub 整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)取得配套成品；安装步骤见[本套说明](../piq-fc-arcade/docs/整套测试版-20261007.md)。Code → Download ZIP 是源码，不是可安装成品；不随意替换 DLL。
 
 当前街机源码版本为 `0.1.5.7`。已有候选沿用该附属，主包的后续公共修复也会影响机柜；安装时核对整套版本，而不只看街机 JAR 是否最新。
 

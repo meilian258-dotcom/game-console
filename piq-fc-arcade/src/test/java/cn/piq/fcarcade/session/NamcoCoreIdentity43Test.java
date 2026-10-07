@@ -20,7 +20,7 @@ class NamcoCoreIdentity43Test {
     @Test void existingOrdinalsAndNamespacesStayFrozen(){
         assertEquals(0,NesCoreVariant.LEGACY.ordinal());assertEquals(1,NesCoreVariant.ZAPPER_V1.ordinal());assertEquals(2,NesCoreVariant.MAPPER19_V1.ordinal());
         assertEquals("nes-legacy-v1",NesCoreVariant.LEGACY.stateNamespace());
-        assertEquals("nes-zapper-v1/c8d8824e5caf727678c642e6b0539deaa7c0084f33524d96779d90c7b5da79ef",NesCoreVariant.ZAPPER_V1.stateNamespace());
+        assertEquals("nes-zapper-v1/b8b2a72543fa49f286e645bf4e5b13840485c2ceddb66a4734f01b08c25ff64c",NesCoreVariant.ZAPPER_V1.stateNamespace());
         assertEquals(NesCoreVariant.MAPPER19_V1,NesCoreVariant.fromNetwork(2));assertThrows(IllegalArgumentException.class,()->NesCoreVariant.fromNetwork(5));
         assertThrows(IllegalArgumentException.class,()->NesCoreVariant.fromNetwork(-1));
     }
