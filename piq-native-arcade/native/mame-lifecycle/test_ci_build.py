@@ -12,7 +12,7 @@ import subprocess
 from types import SimpleNamespace
 import unittest
 import zipfile
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import build_candidate as build
 import ci_prepare as ci
@@ -72,6 +72,169 @@ class DownloadTests(unittest.TestCase):
         for url in ("http://repo.msys2.org/x", "https://untrusted.example/x"):
             with self.assertRaises(ValueError):
                 ci.LockedRedirectHandler().redirect_request(None, None, 302, "", {}, url)
+
+
+class ExtractionTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(prefix="piq-extract-test-")
+        self.addCleanup(self.tmp.cleanup)
+        fixture = Path(self.tmp.name).resolve()
+        self.root = fixture / "prepare"
+        (self.root / "inputs").mkdir(parents=True)
+        self.archive = self.root / "inputs/base.tar.xz"
+        self.archive.write_bytes(b"authenticated archive fixture; never extracted")
+        self.base = {"filename": self.archive.name, "bytes": self.archive.stat().st_size,
+                     "sha256": build.sha(self.archive)}
+        self.system = fixture / "system"
+        self.tar = self.system / "System32/tar.exe"
+        self.tar.parent.mkdir(parents=True)
+        self.tar.write_bytes(b"non-executable extractor fixture")
+
+    def layout(self):
+        for name in ("usr/bin/bash.exe", "usr/bin/pacman.exe", "usr/bin/msys-2.0.dll",
+                     "etc/post-install/07-pacman-key.post"):
+            path = self.root / "msys64" / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"non-executable layout fixture")
+
+    def invoke(self, outcome=None, *, layout=False):
+        def run(command, **kwargs):
+            kwargs["stdout"].write(b"x msys64/usr/bin/bash.exe\n")
+            if layout:
+                self.layout()
+            if outcome is not None:
+                raise outcome
+            return subprocess.CompletedProcess(command, 0)
+        with patch.dict(os.environ, {"SystemRoot": str(self.system)}), \
+                patch.object(ci.subprocess, "run", side_effect=run) as mocked, \
+                patch("sys.stdout", new_callable=io.StringIO):
+            result = ci.extract_base(self.root, self.base)
+        return result, mocked
+
+    def finished(self):
+        return json.loads((self.root / "toolchain-extract-finished.json").read_text(encoding="utf-8"))
+
+    def test_bounded_verbose_extraction_records_hashes_and_layout(self):
+        result, run = self.invoke(layout=True)
+        self.assertEqual(result, self.finished())
+        self.assertEqual(result["status"], "complete")
+        self.assertEqual(result["archive_sha256"], self.base["sha256"])
+        self.assertEqual(result["sha256"], build.sha(self.tar))
+        self.assertEqual(result["log_sha256"], build.sha(self.root / "msys-extract.log"))
+        self.assertTrue(result["child_reaped"])
+        self.assertEqual(run.call_count, 1)
+        self.assertEqual(run.call_args.args[0],
+                         [str(self.tar), "-xvf", str(self.archive), "-C", str(self.root)])
+        self.assertEqual(run.call_args.kwargs["timeout"], 1200)
+        self.assertEqual(run.call_args.kwargs["stdin"], subprocess.DEVNULL)
+        self.assertEqual(run.call_args.kwargs["stderr"], subprocess.STDOUT)
+        self.assertTrue(run.call_args.kwargs["check"])
+        started = json.loads((self.root / "toolchain-extract-started.json").read_text(encoding="utf-8"))
+        self.assertEqual(started["status"], "extracting")
+
+    def test_timeout_preserves_log_partial_tree_and_finished_receipt(self):
+        with self.assertRaises(subprocess.TimeoutExpired):
+            self.invoke(subprocess.TimeoutExpired("fixture", 1200), layout=True)
+        result = self.finished()
+        self.assertEqual(result["status"], "timed-out")
+        self.assertTrue(result["timed_out"])
+        self.assertTrue(result["child_reaped"])
+        self.assertGreater(result["log_bytes"], 0)
+        before = (self.root / "msys-extract.log").read_bytes()
+        with patch.object(ci.subprocess, "run") as run, self.assertRaises(FileExistsError):
+            ci.extract_base(self.root, self.base)
+        run.assert_not_called()
+        self.assertEqual((self.root / "msys-extract.log").read_bytes(), before)
+        self.assertTrue((self.root / "msys64/usr/bin/bash.exe").is_file())
+
+    def test_nonzero_extractor_exit_is_not_success(self):
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.invoke(subprocess.CalledProcessError(2, "fixture"))
+        self.assertEqual(self.finished()["exit_code"], 2)
+        self.assertEqual(self.finished()["status"], "failed")
+
+    def test_zero_exit_with_wrong_archive_layout_fails_closed(self):
+        with self.assertRaisesRegex(ValueError, "msys64 layout"):
+            self.invoke()
+        self.assertEqual(self.finished()["status"], "failed")
+        self.assertTrue(self.finished()["child_reaped"])
+
+    def test_changed_base_is_rejected_before_extractor_or_receipt(self):
+        self.archive.write_bytes(b"changed fixture")
+        with patch.object(ci.subprocess, "run") as run, self.assertRaisesRegex(ValueError, "changed"):
+            ci.extract_base(self.root, self.base)
+        run.assert_not_called()
+        self.assertFalse((self.root / "toolchain-extract-started.json").exists())
+
+    def test_interruption_retains_receipt_without_claiming_confirmed_reap(self):
+        with self.assertRaises(KeyboardInterrupt):
+            self.invoke(KeyboardInterrupt())
+        self.assertEqual(self.finished()["status"], "interrupted")
+        self.assertFalse(self.finished()["child_reaped"])
+
+    @unittest.skipUnless(os.name == "nt", "Windows subprocess.run timeout cleanup path")
+    def test_stdlib_timeout_kills_only_owned_popen_and_finishes_communication(self):
+        # Exercise the real subprocess.run wrapper with a fake Popen, not tar.
+        process = MagicMock()
+        process.__enter__.return_value = process
+        events = []
+        process.kill.side_effect = lambda: events.append("kill")
+        process.wait.side_effect = lambda: events.append("wait")
+
+        def communicate(*args, **kwargs):
+            if kwargs.get("timeout") is not None:
+                raise subprocess.TimeoutExpired("fixture", 1200)
+            process.wait()  # Popen.communicate's documented post-kill behavior.
+            return None, None
+
+        real_save = ci.save
+
+        def save(path, value):
+            if path.name == "toolchain-extract-finished.json":
+                events.append("finished")
+            real_save(path, value)
+
+        process.communicate.side_effect = communicate
+        process.__exit__.side_effect = lambda *args: process.wait()
+        with patch.dict(os.environ, {"SystemRoot": str(self.system)}), \
+                patch.object(ci.subprocess, "Popen", return_value=process) as popen, \
+                patch.object(ci, "save", side_effect=save), \
+                patch("sys.stdout", new_callable=io.StringIO), self.assertRaises(subprocess.TimeoutExpired):
+            ci.extract_base(self.root, self.base)
+        self.assertEqual(popen.call_count, 1)
+        process.kill.assert_called_once_with()
+        self.assertEqual(process.communicate.call_count, 2)
+        self.assertEqual(process.communicate.call_args_list[-1].args, ())
+        self.assertEqual(process.communicate.call_args_list[-1].kwargs, {})
+        process.__exit__.assert_called_once()
+        self.assertLess(events.index("kill"), events.index("wait"))
+        self.assertLess(events.index("wait"), events.index("finished"))
+        self.assertEqual(self.finished()["status"], "timed-out")
+
+    def test_main_extraction_failure_never_initializes_msys(self):
+        target = self.root / "fresh"
+
+        def download(url, path, *args, **kwargs):
+            path.write_bytes(b"")
+            return {"fixture": path.name}
+
+        base = self.base | {"url": "https://repo.msys2.org/fixture",
+                           "manifest_url": "https://repo.msys2.org/manifest", "manifest_sha256": "0" * 64}
+        with patch("sys.argv", ["ci_prepare.py", "--root", str(target)]), \
+                patch.object(ci, "require_hosted_ci"), \
+                patch.object(ci.shutil, "disk_usage", return_value=SimpleNamespace(free=20 * ci.GIB)), \
+                patch.object(ci, "load_lock", return_value={"base": base, "base_manifest": {}}), \
+                patch.object(ci, "download", side_effect=download) as fetch, \
+                patch.object(ci, "extract_base", side_effect=subprocess.TimeoutExpired("fixture", 1200)), \
+                patch.object(ci, "disable_key_refresh") as refresh, patch.object(ci, "run_shell") as shell, \
+                self.assertRaises(subprocess.TimeoutExpired):
+            ci.main()
+        self.assertEqual(fetch.call_count, 2)
+        refresh.assert_not_called()
+        shell.assert_not_called()
+        self.assertFalse((target / "toolchain-receipt.json").exists())
+        failed = json.loads((target / "toolchain-failed.json").read_text(encoding="utf-8"))
+        self.assertEqual(failed["status"], "failed")
 
 
 class LockAndIsolationTests(unittest.TestCase):

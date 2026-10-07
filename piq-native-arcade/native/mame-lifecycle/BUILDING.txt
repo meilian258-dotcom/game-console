@@ -101,7 +101,11 @@ Do not use rolling pacman -S/-Sy/-Su or setup-msys2's default latest release /
 install options. ci_prepare.py requires a new directory under RUNNER_TEMP on
 a GitHub-hosted Windows runner (not a self-hosted or local machine). It:
 * downloads the pinned official base and source ZIP, checking size and SHA;
-* extracts with Windows System32 bsdtar into a new, task-owned MSYS2 instance;
+* extracts with Windows System32 bsdtar into a new, task-owned MSYS2 instance,
+  with a 1,200-second extraction timeout and noninteractive, file-backed verbose
+  output in msys-extract.log; retains extractor/archive hashes, elapsed time,
+  exit/timeout status in toolchain-extract-started/finished.json, and checks the
+  expected msys64 layout before initialization;
 * disables only first-start online key refresh, as the official setup-msys2
   action does, retaining offline key initialization and population;
 * disables automatic key lookup/import and Dirmngr in that instance, verifies
@@ -134,6 +138,13 @@ PowerShell steps from the repository checkout:
     --toolchain-receipt "$ciRoot/toolchain-receipt.json"
 Check LASTEXITCODE after each native command, or put them in separate workflow
 steps. Preparation/build failures stop the job; no automatic rebuild occurs.
+The extraction timeout is a bounded diagnostic budget, not a proven runtime:
+an initial hosted extraction exceeded 300 seconds without a recorded tar error.
+Python's subprocess.run kills and waits for its direct child before reporting
+TimeoutExpired. This is not an arbitrary descendant-process cleanup guarantee.
+Partial extraction and logs are retained, never retried or reused; initialization
+and installation cannot proceed after a failed or incomplete extraction. The
+35-minute preparation step still bounds the whole preparation workflow.
 
 Resource budget and limitations
 -------------------------------
@@ -173,7 +184,7 @@ build/mame/mame_libretro.dll on successful compilation; build/source-receipt.jso
 build/build-*-started.json, build/build-*-finished.json and build/build-*.log;
 toolchain-*.json, packages-before.txt, packages-after.txt, packages-install.log,
 packages-signatures.log,
-msys-initialize.log and tool-versions.txt from the CI preparation root. Never
+msys-extract.log, msys-initialize.log and tool-versions.txt from the CI preparation root. Never
 upload the whole root, package-download directory, .o/.a objects, package caches,
 game data or any local diagnostic directory. Keep artifact retention short.
 These hosted-run logs contain only runner paths; local logs require a separate
@@ -190,6 +201,7 @@ https://docs.github.com/en/actions/reference/limits
 https://www.msys2.org/docs/package-management/
 https://github.com/msys2/msys2-installer/releases/tag/2026-09-27
 https://github.com/msys2/setup-msys2
+https://docs.python.org/3.12/library/subprocess.html#subprocess.run
 https://gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
 https://docs.mamedev.org/initialsetup/compilingmame.html
 

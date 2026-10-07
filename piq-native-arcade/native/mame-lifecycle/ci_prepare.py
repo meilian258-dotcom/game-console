@@ -15,6 +15,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import time
 import urllib.parse
 import urllib.request
 
@@ -24,6 +25,7 @@ LOCK = Path(__file__).with_name("ci-toolchain-lock.json")
 SOURCE_URL = f"https://github.com/libretro/mame/archive/{COMMIT}.zip"
 SOURCE_BYTES = 234551698
 GIB = 1024**3
+EXTRACT_TIMEOUT_SECONDS = 1200
 
 
 def require_hosted_ci(root: Path, env=None) -> None:
@@ -179,6 +181,61 @@ def run_shell(msys: Path, command: str, log: Path, *, login=False) -> str:
     return result.stdout
 
 
+def extract_base(root: Path, base: dict) -> dict:
+    """Extract the authenticated base once, retaining partial output on failure."""
+    archive = root / "inputs" / base["filename"]
+    if archive.stat().st_size != base["bytes"] or sha(archive) != base["sha256"].upper():
+        raise ValueError("Pinned MSYS2 base changed before extraction")
+    if (root / "msys64").exists():
+        raise FileExistsError("MSYS2 extraction target already exists; no retry/reuse")
+    tar = Path(os.environ["SystemRoot"]) / "System32/tar.exe"
+    log = root / "msys-extract.log"
+    command = [str(tar), "-xvf", str(archive), "-C", str(root)]
+    record = {"schema": "piq-mame-ci-extraction-1", "kind": "Windows System32 bsdtar",
+              "status": "extracting", "started_utc": stamp(), "sha256": sha(tar),
+              "archive": archive.name, "archive_sha256": base["sha256"].upper(),
+              "archive_bytes": base["bytes"], "timeout_seconds": EXTRACT_TIMEOUT_SECONDS,
+              "command": command, "log": log.name, "timed_out": False,
+              "child_reaped": False}
+    save(root / "toolchain-extract-started.json", record)
+    print(json.dumps({"stage": "msys-extract", "status": "started",
+                      "timeout_seconds": EXTRACT_TIMEOUT_SECONDS, "log": log.name}), flush=True)
+    began = time.monotonic()
+    try:
+        with log.open("xb") as output:
+            # File-backed verbose output cannot fill a PIPE or consume unbounded
+            # Python memory. subprocess.run kills and waits for its own child
+            # before re-raising TimeoutExpired; do not add a broad process kill.
+            result = subprocess.run(command, check=True, timeout=EXTRACT_TIMEOUT_SECONDS,
+                                    stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT,
+                                    creationflags=getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0))
+        record.update(exit_code=result.returncode, child_reaped=True)
+        required = ("usr/bin/bash.exe", "usr/bin/pacman.exe", "usr/bin/msys-2.0.dll",
+                    "etc/post-install/07-pacman-key.post")
+        if not all((root / "msys64" / name).is_file() for name in required):
+            raise ValueError("Pinned MSYS2 archive did not produce the required msys64 layout")
+        record["status"] = "complete"
+    except subprocess.TimeoutExpired:
+        record.update(status="timed-out", timed_out=True, child_reaped=True)
+        raise
+    except subprocess.CalledProcessError as exc:
+        record.update(status="failed", exit_code=exc.returncode, child_reaped=True)
+        raise
+    except BaseException as exc:
+        record.update(status="interrupted" if isinstance(exc, KeyboardInterrupt) else "failed",
+                      error_type=type(exc).__name__)
+        raise
+    finally:
+        record.update(finished_utc=stamp(), elapsed_seconds=round(time.monotonic() - began, 3))
+        if log.is_file():
+            record.update(log_bytes=log.stat().st_size, log_sha256=sha(log))
+        save(root / "toolchain-extract-finished.json", record)
+        print(json.dumps({"stage": "msys-extract", "status": record["status"],
+                          "elapsed_seconds": record["elapsed_seconds"],
+                          "timed_out": record["timed_out"]}), flush=True)
+    return record
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True)
@@ -205,10 +262,7 @@ def main() -> None:
         receipt["downloads"].append(download(base["manifest_url"], manifest, base["manifest_sha256"], None, limit=65536))
         if parse_manifest(manifest.read_text(encoding="utf-8")) != lock["base_manifest"]:
             raise ValueError("Base package manifest does not match lock")
-        # Windows' bundled bsdtar extracts only the authenticated official archive.
-        tar = Path(os.environ["SystemRoot"]) / "System32/tar.exe"
-        subprocess.run([str(tar), "-xf", str(inputs / base["filename"]), "-C", str(root)], check=True, timeout=300)
-        receipt["extractor"] = {"kind": "Windows System32 bsdtar", "sha256": sha(tar)}
+        receipt["extractor"] = extract_base(root, base)
         msys = root / "msys64"
         receipt["offline_key_initialization"] = disable_key_refresh(msys)
         run_shell(msys, "true", root / "msys-initialize.log", login=True)

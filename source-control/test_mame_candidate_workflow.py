@@ -52,7 +52,8 @@ class CandidateWorkflowPolicyTests(unittest.TestCase):
 
     def test_file_transfers_are_allowlisted(self):
         paths = re.findall(r'^            (\$\{\{ runner.temp \}\}/[^\n]+)$', self.text, re.M)
-        self.assertEqual(17, len(paths))
+        self.assertEqual(18, len(paths))
+        self.assertIn('${{ runner.temp }}/piq-mame-ci/msys-extract.log', paths)
         self.assertTrue(all('/**' not in p and '/staging' not in p and '/inputs/' not in p for p in paths))
         candidate = [p.rsplit('/', 1)[-1] for p in paths if '/candidate/' in p]
         self.assertEqual(['core.dll', 'candidate-source.zip', 'candidate.json'], candidate)

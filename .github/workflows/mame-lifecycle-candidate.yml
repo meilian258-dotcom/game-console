@@ -93,6 +93,7 @@ jobs:
             ${{ runner.temp }}/piq-mame-ci/packages-after.txt
             ${{ runner.temp }}/piq-mame-ci/packages-install.log
             ${{ runner.temp }}/piq-mame-ci/packages-signatures.log
+            ${{ runner.temp }}/piq-mame-ci/msys-extract.log
             ${{ runner.temp }}/piq-mame-ci/msys-initialize.log
             ${{ runner.temp }}/piq-mame-ci/tool-versions.txt
           if-no-files-found: warn
