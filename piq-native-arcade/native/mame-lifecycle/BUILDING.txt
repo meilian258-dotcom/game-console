@@ -128,6 +128,9 @@ a GitHub-hosted Windows runner (not a self-hosted or local machine). It:
   added options and before/after hashes, without reinitialization or chmod;
 * refuses missing dependencies, expired/untrusted signatures or package drift;
   it does not refresh the keyring or relax checks to bypass a failure;
+* clears unrelated hosted-runner Android NDK variables in the Windows build
+  shell: upstream checks those paths even with platform=win; this does not
+  change the runner's installation, the local build environment or MAME sources;
 * compares the complete installed package manifest with the lock, verifies
   actual compiler/Python/Make versions, and hashes key executables/version.h.
 

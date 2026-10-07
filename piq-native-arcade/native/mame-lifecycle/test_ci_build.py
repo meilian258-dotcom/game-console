@@ -436,6 +436,8 @@ class BuildCommandTests(unittest.TestCase):
         self.assertIn("-j4", command)
         self.assertIn("TARGET=mame SUBTARGET=mame", command)
         self.assertIn("timeout --signal=INT --kill-after=60s 18000s", command)
+        self.assertIn("unset ANDROID_NDK_HOME ANDROID_NDK_ROOT\n", command)
+        self.assertLess(command.index("unset ANDROID_NDK_HOME"), command.index("make -f Makefile.libretro"))
         for forbidden in ("SOURCES=", "PIQ_SNAPSHOT", "SOUND_DISABLE_THREADING", "ccache"):
             self.assertNotIn(forbidden, command)
         for value in ("D:/ci/build", "/d/ci/build", "D:/ci/msys64", "/d/ci/msys64"):
@@ -445,6 +447,7 @@ class BuildCommandTests(unittest.TestCase):
     def test_local_command_has_no_ci_timeout(self):
         command = build.build_command(PureWindowsPath("D:/build"), PureWindowsPath("D:/msys64"), 2, False)
         self.assertNotIn("timeout ", command)
+        self.assertNotIn("unset ANDROID_NDK", command)
         self.assertIn("-j2", command)
 
     def test_helpers_packaged_without_private_outputs(self):

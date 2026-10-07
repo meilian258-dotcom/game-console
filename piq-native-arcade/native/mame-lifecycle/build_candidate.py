@@ -110,6 +110,9 @@ def build_command(root: Path, msys: Path, jobs: int, ci_clean: bool) -> str:
     bounded = "timeout --signal=INT --kill-after=60s 18000s " if ci_clean else ""
     return "\n".join([
         "set -eu", "export PATH=/mingw64/bin:/usr/bin",
+        # Makefile.libretro checks Android paths even for platform=win. Hosted
+        # runners provide unrelated Windows-form NDK paths; keep this CI target isolated.
+        *(["unset ANDROID_NDK_HOME ANDROID_NDK_ROOT"] if ci_clean else []),
         "export MSYS2_ARG_CONV_EXCL='-ffile-prefix-map=;-fdebug-prefix-map='",
         "gcc --version", "g++ --version", "make --version", "python3 --version",
         "test \"$(gcc -dumpmachine)\" = x86_64-w64-mingw32",
@@ -231,6 +234,13 @@ def main() -> None:
                                   "log_bytes": log_path.stat().st_size,
                                   "free_gib": round(shutil.disk_usage(root).free / 1024**3, 2)}), flush=True)
     metadata.update(exit_code=result, finished_utc=stamp(), log_sha256=sha(log_path))
+    if result != 0 and args.ci_clean:
+        # This exact hosted-build log is already in the allowlisted evidence.
+        # Surface a bounded tail without requiring the entire source artifact download.
+        with log_path.open("rb") as failed_log:
+            failed_log.seek(max(0, log_path.stat().st_size - 16384))
+            tail = failed_log.read(16384).decode("utf-8", "replace")
+        print("\n".join(tail.splitlines()[-60:]), flush=True)
     artifacts = []
     for dll in (root / "mame").glob("*libretro*.dll"):
         artifacts.append({"path": str(dll), "bytes": dll.stat().st_size, "sha256": sha(dll)})
