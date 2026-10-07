@@ -9,6 +9,7 @@ import os
 from pathlib import Path, PureWindowsPath
 import tempfile
 import subprocess
+from types import SimpleNamespace
 import unittest
 import zipfile
 from unittest.mock import patch
@@ -77,7 +78,32 @@ class LockAndIsolationTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix="piq-ci-test-")
         self.addCleanup(self.tmp.cleanup)
-        self.root = Path(self.tmp.name)
+        # Production CLI entry points resolve roots before validating them.
+        # Windows TEMP may contain an 8.3 alias instead of its long spelling.
+        self.root = Path(self.tmp.name).resolve()
+
+    def test_ci_fixtures_normalize_noncanonical_temporary_directory(self):
+        real_temporary_directory = tempfile.TemporaryDirectory
+
+        def aliased_temporary_directory(*args, **kwargs):
+            temporary = real_temporary_directory(*args, **kwargs)
+            canonical = Path(temporary.name).resolve()
+            # Exercise the same lexical-versus-canonical mismatch without
+            # requiring NTFS short names or permission to create a symlink.
+            alias = canonical.parent / ".." / canonical.parent.name / canonical.name
+            self.assertNotEqual(alias, canonical)
+            self.assertEqual(alias.resolve(), canonical)
+            # Cleanup retains the real TemporaryDirectory's original path.
+            return SimpleNamespace(name=str(alias), cleanup=temporary.cleanup)
+
+        for name in ("test_ci_bounds", "test_ci_receipt_accepts_exact_input_set_and_rejects_drift"):
+            with self.subTest(case=name), patch.object(
+                    tempfile, "TemporaryDirectory", side_effect=aliased_temporary_directory):
+                fixture = LockAndIsolationTests(name)
+                result = unittest.TestResult()
+                fixture.run(result)
+                self.assertTrue(result.wasSuccessful(), result.errors + result.failures)
+                self.assertEqual(fixture.root, fixture.root.resolve())
 
     def test_complete_lock_and_pins(self):
         lock = ci.load_lock()
