@@ -15,7 +15,7 @@ neoForge {
 }
 repositories { mavenCentral() }
 def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.42.jar'),
-        providers.gradleProperty('sfcCoreJar').getOrElse('../piq-sfc-arcade/build/libs/piq_sfc_arcade-0.2.0-alpha.10.jar'))
+        providers.gradleProperty('sfcCoreJar').getOrElse('../piq-sfc-arcade/build/libs/piq_sfc_arcade-0.2.0-alpha.11.jar'))
 dependencies {
     implementation localModJars
     testImplementation platform('org.junit:junit-bom:5.13.4')
@@ -53,7 +53,7 @@ tasks.named('test', Test) {
 }
 jar {
     from('LICENSE') { into 'META-INF' }
-    // Internal thin build. Package with the reviewed core10 using the explicit
+    // Internal thin build. Package with the reviewed core11 using the explicit
     // merge procedure in the current delivery guide; preserve both legacy mod IDs.
     // FC owns the public platform and runtime: do not embed duplicate copies.
     manifest { attributes 'Implementation-Title': 'Game Console: SFC', 'Implementation-Version': project.version }

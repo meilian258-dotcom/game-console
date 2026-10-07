@@ -1,14 +1,26 @@
 # Third-party notices
 
-## Generic Libretro JNI ABI1 (FC76.22, 2026-09-29)
+## FC76.44 distribution
+
+The complete test release includes a separate corresponding-source asset on the
+same release page: fixed upstream sources, complete modified Mesen/RetroArch/JNI
+sources, patches, build instructions and original license texts. See
+`docs/整套测试版-20261007.md`. No component is relicensed by this notice.
+
+FC76.44's legacy Zapper WASM has equal-width diagnostic-prefix redactions in its
+data section. Its code and all non-data sections are unchanged; its new SHA-256
+is `b8b2a72543fa49f286e645bf4e5b13840485c2ceddb66a4734f01b08c25ff64c`.
+The release supplies the derivative and transform source. Old raw-memory saves
+are not migrated or overwritten. No Mesen or JNI binary changed for this revision.
+
+## Generic Libretro JNI ABI2
 
 PIQ's bridge implementation is GPL-3.0-or-later, with source/build scripts under
 `native/libretro-jni/`. The bundled libretro API header retains its upstream MIT
 notice. The bridge is main-mod-owned; core binaries remain addon-owned with their
-original licenses. It does not relicense FBNeo, Mesen, Mesen-S or PvZ. The local
-candidate includes source evidence but is not a claim of a complete publicly
-reproducible third-party SDK. Review every core's source/license distribution
-obligations before public release. No ROM, BIOS or game data is included.
+original licenses. It does not relicense FBNeo, Mesen, Mesen-S or PvZ. The release
+provides matching bridge source and API header, without claiming a complete
+byte-reproducible third-party SDK. No ROM, BIOS or game data is included.
 
 FC76.22's RetroArch 1.22.2 PNP7 frontend additionally gates input polling and save
 capture to outer core runs (not recursive rollback replay). The matching modified
@@ -27,10 +39,10 @@ The named license files below are included in the JAR under `META-INF/licenses/`
 - Changes: bounded loopback audio/video/input bridge, display pacing, Minecraft-authorized
   P2/spectator socket capabilities and loopback-only listeners. Original Netplay algorithm retained.
 - Bridge source and build transform: `piq-fc-arcade/netplay-native/` in this workspace.
-- Full modified source/build receipt: `outputs/netplay68/native/RetroArch-1.22.2` and `build.json`.
-- No ROM or BIOS included. Public distribution still requires a corresponding-source bundle
-  including upstream notices/dependencies and the existing Mesen binary/source audit below.
-  This candidate is local testing only; it is not a completed public-release compliance claim.
+- Full modified source/build receipt: `retroarch-piq-pnp7-corresponding-source.zip`
+  in the release source asset, including upstream dependency sources and notices.
+- No ROM or BIOS included. Runtime support and validation remain separate from
+  source availability; this does not certify universal Netplay compatibility.
 
 ## Mesen libretro (FC62 candidate)
 
@@ -42,9 +54,10 @@ The named license files below are included in the JAR under `META-INF/licenses/`
 - Linux x86-64 SHA-256: `552f8ab6ac1fd08bd555f589eb999be73a469c79ccfa929f884adb2cf3366b43`
 
 These fixed candidate binaries are bundled under `core/libretro/`. No runtime
-download or arbitrary user-selected core is enabled. Exact correspondence of the
-buildbot binaries to the above source revision is still under audit: this is a
-local testing candidate, not a completed public distribution compliance claim.
+download or arbitrary user-selected core is enabled. The fixed upstream source,
+CI/build files and matching official download-cache hashes accompany the release.
+The original per-artifact CI receipt was unavailable; this does not claim a
+byte-for-byte rebuild with historical toolchains.
 Mesen's upstream copyright notices must be retained with corresponding source.
 
 ## Java Native Access (JNA)

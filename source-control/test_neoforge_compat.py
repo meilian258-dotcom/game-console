@@ -145,7 +145,7 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
                 self.assertEqual('optional', deps['piq_pvz']['type'])
                 self.assertEqual('[0.1.0-prototype.12,0.1.0-prototype.13)', deps['piq_pvz']['versionRange'])
             if owner == 'piq_sfc_home':
-                self.assertEqual('[0.2.0-alpha.10,0.3.0)', deps['piq_sfc_arcade']['versionRange'])
+                self.assertEqual('[0.2.0-alpha.11,0.3.0)', deps['piq_sfc_arcade']['versionRange'])
 
 
 if __name__ == '__main__':

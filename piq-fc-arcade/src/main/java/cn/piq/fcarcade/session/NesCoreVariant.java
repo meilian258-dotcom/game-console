@@ -12,7 +12,9 @@ public enum NesCoreVariant {
     public String stateNamespace() {
         return switch(this) {
             case LEGACY -> "nes-legacy-v1";
-            case ZAPPER_V1 -> "nes-zapper-v1/c8d8824e5caf727678c642e6b0539deaa7c0084f33524d96779d90c7b5da79ef";
+            // Diagnostics-only WASM derivative still changes raw-memory/hash identity.
+            // Keep historical saves untouched; never accept the previous module's state.
+            case ZAPPER_V1 -> "nes-zapper-v1/b8b2a72543fa49f286e645bf4e5b13840485c2ceddb66a4734f01b08c25ff64c";
             case MAPPER19_V1 -> "nes-mapper19-v1/"+cn.piq.fcarcade.core.wasm.NamcoWasmNesCore.MODULE_SHA256;
             case LIBRETRO_V1 -> "nes-libretro-mesen-v1/"+cn.piq.fcarcade.core.libretro.LibretroNesCore.PROFILE_SHA256;
             case LIBRETRO_ZAPPER_V1 -> "nes-libretro-mesen-zapper-v1/"+cn.piq.fcarcade.core.libretro.LibretroNesCore.PROFILE_SHA256;
