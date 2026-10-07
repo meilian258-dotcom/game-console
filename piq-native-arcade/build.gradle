@@ -1,5 +1,6 @@
 plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
 apply from: '../source-control/neoforge-compat.gradle'
+apply from: '../source-control/snapshot-resources.gradle'
 group = 'cn.piq.nativearcade'
 version = mod_version
 base { archivesName = 'piq_native_arcade' }
@@ -95,11 +96,17 @@ def prepareFbneo = tasks.register('prepareFbneoNetplay015', Exec) {
             file('tools/prepare_fbneo_netplay015.py').absolutePath, '--output', fbneoRuntime.get().asFile.absolutePath
 }
 jar {
-    dependsOn prepareFbneo
-    from(fbneoRuntime)
-    dependsOn prepareEmbeddedRuntime, prepareRuntime011
-    from(embeddedRuntimeOutput)
-    from(embeddedRuntime011)
+    if (providers.gradleProperty('snapshotResourcesDir').isPresent()) {
+        // The receipt-verified tree excludes this helper: compile it from this checkout.
+        dependsOn buildHelper011
+        from(helper011) { into 'native-runtime/win-x64-v1/piq-native-arcade/runtime' }
+    } else {
+        dependsOn prepareFbneo
+        from(fbneoRuntime)
+        dependsOn prepareEmbeddedRuntime, prepareRuntime011
+        from(embeddedRuntimeOutput)
+        from(embeddedRuntime011)
+    }
     from('LICENSE') { into 'META-INF' }
     duplicatesStrategy = DuplicatesStrategy.FAIL
     manifest { attributes 'Implementation-Title': 'Game Console: Arcade', 'Implementation-Version': project.version }

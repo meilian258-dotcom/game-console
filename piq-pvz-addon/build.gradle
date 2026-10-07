@@ -1,5 +1,6 @@
 plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
 apply from: '../source-control/neoforge-compat.gradle'
+apply from: '../source-control/snapshot-resources.gradle'
 group = 'cn.piq.pvz'
 version = '0.1.0-prototype.12'
 base { archivesName = 'game_console_pvz' }

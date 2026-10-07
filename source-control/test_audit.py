@@ -12,6 +12,11 @@ class GuardTests(unittest.TestCase):
         self.assertEqual([],path_issues('piq-fc-arcade/src/main/java/cn/piq/Test.java'))
         self.assertEqual([],path_issues('piq-md-home/src/main/resources/assets/piq_md_home/models/block/md2_empty.json'))
         self.assertIn('outside-source-scope',path_issues('piq-server-assistant/server.py'))
+    def test_only_reviewed_workflow_is_allowed(self):
+        self.assertEqual([], path_issues('.github/workflows/snapshot.yml'))
+        for name in ('.github/workflows/another.yml', '.github/actions/run/action.yml',
+                     '.github/workflows/snapshot.yml/hidden.txt', '.github/secret.json'):
+            self.assertIn('outside-source-scope', path_issues(name))
     def test_credentials(self):
         for name in ['.env','登录信息.txt','keys/server.pem','private/config.json']:
             self.assertTrue(path_issues('piq-gba/'+name),name)

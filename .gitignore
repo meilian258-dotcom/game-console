@@ -5,6 +5,11 @@
 !/.gitmodules
 !/GIT_WORKFLOW.md
 !/README.md
+!/.github/
+/.github/*
+!/.github/workflows/
+/.github/workflows/*
+!/.github/workflows/snapshot.yml
 !/source-control/
 !/piq-fc-arcade/
 !/piq-retro-platform/

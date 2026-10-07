@@ -3,6 +3,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.141'
 }
 apply from: '../source-control/neoforge-compat.gradle'
+apply from: '../source-control/snapshot-resources.gradle'
 group = 'cn.piq.sfchome'
 version = mod_version
 base { archivesName = 'piq_sfc_home' }

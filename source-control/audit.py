@@ -13,6 +13,7 @@ MODULES = (
     'piq-flash-box', 'piq-pvz-addon', 'piq-md-home',
 )
 ROOT_FILES = {'.gitignore', '.gitattributes', '.gitmodules', 'GIT_WORKFLOW.md', 'README.md'}
+APPROVED_WORKFLOWS = {'.github/workflows/snapshot.yml'}
 APPROVED_SUBMODULES = {
     'piq-pvz-addon/vendor/PvZ-Portable': {
         'url': 'https://github.com/KLuoNuoYa/PvZ-Portable.git', 'branch': 'libretro',
@@ -44,7 +45,7 @@ def path_issues(name: str) -> list[str]:
     issues = []
     if not parts or p.is_absolute() or '..' in parts or '\\' in name or ':' in name:
         return ['unsafe-path']
-    if name not in ROOT_FILES and parts[0] not in (*MODULES, 'source-control'):
+    if name not in ROOT_FILES | APPROVED_WORKFLOWS and parts[0] not in (*MODULES, 'source-control'):
         issues.append('outside-source-scope')
     if any(part.lower() in BLOCKED_DIRS or part.lower().startswith('publish') for part in parts[:-1]):
         issues.append('generated-or-private-directory')
