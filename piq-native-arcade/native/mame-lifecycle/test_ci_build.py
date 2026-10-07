@@ -42,8 +42,11 @@ class DownloadTests(unittest.TestCase):
         self.assertEqual(self.path.read_bytes(), self.data)
 
     def test_short_download_rejected(self):
-        with self.assertRaisesRegex(ValueError, "size mismatch"):
+        with self.assertRaisesRegex(ValueError, "size mismatch") as error:
             self.fetch(size=len(self.data) + 1)
+        self.assertIn(f"actual_bytes={len(self.data)}", str(error.exception))
+        self.assertIn(f"actual_sha256={self.digest}", str(error.exception))
+        self.assertEqual(self.path.read_bytes(), self.data)
 
     def test_oversize_rejected(self):
         with self.assertRaisesRegex(ValueError, "exceeded"):

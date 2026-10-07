@@ -36,7 +36,13 @@ Inputs
 Official source:
 https://github.com/libretro/mame/archive/4fc9a9312baaf34963847f884961ad9793fbbc1d.zip
 ZIP SHA-256:
-72D9472975173C1CE43201945F19D3866F9DA3EA51F67131C1134D66D7C6B22D
+C24D6FAAB64B4B571AA27F00FAC6D61FE19C9A1A9FEBEB0A57882DF26CE2EB0C
+ZIP bytes: 234551686
+The commit remains fixed. Its lua-zlib source uses Git export-subst for a
+version-string ref decoration, so a regenerated source archive can differ
+even at this commit. The current pin was checked against all 31,413 files;
+the only change from the earlier archive is removal of " (HEAD -> master)"
+in that library's version string. Unknown archive hashes are still rejected.
 
 Provide an existing portable MSYS2 installation with mingw64 GCC, make,
 native Windows Python 3.11+ and required build headers, and an existing git

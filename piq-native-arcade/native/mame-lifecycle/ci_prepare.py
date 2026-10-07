@@ -23,7 +23,7 @@ from build_candidate import COMMIT, SOURCE_SHA256, save, sha, stamp
 
 LOCK = Path(__file__).with_name("ci-toolchain-lock.json")
 SOURCE_URL = f"https://github.com/libretro/mame/archive/{COMMIT}.zip"
-SOURCE_BYTES = 234551698
+SOURCE_BYTES = 234551686
 GIB = 1024**3
 EXTRACT_TIMEOUT_SECONDS = 1200
 
@@ -73,9 +73,11 @@ def download(url: str, target: Path, expected_sha: str | None, expected_bytes: i
                 output.write(chunk)
     actual = digest.hexdigest().upper()
     if expected_bytes is not None and count != expected_bytes:
-        raise ValueError("Download size mismatch: " + target.name)
+        raise ValueError(f"Download size mismatch: {target.name}; expected_bytes={expected_bytes}; "
+                         f"actual_bytes={count}; actual_sha256={actual}")
     if expected_sha is not None and actual != expected_sha.upper():
-        raise ValueError("Download SHA-256 mismatch: " + target.name)
+        raise ValueError(f"Download SHA-256 mismatch: {target.name}; expected_sha256={expected_sha.upper()}; "
+                         f"actual_sha256={actual}; actual_bytes={count}")
     if count == 0:
         raise ValueError("Empty download")
     return {"file": target.name, "url": url, "bytes": count, "sha256": actual}
