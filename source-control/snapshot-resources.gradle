@@ -1,0 +1,19 @@
+// Explicit CI-only binary inputs. No downloads or historical outputs fallback.
+if (providers.gradleProperty('snapshotResourcesDir').isPresent()) {
+    if (!providers.gradleProperty('snapshotReceipt').isPresent()) {
+        throw new GradleException('snapshotResourcesDir requires a verified snapshotReceipt')
+    }
+    def resourceRoot = file(providers.gradleProperty('snapshotResourcesDir').get())
+    def receipt = file(providers.gradleProperty('snapshotReceipt').get())
+    def verify = tasks.register('verifySnapshotResources', Exec) {
+        inputs.file(receipt)
+        inputs.dir(resourceRoot)
+        inputs.file('../source-control/snapshot_build.py')
+        workingDir projectDir.parentFile
+        commandLine providers.gradleProperty('snapshotPython').getOrElse('python'),
+                file('../source-control/snapshot_build.py').absolutePath,
+                '--verify-resources', resourceRoot.absolutePath, '--receipt', receipt.absolutePath
+    }
+    sourceSets.main.resources.srcDir(resourceRoot)
+    tasks.named('processResources') { dependsOn verify }
+}

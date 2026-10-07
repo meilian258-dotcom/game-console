@@ -34,7 +34,7 @@ NeoForge 最低版本不是对所有更新版本或整个整合包的兼容保�
 
 ## 我想参与开发
 
-- [构建源码](source-control/BUILDING.md)：环境、固定运行库和构建顺序。当前还不是空环境一键编译全部附属。
+- [构建源码](source-control/BUILDING.md)：固定核心开发构建，以及 `main` 自动编译七个成品并发布 nightly 核心测试快照的流程。
 - [开发协作](GIT_WORKFLOW.md)：克隆、分支、提交与审查。
 - [制作新设备](piq-fc-arcade/design/机器制作与交互标准.md)：玩家应该得到怎样的操作体验。
 - [公共接口与现状](piq-fc-arcade/design/全组件运行流程与复用接口总览.md)：哪些可以复用，哪些仍需适配。

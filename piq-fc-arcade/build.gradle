@@ -205,6 +205,13 @@ def prepareAsciiGameDependencies = tasks.register('prepareAsciiGameDependencies'
     from sourceSets.main.compileClasspath
     into asciiGameDependencies
 }
+// GBA's explicit javac builder consumes this same resolved compile classpath.
+tasks.register('exportSnapshotCompileDependencies', Sync) {
+    from sourceSets.main.compileClasspath
+    into providers.gradleProperty('snapshotDependenciesDir').map { file(it) }
+            .getOrElse(layout.buildDirectory.dir('snapshot-compile-dependencies').get().asFile)
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+}
 
 def prepareAsciiTestOutput = tasks.register('prepareAsciiTestOutput', Sync) {
     dependsOn tasks.named('testClasses')

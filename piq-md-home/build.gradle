@@ -1,5 +1,6 @@
 plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
 apply from: '../source-control/neoforge-compat.gradle'
+apply from: '../source-control/snapshot-resources.gradle'
 group = 'cn.piq.mdhome'
 version = mod_version
 base { archivesName = 'game_console_md' }
@@ -28,7 +29,8 @@ def verifyCores = tasks.register('verifyCores') {
     doLast {
         ['genesis_plus_gx_libretro.dll':'9ffa10a115b20e1b49e9caf0b53f287c640ed4e5bb93f7ed9a23b416a4ccfdf7',
          'genesis_plus_gx_piq_netplay_libretro.dll':'8200a6d5e7c39f60afefd8e87e369d253f737de6a73bf8d920d2ab81888a5fb5'].each { name, sha ->
-            def input = file('src/main/resources/core/windows-x64/' + name)
+            def resources = providers.gradleProperty('snapshotResourcesDir').getOrElse('src/main/resources')
+            def input = file(resources + '/core/windows-x64/' + name)
             if(!input.isFile() || input.length() > 32 * 1024 * 1024 ||
                 java.security.MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() != sha)
                 throw new GradleException('Pinned MD core missing/mismatched: ' + name + '; see tools/prepare_genesis.py, native-genesis-netplay/README.md and README')

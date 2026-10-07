@@ -2,7 +2,45 @@
 
 这份指南供开发者从当前源码构建主模组和附属。玩家安装成品请看[玩家指南](../piq-fc-arcade/docs/玩家指南.md)，不要把源码 ZIP 放进 `mods`。
 
-**先确认你有固定版本的原生运行库。** Git 仓库不包含全部 DLL、WASM、运行器和附属打包输入，也没有自动下载并重建所有核心的入口。缺少这些文件时，仅安装 Java 和 Gradle 不能完成构建。
+可选择两种构建方式：**普通开发构建使用固定核心**；**自动快照构建下载官方 nightly 普通核心，并为该批制品生成匹配的运行身份**。Git 不保存全部 DLL、WASM 和运行器；快照会自动取得明确列出的公开输入，不依赖维护电脑上的历史目录，也不会重编所有第三方原生核心。
+
+## 自动快照
+
+[snapshot.yml](../.github/workflows/snapshot.yml) 在进入 `main` 的每次 push 后触发，也支持在 Actions 中手动选择 `main` 运行。只有七个成品全部编译、检查和打包成功，才会创建独立预发行；失败不会覆盖已有发行版。workflow 合入 `main` 后才启用，不在拉取请求中使用发布权限。
+
+构建使用 GitHub 的 Windows 2022 runner、Java 21 和 Python 3.12，依次完成主模组、完整 SFC、MD、GBA、街机、电脑和 PvZ 七个玩家 JAR。SFC 由本次编译的两个内部组件合成一个完整玩家包；PvZ 仍是可选开发验证组件，不因自动打包变成稳定机型。
+
+普通核心从以下官方目录下载，每次运行只解析一次 `latest`，校验归档、架构和体积，并记录最终 SHA-256：
+
+| 用途 | 快照来源 |
+| --- | --- |
+| FC Mesen | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/mesen_libretro.dll.zip)、[Linux x64](https://buildbot.libretro.com/nightly/linux/x86_64/latest/mesen_libretro.so.zip) |
+| SFC Mesen-S | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/mesen-s_libretro.dll.zip) |
+| MD 普通 Genesis Plus GX | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/genesis_plus_gx_libretro.dll.zip) |
+| GBA mGBA | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/mgba_libretro.dll.zip) |
+
+定制 FC 和 MD Netplay 核心、公共 JNI 桥、街机定制运行库、PvZ 原生组件及保留的 WASM 不用同名 nightly 文件替换。它们由 `snapshot_inputs.py` 从已公开的 `full-test-20261007-r1` 成品中按固定摘要提取；只取白名单内的原生资源，不把旧模组 Java 类当成本次构建结果。当前 GBA helper、街机 helper 和公共 worker 仍从源码编译。
+
+这些定制或历史运行库仍受固定接口和摘要约束。修改街机 helper 等相关源码时，若新产物与运行器目录的身份不一致，构建会停止，需要同时审核并更新对应构建约束；不会仅因 `main` 有新提交就跳过兼容校验。旧离线运行库的校验表单独保留，不重新解释为 nightly 包。
+
+**快照不是固定核心版的原位升级。** 临时构建源码中的核心摘要、版本断言和保存身份与实际下载文件一起生成；正常源码的固定默认值、旧成品和旧存档保持不动。SFC 的 Netplay 使用普通 Mesen-S，也会跟随本次核心身份变化。升级前备份，在独立测试实例中使用同一快照的主包和附属；不要要求不同快照或固定核心版相互联机、读取旧即时档。下载 Linux Mesen 不代表整套附属或 JNI Netplay 已支持 Linux。
+
+成功的发布标签是 `snapshot-<run_id>-<attempt>-<commit前12位>`，不会移动旧标签或替换稳定版。附件只有七个 JAR、`manifest.json` 和 `SHA256SUMS.txt`。JAR 内的 `META-INF/game-console/snapshot-cores.json` 记录源码提交及本批核心身份；内部 MOD 兼容版本沿用源码版本，以免破坏依赖范围，因此区分快照应查看发行标签、清单和哈希，不能只看文件名。
+
+构建任务只有只读权限；单独的发布任务使用短期 `GITHUB_TOKEN` 的 `contents: write` 权限，不需要配置个人令牌。发布先创建草稿，上传并核对所有附件后才公开。仓库或组织策略若禁止此权限，任务会失败，旧 Release 不变。参见 [GitHub workflow 权限说明](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions)。
+
+在 Windows 仓库根复现本地快照构建：
+
+```powershell
+python -B -m unittest discover -s source-control -p "test_*.py"
+python source-control/snapshot_inputs.py --output .snapshot-build/inputs
+python source-control/snapshot_build.py --work .snapshot-build --output snapshot-dist
+python source-control/snapshot_release.py --directory snapshot-dist --validate-only
+```
+
+设置 `JAVA_HOME` 指向 Java 21。输入和临时源码保留在 `.snapshot-build/`，成品在 `snapshot-dist/`。本地未提交改动可用于构建排错，但候选会标记 `sourceDirty=true`，不能通过发布校验；正式快照要求干净的已提交源码。失败后保留日志；重新完整构建时为 `--work` 与 `--output` 选择新的空目录，不覆盖前一批。`--bootstrap-dir` 可复用六个摘要完全一致的公开 JAR，普通核心仍按本次 nightly 下载，不静默回退到旧核心。
+
+自动检查不替代 Minecraft 多人、画面、音频、存档及长时间运行验收。nightly 发生不兼容变更时，应修复适配或明确更新构建约束，不能删校验、跳过失败测试后继续发布。
 
 ## 环境与源码
 
@@ -68,7 +106,7 @@ $sfcCoreJar = (Resolve-Path ".\piq-sfc-arcade\build\libs\piq_sfc_arcade-$sfcCore
 .\piq-sfc-home\gradlew.bat -p piq-sfc-home "-PgameConsoleJar=$fcJar" "-PsfcCoreJar=$sfcCoreJar" check jar
 ```
 
-上面的 SFC 家用产物仍是开发薄包，**不是玩家使用的完整 SFC 包**。当前完整合包尚无可直接照抄的通用公开命令，需要维护者提供该版本的审核流程和配套材料；玩家应直接取得完整测试包。仓库内有锁定旧版本的历史合包脚本，不要拿它们处理当前产物。组件区别见 [SFC 说明](../piq-sfc-home/README.md)。
+上面的 SFC 家用产物仍是开发薄包，**不是玩家使用的完整 SFC 包**。上方快照构建入口会编译两个组件并核验合包；单独运行这些 Gradle 命令不会自动合包。仓库内锁定旧版本的历史合包脚本不用于当前产物。组件区别见 [SFC 说明](../piq-sfc-home/README.md)。
 
 | 组件 | 继续阅读 |
 | --- | --- |
