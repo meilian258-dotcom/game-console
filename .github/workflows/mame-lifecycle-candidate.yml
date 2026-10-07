@@ -1,0 +1,145 @@
+name: Build and verify MAME lifecycle candidate
+
+# An isolated repair branch only. This workflow cannot publish or change Latest.
+on:
+  push:
+    branches: [codex/arcade-jni-crash-latency]
+    paths:
+      - .github/workflows/mame-lifecycle-candidate.yml
+      - piq-native-arcade/native/mame-lifecycle/**
+      - piq-native-arcade/tools/make_diagnostic_rom.py
+      - piq-fc-arcade/native/libretro-jni/libretro.h
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mame-lifecycle-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/codex/arcade-jni-crash-latency'
+    runs-on: windows-2022
+    timeout-minutes: 360
+    steps:
+      - name: Preserve pinned patch bytes on the disposable runner
+        run: git config --global core.autocrlf input
+      - name: Check out the exact triggering commit
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          submodules: false
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+      - name: Test source guardrails
+        run: python -B -m unittest discover -s source-control -p 'test_*.py'
+      - name: Audit the checked-out index
+        run: python -B source-control/audit.py --staged
+      - name: Test build and validation helpers without loading a core
+        run: python -B -m unittest discover -s piq-native-arcade/native/mame-lifecycle -p 'test_*.py' -v
+      - name: Prepare fresh pinned sources and signed toolchain packages
+        timeout-minutes: 35
+        run: >-
+          python -B piq-native-arcade/native/mame-lifecycle/ci_prepare.py
+          --root "$env:RUNNER_TEMP/piq-mame-ci"
+      - name: Compile the complete same-version patched core
+        timeout-minutes: 310
+        run: >-
+          python -B piq-native-arcade/native/mame-lifecycle/build_candidate.py
+          --ci-clean --jobs 4
+          --source-zip "$env:RUNNER_TEMP/piq-mame-ci/inputs/mame-upstream.zip"
+          --msys-root "$env:RUNNER_TEMP/piq-mame-ci/msys64"
+          --build-root "$env:RUNNER_TEMP/piq-mame-ci/build"
+          --git (Get-Command git).Source
+          --toolchain-receipt "$env:RUNNER_TEMP/piq-mame-ci/toolchain-receipt.json"
+      - name: Verify provenance and stage the exact candidate file set
+        run: >-
+          python -B piq-native-arcade/native/mame-lifecycle/ci_artifacts.py stage
+          --build-root "$env:RUNNER_TEMP/piq-mame-ci/build"
+          --output "$env:RUNNER_TEMP/piq-mame-ci/candidate"
+      - name: Transfer candidate and corresponding source only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mame-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/piq-mame-ci/candidate/core.dll
+            ${{ runner.temp }}/piq-mame-ci/candidate/candidate-source.zip
+            ${{ runner.temp }}/piq-mame-ci/candidate/candidate.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+          include-hidden-files: false
+      - name: Retain allowlisted hosted build evidence on success or failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mame-build-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/piq-mame-ci/build/candidate-source.zip
+            ${{ runner.temp }}/piq-mame-ci/build/source-receipt.json
+            ${{ runner.temp }}/piq-mame-ci/build/build-*-started.json
+            ${{ runner.temp }}/piq-mame-ci/build/build-*-finished.json
+            ${{ runner.temp }}/piq-mame-ci/build/build-*.log
+            ${{ runner.temp }}/piq-mame-ci/toolchain-*.json
+            ${{ runner.temp }}/piq-mame-ci/packages-before.txt
+            ${{ runner.temp }}/piq-mame-ci/packages-after.txt
+            ${{ runner.temp }}/piq-mame-ci/packages-install.log
+            ${{ runner.temp }}/piq-mame-ci/packages-signatures.log
+            ${{ runner.temp }}/piq-mame-ci/msys-initialize.log
+            ${{ runner.temp }}/piq-mame-ci/tool-versions.txt
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 14
+          include-hidden-files: false
+
+  verify:
+    needs: build
+    if: github.ref == 'refs/heads/codex/arcade-jni-crash-latency' && needs.build.result == 'success'
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - name: Preserve diagnostic input identities
+        run: git config --global core.autocrlf input
+      - name: Check out the same verifier sources
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          submodules: false
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+      - name: Download this run's exact candidate
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: mame-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/mame-candidate
+      - name: Verify candidate and run isolated lifecycle checks
+        timeout-minutes: 45
+        run: |
+          $candidateDir = Join-Path $env:RUNNER_TEMP 'mame-candidate'
+          $coreSha = python -B piq-native-arcade/native/mame-lifecycle/ci_artifacts.py verify --directory "$candidateDir"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($coreSha -notmatch '^[0-9a-f]{64}$') { throw 'Invalid candidate checksum receipt' }
+          python -B piq-native-arcade/native/mame-lifecycle/verify_candidate.py --core "$candidateDir/core.dll" --sha256 "$coreSha" --output "$env:RUNNER_TEMP/mame-verification"
+          exit $LASTEXITCODE
+      - name: Retain restricted lifecycle receipts without test content
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mame-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/mame-verification/summary.json
+            ${{ runner.temp }}/mame-verification/receipts/*.json
+          if-no-files-found: warn
+          retention-days: 14
+          include-hidden-files: false

@@ -15,6 +15,8 @@ package cn.piq.retro.api;
 public interface RetroEmulator extends AutoCloseable {
     boolean isReady();
     String error();
+    /** Local read-only measurements only; never runs a core or consumes an input/frame mailbox. */
+    default java.util.List<String> diagnostics() { return java.util.List.of(); }
     void offerInput(int p1, int p2);
     /** Number of digital controller ports exposed by this adapter, not a promise about every ROM. */
     default int maxPlayers() { return 2; }

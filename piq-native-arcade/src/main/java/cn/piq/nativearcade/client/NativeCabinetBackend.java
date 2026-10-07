@@ -74,6 +74,7 @@ public final class NativeCabinetBackend implements CabinetBackend {
             @Override public int maxPlayers(){return core.maxPlayers();}
             @Override public boolean isReady(){return core.isReady();}
             @Override public String error(){return core.error();}
+            @Override public List<String> diagnostics(){return core.diagnostics();}
             @Override public void offerInput(int p1,int p2){core.offerInput(p1,p2);}
             @Override public void offerInputs(int p1,int p2,int p3,int p4){core.offerInputs(p1,p2,p3,p4);}
             @Override public void releasePort(int port){core.releasePort(port);}

@@ -13,7 +13,8 @@ MODULES = (
     'piq-flash-box', 'piq-pvz-addon', 'piq-md-home',
 )
 ROOT_FILES = {'.gitignore', '.gitattributes', '.gitmodules', 'GIT_WORKFLOW.md', 'README.md'}
-APPROVED_WORKFLOWS = {'.github/workflows/snapshot.yml'}
+APPROVED_WORKFLOWS = {'.github/workflows/snapshot.yml',
+                      '.github/workflows/mame-lifecycle-candidate.yml'}
 APPROVED_SUBMODULES = {
     'piq-pvz-addon/vendor/PvZ-Portable': {
         'url': 'https://github.com/KLuoNuoYa/PvZ-Portable.git', 'branch': 'libretro',

@@ -14,6 +14,7 @@ class GuardTests(unittest.TestCase):
         self.assertIn('outside-source-scope',path_issues('piq-server-assistant/server.py'))
     def test_only_reviewed_workflow_is_allowed(self):
         self.assertEqual([], path_issues('.github/workflows/snapshot.yml'))
+        self.assertEqual([], path_issues('.github/workflows/mame-lifecycle-candidate.yml'))
         for name in ('.github/workflows/another.yml', '.github/actions/run/action.yml',
                      '.github/workflows/snapshot.yml/hidden.txt', '.github/secret.json'):
             self.assertIn('outside-source-scope', path_issues(name))

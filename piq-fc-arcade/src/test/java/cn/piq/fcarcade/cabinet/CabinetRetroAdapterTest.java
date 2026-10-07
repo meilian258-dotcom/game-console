@@ -67,4 +67,19 @@ class CabinetRetroAdapterTest {
         for(int i=0;i<4;i++){shared.releasePort(i);assertEquals(i,released[0]);}
         assertEquals(0,legacy.cleared);assertEquals(0,legacy.inputCalls);
     }
+    @Test void legacyDiagnosticsAreEmptyAndDoNotConsumeOrMutateAnything(){
+        var legacy=new Legacy();var shared=legacy.asRetro();
+        assertTrue(legacy.diagnostics().isEmpty());assertTrue(shared.diagnostics().isEmpty());
+        assertEquals(0,legacy.inputCalls);assertEquals(0,legacy.cleared);assertEquals(0,legacy.closed);
+    }
+    @Test void capableDiagnosticsPassThroughWithoutPollingOrNativeWork(){
+        var lines=java.util.List.of("core 60 fps","pending 0");
+        var legacy=new Legacy(){
+            @Override public java.util.List<String> diagnostics(){return lines;}
+            @Override public CabinetFrame pollFrame(){throw new AssertionError("Diagnostics consumed video");}
+            @Override public boolean isReady(){throw new AssertionError("Diagnostics queried native readiness");}
+        };
+        var shared=legacy.asRetro();assertSame(lines,shared.diagnostics());
+        assertEquals(0,legacy.inputCalls);assertEquals(0,legacy.cleared);assertEquals(0,legacy.closed);
+    }
 }

@@ -123,7 +123,8 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
             # Unified content paths / file-backed JNI content require FC 76.40.
             'piq-sfc-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
             'piq-md-home': '[0.31.0-alpha.76.36,0.31.0-alpha.77)',
-            'piq-native-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
+            # JNI diagnostics and cabinet adapter require FC 76.45.
+            'piq-native-arcade': '[0.31.0-alpha.76.45,0.31.0-alpha.77)',
             'piq-gba': '[0.31.0-alpha.76.31,0.31.0-alpha.77)',
             'piq-computer': '[0.31.0-alpha.76.26,0.31.0-alpha.77)',
             'piq-pvz-addon': '[0.31.0-alpha.76.22,0.31.0-alpha.77)',

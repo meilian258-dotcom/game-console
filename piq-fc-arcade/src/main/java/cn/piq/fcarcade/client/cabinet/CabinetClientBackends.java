@@ -184,6 +184,12 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         watchers=value.watchers();watchExpires=System.nanoTime()+6_000_000_000L;updateMediaDemand();
     }
     public static boolean hasLocalSession(){return launch!=null||room!=null||OPENING.get();}
+    /** Only the currently admitted local core is inspected; receivers do not pretend to measure the host. */
+    static List<String> mediaDiagnostics(){
+        if(!playing||emulator==null||!current())return List.of();
+        try{return List.copyOf(emulator.diagnostics());}
+        catch(RuntimeException|LinkageError unavailable){return List.of("本机核心诊断暂不可用");}
+    }
     public static int pendingNativeControlClaims(){
         if(netplayGrant==null)return 0;
         var mc=Minecraft.getInstance();if(mc.getConnection()==null)return 0;

@@ -1,0 +1,227 @@
+MAME 0.289 lifecycle candidate (Windows x64)
+==========================================
+
+Scope
+-----
+This is a lifecycle patch to libretro/mame commit
+4fc9a9312baaf34963847f884961ad9793fbbc1d, not a different emulator,
+driver subset, save-format migration, RTC patch or audio-threading patch.
+The original binary and all existing saves must remain unchanged. Build helpers
+and CI preparation are maintained by the Game Console maintainers (2026-10-08).
+
+The Windows Asio IOCP timer service can be created when the OSD registers its
+network-output module, even when that module is not selected. Merely running
+the machine exit notifiers does not destroy all registered modules. The
+libretro OSD must be destroyed before the frontend unloads the DLL, allowing
+Asio to signal and join its timer thread instead of returning into unloaded
+code at its five-minute timer interval.
+
+The patch has four source files:
+* mame.cpp: null-safe machine/config cleanup, skip duplicate machine-exit
+  notifications after failed startup, and release OSD after manager cleanup.
+* clifront.cpp: clear the owned manager pointer after deletion.
+* retromain.cpp: provide the matching deletion for the allocated OSD.
+* libretro.cpp: clean up on rejected loads as well as successful loads;
+  free audio callback storage only after native owners have been released.
+
+running_machine::run catches initialization failures and already performs its
+exit notifiers before returning with phase EXIT. Only a machine that yielded
+successfully in phase RUNNING receives the additional retro_machine_exit.
+Clearing the pointers also makes repeated retro_deinit calls null-safe.
+This does not authorize concurrent retro_run/deinit calls. The frontend must
+still serialize core lifecycle calls on its owning thread.
+
+Inputs
+------
+Official source:
+https://github.com/libretro/mame/archive/4fc9a9312baaf34963847f884961ad9793fbbc1d.zip
+ZIP SHA-256:
+72D9472975173C1CE43201945F19D3866F9DA3EA51F67131C1134D66D7C6B22D
+
+Provide an existing portable MSYS2 installation with mingw64 GCC, make,
+native Windows Python 3.11+ and required build headers, and an existing git
+executable. The initial local build attempt used GCC 16.2.0 (MSYS2 Rev3), GNU
+Make 4.4.1 and native Windows Python 3.14.7; it did not produce a candidate DLL.
+build_candidate.py and package_source.py do not download/install dependencies.
+Only the explicit CI-only ci_prepare.py entry described below does so. An
+already modified upstream build tree or its object cache must not be used.
+
+Full build
+----------
+Example paths below are placeholders. BUILD_ROOT must not already exist,
+must be ASCII-only and must have at least 80 GiB free on its volume.
+
+python build_candidate.py --source-zip SOURCE.zip --msys-root MSYS_ROOT \
+  --build-root BUILD_ROOT --git GIT_EXECUTABLE
+
+The build script verifies the fixed source ZIP, materialises only the two
+known same-directory zstd test symlinks, applies the patch with git apply,
+then hashes all 31,413 input files and rejects any unexpected source change.
+It uses a new source tree, -j2 by default, below-normal priority and a temporary directory
+on the build volume. Prefix maps cover both Windows and MSYS source/toolchain
+paths. The generated makefiles must retain those flags in the selected x64
+configuration. No external environment settings are changed.
+
+Effective make settings:
+make -f Makefile.libretro -j2 platform=win MSYSTEM=MINGW64 MINGW64=/mingw64 \
+  CC=gcc CXX=g++ AR=ar TARGET=mame SUBTARGET=mame REGENIE=1 VERBOSE= \
+  NOWERROR=1 PTR64=1 PYTHON_EXECUTABLE=python3 IGNORE_GIT=1 \
+  ARCHOPTS='[source and toolchain -ffile-prefix-map/-fdebug-prefix-map flags]'
+
+There is no SOURCES restriction and no PIQ_SNAPSHOT_AUDIO_LAB or
+SOUND_DISABLE_THREADING definition. IGNORE_GIT avoids accidentally embedding
+an unrelated enclosing checkout identity; the exact upstream revision is
+recorded in the source receipt. BARE_BUILD_VERSION remains 0.289.
+
+--prepare-only stops before compilation. --resume resumes only this script's
+own prepared tree with unchanged patch and patched files; never point it at
+a historical build. Keep failed attempt logs and resolve build failures
+without changing pinned source or dependencies silently.
+
+An explicitly selected --jobs 6 enables six jobs on a sufficiently provisioned
+host. To change a running build, gracefully interrupt only that build's make
+process group, confirm all of its child compilers have exited and make has
+removed interrupted targets, then use --resume --jobs 6. Never run two builds
+against the same tree, force-kill unrelated processes, or silently reuse a
+different source/object tree. Retain the interrupted attempt's receipts.
+
+Clean GitHub-hosted Windows build
+---------------------------------
+This route is independent of local build objects and caches. The exact same
+MAME commit, archive SHA and lifecycle patch are used. ci-toolchain-lock.json
+pins the official MSYS2 base 2026-09-27 (SHA-256
+EA2F31A0B6ADE63914CE441FFB022F0F6AA96982BFEFA2326460A26D5FB01322),
+its 85-package manifest and a 38-package dependency closure from the official
+MSYS2 repositories. Each additional package has its own URL, version, size and
+SHA. The native toolchain remains MINGW64: GCC 16.2.0-4, Python 3.14.8-1 and
+Make 4.4.1-3. These revisions differ from the historical local toolchain; the
+cloud binary must be independently validated. There is no silent UCRT switch.
+
+Do not use rolling pacman -S/-Sy/-Su or setup-msys2's default latest release /
+install options. ci_prepare.py requires a new directory under RUNNER_TEMP on
+a GitHub-hosted Windows runner (not a self-hosted or local machine). It:
+* downloads the pinned official base and source ZIP, checking size and SHA;
+* extracts with Windows System32 bsdtar into a new, task-owned MSYS2 instance;
+* disables only first-start online key refresh, as the official setup-msys2
+  action does, retaining offline key initialization and population;
+* disables automatic key lookup/import and Dirmngr in that instance, verifies
+  every local signature with pacman-key --verify before installation, then
+  installs the packages together with pacman -U using a repository-free
+  configuration and Required signatures (noconfirm alone is not an offline gate);
+* refuses missing dependencies, expired/untrusted signatures or package drift;
+  it does not refresh the keyring or relax checks to bypass a failure;
+* compares the complete installed package manifest with the lock, verifies
+  actual compiler/Python/Make versions, and hashes key executables/version.h.
+
+CI prerequisites: Windows x64 hosted runner, existing native Python 3.11+ and
+Git, checkout with core.autocrlf=input so the patch bytes remain pinned. No
+secrets, shared cache, submodule checkout or write token is needed. Suggested
+immutable action pins (official API checked 2026-10-08):
+  actions/checkout@11d5960a326750d5838078e36cf38b85af677262 (v4)
+  actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 (v4)
+Use contents: read, persist-credentials: false and an independent branch.
+Build/validation artifacts are not a Release and must not install themselves.
+
+PowerShell steps from the repository checkout:
+  $helper = Join-Path $env:GITHUB_WORKSPACE 'piq-native-arcade/native/mame-lifecycle'
+  $ciRoot = Join-Path $env:RUNNER_TEMP 'piq-mame-ci'
+  python -B -m unittest discover -s "$helper" -p 'test_*.py' -v
+  python -B "$helper/ci_prepare.py" --root "$ciRoot"
+  python -B "$helper/build_candidate.py" --ci-clean --jobs 4 `
+    --source-zip "$ciRoot/inputs/mame-upstream.zip" `
+    --msys-root "$ciRoot/msys64" --build-root "$ciRoot/build" `
+    --git (Get-Command git).Source `
+    --toolchain-receipt "$ciRoot/toolchain-receipt.json"
+Check LASTEXITCODE after each native command, or put them in separate workflow
+steps. Preparation/build failures stop the job; no automatic rebuild occurs.
+
+Resource budget and limitations
+-------------------------------
+GitHub documents standard public-repository Windows x64 runners as 4 CPUs,
+16 GB RAM and 14 GB SSD, with a six-hour maximum job runtime. Use at most -j4,
+a 360-minute job timeout, and no SYMBOLS=1 or driver subset. CI make has its
+own five-hour timeout (INT, then KILL after 60 seconds only for its own newly
+created process group), leaving time for setup, evidence and isolated probes.
+This is a limit, not a claim that every complete build will fit five hours.
+If it times out, preserve the failure and reassess resources; do not substitute
+a partial core, resume another machine's objects, or silently reduce drivers.
+
+The default local 80 GiB preflight remains unchanged. Explicit --ci-clean uses
+10 GiB free at build start; preparation requires 12 GiB before downloading and
+installing. Observed partial full-driver build storage was 1,699,503,045 bytes,
+including 1,794 object files (344,849,642 bytes) and 117 archives (360,583,170
+bytes). A historical completed tree was only a driver subset, not a full-build
+measurement. There is no measured complete full-build peak yet: 10 GiB is a
+conservative CI trial budget based on current objects, source/toolchain,
+archives, link output and source package, not a proven peak-space guarantee.
+Package downloads total 120,404,498 bytes and declared extra installed size is
+853,292,822 bytes, plus the MSYS2 base and source. Build heartbeat output every
+30 seconds records elapsed time, log growth and remaining disk; disk exhaustion
+or compiler errors remain failures. Do not delete unrelated runner tools to
+make a preflight pass.
+
+CI artifacts and validation status
+-----------------------------------
+The CI build creates build/candidate-source.zip before compilation, so complete
+corresponding input source is available even when compilation fails. It includes
+all upstream source/licenses, the lifecycle patch, build/CI helpers, dependency
+lock and offline tests. A successful build rechecks all original source inputs
+and the tracked tool files before its finished receipt reports success.
+
+Upload only an explicit allowlist: candidate-source.zip; the completed
+build/mame/mame_libretro.dll on successful compilation; build/source-receipt.json;
+build/build-*-started.json, build/build-*-finished.json and build/build-*.log;
+toolchain-*.json, packages-before.txt, packages-after.txt, packages-install.log,
+packages-signatures.log,
+msys-initialize.log and tool-versions.txt from the CI preparation root. Never
+upload the whole root, package-download directory, .o/.a objects, package caches,
+game data or any local diagnostic directory. Keep artifact retention short.
+These hosted-run logs contain only runner paths; local logs require a separate
+privacy review and must not be fed to this workflow.
+
+Offline helper tests are not a cloud installation/build result. The initial
+clean-runner package installation, full link, PE imports/exports, embedded-path
+scan and real lifecycle behavior all remain to be validated by the workflow and
+isolated candidate tests. Do not fill runtime.json with a predicted DLL hash.
+
+Official references (checked 2026-10-08):
+https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+https://docs.github.com/en/actions/reference/limits
+https://www.msys2.org/docs/package-management/
+https://github.com/msys2/msys2-installer/releases/tag/2026-09-27
+https://github.com/msys2/setup-msys2
+https://gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
+https://docs.mamedev.org/initialsetup/compilingmame.html
+
+Receipts and source package
+---------------------------
+source-receipt.json and build-*-started/finished.json record source, patch,
+compiler and artifact hashes, actual commands, process IDs and local paths.
+These are private diagnostics, not publishable release metadata.
+
+python package_source.py --source-zip SOURCE.zip --build-root BUILD_ROOT \
+  --output CANDIDATE_SOURCE.zip
+
+The source packager checks every input file against the pinned archive and
+the four patch hashes. It includes the full upstream source, licenses and
+these lifecycle build files, but excludes generated objects, private build
+receipts, ROMs, BIOS images and saves. Do not replace an earlier source ZIP.
+
+Acceptance gates
+----------------
+A successful compile alone is not a tested or stable release. Keep the
+candidate separate until isolated-JVM tests verify rejected-load cleanup,
+successful play/close, repeated start/stop, deinit without load and repeated
+deinit, then keep the process alive beyond the original five-minute failure
+window. Observe OS thread and handle counts, callback errors and DLL unload.
+Check PE imports/exports, full-driver inclusion and embedded private paths.
+Compare save behavior separately; retaining 0.289 does not prove all old
+states compatible. Do not overwrite or migrate old saves for testing.
+
+License
+-------
+MAME is distributed under its upstream COPYING and per-file license terms.
+The four modified sources retain their upstream BSD-3-Clause notices.
+Distribute the complete corresponding source and required license notices
+with a binary candidate. These lifecycle build helpers are MIT-licensed;
+see LICENSE in this directory. No game content is included or licensed here.

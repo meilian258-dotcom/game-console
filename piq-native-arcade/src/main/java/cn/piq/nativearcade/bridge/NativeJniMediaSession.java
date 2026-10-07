@@ -12,7 +12,8 @@ import java.util.concurrent.locks.LockSupport;
 /** MAME media adapter. All native work/teardown belongs to one worker, never an MC thread. */
 public final class NativeJniMediaSession implements AutoCloseable {
     public record Frame(int width,int height,int[] abgr,float displayAspect,int rotation,short[] pcm48k){}
-    private final NativeInputPorts inputs=new NativeInputPorts();
+    private final NativeJniInputBuffer inputs=new NativeJniInputBuffer();
+    private final NativeMediaDiagnostics diagnostics=new NativeMediaDiagnostics(inputs);
     private final AtomicBoolean closing=new AtomicBoolean();
     private final Object images=new Object();
     private final short[] pcm=new short[32768];
@@ -40,6 +41,8 @@ public final class NativeJniMediaSession implements AutoCloseable {
     public int maxPlayers(){return 4;}
     public boolean isReady(){return ready&&!closing.get()&&error()==null;}
     public boolean isTerminated(){return terminated;}
+    /** Nonblocking local measurements; never calls JNI or consumes input/video. */
+    public List<String> diagnostics(){return diagnostics.lines();}
     public String error(){var c=core;String nativeError=c==null?"":c.diagnosticError();return failure!=null?failure:nativeError.isEmpty()?null:nativeError;}
     public void offerInput(int a,int b){offerInputs(a,b,0,0);}
     public void offerInputs(int a,int b,int c,int d){if(!closing.get()&&!inputs.offer(a,b,c,d)){failure="街机输入队列已满";close();}}
@@ -55,11 +58,12 @@ public final class NativeJniMediaSession implements AutoCloseable {
             var files=new TreeMap<String,Path>();files.put(name,rom);
             for(String bios:NativeRomStaging.AUXILIARY_NAMES){Path path=rom.getParent().resolve(bios);if(!bios.equals(name)&&Files.exists(path,LinkOption.NOFOLLOW_LINKS))files.put(bios,path);}
             core=new LibretroJniRuntime(profile(),NativeJniMediaSession.class);
-            var info=core.loadFiles(name,files,null);timing(info);
+            var info=core.loadFiles(name,files,null);timing(info);diagnostics.loaded(info.fps());
             long due=System.nanoTime();
             while(!closing.get()) {
                 int[] pads=inputs.nextFrame();for(int p=0;p<4;p++)pads[p]=NativeArcadeButtons.toMame(pads[p]);
-                var out=core.run(List.of(new LibretroProcess.Controls(pads,0)),3);timing(out.info());
+                long started=diagnostics.beginFrame();
+                var out=core.run(List.of(new LibretroProcess.Controls(pads,0)),3);diagnostics.completedFrame(started);timing(out.info());
                 if(out.rgba().length>0) {
                     int[] pixels=new int[out.rgba().length/4];ByteBuffer.wrap(out.rgba()).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer().get(pixels);
                     // MAME supplies rotated DAR; CabinetFrame requires unrotated DAR.

@@ -91,6 +91,7 @@ final class CabinetSyncSettingsScreen extends DeviceScreen {
         g.fill(0,0,width,height,DeviceUi.BG);DeviceUi.panel(g,font,x,y,w,h,
             (powerPage?"关机与屏幕显示":diagnostics?"音画诊断":debugToken!=null?"设备调试":"同步与网络")+" · "+(target.dual()?"双人街机":"单人街机"),setting!=null&&!setting.gameInfo().isBlank()?"游戏 · "+setting.gameInfo():targetText);
         if(width<320||height<240){DeviceUi.text(g,font,"请降低 GUI 缩放或放大窗口",x+10,y+48,w-20,DeviceUi.MUTED);super.render(g,mx,my,partial);return;}
+        var diagnosticLines=diagnostics?CabinetMediaTuning.diagnostics():java.util.List.<String>of();
         if(powerPage){
             var rules=CabinetClientSettings.rules();
             DeviceUi.text(g,font,"全服统一规则（此页只读）",x+10,y+48,w-20,DeviceUi.TEXT);
@@ -100,9 +101,9 @@ final class CabinetSyncSettingsScreen extends DeviceScreen {
             DeviceUi.text(g,font,"修改入口：管理终端 → 街机全服",x+10,y+142,w-20,DeviceUi.MUTED);
             DeviceUi.text(g,font,"有人入席取消计时；无按键不算退出。",x+10,y+158,w-20,DeviceUi.MUTED);
         }else if(diagnostics){
-            int row=y+46;for(String line:CabinetMediaTuning.diagnostics()){if(row>=y+h-62)break;DeviceUi.text(g,font,line,x+10,row,w-20,DeviceUi.TEXT);row+=13;}
-            DeviceUi.text(g,font,"平均值从音画流创建起统计；取帧不等于模拟器 CPU 速度",x+10,y+h-56,w-20,DeviceUi.MUTED);
-            DeviceUi.text(g,font,"队列接纳 ≠ 远端已收到；模拟器变慢与网络丢帧须分别检查",x+10,y+h-44,w-20,DeviceUi.MUTED);
+            int row=y+46;for(String line:diagnosticLines){if(row>=y+h-62)break;DeviceUi.text(g,font,line,x+10,row,w-20,DeviceUi.TEXT);row+=13;}
+            DeviceUi.text(g,font,"核心为近 1 秒墙钟耗时；音画流为创建以来平均",x+10,y+h-56,w-20,DeviceUi.MUTED);
+            DeviceUi.text(g,font,"合并不丢按键边沿；核心过慢仍会延迟，网络另计",x+10,y+h-44,w-20,DeviceUi.MUTED);
         }else{
             if(CabinetNetplay.supported(backend)){
                 DeviceUi.text(g,font,"Netplay：最多 "+CabinetNetplay.maxPlayers(backend)+" 席、"+(CabinetCoinPolicy.supported(backend.toString())?"支持实体投币、":"")+"存档策略见上方。",x+10,y+96,w-20,DeviceUi.MUTED);
@@ -120,6 +121,10 @@ final class CabinetSyncSettingsScreen extends DeviceScreen {
         super.render(g,mx,my,partial);
         if(mx>=x+8&&mx<x+w-8&&my>=y+8&&my<y+38)
             g.renderTooltip(font,Component.literal((setting==null?"":setting.gameInfo()+" · ")+targetText+" · "+target.dimension()),mx,my);
+        else if(diagnostics&&mx>=x+10&&mx<x+w-10&&my>=y+46&&my<y+h-62){
+            int line=(my-y-46)/13;
+            if(line<diagnosticLines.size())g.renderTooltip(font,Component.literal(diagnosticLines.get(line)),mx,my);
+        }
         else if(!diagnostics&&!powerPage&&mx>=x+8&&mx<x+w-8&&my>=y+110&&my<y+h-80)
             g.renderTooltip(font,Component.literal(status),mx,my);
     }

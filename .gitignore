@@ -10,6 +10,7 @@
 !/.github/workflows/
 /.github/workflows/*
 !/.github/workflows/snapshot.yml
+!/.github/workflows/mame-lifecycle-candidate.yml
 !/source-control/
 !/piq-fc-arcade/
 !/piq-retro-platform/

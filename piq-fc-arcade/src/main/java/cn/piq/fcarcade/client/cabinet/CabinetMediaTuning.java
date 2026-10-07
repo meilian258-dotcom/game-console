@@ -15,7 +15,10 @@ public final class CabinetMediaTuning {
     static void register(CabinetMediaStream stream){streams.add(stream);}
     static void remove(CabinetMediaStream stream){streams.remove(stream);}
     public static List<String> diagnostics(){
-        var active=List.copyOf(streams);if(active.isEmpty())return List.of("暂无音画流：开机并有其他玩家参与或旁观后统计", "本地同步的控制端不需要接收视频流");
-        var lines=new ArrayList<String>();for(var stream:active){lines.addAll(stream.diagnostics());if(lines.size()>=8)break;}return List.copyOf(lines);
+        var lines=new ArrayList<String>(CabinetClientBackends.mediaDiagnostics());
+        var active=List.copyOf(streams);
+        if(active.isEmpty())lines.addAll(List.of("暂无音画流：本机游玩仍可有核心统计", "接收端不测量远端核心速度"));
+        else for(var stream:active){lines.addAll(stream.diagnostics());if(lines.size()>=8)break;}
+        return List.copyOf(lines.subList(0,Math.min(8,lines.size())));
     }
 }

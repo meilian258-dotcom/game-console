@@ -22,6 +22,6 @@ side="BOTH"
 [[dependencies.piq_native_arcade]]
 modId="piq_fc_arcade"
 type="required"
-versionRange="[0.31.0-alpha.76.40,0.31.0-alpha.77)"
+versionRange="[0.31.0-alpha.76.45,0.31.0-alpha.77)"
 ordering="AFTER"
 side="BOTH"

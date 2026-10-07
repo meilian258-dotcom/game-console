@@ -1,0 +1,85 @@
+diff --git a/src/frontend/mame/mame.cpp b/src/frontend/mame/mame.cpp
+--- a/src/frontend/mame/mame.cpp
++++ b/src/frontend/mame/mame.cpp
+@@ -41,6 +41,7 @@
+ extern void retro_loop(running_machine *machine);
+ extern void retro_execute();
+ extern void free_man();
++extern void retro_finish_osd();
+ 
+ static running_machine *retro_global_machine;
+ static const machine_config *retro_global_config;
+@@ -69,18 +70,26 @@
+ 
+ void free_machineconfig()
+ {
+-	retro_manager->set_machine(nullptr);
++	if (retro_manager)
++		retro_manager->set_machine(nullptr);
+ 
+ 	delete retro_global_machine;
++	retro_global_machine = nullptr;
+ 	delete retro_global_config;
++	retro_global_config = nullptr;
+ }
+ 
+ void retro_finish()
+ {
+-	retro_global_machine->retro_machine_exit();
++	// Failed startup already emits exit notifications in running_machine::run.
++	// Only a successfully yielded machine still needs its normal exit sequence.
++	if (retro_global_machine && retro_global_machine->phase() == machine_phase::RUNNING)
++		retro_global_machine->retro_machine_exit();
+ 
+ 	free_machineconfig();
+ 	free_man();
++	// OSD owns registered modules, including dormant network/Asio services.
++	// Destroy it before the frontend is allowed to unload this shared library.
++	retro_finish_osd();
+ }
+ 
+ void retro_main_loop()
+diff --git a/src/frontend/mame/clifront.cpp b/src/frontend/mame/clifront.cpp
+--- a/src/frontend/mame/clifront.cpp
++++ b/src/frontend/mame/clifront.cpp
+@@ -57,6 +57,7 @@
+ {
+ 	util::archive_file::cache_clear();
+ 	delete retro_manager;
++	retro_manager = nullptr;
+ }
+ #endif
+ 
+diff --git a/src/osd/libretro/retromain.cpp b/src/osd/libretro/retromain.cpp
+--- a/src/osd/libretro/retromain.cpp
++++ b/src/osd/libretro/retromain.cpp
+@@ -216,6 +216,12 @@
+ 
+ retro_osd_interface *retro_global_osd;
+ 
++void retro_finish_osd()
++{
++	delete retro_global_osd;
++	retro_global_osd = nullptr;
++}
++
+ // translated to utf8_main
+ int mmain(int argc, char *argv[])
+ {
+diff --git a/src/osd/libretro/libretro-internal/libretro.cpp b/src/osd/libretro/libretro-internal/libretro.cpp
+--- a/src/osd/libretro/libretro-internal/libretro.cpp
++++ b/src/osd/libretro/libretro-internal/libretro.cpp
+@@ -876,10 +876,12 @@
+ 
+ void retro_deinit(void)
+ {
++   // A rejected load can still own an OSD and its background services.
++   // Keep callback buffers alive until every owned service has stopped.
++   retro_finish();
++   retro_load_ok = false;
+    free_output_audio_buffer();
+-   if (retro_load_ok)
+-      retro_finish();
+ }
+ 
+ void retro_reset(void)

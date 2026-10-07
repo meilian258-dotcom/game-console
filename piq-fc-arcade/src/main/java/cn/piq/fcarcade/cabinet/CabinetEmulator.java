@@ -8,6 +8,8 @@ import cn.piq.retro.api.RetroFrame;
 public interface CabinetEmulator extends AutoCloseable {
     boolean isReady();
     String error();
+    /** Optional local read-only measurements, without native calls or input/frame consumption. */
+    default java.util.List<String> diagnostics() { return java.util.List.of(); }
     void offerInput(int p1, int p2);
     default int maxPlayers() { return 2; }
     default void offerInputs(int p1, int p2, int p3, int p4) {
@@ -35,6 +37,7 @@ public interface CabinetEmulator extends AutoCloseable {
         return new RetroEmulator() {
             @Override public boolean isReady() { return legacy.isReady(); }
             @Override public String error() { return legacy.error(); }
+            @Override public java.util.List<String> diagnostics() { return legacy.diagnostics(); }
             @Override public void offerInput(int p1, int p2) { legacy.offerInput(p1, p2); }
             @Override public int maxPlayers() { return legacy.maxPlayers(); }
             @Override public void offerInputs(int p1,int p2,int p3,int p4) { legacy.offerInputs(p1,p2,p3,p4); }
