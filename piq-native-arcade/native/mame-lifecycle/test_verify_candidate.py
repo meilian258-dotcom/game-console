@@ -210,6 +210,23 @@ class VerificationTest(unittest.TestCase):
         self.assertEqual(180, frontend.video_frames)
         self.assertEqual(180 * 800, frontend.audio_frames)
 
+    def test_immediate_close_has_no_run_or_pre_close_delay_and_deinitializes_twice(self):
+        api, frontend, events = self.run_lifecycle("immediate-close")
+        self.assertEqual(["init", "load", "unload", "deinit", "deinit"], api.calls)
+        self.assertEqual(0, frontend.video_frames)
+        self.assertEqual(0, frontend.audio_frames)
+        self.assertNotIn("running", [phase for phase, _ in events])
+        self.assertIn(("unloading-game", {"run_frames": 0}), events)
+        self.assertEqual(target.SETTLE_SECONDS * 2, self.clock.now)
+        self.assert_code("load-result", lambda: self.run_lifecycle("immediate-close", load=False))
+
+    def test_immediate_close_receipt_cannot_be_substituted_for_playback(self):
+        events = self.fake_events("immediate-close")
+        self.assertTrue(target.events_passed("immediate-close", events))
+        self.assertFalse(target.events_passed("success-double-deinit", events))
+        next(row for row in events if row["phase"] == "unloading-game")["run_frames"] = 180
+        self.assertFalse(target.events_passed("immediate-close", events))
+
     def test_unexpected_load_result_is_failure_not_claimed_rejection(self):
         self.assert_code("load-result", lambda: self.run_lifecycle("failed-double-deinit", load=True))
         self.assert_code("load-result", lambda: self.run_lifecycle("success-double-deinit", load=False))

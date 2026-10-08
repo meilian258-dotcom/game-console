@@ -652,7 +652,8 @@ class CorrespondingSourceTests(unittest.TestCase):
         # Fixture-only replacement of pinned archive identity/count: production
         # never accepts a caller-provided source pin or file-count override.
         with patch("sys.argv", args), patch.object(package_source, "SOURCE_SHA256", build.sha(self.source_zip)), \
-                patch.object(package_source, "SOURCE_FILES", 5), patch("sys.stdout", new_callable=io.StringIO):
+                patch.object(package_source, "SOURCE_FILES", len(build.CHANGED) + 1), \
+                patch("sys.stdout", new_callable=io.StringIO):
             package_source.main()
 
     def test_complete_source_and_helpers_packaged(self):
@@ -661,7 +662,7 @@ class CorrespondingSourceTests(unittest.TestCase):
         with zipfile.ZipFile(output) as archive:
             self.assertIsNone(archive.testzip())
             names = archive.namelist()
-            self.assertEqual(len(names), 5 + len(package_source.HELPERS) + 1)
+            self.assertEqual(len(names), len(build.CHANGED) + 1 + len(package_source.HELPERS) + 1)
             self.assertIn("mame-0.289-piq-lifecycle1/piq-lifecycle/ci-toolchain-lock.json", names)
         self.assertFalse(output.with_suffix(".zip.partial").exists())
         with self.assertRaises(FileExistsError):

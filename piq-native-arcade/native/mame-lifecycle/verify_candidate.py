@@ -48,7 +48,7 @@ SYSTEM_IMPORTS = frozenset(("kernel32.dll", "msvcrt.dll", "shell32.dll", "shlwap
     "api-ms-win-crt-time-l1-1-0.dll", "api-ms-win-crt-utility-l1-1-0.dll"))
 _PROCESS_RUNTIME_OWNERS = []  # OS reclaims the dependency and read lock at child exit.
 CASES = ("three-cycles", "no-load", "double-deinit", "failed-double-deinit",
-         "success-double-deinit")
+         "success-double-deinit", "immediate-close")
 LINGER_SECONDS = 330
 SAMPLE_SECONDS = 5
 SETTLE_SECONDS = 6
@@ -435,7 +435,7 @@ def lifecycle(api, frontend, case, game, record, pause=time.sleep, clock=time.mo
     api.retro_init()
     frontend.check()
     loaded = False
-    if case in ("failed-double-deinit", "success-double-deinit", "three-cycles"):
+    if case in ("failed-double-deinit", "success-double-deinit", "three-cycles", "immediate-close"):
         record("loading-content")
         loaded = bool(api.retro_load_game(c.byref(game)))
         frontend.check()
@@ -443,12 +443,17 @@ def lifecycle(api, frontend, case, game, record, pause=time.sleep, clock=time.mo
             raise ProbeError("load-result")
         record("loaded" if loaded else "expected-load-rejection", loaded=loaded)
         if loaded:
-            record("running")
-            for _ in range(RUN_FRAMES):
-                api.retro_run()
-                frontend.check()
-                pause(1 / 60)
-            record("unloading-game", run_frames=RUN_FRAMES)
+            # UI cache workers start inside retro_load_game. Close immediately
+            # in this case, without a frame loop/delay that could hide an early
+            # join-under-mutex failure. Normal cases still require real media.
+            frames = 0 if case == "immediate-close" else RUN_FRAMES
+            if frames:
+                record("running")
+                for _ in range(frames):
+                    api.retro_run()
+                    frontend.check()
+                    pause(1 / 60)
+            record("unloading-game", run_frames=frames)
             api.retro_unload_game()
             frontend.check()
     for number in range(1, 2 if case in ("no-load", "three-cycles") else 3):
@@ -459,7 +464,7 @@ def lifecycle(api, frontend, case, game, record, pause=time.sleep, clock=time.mo
         milliseconds = (clock() - begin) * 1000
         pause(SETTLE_SECONDS)
         record("after-deinit", call=number, milliseconds=milliseconds)
-    if loaded and (frontend.video_frames == 0 or frontend.audio_frames == 0):
+    if loaded and case != "immediate-close" and (frontend.video_frames == 0 or frontend.audio_frames == 0):
         raise ProbeError("no-media")
     return loaded
 
@@ -765,6 +770,8 @@ def events_passed(case, events):
             expected += ["loading-content", "expected-load-rejection"]
         elif case in ("success-double-deinit", "three-cycles"):
             expected += ["loading-content", "loaded", "running", "unloading-game"]
+        elif case == "immediate-close":
+            expected += ["loading-content", "loaded", "unloading-game"]
         expected += ["deinit", "after-deinit"] * (1 if case in ("no-load", "three-cycles") else 2)
         expected += ["free-library", "after-free", "cycle-completed"]
         if cycle == cycles:
@@ -778,6 +785,10 @@ def events_passed(case, events):
         if case in ("success-double-deinit", "three-cycles"):
             ran = next(event for event in rows if event["phase"] == "unloading-game")
             if ran.get("run_frames") != RUN_FRAMES or free.get("video_frames", 0) <= 0 or free.get("audio_frames", 0) <= 0:
+                return False
+        if case == "immediate-close":
+            ran = next(event for event in rows if event["phase"] == "unloading-game")
+            if ran.get("run_frames") != 0:
                 return False
         after_free = next(event for event in rows if event["phase"] == "after-free")
         lingering = [event for event in rows if event["phase"] == "linger"]

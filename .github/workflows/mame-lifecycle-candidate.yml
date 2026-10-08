@@ -51,6 +51,15 @@ jobs:
           python -B piq-native-arcade/native/mame-lifecycle/ci_prepare.py
           --profile clang64-shared
           --root "$env:RUNNER_TEMP/piq-mame-ci"
+      - name: Regress UI cache shutdown against the pinned real source methods
+        timeout-minutes: 3
+        run: |
+          Get-Command git -ErrorAction Stop | Out-Null
+          $env:PIQ_TEST_MAME_SOURCE_ZIP = "$env:RUNNER_TEMP/piq-mame-ci/inputs/mame-upstream.zip"
+          $env:PIQ_TEST_CLANGXX = "$env:RUNNER_TEMP/piq-mame-ci/msys64/clang64/bin/clang++.exe"
+          $env:PIQ_TEST_HARNESS_PARENT = $env:RUNNER_TEMP
+          python -B -m unittest discover -s piq-native-arcade/native/mame-lifecycle -p 'test_systemlist_reset.py' -v
+          exit $LASTEXITCODE
       - name: Compile the complete same-version patched core
         timeout-minutes: 310
         run: >-

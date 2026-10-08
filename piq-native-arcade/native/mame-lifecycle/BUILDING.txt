@@ -13,7 +13,7 @@ This is a lifecycle patch to libretro/mame commit
 4fc9a9312baaf34963847f884961ad9793fbbc1d, not a different emulator,
 driver subset, save-format migration, RTC patch or audio-threading patch.
 The original binary and all existing saves must remain unchanged. Build helpers
-and CI preparation are maintained by the Game Console maintainers (2026-10-08).
+and CI preparation are maintained by the Game Console maintainers (2026-10-09).
 
 The Windows Asio IOCP timer service can be created when the OSD registers its
 network-output module, even when that module is not selected. Merely running
@@ -22,9 +22,22 @@ libretro OSD must be destroyed before the frontend unloads the DLL, allowing
 Asio to signal and join its timer thread instead of returning into unloaded
 code at its five-minute timer interval.
 
-The patch has four source files:
+The UI system-list cache is another independent background owner. Its
+function-static destructor joins a worker; waiting there during Windows DLL
+detach can deadlock with that worker's LdrShutdownThread. retro_finish must
+finish this worker before FreeLibrary, after removing its UI consumers and
+before destroying OSD. reset_cache releases its notification mutex while
+joining, then reacquires it before clearing data. Otherwise an early close
+can wait forever for a worker that needs the same mutex to publish results.
+Cache/reset calls remain serialized on the emulator owner; this is not a
+concurrent-reset API, a detached-thread workaround or a DLL-unload bypass.
+
+The patch has five source files:
 * mame.cpp: null-safe machine/config cleanup, skip duplicate machine-exit
-  notifications after failed startup, and release OSD after manager cleanup.
+  notifications after failed startup, finish the UI cache after manager
+  cleanup, and then release OSD.
+* ui/systemlist.cpp: release the notification mutex during the worker join;
+  clear the thread and cached data after it has finished.
 * clifront.cpp: clear the owned manager pointer after deletion.
 * retromain.cpp: provide the matching deletion for the allocated OSD.
 * libretro.cpp: clean up on rejected loads as well as successful loads;
@@ -259,7 +272,7 @@ python package_source.py --source-zip SOURCE.zip --build-root BUILD_ROOT \
   --output CANDIDATE_SOURCE.zip
 
 The source packager checks every input file against the pinned archive and
-the four patch hashes. It includes the full upstream source, licenses and
+the selected patch identities. It includes the full upstream source, licenses and
 these lifecycle build files, but excludes generated objects, private build
 receipts, ROMs, BIOS images and saves. Do not replace an earlier source ZIP.
 
@@ -271,13 +284,21 @@ successful play/close, repeated start/stop, deinit without load and repeated
 deinit, then keep the process alive beyond the original five-minute failure
 window. Observe OS thread and handle counts, callback errors and DLL unload.
 Check PE imports/exports, full-driver inclusion and embedded private paths.
+The native verifier additionally closes immediately after a successful load,
+without running frames or waiting for the UI cache. It requires double deinit,
+actual DLL unload and the same 330-second resource checks. This zero-frame
+case supplements, never replaces, the normal video/audio playback cases.
+The bounded source-method regression checks that the original mutex/join
+ordering times out while the patched ordering completes; it is not an actual
+core, JNI or Minecraft acceptance result. Earlier resource-recovery failures
+remain failures and must not be re-labelled by a source-only test.
 Compare save behavior separately; retaining 0.289 does not prove all old
 states compatible. Do not overwrite or migrate old saves for testing.
 
 License
 -------
 MAME is distributed under its upstream COPYING and per-file license terms.
-The four modified sources retain their upstream BSD-3-Clause notices.
+The five modified sources retain their upstream BSD-3-Clause notices.
 Distribute the complete corresponding source and required license notices
 with a binary candidate. These lifecycle build helpers are MIT-licensed;
 see LICENSE in this directory. No game content is included or licensed here.

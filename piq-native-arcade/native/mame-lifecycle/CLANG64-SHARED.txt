@@ -1,10 +1,11 @@
 MAME 0.289: isolated CLANG64 shared-runtime build profile
 ========================================================
 
-Maintained by Game Console maintainers, 2026-10-08.
+Maintained by Game Console maintainers, 2026-10-09.
 This is a build candidate, not a validated gameplay or crash-fix release.
-The default gcc-static profile and its four-file lifecycle patch remain
-unchanged. No game drivers, audio/threading policy or save format are changed.
+Both build profiles use the five-file lifecycle patch, including explicit
+UI cache worker shutdown before DLL detach. No game drivers, emulation audio
+threading policy or save format are changed.
 
 Pinned source and build-only change
 ----------------------------------
@@ -68,7 +69,7 @@ Entry and mandatory preflight
     --git GIT_EXECUTABLE --toolchain-receipt TOOLCHAIN_RECEIPT.json
 
 The hosted-CI fresh-root, no-cache/no-resume protections remain. The script
-checks/applies both fixed patches, records all five modified source identities,
+checks/applies both fixed patches, records all six modified source identities,
 then invokes preflight_shared.py before a full make. The preflight must generate
 the actual full-driver build rules and validate a bounded selection of relevant
 translation/link inputs. Its successful receipt is bound to the source receipt,
@@ -91,7 +92,7 @@ non-system runtime dependency needs an explicit fixed identity and review.
 Corresponding source and validation boundary
 -------------------------------------------
 Package with package_source.py --profile clang64-shared. The source manifest
-records both patch hashes, the profile and all five changed files, and includes
+records both patch hashes, the profile and all six changed files, and includes
 the shared profile lock, preflight, tests and these instructions. The original
 core, old save identities and previous candidates remain untouched.
 

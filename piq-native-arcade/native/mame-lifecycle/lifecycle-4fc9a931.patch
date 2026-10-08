@@ -1,7 +1,15 @@
 diff --git a/src/frontend/mame/mame.cpp b/src/frontend/mame/mame.cpp
 --- a/src/frontend/mame/mame.cpp
 +++ b/src/frontend/mame/mame.cpp
-@@ -41,6 +41,7 @@
+@@ -14,6 +14,7 @@
+ #include "ui/inifile.h"
+ #include "ui/selgame.h"
+ #include "ui/simpleselgame.h"
++#include "ui/systemlist.h"
+ #include "ui/ui.h"
+ 
+ #include "cheat.h"
+@@ -41,6 +42,7 @@
  extern void retro_loop(running_machine *machine);
  extern void retro_execute();
  extern void free_man();
@@ -9,7 +17,7 @@ diff --git a/src/frontend/mame/mame.cpp b/src/frontend/mame/mame.cpp
  
  static running_machine *retro_global_machine;
  static const machine_config *retro_global_config;
-@@ -69,18 +70,26 @@
+@@ -69,18 +71,31 @@
  
  void free_machineconfig()
  {
@@ -33,12 +41,36 @@ diff --git a/src/frontend/mame/mame.cpp b/src/frontend/mame/mame.cpp
  
  	free_machineconfig();
  	free_man();
++	// The UI is gone; join its static cache worker before DLL detach takes
++	// the loader lock. Its thread must be able to finish LdrShutdownThread.
++	// Core lifecycle calls, including this reset, stay serialized by the owner.
++	ui::system_list::instance().reset_cache();
 +	// OSD owns registered modules, including dormant network/Asio services.
 +	// Destroy it before the frontend is allowed to unload this shared library.
 +	retro_finish_osd();
  }
  
  void retro_main_loop()
+diff --git a/src/frontend/mame/ui/systemlist.cpp b/src/frontend/mame/ui/systemlist.cpp
+--- a/src/frontend/mame/ui/systemlist.cpp
++++ b/src/frontend/mame/ui/systemlist.cpp
+@@ -51,7 +51,15 @@
+ {
+ 	std::unique_lock<std::mutex> lock(m_mutex);
+ 	if (m_thread)
+-		m_thread->join();
++	{
++		// The owner serializes cache/reset calls. Keep m_started set until the
++		// worker finishes, but release the mutex needed by notify_available.
++		// Joining with this lock held can deadlock during an early shutdown.
++		lock.unlock();
++		if (m_thread->joinable())
++			m_thread->join();
++		lock.lock();
++	}
+ 	m_thread.reset();
+ 	m_started = false;
+ 	m_available = AVAIL_NONE;
 diff --git a/src/frontend/mame/clifront.cpp b/src/frontend/mame/clifront.cpp
 --- a/src/frontend/mame/clifront.cpp
 +++ b/src/frontend/mame/clifront.cpp
@@ -69,7 +101,7 @@ diff --git a/src/osd/libretro/retromain.cpp b/src/osd/libretro/retromain.cpp
 diff --git a/src/osd/libretro/libretro-internal/libretro.cpp b/src/osd/libretro/libretro-internal/libretro.cpp
 --- a/src/osd/libretro/libretro-internal/libretro.cpp
 +++ b/src/osd/libretro/libretro-internal/libretro.cpp
-@@ -876,10 +876,12 @@
+@@ -876,9 +876,11 @@
  
  void retro_deinit(void)
  {

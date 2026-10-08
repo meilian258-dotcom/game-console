@@ -25,10 +25,11 @@ class ProfileTests(unittest.TestCase):
                 "profile": profile, "patches": build.patch_identities(profile),
                 "changed_files": {name: {} for name in build.changed_files(profile)}}
 
-    def test_original_lifecycle_identity_unchanged(self):
+    def test_lifecycle_identity_includes_early_ui_cache_cleanup(self):
         self.assertEqual(build.sha(build.PATCH),
-                         "802DF281F5B5342992A993937E6CF620A5CB412F83FB0D055332A8360EEFD27E")
-        self.assertEqual(len(build.CHANGED), 4)
+                         "1E8BE3B68FB9B199360776E4DDF1F410C41787E9427EAB9C5F64832DCB9B85A8")
+        self.assertEqual(len(build.CHANGED), 5)
+        self.assertIn("src/frontend/mame/ui/systemlist.cpp", build.CHANGED)
         self.assertEqual(build.patches(), [(build.PATCH, build.PATCH_SHA256)])
 
     def test_shared_is_exactly_one_additional_build_file(self):
@@ -269,10 +270,11 @@ class SharedCorrespondingSourceTests(unittest.TestCase):
         argv = ["package_source.py", "--profile", "clang64-shared", "--source-zip", str(self.source_zip),
                 "--build-root", str(self.root), *mode]
         with patch("sys.argv", argv), patch.object(package_source, "SOURCE_SHA256", build.sha(self.source_zip)), \
-                patch.object(package_source, "SOURCE_FILES", 6), patch("sys.stdout", new_callable=io.StringIO):
+                patch.object(package_source, "SOURCE_FILES", len(build.changed_files("clang64-shared")) + 1), \
+                patch("sys.stdout", new_callable=io.StringIO):
             package_source.main()
 
-    def test_shared_five_file_source_verified(self):
+    def test_shared_six_file_source_verified(self):
         self.invoke("--verify-only")
 
     def test_shared_build_script_tampering_rejected(self):
@@ -313,13 +315,13 @@ class FixedUpstreamPatchTests(unittest.TestCase):
             for item, _ in build.patches("clang64-shared"):
                 for flags in (("--check",), ()):
                     subprocess.run([shutil.which("git"), "-c", "core.autocrlf=false", "apply",
-                                    "--recount", *flags, str(item)],
+                                    *flags, str(item)],
                                    cwd=root, check=True, capture_output=True, timeout=30)
             changed = {name for name, before in originals.items() if (root / name).read_bytes() != before}
             self.assertEqual(changed, build.changed_files("clang64-shared"))
             for item, _ in reversed(build.patches("clang64-shared")):
                 subprocess.run([shutil.which("git"), "-c", "core.autocrlf=false", "apply",
-                                "--recount", "--reverse", str(item)],
+                                "--reverse", str(item)],
                                cwd=root, check=True, capture_output=True, timeout=30)
             for name, before in originals.items():
                 self.assertEqual((root / name).read_bytes(), before)

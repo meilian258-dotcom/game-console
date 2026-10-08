@@ -23,7 +23,7 @@ import zipfile
 COMMIT = "4fc9a9312baaf34963847f884961ad9793fbbc1d"
 SOURCE_SHA256 = "C24D6FAAB64B4B571AA27F00FAC6D61FE19C9A1A9FEBEB0A57882DF26CE2EB0C"
 PATCH = Path(__file__).with_name("lifecycle-4fc9a931.patch")
-PATCH_SHA256 = "802DF281F5B5342992A993937E6CF620A5CB412F83FB0D055332A8360EEFD27E"
+PATCH_SHA256 = "1E8BE3B68FB9B199360776E4DDF1F410C41787E9427EAB9C5F64832DCB9B85A8"
 SHARED_PATCH = Path(__file__).with_name("clang64-shared-4fc9a931.patch")
 SHARED_PATCH_SHA256 = "33396A5624F32C495280E114A1D91F57600FBFF24FD7D6CE5F19EDFBC003F357"
 PROFILES = ("gcc-static", "clang64-shared")
@@ -31,6 +31,7 @@ SOURCE_FILES = 31413
 CHANGED = {
     "src/frontend/mame/mame.cpp",
     "src/frontend/mame/clifront.cpp",
+    "src/frontend/mame/ui/systemlist.cpp",
     "src/osd/libretro/retromain.cpp",
     "src/osd/libretro/libretro-internal/libretro.cpp",
 }
