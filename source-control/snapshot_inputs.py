@@ -33,6 +33,15 @@ BOOTSTRAP = {
     'arcade': ('game-console-arcade-0.1.5.7.jar', 141792262, '575f16d2123f1e91cadba12d8ace9dead63936770fcdec4476c260c13ce5d925'),
     'pvz': ('game-console-pvz-0.1.0-prototype.12.jar', 5004879, 'e010b4185c8a9e51edcba3ef40718a81781068320681892cf869d68c3046f04a'),
 }
+# This repair branch is not merge/release-ready. FC76.44 has no dependency
+# bundle. Review a published replacement, both snapshot bootstrap pins, and this
+# inventory only after full MAME validation and explicit publication approval.
+JNI_BUNDLE_INPUTS = ('libretro-jni-abi2', 'libcxx-windows')
+PUBLISHED_JNI_BUNDLES = {
+    '7d4db04cc8bafb3f7dc426e3e8412459ba1308dac9d33c434f99c1fcf5eac716': {
+        'libretro-jni-abi2': (1375744, 'aec72d00384d89de94c214e12fe32a19c1c54c93ea80c9bc82727895be509a36'),
+    },
+}
 NIGHTLY_BASE = {
     'windows-x64': 'https://buildbot.libretro.com/nightly/windows/x86_64/latest/',
     'linux-x64': 'https://buildbot.libretro.com/nightly/linux/x86_64/latest/',
@@ -49,6 +58,7 @@ FC_RESOURCES = {
     'mesen-windows': 'core/libretro/windows-x64/mesen_libretro.dll',
     'mesen-linux': 'core/libretro/linux-x64/mesen_libretro.so',
     'libretro-jni-abi2': 'core/libretro-jni/windows-x64/piq-libretro-jni.dll',
+    'libcxx-windows': 'core/libretro-jni/windows-x64/libc++.dll',
     'retroarch-netplay': 'core/netplay/piq-retroarch.exe',
     'mesen-jni-netplay-r2': 'core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r2.dll',
     'nes-zapper-wasm': 'core/nes_zapper_v1.wasm',
@@ -203,8 +213,17 @@ def unpack_core(archive_path: Path, destination: Path, member: str, platform: st
     put(destination, data)
 
 
+def require_published_jni_bundle(lock: dict) -> None:
+    published = PUBLISHED_JNI_BUNDLES.get(BOOTSTRAP['fc'][2], {})
+    requested = {ident: (lock[ident]['bytes'], lock[ident]['sha256'])
+                 for ident in JNI_BUNDLE_INPUTS if ident in lock}
+    if set(requested) != set(JNI_BUNDLE_INPUTS) or requested != published:
+        raise ValueError('JNI dependency bundle requires a matching published bootstrap')
+
+
 def extract_bootstrap(pins: dict[str, Path], output: Path, source: Path) -> None:
     lock = load_lock(source / 'source-control/build-inputs.json')
+    require_published_jni_bundle(lock)
     if set(lock) != set(FC_RESOURCES):
         raise ValueError('FC build-input inventory changed; review snapshot resource mapping')
     with zipfile.ZipFile(pins['fc']) as jar:
@@ -245,6 +264,9 @@ def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = N
     # its verified receipt, not by accidentally mixing two downloads of latest.
     if (output / 'receipt.json').exists() or (output / 'nightly').exists():
         raise ValueError('Input directory already resolved; build it or choose a new directory')
+    # Fail before network or even offline bootstrap copying; never silently
+    # satisfy the new API from an old bridge or an unrelated nightly runtime.
+    require_published_jni_bundle(load_lock(source / 'source-control/build-inputs.json'))
     output.mkdir(parents=True, exist_ok=True)
     pins, boot_records, sources = {}, [], []
     for ident, (filename, size, sha) in BOOTSTRAP.items():

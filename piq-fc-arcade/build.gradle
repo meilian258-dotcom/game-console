@@ -23,6 +23,7 @@ def jnaInput = piqLockedInput('jna-5-14-0')
 def mesenWindowsInput = piqLockedInput('mesen-windows')
 def mesenLinuxInput = piqLockedInput('mesen-linux')
 def jniBridgeInput = piqLockedInput('libretro-jni-abi2')
+def jniLibcxxInput = piqLockedInput('libcxx-windows')
 def netplayInput = piqLockedInput('retroarch-netplay')
 def pinnedCoreInputs = [
         'core/nes_rust_wasm_bg.wasm': piqLockedInput('nes-wasm'),
@@ -128,13 +129,27 @@ tasks.named('processResources') { dependsOn prepareLibretroRuntime }
 // Rebuilt native DLLs require a reviewed lock change and verified cache import.
 def prepareJniRuntime = tasks.register('prepareJniRuntime', Sync) {
     from(jniBridgeInput) { into 'windows-x64' }
+    from(jniLibcxxInput) { into 'windows-x64'; rename { 'libc++.dll' } }
     from('native/libretro-jni/README.md')
+    from('native/libretro-jni/licenses') { into 'licenses' }
     into layout.buildDirectory.dir('generated/jni-resources/core/libretro-jni')
     doLast {
         def dll = new File(destinationDir, 'windows-x64/piq-libretro-jni.dll')
+        def runtime = new File(destinationDir, 'windows-x64/libc++.dll')
         if (!dll.isFile()) throw new GradleException('Build native/libretro-jni into dist first; see its README')
+        if (!runtime.isFile()) throw new GradleException('Missing reviewed JNI runtime dependency')
+        ['libcxx-LICENSE.txt', 'libcxxabi-LICENSE.txt', 'libunwind-LICENSE.txt', 'NOTICE.md'].each { name ->
+            def license = new File(destinationDir, 'licenses/' + name)
+            if (!license.isFile() || license.length() == 0) {
+                throw new GradleException('Missing JNI runtime license/notice: ' + name)
+            }
+        }
         def sha = java.security.MessageDigest.getInstance('SHA-256').digest(dll.bytes).encodeHex().toString()
-        new File(destinationDir, 'runtime.properties').setText("abi=2\nwindows-x64.sha256=${sha}\n", 'UTF-8')
+        def runtimeSha = java.security.MessageDigest.getInstance('SHA-256').digest(runtime.bytes).encodeHex().toString()
+        new File(destinationDir, 'runtime.properties').setText(
+            "abi=2\nwindows-x64.sha256=${sha}\nruntime-dependency-api=1\n" +
+            "windows-x64.runtime.count=1\nwindows-x64.runtime.0.name=libc++.dll\n" +
+            "windows-x64.runtime.0.sha256=${runtimeSha}\nwindows-x64.runtime.0.bytes=${runtime.length()}\n", 'UTF-8')
     }
 }
 sourceSets.main.resources.srcDir layout.buildDirectory.dir('generated/jni-resources')

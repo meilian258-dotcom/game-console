@@ -42,6 +42,43 @@ class InputTests(unittest.TestCase):
         self.assertEqual(set(subject.NIGHTLY_BASE), {'windows-x64', 'linux-x64'})
         self.assertEqual(len(subject.NIGHTLY), 5)
         self.assertFalse(any('netplay' in member or 'blastem' in member for _, member in subject.NIGHTLY.values()))
+        self.assertTrue(set(subject.JNI_BUNDLE_INPUTS).isdisjoint(subject.NIGHTLY))
+        self.assertFalse(any('libc++' in member or 'libcxx' in member or 'libretro-jni' in member
+                             for _, member in subject.NIGHTLY.values()))
+
+    def test_fc_mapping_includes_cache_to_packaged_runtime_rename(self):
+        lock = subject.load_lock()
+        self.assertEqual(set(lock), set(subject.FC_RESOURCES))
+        self.assertEqual(lock['libcxx-windows']['filename'], 'libcxx.dll')
+        self.assertEqual(subject.FC_RESOURCES['libcxx-windows'],
+                         'core/libretro-jni/windows-x64/libc++.dll')
+
+    def test_unpublished_bundle_fails_before_network_and_offline_copy(self):
+        for offline in (None, self.root / 'missing-offline-bootstrap'):
+            output = self.root / 'unprepared'
+            with self.subTest(offline=offline), patch.object(subject, 'fetch') as fetch, \
+                    patch.object(subject, 'verify') as verify:
+                with self.assertRaisesRegex(ValueError, '^JNI dependency bundle requires a matching published bootstrap$'):
+                    subject.prepare(output, bootstrap_dir=offline)
+                fetch.assert_not_called()
+                verify.assert_not_called()
+                self.assertFalse(output.exists())
+
+    def test_bundle_guard_requires_exact_published_hash_and_size(self):
+        lock = subject.load_lock()
+        published = {ident: (lock[ident]['bytes'], lock[ident]['sha256'])
+                     for ident in subject.JNI_BUNDLE_INPUTS}
+        with patch.dict(subject.PUBLISHED_JNI_BUNDLES, {subject.BOOTSTRAP['fc'][2]: published}, clear=True):
+            subject.require_published_jni_bundle(lock)
+            for ident in subject.JNI_BUNDLE_INPUTS:
+                for change in ({'bytes': lock[ident]['bytes'] + 1}, {'sha256': '0' * 64}):
+                    with self.subTest(ident=ident, change=change), self.assertRaisesRegex(ValueError, 'matching published bootstrap'):
+                        subject.require_published_jni_bundle({**lock, ident: {**lock[ident], **change}})
+            with self.assertRaisesRegex(ValueError, 'matching published bootstrap'):
+                subject.require_published_jni_bundle({k: v for k, v in lock.items() if k != 'libcxx-windows'})
+        with patch.dict(subject.PUBLISHED_JNI_BUNDLES, {}, clear=True), \
+                self.assertRaisesRegex(ValueError, 'matching published bootstrap'):
+            subject.require_published_jni_bundle(lock)
 
     def test_redirect_rejects_foreign_insecure_credentials(self):
         for url in ('http://buildbot.libretro.com/core.zip', 'https://evil.test/file',

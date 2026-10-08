@@ -6,6 +6,14 @@
 
 ## 自动快照
 
+当前街机修复开发分支的主包已改用依赖 API 1 公共桥及固定 libc++。
+旧 `full-test-20261007-r1` 不包含这套输入，快照准备会在下载前明确拒绝，
+不能回退旧桥或用 nightly 覆盖它。此分支暂不能合入自动发布的 `main`。
+完成整核验证、准备并获准公开新固定成品后，需要一起审核更新
+`snapshot_inputs.py` 的已发布 JNI 输入表及它与 `snapshot_build.py` 的
+bootstrap 身份；这里不预设尚未发布的 URL。普通本地开发可按锁表导入
+审核过的新桥和官方运行库后构建，产物仍是未完成街机整核验收的内部候选。
+
 [snapshot.yml](../.github/workflows/snapshot.yml) 在进入 `main` 的每次 push 后触发，也支持在 Actions 中手动选择 `main` 运行。只有七个成品全部编译、检查和打包成功，才会创建独立预发行；失败不会覆盖已有发行版。workflow 合入 `main` 后才启用，不在拉取请求中使用发布权限。
 
 构建使用 GitHub 的 Windows 2022 runner、Java 21 和 Python 3.12，依次完成主模组、完整 SFC、MD、GBA、街机、电脑和 PvZ 七个玩家 JAR。SFC 由本次编译的两个内部组件合成一个完整玩家包；PvZ 仍是可选开发验证组件，不因自动打包变成稳定机型。
