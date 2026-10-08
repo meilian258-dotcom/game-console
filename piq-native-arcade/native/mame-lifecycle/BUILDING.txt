@@ -3,6 +3,12 @@ MAME 0.289 lifecycle candidate (Windows x64)
 
 Scope
 -----
+The repair-branch workflow now explicitly selects clang64-shared. Read
+CLANG64-SHARED.txt for its additional build-only patch, fixed CLANG64 toolchain,
+mandatory real-source preflight and process-owned libc++ dependency. The GCC
+commands below describe the retained gcc-static profile, not the current
+workflow selection. Neither profile is a validated crash-fix release.
+
 This is a lifecycle patch to libretro/mame commit
 4fc9a9312baaf34963847f884961ad9793fbbc1d, not a different emulator,
 driver subset, save-format migration, RTC patch or audio-threading patch.
@@ -79,7 +85,7 @@ SOUND_DISABLE_THREADING definition. IGNORE_GIT avoids accidentally embedding
 an unrelated enclosing checkout identity; the exact upstream revision is
 recorded in the source receipt. BARE_BUILD_VERSION remains 0.289.
 
---prepare-only stops before compilation. --resume resumes only this script's
+For gcc-static, --prepare-only stops before compilation. --resume resumes only this script's
 own prepared tree with unchanged patch and patched files; never point it at
 a historical build. Keep failed attempt logs and resolve build failures
 without changing pinned source or dependencies silently.
@@ -91,8 +97,8 @@ removed interrupted targets, then use --resume --jobs 6. Never run two builds
 against the same tree, force-kill unrelated processes, or silently reuse a
 different source/object tree. Retain the interrupted attempt's receipts.
 
-Clean GitHub-hosted Windows build
----------------------------------
+Retained GCC GitHub-hosted Windows build
+--------------------------------------
 This route is independent of local build objects and caches. The exact same
 MAME commit, archive SHA and lifecycle patch are used. ci-toolchain-lock.json
 pins the official MSYS2 base 2026-09-27 SFX (43,117,824 bytes; SHA-256

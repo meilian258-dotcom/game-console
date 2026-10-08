@@ -15,6 +15,36 @@ import zipfile
 import verify_candidate as target
 
 
+def imported_pe(normal=("libc++.dll", "KERNEL32.dll"), delayed=()):
+    """Synthetic PE import tables; never executable code."""
+    raw = bytearray(4096)
+    raw[:2] = b"MZ"
+    struct.pack_into("<I", raw, 60, 0x80)
+    raw[0x80:0x84] = b"PE\0\0"
+    struct.pack_into("<HHIIIHH", raw, 0x84, 0x8664, 1, 0, 0, 0, 240, 0x2000)
+    optional = 0x98
+    struct.pack_into("<H", raw, optional, 0x20b)
+    struct.pack_into("<Q", raw, optional + 24, 0x180000000)
+    struct.pack_into("<I", raw, optional + 56, 0x3000)
+    struct.pack_into("<I", raw, optional + 60, 0x400)
+    struct.pack_into("<I", raw, optional + 108, 16)
+    struct.pack_into("<IIII", raw, optional + 240 + 8, 0xc00, 0x1000, 0xc00, 0x400)
+    string_pos = 0xc00
+    for names, kind, position, width in ((normal, 1, 0x400, 20), (delayed, 13, 0x800, 32)):
+        if names:
+            struct.pack_into("<II", raw, optional + 112 + kind * 8, position + 0xc00, (len(names) + 1) * width)
+        for index, name in enumerate(names):
+            data = name.encode("ascii") + b"\0"
+            raw[string_pos:string_pos + len(data)] = data
+            name_rva = string_pos + 0xc00
+            if kind == 1:
+                struct.pack_into("<IIIII", raw, position + index * width, 0, 0, 0, name_rva, 0)
+            else:
+                struct.pack_into("<IIIIIIII", raw, position + index * width, 1, name_rva, 0, 0, 0, 0, 0, 0)
+            string_pos += len(data)
+    return bytes(raw)
+
+
 def clean_sample(**changes):
     return {"thread_count": 1, "new_threads": 0, "candidate_start_threads": 0,
             "unmapped_start_threads": 0, "thread_query_errors": 0,
@@ -507,6 +537,117 @@ class VerificationTest(unittest.TestCase):
         self.assertEqual(1, len(events))
         self.assertEqual("os-observation", events[0]["error"])
         self.assertFalse(target.events_passed("no-load", events))
+
+
+class SharedVerificationTest(unittest.TestCase):
+    assert_code = VerificationTest.assert_code
+
+    def setUp(self):
+        VerificationTest.setUp(self)
+        self.core.write_bytes(imported_pe())
+        self.expected = target.sha(self.core)
+        self.runtime = self.root / target.RUNTIME_NAME
+        self.runtime.write_bytes(imported_pe(("KERNEL32.dll",)))
+        for key, value in (("RUNTIME_BYTES", self.runtime.stat().st_size), ("RUNTIME_SHA", target.sha(self.runtime))):
+            patcher = mock.patch.object(target, key, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+    def test_shared_pe_imports_and_exact_non_wildcard_allowlist(self):
+        actual = target.verify_core(self.core, self.expected, "clang64-shared")
+        self.assertEqual(["kernel32.dll", "libc++.dll"], actual["imports"])
+        for name in ("libwinpthread-1.dll", "libstdc++-6.dll", "libgcc_s_seh-1.dll", "__emutls.dll",
+                     "api-ms-win-crt-made-up-l1-1-0.dll", "other.dll"):
+            for delayed in (False, True):
+                self.core.write_bytes(imported_pe(("libc++.dll",) if delayed else ("libc++.dll", name),
+                                                 (name,) if delayed else ()))
+                self.assert_code("dependency-imports", lambda: target.verify_core(self.core, target.sha(self.core), "clang64-shared"))
+
+    def test_shared_runtime_must_be_an_eager_dependency(self):
+        for raw in (imported_pe(("KERNEL32.dll",)), imported_pe(("KERNEL32.dll",), ("libc++.dll",))):
+            self.core.write_bytes(raw)
+            self.assert_code("dependency-imports", lambda: target.verify_core(self.core, target.sha(self.core), "clang64-shared"))
+
+    def test_import_parser_rejects_unbounded_tables_and_truncated_headers(self):
+        original = imported_pe()
+        for offset, value in ((0x98 + 60, 0x10000000), (0x98 + 108, 17),
+                              (0x98 + 112 + 8, 0x10000000), (0x98 + 112 + 8 + 4, 20)):
+            raw = bytearray(original)
+            struct.pack_into("<I", raw, offset, value)
+            self.core.write_bytes(raw)
+            self.assert_code("invalid-pe", lambda: target.pe_imports(self.core))
+
+    def test_runtime_name_size_hash_and_dependency_are_fixed(self):
+        expected = target.verify_runtime(self.runtime)
+        self.assertEqual(target.RUNTIME_SHA, expected["sha256"])
+        with mock.patch.object(target, "RUNTIME_SHA", "0" * 64):
+            self.assert_code("runtime-identity", lambda: target.verify_runtime(self.runtime))
+        with mock.patch.object(target, "RUNTIME_BYTES", 1):
+            self.assert_code("runtime-identity", lambda: target.verify_runtime(self.runtime))
+        self.assert_code("runtime-identity", lambda: target.verify_runtime(self.core))
+        self.runtime.write_bytes(imported_pe(("libwinpthread-1.dll",)))
+        with mock.patch.object(target, "RUNTIME_SHA", target.sha(self.runtime)):
+            self.assert_code("dependency-imports", lambda: target.verify_runtime(self.runtime))
+
+    def test_shared_staging_copies_and_pins_runtime_without_changing_scope(self):
+        receipt = target.prepare(self.core, self.expected, self.output, "clang64-shared")
+        self.assertEqual("clang64-shared", receipt["profile"])
+        self.assertFalse(receipt["java_jni_verified"])
+        self.assertFalse(receipt["minecraft_verified"])
+        self.assertEqual(self.runtime.read_bytes(), (self.output / "staging/libc++.dll").read_bytes())
+        for case in target.CASES:
+            launch = json.loads((self.output / "staging" / case / "launch.json").read_text())
+            self.assertEqual("clang64-shared", launch["profile"])
+            self.assertEqual(target.RUNTIME_SHA, launch["runtime"]["sha256"])
+
+    def test_missing_runtime_fails_before_any_output_or_loading(self):
+        with mock.patch.object(target, "RUNTIME_SHA", "0" * 64):
+            self.assert_code("runtime-identity", lambda: target.prepare(self.core, self.expected, self.output, "clang64-shared"))
+        self.assertFalse(self.output.exists())
+
+    def test_preload_refuses_an_already_loaded_same_name_without_loading(self):
+        observer = mock.Mock()
+        observer.runtime_paths.return_value = [str(self.runtime)]
+        self.assert_code("runtime-conflict", lambda: target.retain_runtime(self.runtime, observer))
+
+    def test_preload_read_lock_and_library_stay_owned_until_process_exit(self):
+        observer, kernel, library = mock.Mock(), mock.Mock(), mock.Mock()
+        observer.runtime_paths.side_effect = [[], [target.os.path.normcase(str(self.runtime))]]
+        kernel.CreateFileW.return_value = 123
+        owners = []
+        with mock.patch.object(target.c, "WinDLL", return_value=kernel), \
+             mock.patch.object(target.c, "CDLL", return_value=library) as loader, \
+             mock.patch.object(target, "_PROCESS_RUNTIME_OWNERS", owners):
+            target.retain_runtime(self.runtime, observer)
+        self.assertEqual([(kernel, 123), library], owners)
+        loader.assert_called_once_with(str(self.runtime), winmode=0x900)
+        kernel.CloseHandle.assert_not_called()
+        observer.free.assert_not_called()
+        self.assertEqual(1, kernel.CreateFileW.call_args.args[2])  # read share only
+
+    def test_shared_dependency_loaded_before_baseline_core_still_freed(self):
+        target.prepare(self.core, self.expected, self.output, "clang64-shared")
+        work = self.output / "staging/no-load"
+        observer = mock.Mock(affinity_cpus=2)
+        timeline = []
+        observer.take.side_effect = lambda: (timeline.append("baseline"), clean_sample())[1]
+        observer.free.side_effect = lambda handle: (timeline.append("free-core"), True)[1]
+        observer.mapped.return_value = None
+        api = FakeCore()
+        recorder, lifecycle = target.Recorder, target.lifecycle
+        with mock.patch.object(Path, "cwd", return_value=work), \
+             mock.patch.object(target.os, "getppid", return_value=target.os.getpid()), \
+             mock.patch.object(target, "WindowsObserver", return_value=observer), \
+             mock.patch.object(target, "retain_runtime", side_effect=lambda *a: timeline.append("runtime")), \
+             mock.patch.object(target.c, "CDLL", side_effect=lambda *a, **k: (timeline.append("core"), api)[1]), \
+             mock.patch.object(target, "bind_core"), \
+             mock.patch.object(target, "Recorder", side_effect=lambda stream, obs: recorder(stream, obs, clock=self.clock.clock)), \
+             mock.patch.object(target, "lifecycle", side_effect=lambda *args: lifecycle(*args, pause=self.clock.pause, clock=self.clock.clock)), \
+             mock.patch.object(target, "retain", return_value=None):
+            self.assertEqual(0, target.child(self.output / "staging/core.dll", self.expected, work, "no-load", "clang64-shared"))
+        self.assertEqual("runtime", timeline[0])
+        self.assertLess(timeline.index("baseline"), timeline.index("core"))
+        self.assertIn("free-core", timeline)
 
 
 class FrontendTest(unittest.TestCase):

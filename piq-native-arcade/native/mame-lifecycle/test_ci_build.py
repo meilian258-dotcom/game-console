@@ -222,7 +222,7 @@ class ExtractionTests(unittest.TestCase):
         with patch("sys.argv", ["ci_prepare.py", "--root", str(target)]), \
                 patch.object(ci, "require_hosted_ci"), \
                 patch.object(ci.shutil, "disk_usage", return_value=SimpleNamespace(free=20 * ci.GIB)), \
-                patch.object(ci, "load_lock", return_value={"base": base, "base_manifest": {}}), \
+                patch.object(ci, "load_lock", return_value={"base": base, "base_manifest": {}, "environment": "MINGW64"}), \
                 patch.object(ci, "download", side_effect=download) as fetch, \
                 patch.object(ci, "extract_base", side_effect=subprocess.TimeoutExpired("fixture", 1200)), \
                 patch.object(ci, "disable_key_refresh") as refresh, patch.object(ci, "run_shell") as shell, \
@@ -266,7 +266,8 @@ class BuildDependencyTests(unittest.TestCase):
         self.assertEqual(set(result["files"]), set(ci.BUILD_DEPENDENCY_FILES))
         self.assertEqual(run.call_count, 1)
         self.assertEqual(run.call_args.kwargs["timeout"], 60)
-        command = run.call_args.args[0][-1]
+        command = run.call_args.kwargs["input"]
+        self.assertEqual(run.call_args.args[0][-1], "-s")
         self.assertIn("timeout --signal=TERM --kill-after=5s 50s g++", command)
         self.assertIn("-std=gnu++17 -fsyntax-only -x c++ -", command)
         self.assertIn("#include <SDL2/SDL.h>", command)
@@ -580,7 +581,8 @@ class LockAndIsolationTests(unittest.TestCase):
         self.assertNotIn("PYTHONPATH", env)
         self.assertNotIn("injected", env["PATH"])
         self.assertEqual(run.call_args.args[0],
-                         [str(self.root / "usr/bin/bash.exe"), "--noprofile", "--norc", "-c", "set -eu\nfixture"])
+                         [str(self.root / "usr/bin/bash.exe"), "--noprofile", "--norc", "-s"])
+        self.assertEqual(run.call_args.kwargs["input"], "set -eu\nfixture")
         self.assertEqual(run.call_args.kwargs["cwd"], self.root)
         self.assertEqual(env["PATH"], str(self.root / "usr/bin") + os.pathsep + str(Path("C:/Windows/System32")))
         self.assertEqual(env["MSYSTEM"], "MSYS")

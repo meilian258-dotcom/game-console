@@ -1,0 +1,109 @@
+MAME 0.289: isolated CLANG64 shared-runtime build profile
+========================================================
+
+Maintained by Game Console maintainers, 2026-10-08.
+This is a build candidate, not a validated gameplay or crash-fix release.
+The default gcc-static profile and its four-file lifecycle patch remain
+unchanged. No game drivers, audio/threading policy or save format are changed.
+
+Pinned source and build-only change
+----------------------------------
+Use the exact upstream commit/archive in BUILDING.txt. Apply, in order:
+  lifecycle-4fc9a931.patch
+  clang64-shared-4fc9a931.patch
+The latter changes only scripts/genie.lua, in the intersection of the
+mingw-clang, x64 and libretro* configurations (libretro and libretrodbg).
+It uses the existing GENie removeflags/removelinkoptions/removebuildoptions
+APIs to remove StaticRuntime, -static and -femulated-tls, respectively, and
+explicitly selects -stdlib=libc++ and -fno-emulated-tls. The original circular
+dependency flag and upstream --allow-multiple-definition option remain; no
+linker tolerance is added. Other platforms, x32 and standalone Debug/Release
+configurations are outside this patch. Generated rules must verify that scope.
+
+Build patch SHA-256:
+33396A5624F32C495280E114A1D91F57600FBFF24FD7D6CE5F19EDFBC003F357
+
+The upstream source officially supports mingw-clang/CLANG64, but its 0.289
+Windows Clang CI example uses SUBTARGET=tiny. It is not evidence that the full
+libretro driver set, native TLS or unload lifecycle passes with this profile.
+This profile uses upstream mechanisms rather than a replacement thread model.
+
+Required effective settings
+---------------------------
+MSYS shell PATH must start with /clang64/bin:/usr/bin. The complete libretro
+invocation includes:
+  make -f Makefile.libretro -j2 platform=win MSYSTEM=CLANG64 \
+    MINGW_PREFIX=/clang64 MINGW64=/clang64 LIBRETRO_CPU=x86_64 \
+    CC=clang CXX=clang++ AR=llvm-ar OVERRIDE_AR=llvm-ar \
+    WINDRES=llvm-windres MAP=1 \
+    TARGET=mame SUBTARGET=mame REGENIE=1 VERBOSE= \
+    NOWERROR=1 PTR64=1 PYTHON_EXECUTABLE=python3 IGNORE_GIT=1 \
+    ARCHOPTS='[source/toolchain file and debug prefix-map options]'
+
+The fixed Makefile.libretro forwards CC/CXX as OVERRIDE_CC/OVERRIDE_CXX.
+AR plus OVERRIDE_AR binds both recursive GNU make and GENie's --AR option.
+WINDRES is needed for the generated Windows resource recipes. Command-line
+assignments propagate to recursive make, including the build of GENie itself;
+do not rely on its default gcc/g++/ar names or a GCC compatibility wrapper.
+The real Clang version detected by makefile selects windows_x64_clang and
+--gcc=mingw-clang. COMPILER and PREMAKE_TOOLCHAIN are not read by this fixed
+source and cannot be used as proof of the selected compiler. The existing
+LLD detection in Makefile.libretro supplies -fuse-ld=lld.
+MAP=1 retains the upstream build/mame.map link map. Symbol/stripping settings remain
+at the upstream release defaults. Consequently the final stripped DLL's symbol
+table alone cannot prove the absence of statically linked runtime code. Inspect
+the corresponding link map together with the PE imports/TLS and retained probe
+objects. The map is private diagnostic evidence, not a public release attachment.
+
+Use ci-clang64-toolchain-lock.json, not the GCC lock or a rolling package
+installation. The fixed package signatures, complete manifest, compiler and
+dependency identities must all pass before source generation. Native Windows
+Python, GNU make and SDL2 headers are required even though the core uses the
+libretro OSD. Build dependencies are not automatically runtime dependencies.
+
+Entry and mandatory preflight
+-----------------------------
+  python build_candidate.py --profile clang64-shared --ci-clean --jobs 4 \
+    --source-zip SOURCE.zip --msys-root MSYS_ROOT --build-root NEW_BUILD_ROOT \
+    --git GIT_EXECUTABLE --toolchain-receipt TOOLCHAIN_RECEIPT.json
+
+The hosted-CI fresh-root, no-cache/no-resume protections remain. The script
+checks/applies both fixed patches, records all five modified source identities,
+then invokes preflight_shared.py before a full make. The preflight must generate
+the actual full-driver build rules and validate a bounded selection of relevant
+translation/link inputs. Its successful receipt is bound to the source receipt,
+toolchain receipt and preflight script. A failed or missing receipt prevents the
+full build. --prepare-only is not a successful compiler or binary validation.
+Local --prepare-only can inspect source changes without compiling; shared full
+builds also require the fixed toolchain receipt and their own fresh preflight.
+The two real-source probe objects must not pre-exist. After successful checks,
+their object/dependency pairs are moved with hash verification to the private
+preflight evidence directory. A full build recompiles both with its own effective
+flags and path maps; it cannot inherit those private probe objects as a cache.
+
+No static GNU C++/winpthreads or emulated-TLS runtime may silently enter this
+profile. Inspect the effective generated flags, PE import table, link map and
+actual loaded dependency identities. Shared libc++ must have the separately
+fixed, process-owned lifecycle supported by the public JNI loader; merely
+placing a DLL next to each per-session core is not equivalent. Any additional
+non-system runtime dependency needs an explicit fixed identity and review.
+
+Corresponding source and validation boundary
+-------------------------------------------
+Package with package_source.py --profile clang64-shared. The source manifest
+records both patch hashes, the profile and all five changed files, and includes
+the shared profile lock, preflight, tests and these instructions. The original
+core, old save identities and previous candidates remain untouched.
+
+Patch replay, generated rules and translation checks are not a full core test.
+After a complete build, success/failure loading, repeated actual unloads, at
+least 330 seconds after close, thread/handle recovery and the actual public JNI
+path still need separate validation. Long gameplay, multiplayer Minecraft and
+unrelated JVM failures cannot be marked fixed by the build preflight.
+
+References
+----------
+https://www.mamedev.org/tools/
+https://github.com/mamedev/mame/blob/mame0289/.github/workflows/ci-windows.yml
+https://github.com/libretro/mame/tree/4fc9a9312baaf34963847f884961ad9793fbbc1d
+https://github.com/mamedev/mame/commit/3187306416775381ae8d2cf2e2a320c90e25808b

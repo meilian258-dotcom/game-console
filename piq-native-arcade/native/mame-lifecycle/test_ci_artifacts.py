@@ -9,6 +9,8 @@ import unittest
 from unittest import mock
 
 import ci_artifacts as target
+import ci_prepare
+from test_verify_candidate import imported_pe
 
 
 class CandidateArtifactsTest(unittest.TestCase):
@@ -273,6 +275,175 @@ class CandidateArtifactsTest(unittest.TestCase):
         with mock.patch.object(target, "inspect_build", side_effect=inspect_and_change):
             with self.assertRaises(target.ArtifactError):
                 target.stage(self.build, self.output)
+
+
+class SharedCandidateArtifactsTest(unittest.TestCase):
+    write_json = staticmethod(CandidateArtifactsTest.write_json)
+
+    def setUp(self):
+        CandidateArtifactsTest.setUp(self)
+        self.core.write_bytes(imported_pe())
+        genie = self.source / "scripts/genie.lua"
+        genie.parent.mkdir(parents=True, exist_ok=True)
+        genie.write_bytes(b"fake shared patched source")
+        self.provenance.update(profile="clang64-shared", patches=target.build.patch_identities("clang64-shared"))
+        self.provenance["changed_files"]["scripts/genie.lua"] = {"before": "1" * 64, "after": target.build.sha(genie)}
+        self.write_json(self.source_receipt, self.provenance)
+        self.msys = self.root / "fixed-msys"
+        self.runtime = self.msys / "clang64/bin/libc++.dll"
+        self.runtime.parent.mkdir(parents=True)
+        self.runtime.write_bytes(imported_pe(("KERNEL32.dll",)))
+        archive = self.msys / "clang64/lib/libc++.a"
+        archive.parent.mkdir()
+        archive.write_bytes(b"!<arch>\n" + b"mutex.cpp.obj/".ljust(16) + b"0".ljust(12)
+            + b"0".ljust(6) + b"0".ljust(6) + b"100644".ljust(8) + b"0".ljust(10) + b"`\n")
+        for obj, key, value in ((target.probe, "RUNTIME_BYTES", self.runtime.stat().st_size),
+                               (target.probe, "RUNTIME_SHA", target.probe.sha(self.runtime)),
+                               (target, "STATIC_CXX_SHA", target.build.sha(archive))):
+            patcher = mock.patch.object(obj, key, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        patcher = mock.patch.object(ci_prepare, "tool_files", return_value={"fake": "fixed"})
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.tool_path = self.root / "toolchain-receipt.json"
+        self.tool = {"schema": "piq-mame-ci-toolchain-receipt-1", "status": "ready", "profile": "clang64-shared",
+            "msys_root": str(self.msys), "lock_sha256": target.build.sha(ci_prepare.lock_path("clang64-shared")),
+            "tool_files": {"fake": "fixed"}}
+        lock = ci_prepare.load_lock(ci_prepare.lock_path("clang64-shared"))
+        self.tool["packages"] = lock["base_manifest"] | {p["name"]: p["version"] for p in lock["packages"]}
+        self.write_json(self.tool_path, self.tool)
+        self.preflight_path = self.build / "shared-preflight.json"
+        self.preflight = {"schema": "piq-mame-shared-preflight-1", "status": "passed", "profile": "clang64-shared",
+            "source_receipt_sha256": target.build.sha(self.source_receipt), "toolchain_receipt_sha256": target.build.sha(self.tool_path),
+            "preflight_sha256": target.build.sha(Path(target.__file__).with_name("preflight_shared.py")),
+            "core_executed": False, "full_build": False}
+        self.write_json(self.preflight_path, self.preflight)
+        self.link = self.source / "build/mame.map"
+        self.link.parent.mkdir()
+        self.link.write_text("Address Size Align Out In Symbol\n001 10 4 .tls\n001 0 0 _tls_used\n001 0 0 _tls_index\n", encoding="utf-8")
+        self.receipt.update(profile="clang64-shared", patches=target.build.patch_identities("clang64-shared"),
+            portable_msys=str(self.msys), source_receipt_sha256=target.build.sha(self.source_receipt),
+            toolchain_receipt_sha256=target.build.sha(self.tool_path), shared_preflight_sha256=target.build.sha(self.preflight_path),
+            link_map={"path": str(self.link), "bytes": self.link.stat().st_size, "sha256": target.build.sha(self.link)})
+        self.receipt["artifacts"][0]["sha256"] = target.build.sha(self.core)
+        self.write_json(self.finished, self.receipt)
+
+    def stage(self):
+        return target.stage(self.build, self.output, "clang64-shared", self.msys)
+
+    def rejected(self):
+        with self.assertRaises((target.ArtifactError, target.probe.ProbeError)):
+            self.stage()
+        self.assertFalse(self.output.exists())
+
+    def save_preflight(self):
+        self.write_json(self.preflight_path, self.preflight)
+        self.receipt["shared_preflight_sha256"] = target.build.sha(self.preflight_path)
+        self.write_json(self.finished, self.receipt)
+
+    def save_map(self, text):
+        self.link.write_text(text, encoding="utf-8")
+        self.receipt["link_map"].update(bytes=self.link.stat().st_size, sha256=target.build.sha(self.link))
+        self.write_json(self.finished, self.receipt)
+
+    def test_shared_is_exact_eight_files_with_bound_static_evidence_no_runtime_claim(self):
+        manifest = self.stage()
+        self.assertEqual(8, len(list(self.output.iterdir())))
+        self.assertEqual(target.SHARED_FILES, {p.name for p in self.output.iterdir()})
+        self.assertEqual(target.SHARED_SCHEMA, manifest["schema"])
+        self.assertEqual(target.build.sha(self.core), target.verify(self.output, "clang64-shared"))
+        self.assertEqual({"not-run"}, set(manifest["validation"].values()))
+        self.assertEqual(target.build.sha(self.link), manifest["static_link"]["map_sha256"])
+        serialized = (self.output / "candidate.json").read_text()
+        for private in (str(self.root), "portable_msys", "launcher_pid", "tool_files"):
+            self.assertNotIn(private, serialized)
+        self.assertEqual(self.runtime.read_bytes(), (self.output / "libc++.dll").read_bytes())
+
+    def test_profile_must_be_explicit_both_stage_and_verify(self):
+        with self.assertRaises(target.ArtifactError):
+            target.stage(self.build, self.output)
+        with self.assertRaises(target.ArtifactError):
+            target.stage(self.build, self.output, "clang64-shared")
+        self.stage()
+        with self.assertRaises(target.ArtifactError):
+            target.verify(self.output)
+
+    def test_local_tool_receipt_cannot_claim_ci_artifact(self):
+        self.tool["schema"] = "piq-mame-local-toolchain-receipt-1"
+        self.write_json(self.tool_path, self.tool)
+        self.receipt["toolchain_receipt_sha256"] = target.build.sha(self.tool_path)
+        self.preflight["toolchain_receipt_sha256"] = target.build.sha(self.tool_path)
+        self.save_preflight()
+        self.rejected()
+
+    def test_preflight_status_profile_execution_scope_and_identity_fail_closed(self):
+        original = copy.deepcopy(self.preflight)
+        for key, value in (("status", "failed"), ("profile", "gcc-static"), ("core_executed", 0),
+                           ("full_build", 0), ("source_receipt_sha256", "0" * 64), ("preflight_sha256", "0" * 64)):
+            with self.subTest(key=key):
+                self.preflight = {**original, key: value}
+                self.save_preflight()
+                self.rejected()
+
+    def test_static_archive_parser_recovers_member_name(self):
+        self.assertEqual({"mutex.cpp.obj"}, target.static_archive_members(self.msys / "clang64/lib/libc++.a"))
+
+    def test_static_archive_parser_handles_coff_and_gnu_long_names(self):
+        archive = self.msys / "clang64/lib/libc++.a"
+        def entry(name, body):
+            return (name.encode().ljust(16) + b"0".ljust(12) + b"0".ljust(6) + b"0".ljust(6)
+                    + b"100644".ljust(8) + str(len(body)).encode().ljust(10) + b"`\n"
+                    + body + (b"\n" if len(body) % 2 else b""))
+        for suffix in (b"\0", b"/\n"):
+            archive.write_bytes(b"!<arch>\n" + entry("//", b"condition_variable.cpp.obj" + suffix) + entry("/0", b""))
+            with mock.patch.object(target, "STATIC_CXX_SHA", target.build.sha(archive)):
+                self.assertEqual({"condition_variable.cpp.obj"}, target.static_archive_members(archive))
+
+    def test_map_requires_native_tls_and_rejects_static_member_or_gnu_emutls(self):
+        original = self.link.read_text()
+        for extra in ("__emutls_get_address", "libwinpthread-1.dll", "libstdc++.a(foo.o)", "libgcc.a(x.o)",
+                      "mutex.cpp.obj:(.text)", "C:/fixed/mutex.cpp.obj:(.text)", "libc++.a(foo.o)"):
+            with self.subTest(extra=extra):
+                self.save_map(original + "0 0 0 " + extra + "\n")
+                self.rejected()
+        for token in (".tls", "_tls_used", "_tls_index"):
+            self.save_map(original.replace(token, "absent"))
+            self.rejected()
+
+    def test_map_hash_or_path_cannot_be_forged(self):
+        original = copy.deepcopy(self.receipt)
+        for key, value in (("sha256", "0" * 64), ("bytes", True), ("path", str(self.core))):
+            self.receipt = copy.deepcopy(original)
+            self.receipt["link_map"][key] = value
+            self.write_json(self.finished, self.receipt)
+            self.rejected()
+
+    def test_runtime_and_license_hashes_checked_at_stage_and_verify(self):
+        with mock.patch.object(target.probe, "RUNTIME_SHA", "0" * 64):
+            self.rejected()
+        with mock.patch.object(target, "LICENSE_ROOT", self.root):
+            self.rejected()
+        self.stage()
+        for name in ("libc++.dll", *target.LICENSES):
+            path = self.output / name
+            original = path.read_bytes()
+            path.write_bytes(original[:-1] + bytes([original[-1] ^ 1]))
+            with self.assertRaises(target.ArtifactError):
+                target.verify(self.output, "clang64-shared")
+            path.write_bytes(original)
+
+    def test_manifest_rejects_added_private_fields_static_claims_and_imports(self):
+        original = self.stage()
+        variants = [{**original, "profile": "gcc-static"}, {**original, "patches": []}]
+        for key, value in (("private_path", str(self.root)), ("native_tls_map", 1),
+                           ("forbidden_runtime_map_entries", False), ("imports", ["unknown.dll"]),
+                           ("core_sha256", "0" * 64), ("static_libcxx_sha256", "0" * 64)):
+            variants.append({**original, "static_link": {**original["static_link"], key: value}})
+        for value in variants:
+            self.write_json(self.output / "candidate.json", value)
+            with self.assertRaises(target.ArtifactError):
+                target.verify(self.output, "clang64-shared")
 
 
 if __name__ == "__main__":

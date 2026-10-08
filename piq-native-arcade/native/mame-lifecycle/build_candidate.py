@@ -24,6 +24,9 @@ COMMIT = "4fc9a9312baaf34963847f884961ad9793fbbc1d"
 SOURCE_SHA256 = "C24D6FAAB64B4B571AA27F00FAC6D61FE19C9A1A9FEBEB0A57882DF26CE2EB0C"
 PATCH = Path(__file__).with_name("lifecycle-4fc9a931.patch")
 PATCH_SHA256 = "802DF281F5B5342992A993937E6CF620A5CB412F83FB0D055332A8360EEFD27E"
+SHARED_PATCH = Path(__file__).with_name("clang64-shared-4fc9a931.patch")
+SHARED_PATCH_SHA256 = "33396A5624F32C495280E114A1D91F57600FBFF24FD7D6CE5F19EDFBC003F357"
+PROFILES = ("gcc-static", "clang64-shared")
 SOURCE_FILES = 31413
 CHANGED = {
     "src/frontend/mame/mame.cpp",
@@ -31,6 +34,43 @@ CHANGED = {
     "src/osd/libretro/retromain.cpp",
     "src/osd/libretro/libretro-internal/libretro.cpp",
 }
+
+
+def selected_profile(args) -> str:
+    profile = getattr(args, "profile", "gcc-static")
+    if profile not in PROFILES:
+        raise ValueError("Unknown MAME build profile")
+    return profile
+
+
+def patches(profile: str = "gcc-static") -> list[tuple[Path, str]]:
+    selected_profile(argparse.Namespace(profile=profile))
+    return [(PATCH, PATCH_SHA256)] + ([(SHARED_PATCH, SHARED_PATCH_SHA256)]
+                                     if profile == "clang64-shared" else [])
+
+
+def changed_files(profile: str = "gcc-static") -> set[str]:
+    selected_profile(argparse.Namespace(profile=profile))
+    return CHANGED | ({"scripts/genie.lua"} if profile == "clang64-shared" else set())
+
+
+def patch_identities(profile: str = "gcc-static") -> list[dict]:
+    result = []
+    for path, expected in patches(profile):
+        if sha(path) != expected:
+            raise ValueError("Pinned build patch SHA-256 mismatch: " + path.name)
+        result.append({"file": path.name, "sha256": expected})
+    return result
+
+
+def validate_source_profile(record: dict, profile: str) -> None:
+    expected = patch_identities(profile)
+    # Old GCC-only receipts remain readable; never infer a shared-runtime profile.
+    if (record.get("profile", "gcc-static") != profile
+            or record.get("patches", expected if profile == "gcc-static" else None) != expected
+            or record["commit"] != COMMIT or record["patch_sha256"] != PATCH_SHA256
+            or set(record["changed_files"]) != changed_files(profile)):
+        raise ValueError("Candidate source profile/patch provenance mismatch")
 
 
 def sha(path: Path) -> str:
@@ -85,12 +125,12 @@ def failure_excerpt(path: Path) -> str:
 
 
 def prepare(args, root: Path) -> dict:
+    profile = selected_profile(args)
     if root.exists():
         raise ValueError("New build requires a nonexistent root; use --resume only for this script's own tree")
     if sha(args.source_zip) != SOURCE_SHA256:
         raise ValueError("Pinned upstream source SHA-256 mismatch")
-    if sha(PATCH) != PATCH_SHA256:
-        raise ValueError("Pinned lifecycle patch SHA-256 mismatch (check checkout line endings)")
+    patch_records = patch_identities(profile)
     root.mkdir(parents=True)
     source = root / "mame"
     source.mkdir()
@@ -119,16 +159,20 @@ def prepare(args, root: Path) -> dict:
             original[name] = hashlib.sha256(data).hexdigest().upper()
     if len(original) != SOURCE_FILES:
         raise ValueError("Unexpected pinned source file count")
-    subprocess.run([str(args.git), "apply", "--check", "--recount", str(PATCH)], cwd=source, check=True)
-    subprocess.run([str(args.git), "apply", "--recount", str(PATCH)], cwd=source, check=True)
+    for patch, _ in patches(profile):
+        subprocess.run([str(args.git), "-c", "core.autocrlf=false", "apply", "--check", "--recount", str(patch)],
+                       cwd=source, check=True)
+        subprocess.run([str(args.git), "-c", "core.autocrlf=false", "apply", "--recount", str(patch)],
+                       cwd=source, check=True)
     changes = {}
     for name, before in original.items():
         after = sha(source / name)
         if after != before:
             changes[name] = {"before": before, "after": after}
-    if set(changes) != CHANGED:
+    if set(changes) != changed_files(profile):
         raise ValueError("Patch changed unexpected source files")
     record = {"schema": "piq-mame-lifecycle-source-1", "commit": COMMIT,
+              "profile": profile, "patches": patch_records,
               "source_zip_sha256": SOURCE_SHA256, "patch_sha256": sha(PATCH),
               "source_root": str(source), "checked_source_files": len(original),
               "changed_files": changes, "prepared_utc": stamp()}
@@ -137,7 +181,10 @@ def prepare(args, root: Path) -> dict:
     return record
 
 
-def build_command(root: Path, msys: Path, jobs: int, ci_clean: bool) -> str:
+def build_command(root: Path, msys: Path, jobs: int, ci_clean: bool,
+                  profile: str = "gcc-static") -> str:
+    selected_profile(argparse.Namespace(profile=profile))
+    shared = profile == "clang64-shared"
     maps = []
     for source_path, replacement in ((root, "/mame-build"), (msys, "/toolchain")):
         for prefix in (source_path.as_posix(), "/" + source_path.drive[0].lower() + source_path.as_posix()[2:]):
@@ -145,22 +192,32 @@ def build_command(root: Path, msys: Path, jobs: int, ci_clean: bool) -> str:
     # timeout owns only its newly-created make process group in this dedicated CI VM.
     # A five-hour build budget leaves time for preparation, evidence upload and probes.
     bounded = "timeout --signal=INT --kill-after=60s 18000s " if ci_clean else ""
+    # GNU make's command-line variables propagate to its recursive invocations,
+    # including GENie's own make. COMPILER/PREMAKE_TOOLCHAIN are not read upstream.
+    target = ("platform=win MSYSTEM=CLANG64 MINGW_PREFIX=/clang64 MINGW64=/clang64 "
+              "LIBRETRO_CPU=x86_64 CC=clang CXX=clang++ AR=llvm-ar OVERRIDE_AR=llvm-ar "
+              "WINDRES=llvm-windres MAP=1" if shared else
+              "platform=win MSYSTEM=MINGW64 MINGW64=/mingw64 CC=gcc CXX=g++ AR=ar")
+    cc, cxx = ("clang", "clang++") if shared else ("gcc", "g++")
     return "\n".join([
-        "set -eu", "export PATH=/mingw64/bin:/usr/bin",
+        "set -eu", "export PATH=/clang64/bin:/usr/bin" if shared else "export PATH=/mingw64/bin:/usr/bin",
         # Makefile.libretro checks Android paths even for platform=win. Hosted
         # runners provide unrelated Windows-form NDK paths; keep this CI target isolated.
-        *(["unset ANDROID_NDK_HOME ANDROID_NDK_ROOT"] if ci_clean else []),
+        *(["unset ANDROID_NDK_HOME ANDROID_NDK_ROOT"] if ci_clean or shared else []),
         "export MSYS2_ARG_CONV_EXCL='-ffile-prefix-map=;-fdebug-prefix-map='",
-        "gcc --version", "g++ --version", "make --version", "python3 --version",
+        f"{cc} --version", f"{cxx} --version", "make --version", "python3 --version",
+        f"test \"$({cc} -dumpmachine)\" = x86_64-w64-windows-gnu" if shared else
         "test \"$(gcc -dumpmachine)\" = x86_64-w64-mingw32",
+        *(["llvm-ar --version", "llvm-windres --version", "ld.lld --version"] if shared else []),
         "python3 -c 'import sys; assert sys.platform == \"win32\"'",
         "cd " + shlex.quote((root / "mame").as_posix()),
-        bounded + f"make -f Makefile.libretro -j{jobs} platform=win MSYSTEM=MINGW64 MINGW64=/mingw64 CC=gcc CXX=g++ AR=ar TARGET=mame SUBTARGET=mame REGENIE=1 VERBOSE= NOWERROR=1 PTR64=1 PYTHON_EXECUTABLE=python3 IGNORE_GIT=1 ARCHOPTS=" + shlex.quote(" ".join(maps)),
+        bounded + f"make -f Makefile.libretro -j{jobs} {target} TARGET=mame SUBTARGET=mame REGENIE=1 VERBOSE= NOWERROR=1 PTR64=1 PYTHON_EXECUTABLE=python3 IGNORE_GIT=1 ARCHOPTS=" + shlex.quote(" ".join(maps)),
     ])
 
 
 def validate_ci(args, root: Path) -> dict:
-    from ci_prepare import LOCK, load_lock, require_hosted_ci, tool_files
+    from ci_prepare import lock_path, load_lock, require_hosted_ci, tool_files
+    profile = selected_profile(args)
     require_hosted_ci(root)
     if args.resume or root.exists() or args.prepare_only or args.jobs > 4:
         raise ValueError("CI requires a new complete build with at most four jobs; no resume/cache")
@@ -172,16 +229,31 @@ def validate_ci(args, root: Path) -> dict:
         raise ValueError("CI inputs must belong to this newly prepared sibling root")
     record = json.loads(args.toolchain_receipt.read_text(encoding="utf-8"))
     msys = args.msys_root.resolve()
-    lock = load_lock()
+    locked_path = lock_path(profile)
+    lock = load_lock(locked_path)
     expected = lock["base_manifest"] | {p["name"]: p["version"] for p in lock["packages"]}
     if (record["schema"] != "piq-mame-ci-toolchain-receipt-1" or record["status"] != "ready"
-            or record["lock_sha256"] != sha(LOCK) or record["packages"] != expected
+            or record.get("profile", "gcc-static") != profile
+            or record["lock_sha256"] != sha(locked_path) or record["packages"] != expected
             or record["preparer_sha256"] != sha(Path(__file__).with_name("ci_prepare.py"))
             or record["offline_signature_checks"] != len(lock["packages"])
             or record["offline_keyring_policy"]["after_sha256"] != sha(msys / "etc/pacman.d/gnupg/gpg.conf")
             or record["cache_reused"] is not False or Path(record["msys_root"]).resolve() != msys
-            or record["tool_files"] != tool_files(msys)):
+            or record["tool_files"] != tool_files(msys, profile)):
         raise ValueError("Fresh pinned toolchain provenance mismatch")
+    return record
+
+
+def validate_shared_preflight(args, root: Path) -> dict:
+    path = root / "shared-preflight.json"
+    record = json.loads(path.read_text(encoding="utf-8"))
+    if (record.get("schema") != "piq-mame-shared-preflight-1"
+            or record.get("status") != "passed" or record.get("profile") != "clang64-shared"
+            or record.get("source_receipt_sha256") != sha(root / "source-receipt.json")
+            or not args.toolchain_receipt
+            or record.get("toolchain_receipt_sha256") != sha(args.toolchain_receipt)
+            or record.get("preflight_sha256") != sha(Path(__file__).with_name("preflight_shared.py"))):
+        raise ValueError("Shared build requires matching, successful bounded preflight provenance")
     return record
 
 
@@ -192,11 +264,15 @@ def main() -> None:
     parser.add_argument("--build-root", type=Path, required=True)
     parser.add_argument("--git", type=Path, required=True)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--profile", choices=PROFILES, default="gcc-static")
     parser.add_argument("--prepare-only", action="store_true")
     parser.add_argument("--jobs", type=int, choices=(2, 4, 6), default=2)
     parser.add_argument("--ci-clean", action="store_true", help="explicit fresh hosted-Windows CI mode; no resume")
     parser.add_argument("--toolchain-receipt", type=Path)
     args = parser.parse_args()
+    profile = selected_profile(args)
+    if profile == "clang64-shared" and args.resume:
+        raise ValueError("Shared builds require a new source tree and fresh bounded preflight; no resume/cache")
     root = args.build_root.resolve()
     if not str(root).isascii() or len(root.parts) < 2:
         raise ValueError("Use a dedicated ASCII build directory")
@@ -207,9 +283,10 @@ def main() -> None:
         raise ValueError(f"Build requires at least {minimum_gib} GiB free on its target volume")
     if args.resume:
         record = json.loads((root / "source-receipt.json").read_text(encoding="utf-8"))
+        validate_source_profile(record, profile)
         if (record["commit"] != COMMIT or record["source_zip_sha256"] != SOURCE_SHA256
                 or record["patch_sha256"] != PATCH_SHA256 or sha(PATCH) != PATCH_SHA256
-                or sha(args.source_zip) != SOURCE_SHA256 or set(record["changed_files"]) != CHANGED):
+                or sha(args.source_zip) != SOURCE_SHA256):
             raise ValueError("Resume provenance mismatch")
         if Path(record["source_root"]).resolve() != root / "mame":
             raise ValueError("Resume source directory mismatch")
@@ -220,9 +297,21 @@ def main() -> None:
         record = prepare(args, root)
     if args.prepare_only:
         return
+    if profile == "clang64-shared":
+        if not args.toolchain_receipt:
+            raise ValueError("Shared full builds require the pinned toolchain receipt and preflight")
+        subprocess.run([sys.executable, "-B", str(Path(__file__).with_name("preflight_shared.py")),
+                        "--root", str(root), "--msys", str(args.msys_root.resolve()),
+                        "--toolchain-receipt", str(args.toolchain_receipt)], check=True)
+        validate_shared_preflight(args, root)
+        # The preflight validates the same fixed toolchain on a local invocation.
+        # Keep its identity for the identical post-build drift gate used by CI.
+        if toolchain is None:
+            toolchain = json.loads(args.toolchain_receipt.read_text(encoding="utf-8"))
     if args.ci_clean:
         subprocess.run([sys.executable, "-B", str(Path(__file__).with_name("package_source.py")),
                         "--source-zip", str(args.source_zip), "--build-root", str(root),
+                        "--profile", profile,
                         "--output", str(root / "candidate-source.zip")], check=True)
     temp = root / "tmp"
     temp.mkdir(exist_ok=True)
@@ -233,25 +322,30 @@ def main() -> None:
     env = os.environ.copy()
     env.pop("MAKEFLAGS", None)
     env.pop("MFLAGS", None)
-    if args.ci_clean:
+    if args.ci_clean or profile == "clang64-shared":
         for key in ("CFLAGS", "CXXFLAGS", "CPPFLAGS", "LDFLAGS", "GCC_EXEC_PREFIX", "COMPILER_PATH",
                     "CPATH", "CPLUS_INCLUDE_PATH", "C_INCLUDE_PATH", "LIBRARY_PATH", "BASH_ENV",
                     "ENV", "CDPATH", "PROMPT_COMMAND", "PYTHONHOME", "PYTHONPATH"):
             env.pop(key, None)
         env["CCACHE_DISABLE"] = "1"
-    env.update(MSYSTEM="MINGW64", MSYS2_PATH_TYPE="minimal", CHERE_INVOKING="1",
+    env.update(MSYSTEM="CLANG64" if profile == "clang64-shared" else "MINGW64",
+               MSYS2_PATH_TYPE="minimal", CHERE_INVOKING="1",
                TMP=str(temp), TEMP=str(temp), TMPDIR=str(temp))
-    command = build_command(root, msys, args.jobs, args.ci_clean)
+    command = build_command(root, msys, args.jobs, args.ci_clean, profile)
     started = stamp()
     log_path = root / ("build-" + started + ".log")
     metadata = {"schema": "piq-mame-lifecycle-build-1", "started_utc": started,
+                "profile": profile, "patches": patch_identities(profile),
                 "launcher_pid": os.getpid(), "source_receipt_sha256": sha(root / "source-receipt.json"),
                 "command": command, "jobs": args.jobs, "full_driver_build": True,
                 "portable_msys": str(msys), "log": str(log_path),
-                "compiler_sha256": sha(msys / "mingw64/bin/g++.exe"),
+                "compiler_sha256": sha(msys / ("clang64/bin/clang++.exe" if profile == "clang64-shared"
+                                              else "mingw64/bin/g++.exe")),
                 "launcher_sha256": sha(Path(__file__)), "temp_directory": str(temp),
                 "ci_clean": args.ci_clean, "minimum_free_gib": minimum_gib,
                 "toolchain_receipt_sha256": sha(args.toolchain_receipt) if toolchain else None,
+                "shared_preflight_sha256": sha(root / "shared-preflight.json")
+                if profile == "clang64-shared" else None,
                 "deployment": False, "download": False, "system_environment_modified": False}
     flags = subprocess.BELOW_NORMAL_PRIORITY_CLASS if sys.platform == "win32" else 0
     with log_path.open("xb") as log:
@@ -278,6 +372,14 @@ def main() -> None:
     for dll in (root / "mame").glob("*libretro*.dll"):
         artifacts.append({"path": str(dll), "bytes": dll.stat().st_size, "sha256": sha(dll)})
     metadata["artifacts"] = artifacts
+    if profile == "clang64-shared":
+        link_map = root / "mame/build/mame.map"
+        if link_map.is_file() and link_map.stat().st_size > 0:
+            metadata["link_map"] = {"path": str(link_map), "bytes": link_map.stat().st_size,
+                                    "sha256": sha(link_map)}
+        elif result == 0:
+            result = 1
+            metadata.update(exit_code=result, validation_error="Shared candidate link map is missing")
     if args.ci_clean:
         metadata["corresponding_source"] = {"file": "candidate-source.zip",
                                             "sha256": sha(root / "candidate-source.zip")}
@@ -287,7 +389,7 @@ def main() -> None:
     if toolchain:
         from ci_prepare import tool_files
         try:
-            metadata["toolchain_unchanged"] = tool_files(msys) == toolchain["tool_files"]
+            metadata["toolchain_unchanged"] = tool_files(msys, profile) == toolchain["tool_files"]
         except (OSError, ValueError):
             metadata["toolchain_unchanged"] = False
         if not metadata["toolchain_unchanged"]:
@@ -295,7 +397,8 @@ def main() -> None:
             metadata.update(exit_code=result, validation_error="Toolchain executable changed during build")
         if result == 0:
             verified = subprocess.run([sys.executable, "-B", str(Path(__file__).with_name("package_source.py")),
-                                       "--source-zip", str(args.source_zip), "--build-root", str(root), "--verify-only"])
+                                       "--source-zip", str(args.source_zip), "--build-root", str(root),
+                                       "--profile", profile, "--verify-only"])
             metadata["source_recheck_exit_code"] = verified.returncode
             if verified.returncode:
                 result = 1

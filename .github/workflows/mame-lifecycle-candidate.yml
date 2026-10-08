@@ -49,12 +49,13 @@ jobs:
         timeout-minutes: 35
         run: >-
           python -B piq-native-arcade/native/mame-lifecycle/ci_prepare.py
+          --profile clang64-shared
           --root "$env:RUNNER_TEMP/piq-mame-ci"
       - name: Compile the complete same-version patched core
         timeout-minutes: 310
         run: >-
           python -B piq-native-arcade/native/mame-lifecycle/build_candidate.py
-          --ci-clean --jobs 4
+          --ci-clean --jobs 4 --profile clang64-shared
           --source-zip "$env:RUNNER_TEMP/piq-mame-ci/inputs/mame-upstream.zip"
           --msys-root "$env:RUNNER_TEMP/piq-mame-ci/msys64"
           --build-root "$env:RUNNER_TEMP/piq-mame-ci/build"
@@ -63,6 +64,7 @@ jobs:
       - name: Verify provenance and stage the exact candidate file set
         run: >-
           python -B piq-native-arcade/native/mame-lifecycle/ci_artifacts.py stage
+          --profile clang64-shared --msys-root "$env:RUNNER_TEMP/piq-mame-ci/msys64"
           --build-root "$env:RUNNER_TEMP/piq-mame-ci/build"
           --output "$env:RUNNER_TEMP/piq-mame-ci/candidate"
       - name: Transfer candidate and corresponding source only
@@ -73,6 +75,11 @@ jobs:
             ${{ runner.temp }}/piq-mame-ci/candidate/core.dll
             ${{ runner.temp }}/piq-mame-ci/candidate/candidate-source.zip
             ${{ runner.temp }}/piq-mame-ci/candidate/candidate.json
+            ${{ runner.temp }}/piq-mame-ci/candidate/libc++.dll
+            ${{ runner.temp }}/piq-mame-ci/candidate/libcxx-LICENSE.txt
+            ${{ runner.temp }}/piq-mame-ci/candidate/libcxxabi-LICENSE.txt
+            ${{ runner.temp }}/piq-mame-ci/candidate/libunwind-LICENSE.txt
+            ${{ runner.temp }}/piq-mame-ci/candidate/NOTICE.md
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
@@ -88,6 +95,11 @@ jobs:
             ${{ runner.temp }}/piq-mame-ci/build/build-*-started.json
             ${{ runner.temp }}/piq-mame-ci/build/build-*-finished.json
             ${{ runner.temp }}/piq-mame-ci/build/build-*.log
+            ${{ runner.temp }}/piq-mame-ci/build/shared-preflight.json
+            ${{ runner.temp }}/piq-mame-ci/build/shared-preflight/*-finished.json
+            ${{ runner.temp }}/piq-mame-ci/build/shared-preflight/*.log
+            ${{ runner.temp }}/piq-mame-ci/build/shared-preflight/link-probe.map
+            ${{ runner.temp }}/piq-mame-ci/build/mame/build/mame.map
             ${{ runner.temp }}/piq-mame-ci/toolchain-*.json
             ${{ runner.temp }}/piq-mame-ci/packages-before.txt
             ${{ runner.temp }}/piq-mame-ci/packages-after.txt
@@ -128,10 +140,10 @@ jobs:
         timeout-minutes: 45
         run: |
           $candidateDir = Join-Path $env:RUNNER_TEMP 'mame-candidate'
-          $coreSha = python -B piq-native-arcade/native/mame-lifecycle/ci_artifacts.py verify --directory "$candidateDir"
+          $coreSha = python -B piq-native-arcade/native/mame-lifecycle/ci_artifacts.py verify --directory "$candidateDir" --profile clang64-shared
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           if ($coreSha -notmatch '^[0-9a-f]{64}$') { throw 'Invalid candidate checksum receipt' }
-          python -B piq-native-arcade/native/mame-lifecycle/verify_candidate.py --core "$candidateDir/core.dll" --sha256 "$coreSha" --output "$env:RUNNER_TEMP/mame-verification"
+          python -B piq-native-arcade/native/mame-lifecycle/verify_candidate.py --core "$candidateDir/core.dll" --sha256 "$coreSha" --output "$env:RUNNER_TEMP/mame-verification" --profile clang64-shared
           exit $LASTEXITCODE
       - name: Retain restricted lifecycle receipts without test content
         if: always()

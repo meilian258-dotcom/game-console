@@ -22,6 +22,8 @@ import urllib.request
 from build_candidate import COMMIT, SOURCE_SHA256, save, sha, stamp
 
 LOCK = Path(__file__).with_name("ci-toolchain-lock.json")
+CLANG_LOCK = Path(__file__).with_name("ci-clang64-toolchain-lock.json")
+PROFILES = ("gcc-static", "clang64-shared")
 SOURCE_URL = f"https://github.com/libretro/mame/archive/{COMMIT}.zip"
 SOURCE_BYTES = 234551686
 GIB = 1024**3
@@ -39,6 +41,16 @@ REQUIRED_BUILD_PACKAGES = {
     "mingw-w64-x86_64-SDL2", "mingw-w64-x86_64-vulkan-loader",
     "mingw-w64-x86_64-cc-libs", "mingw-w64-x86_64-libiconv",
 }
+CLANG_BUILD_FILES = tuple(name.replace("mingw64/", "clang64/") for name in BUILD_DEPENDENCY_FILES)
+CLANG_REQUIRED_PACKAGES = {"mingw-w64-clang-x86_64-" + name for name in (
+    "clang", "gcc-compat", "python", "SDL2", "vulkan-loader", "libc++",
+    "libunwind", "compiler-rt", "headers", "crt")} | {"make"}
+
+
+def lock_path(profile="gcc-static") -> Path:
+    if profile not in PROFILES:
+        raise ValueError("Unknown build profile")
+    return CLANG_LOCK if profile == "clang64-shared" else LOCK
 
 
 def require_hosted_ci(root: Path, env=None) -> None:
@@ -98,13 +110,17 @@ def download(url: str, target: Path, expected_sha: str | None, expected_bytes: i
 
 def load_lock(path=LOCK) -> dict:
     lock = json.loads(path.read_text(encoding="utf-8"))
-    if lock["schema"] != "piq-mame-ci-toolchain-1" or lock["environment"] != "MINGW64":
+    if lock["schema"] != "piq-mame-ci-toolchain-1" or lock["environment"] not in ("MINGW64", "CLANG64"):
         raise ValueError("Unexpected toolchain lock schema/environment")
+    clang = lock["environment"] == "CLANG64"
     packages = lock["packages"]
-    if len(packages) != 40 or len({p["name"] for p in packages}) != len(packages):
+    if len(packages) != (38 if clang else 40) or len({p["name"] for p in packages}) != len(packages):
         raise ValueError("Unexpected or duplicate locked package set")
-    if not REQUIRED_BUILD_PACKAGES.issubset({p["name"] for p in packages}):
+    required = CLANG_REQUIRED_PACKAGES if clang else REQUIRED_BUILD_PACKAGES
+    if not required.issubset({p["name"] for p in packages}):
         raise ValueError("Missing locked SDL2 build dependency closure")
+    if clang and any(p["name"] != "make" and not p["name"].startswith("mingw-w64-clang-x86_64-") for p in packages):
+        raise ValueError("Mixed target environments in CLANG64 lock")
     for item in [lock["base"], *packages]:
         validate_url(item["url"])
         if (Path(item["filename"]).name != item["filename"] or "\\" in item["filename"]
@@ -127,7 +143,17 @@ def parse_manifest(text: str) -> dict[str, str]:
     return result
 
 
-def tool_files(msys: Path) -> dict[str, str]:
+def tool_files(msys: Path, profile="gcc-static") -> dict[str, str]:
+    lock_path(profile)  # Reject unknown profiles before filesystem access.
+    if profile == "clang64-shared":
+        names = ["usr/bin/bash.exe", "usr/bin/make.exe", "usr/bin/msys-2.0.dll", "usr/bin/timeout.exe",
+                 "clang64/bin/clang.exe", "clang64/bin/clang++.exe", "clang64/bin/llvm-ar.exe",
+                 "clang64/bin/libclang-cpp.dll", "clang64/bin/libLLVM-22.dll",
+                 "clang64/bin/lld.exe", "clang64/bin/ld.lld.exe", "clang64/bin/llvm-windres.exe", "clang64/bin/python3.exe",
+                 "clang64/bin/llvm-readobj.exe", "clang64/bin/llvm-nm.exe", "clang64/bin/llvm-objdump.exe",
+                 "clang64/bin/libc++.dll", "clang64/bin/libunwind.dll", "clang64/include/c++/v1/__config"]
+        names += list(CLANG_BUILD_FILES)
+        return {name: sha(msys / name) for name in names}
     names = ["usr/bin/bash.exe", "usr/bin/make.exe", "usr/bin/msys-2.0.dll",
              "mingw64/bin/gcc.exe", "mingw64/bin/g++.exe", "mingw64/bin/ar.exe",
              "mingw64/bin/ld.exe", "mingw64/bin/python3.exe"]
@@ -145,7 +171,9 @@ def tool_files(msys: Path) -> dict[str, str]:
 
 def check_build_dependencies(msys: Path, root: Path, lock: dict) -> dict:
     """Fail before the full MAME build; never link or execute a probe binary."""
-    missing = [name for name in BUILD_DEPENDENCY_FILES
+    clang = lock["environment"] == "CLANG64"
+    files = CLANG_BUILD_FILES if clang else BUILD_DEPENDENCY_FILES
+    missing = [name for name in files
                if not (msys / name).is_file() or (msys / name).stat().st_size == 0]
     if missing:
         raise ValueError("Missing installed build dependency: " + ", ".join(missing))
@@ -166,16 +194,22 @@ def check_build_dependencies(msys: Path, root: Path, lock: dict) -> dict:
         "PIQ_SDL2_PREFLIGHT",
         "printf '%s\\n' 'PIQ SDL2 2.32.10 header preflight passed; no binary linked or executed'",
     ])
+    if clang:
+        command = command.replace("/mingw64/bin", "/clang64/bin")
+        command = command.replace("gcc -dumpfullversion", "clang -dumpversion")
+        command = command.replace("gcc -dumpmachine)\" = x86_64-w64-mingw32", "clang -dumpmachine)\" = x86_64-w64-windows-gnu")
+        command = command.replace("50s g++ ", "50s clang++ ")
+        command += "\nllvm-windres --version\n"
     log = root / "tool-versions.txt"
     versions = run_shell(msys, command, log, timeout_seconds=DEPENDENCY_TIMEOUT_SECONDS)
-    if (not versions.startswith(lock["gcc_version"] + "\nPython " + lock["python_version"] + "\n")
+    if (not versions.startswith(lock["clang_version" if clang else "gcc_version"] + "\nPython " + lock["python_version"] + "\n")
             or "GNU Make " + lock["make_version"] not in versions):
         raise ValueError("Executed tool versions differ from lock")
     return {"schema": "piq-mame-build-dependencies-1", "status": "passed",
             "check": "SDL2 2.32.10 header syntax only; no linked or executed probe",
             "timeout_seconds": DEPENDENCY_TIMEOUT_SECONDS,
             "log": log.name, "log_sha256": sha(log),
-            "files": {name: sha(msys / name) for name in BUILD_DEPENDENCY_FILES}}
+            "files": {name: sha(msys / name) for name in files}}
 
 
 def disable_key_refresh(msys: Path) -> dict:
@@ -224,11 +258,15 @@ def run_shell(msys: Path, command: str, log: Path, *, login=False, timeout_secon
                PATH=str(msys / "usr/bin") + os.pathsep + str(Path(os.environ["SystemRoot"]) / "System32"))
     args = [str(msys / "usr/bin/bash.exe")]
     args += ["--login"] if login else ["--noprofile", "--norc"]
-    args += ["-c", "set -eu\n" + command]
+    # A locked package list can exceed MSYS's Windows argv conversion limit.
+    # Keep the script on stdin instead of truncating a signature-check command.
+    args += ["-s"]
     try:
         result = subprocess.run(args, env=env, cwd=msys, text=True, encoding="utf-8",
                                 errors="replace", stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                timeout=timeout_seconds, creationflags=getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0))
+                                input="set -eu\n" + command,
+                                timeout=timeout_seconds, creationflags=getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0)
+                                | getattr(subprocess, "CREATE_NO_WINDOW", 0))
     except subprocess.TimeoutExpired as exc:
         captured = exc.stdout or b""
         if isinstance(captured, bytes):
@@ -302,6 +340,7 @@ def extract_base(root: Path, base: dict) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True)
+    parser.add_argument("--profile", choices=PROFILES, default="gcc-static")
     args = parser.parse_args()
     root = args.root.resolve()
     require_hosted_ci(root)
@@ -309,12 +348,16 @@ def main() -> None:
         raise ValueError("CI preparation requires a nonexistent root; no cache reuse")
     if shutil.disk_usage(root.parent).free < 12 * GIB:
         raise ValueError("CI preparation needs 12 GiB free including toolchain and build budget")
-    lock = load_lock()
+    selected_lock = lock_path(args.profile)
+    lock = load_lock(selected_lock)
+    if lock["environment"] != ("CLANG64" if args.profile == "clang64-shared" else "MINGW64"):
+        raise ValueError("Build profile and locked environment differ")
     root.mkdir()
     inputs = root / "inputs"
     inputs.mkdir()
     receipt = {"schema": "piq-mame-ci-toolchain-receipt-1", "started_utc": stamp(),
-               "lock_sha256": sha(LOCK), "preparer_sha256": sha(Path(__file__)),
+               "lock_sha256": sha(selected_lock), "preparer_sha256": sha(Path(__file__)),
+               "profile": args.profile,
                "status": "preparing", "downloads": [], "host_python": sys.version,
                "runner_image": os.environ.get("ImageVersion"), "cache_reused": False}
     save(root / "toolchain-started.json", receipt)
@@ -356,7 +399,7 @@ def main() -> None:
         receipt["build_dependencies"] = check_build_dependencies(msys, root, lock)
         receipt["downloads"].append(download(SOURCE_URL, inputs / "mame-upstream.zip", SOURCE_SHA256, SOURCE_BYTES))
         receipt.update(status="ready", finished_utc=stamp(), msys_root=str(msys),
-                       packages=expected, tool_files=tool_files(msys),
+                       packages=expected, tool_files=tool_files(msys, args.profile),
                        package_manifest_sha256=sha(root / "packages-after.txt"),
                        source_zip_sha256=SOURCE_SHA256)
         save(root / "toolchain-receipt.json", receipt)

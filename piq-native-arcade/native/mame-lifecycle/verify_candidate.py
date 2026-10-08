@@ -32,6 +32,21 @@ HEADER = REPO / "piq-fc-arcade/native/libretro-jni/libretro.h"
 GENERATOR_SHA = "664f3905f0750c5eafb1a6bf93826ec2701d7f76ee6277224fc68911acf205cb"
 HEADER_SHA = "5875414c47d8af4facf118c184b40b0e311285333a46bbfe8221a853efe5ba7a"
 OLD_CORE_SHA = "6172a988ab67fe68f4177a6fc8fbb82619eb2044c330930f0f572f7b1edc2301"
+PROFILES = ("gcc-static", "clang64-shared")
+RUNTIME_NAME = "libc++.dll"
+RUNTIME_BYTES = 1659392
+RUNTIME_SHA = "7344daed05388589e9bd691ed1d30c568c374da4b8b6a12e1502185948c03cd4"
+# Exact names observed in the prior MAME candidate and pinned official libc++.
+# Do not accept arbitrary api-* DLLs or new non-system dependencies.
+SYSTEM_IMPORTS = frozenset(("kernel32.dll", "msvcrt.dll", "shell32.dll", "shlwapi.dll",
+    "ws2_32.dll", "wsock32.dll", "api-ms-win-crt-convert-l1-1-0.dll",
+    "api-ms-win-crt-environment-l1-1-0.dll", "api-ms-win-crt-filesystem-l1-1-0.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll", "api-ms-win-crt-locale-l1-1-0.dll",
+    "api-ms-win-crt-math-l1-1-0.dll", "api-ms-win-crt-multibyte-l1-1-0.dll",
+    "api-ms-win-crt-private-l1-1-0.dll", "api-ms-win-crt-runtime-l1-1-0.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll", "api-ms-win-crt-string-l1-1-0.dll",
+    "api-ms-win-crt-time-l1-1-0.dll", "api-ms-win-crt-utility-l1-1-0.dll"))
+_PROCESS_RUNTIME_OWNERS = []  # OS reclaims the dependency and read lock at child exit.
 CASES = ("three-cycles", "no-load", "double-deinit", "failed-double-deinit",
          "success-double-deinit")
 LINGER_SECONDS = 330
@@ -53,7 +68,7 @@ ERRORS = frozenset(("invalid-arguments", "invalid-sha", "wrong-platform",
     "source-pin-mismatch", "invalid-launch", "content-sha-mismatch",
     "frontend-callback", "required-options", "api-version", "load-result",
     "no-media", "dll-not-unmapped", "os-observation", "resource-recovery",
-    "invalid-events", "internal-error"))
+    "invalid-events", "runtime-identity", "runtime-conflict", "dependency-imports", "internal-error"))
 NUMBER_FIELDS = frozenset(("cycle", "elapsed_seconds", "call", "milliseconds",
     "video_callbacks", "video_frames", "audio_frames", "run_frames",
     "thread_count", "new_threads", "candidate_start_threads",
@@ -95,7 +110,95 @@ def safe_path(path):
     return result
 
 
-def verify_core(path, expected):
+def profile_name(value):
+    if value not in PROFILES:
+        raise ProbeError("invalid-arguments")
+    return value
+
+
+def pe_imports(path):
+    """Bounded static PE reader, reused from the existing candidate inspection.
+
+    Reads normal and delayed import names, not native code. Final native TLS and
+    linked runtime symbol checks are separate build gates, not inferred here.
+    """
+    size = path.stat().st_size
+    try:
+        with path.open("rb") as source:
+            def read(offset, count):
+                if offset < 0 or count < 0 or offset + count > size:
+                    raise ProbeError("invalid-pe")
+                source.seek(offset)
+                data = source.read(count)
+                if len(data) != count:
+                    raise ProbeError("invalid-pe")
+                return data
+            nt = struct.unpack("<I", read(60, 4))[0]
+            machine, sections, _, _, _, optional_bytes, flags = struct.unpack("<HHIIIHH", read(nt + 4, 20))
+            optional = nt + 24
+            if (read(0, 2) != b"MZ" or read(nt, 4) != b"PE\0\0" or machine != 0x8664
+                    or struct.unpack("<H", read(optional, 2))[0] != 0x20b or not flags & 0x2000
+                    or not 1 <= sections <= 96 or not 240 <= optional_bytes <= 4096):
+                raise ProbeError("invalid-pe")
+            image_base = struct.unpack("<Q", read(optional + 24, 8))[0]
+            header_bytes = struct.unpack("<I", read(optional + 60, 4))[0]
+            if not optional + optional_bytes + sections * 40 <= header_bytes <= size:
+                raise ProbeError("invalid-pe")
+            if not 14 <= struct.unpack("<I", read(optional + 108, 4))[0] <= 16:
+                raise ProbeError("invalid-pe")
+            mappings = []
+            for index in range(sections):
+                data = read(optional + optional_bytes + index * 40, 40)
+                virtual_bytes, rva, disk_bytes, disk = struct.unpack_from("<IIII", data, 8)
+                if disk + disk_bytes > size:
+                    raise ProbeError("invalid-pe")
+                mappings.append((rva, virtual_bytes, disk, disk_bytes))
+            def offset(rva, count=1):
+                if 0 <= rva < header_bytes and rva + count <= header_bytes:
+                    return rva
+                candidates = [disk + rva - start for start, _, disk, length in mappings
+                              if start <= rva and rva + count <= start + length]
+                if len(candidates) != 1:
+                    raise ProbeError("invalid-pe")
+                return candidates[0]
+            def string(rva):
+                data = bytearray()
+                for index in range(260):
+                    byte = read(offset(rva + index), 1)
+                    if byte == b"\0":
+                        name = data.decode("ascii").lower()
+                        if not re.fullmatch(r"[a-z0-9+_.-]+\.dll", name):
+                            raise ProbeError("dependency-imports")
+                        return name
+                    data += byte
+                raise ProbeError("invalid-pe")
+            result = {}
+            for key, directory, width in (("imports", 1, 20), ("delayed_imports", 13, 32)):
+                start, length = struct.unpack("<II", read(optional + 112 + directory * 8, 8))
+                names = []
+                if bool(start) != bool(length):
+                    raise ProbeError("invalid-pe")
+                if start:
+                    for index in range(min(length // width, 512)):
+                        entry = struct.unpack("<" + "I" * (width // 4), read(offset(start + index * width, width), width))
+                        if not any(entry):
+                            break
+                        if directory == 13 and entry[0] not in (0, 1):
+                            raise ProbeError("invalid-pe")
+                        name_rva = entry[3] if directory == 1 else entry[1] if entry[0] else entry[1] - image_base
+                        names.append(string(name_rva))
+                    else:
+                        raise ProbeError("invalid-pe")
+                if len(names) != len(set(names)):
+                    raise ProbeError("invalid-pe")
+                result[key] = sorted(names)
+            return result
+    except (OSError, UnicodeError, struct.error) as error:
+        raise ProbeError("invalid-pe") from error
+
+
+def verify_core(path, expected, profile="gcc-static"):
+    profile_name(profile)
     path = safe_path(path)
     if not path.is_file() or sha(path) != candidate_sha(expected):
         raise ProbeError("core-sha-mismatch")
@@ -117,8 +220,27 @@ def verify_core(path, expected):
     image_size = struct.unpack_from("<I", pe, 24 + 56)[0]
     if not image_size or image_size > 2 ** 31:
         raise ProbeError("invalid-pe")
-    return {"machine": "amd64", "format": "pe32+", "bytes": size,
-            "image_bytes": image_size}
+    result = {"machine": "amd64", "format": "pe32+", "bytes": size,
+              "image_bytes": image_size}
+    if profile == "clang64-shared":
+        imports = pe_imports(path)
+        names = set(imports["imports"]) | set(imports["delayed_imports"])
+        if RUNTIME_NAME not in imports["imports"] or names - SYSTEM_IMPORTS - {RUNTIME_NAME}:
+            raise ProbeError("dependency-imports")
+        result.update(imports)
+    return result
+
+
+def verify_runtime(path):
+    path = safe_path(path)
+    if (path.name != RUNTIME_NAME or not path.is_file() or path.stat().st_size != RUNTIME_BYTES
+            or sha(path) != RUNTIME_SHA):
+        raise ProbeError("runtime-identity")
+    verify_core(path, RUNTIME_SHA)
+    imports = pe_imports(path)
+    if not imports["imports"] or set(imports["imports"] + imports["delayed_imports"]) - SYSTEM_IMPORTS:
+        raise ProbeError("dependency-imports")
+    return {"file": RUNTIME_NAME, "bytes": RUNTIME_BYTES, "sha256": RUNTIME_SHA}
 
 
 def save_new(path, value):
@@ -147,9 +269,12 @@ def make_content(root):
             "original_firmware_sha256": generated["original_firmware_sha256"].lower()}
 
 
-def prepare(core, expected, output):
+def prepare(core, expected, output, profile="gcc-static"):
+    profile_name(profile)
     expected = candidate_sha(expected)
-    pe = verify_core(core, expected)
+    core = safe_path(core)
+    pe = verify_core(core, expected, profile)
+    runtime = verify_runtime(core.parent / RUNTIME_NAME) if profile == "clang64-shared" else None
     output = safe_path(output)
     if output.exists():
         raise ProbeError("existing-output")
@@ -158,7 +283,10 @@ def prepare(core, expected, output):
     staging = output / "staging"
     staging.mkdir()
     shutil.copyfile(core, staging / "core.dll")
-    verify_core(staging / "core.dll", expected)
+    verify_core(staging / "core.dll", expected, profile)
+    if runtime:
+        shutil.copyfile(core.parent / RUNTIME_NAME, staging / RUNTIME_NAME)
+        verify_runtime(staging / RUNTIME_NAME)
     content = make_content(staging)
     for case in CASES:
         work = staging / case
@@ -168,8 +296,10 @@ def prepare(core, expected, output):
         shutil.copyfile(staging / kind / "invaders.zip", work / "content/invaders.zip")
         save_new(work / "launch.json", {"schema": 1, "case": case,
             "parent_pid": os.getpid(), "core_sha256": expected,
-            "content_sha256": content[kind + "_zip_sha256"]})
-    return {"schema": 1, "scope": "native-libretro-only", "core_sha256": expected,
+            "content_sha256": content[kind + "_zip_sha256"], "profile": profile,
+            **({"runtime": runtime} if runtime else {})})
+    return {"schema": 1, "scope": "native-libretro-only", "core_sha256": expected, "profile": profile,
+            **({"runtime": runtime} if runtime else {}),
             "verifier_sha256": sha(Path(__file__)),
             "pe": pe, "inputs": content, "max_concurrent_children": MAX_WORKERS,
             "linger_seconds_per_close": LINGER_SECONDS, "run_frames_per_load": RUN_FRAMES,
@@ -404,6 +534,21 @@ class WindowsObserver:
             result.append((*region, candidate))
         return result
 
+    def runtime_paths(self):
+        array, needed = (c.c_void_p * 4096)(), c.c_uint32()
+        if (not self.enum_modules(self.current, array, c.sizeof(array), c.byref(needed), 3)
+                or needed.value > c.sizeof(array) or needed.value % c.sizeof(c.c_void_p)):
+            raise ProbeError("os-observation")
+        result = []
+        for module in array[:needed.value // c.sizeof(c.c_void_p)]:
+            name = c.create_unicode_buffer(32768)
+            length = self.module_name(self.current, module, name, len(name))
+            if not length or length >= len(name):
+                raise ProbeError("os-observation")
+            if Path(name.value).name.lower() == RUNTIME_NAME:
+                result.append(os.path.normcase(name.value))
+        return result
+
     def take(self):
         modules = self.modules()
         threads, query_errors = {}, 0
@@ -510,14 +655,40 @@ class Recorder:
         return event
 
 
-def child(core, expected, work, case):
+def retain_runtime(path, observer):
+    """Own only the fixed official C++ dependency until this child process exits."""
+    path = safe_path(path)
+    if observer.runtime_paths():
+        raise ProbeError("runtime-conflict")
+    kernel = c.WinDLL("kernel32", use_last_error=True)
+    create = bind(kernel, "CreateFileW", c.c_void_p,
+                  [c.c_wchar_p, c.c_uint32, c.c_uint32, c.c_void_p, c.c_uint32, c.c_uint32, c.c_void_p])
+    handle = create(str(path), 0x80000000, 1, None, 3, 0x80, None)
+    if not handle or handle == c.c_void_p(-1).value:
+        raise ProbeError("runtime-identity")
+    # Do not explicitly close after a failed load: the isolated process owns
+    # this read lock as well as any partially loaded runtime until it exits.
+    _PROCESS_RUNTIME_OWNERS.append((kernel, handle))
+    verify_runtime(path)
+    library = c.CDLL(str(path), winmode=0x100 | 0x800)
+    _PROCESS_RUNTIME_OWNERS.append(library)
+    if observer.runtime_paths() != [os.path.normcase(str(path))]:
+        raise ProbeError("runtime-conflict")
+    verify_runtime(path)
+    return library
+
+
+def child(core, expected, work, case, profile="gcc-static"):
+    profile_name(profile)
     work, core = safe_path(work), safe_path(core)
     launch = json.loads((work / "launch.json").read_text(encoding="utf-8"))
     if (Path.cwd() != work or core != work.parent / "core.dll"
             or launch.get("parent_pid") != os.getppid() or launch.get("case") != case
-            or launch.get("core_sha256") != expected):
+            or launch.get("core_sha256") != expected or launch.get("profile", "gcc-static") != profile):
         raise ProbeError("invalid-launch")
-    verify_core(core, expected)
+    verify_core(core, expected, profile)
+    if profile == "clang64-shared" and launch.get("runtime") != verify_runtime(core.parent / RUNTIME_NAME):
+        raise ProbeError("runtime-identity")
     if sha(work / "content/invaders.zip") != launch.get("content_sha256"):
         raise ProbeError("content-sha-mismatch")
     # The open event-file handle is included in the baseline and every sample.
@@ -526,6 +697,8 @@ def child(core, expected, work, case):
         retained = []  # All callbacks/strings/function objects survive DLL free and the full linger.
         try:
             observer = WindowsObserver(core)
+            if profile == "clang64-shared":
+                retained.append(retain_runtime(core.parent / RUNTIME_NAME, observer))
             record = Recorder(stream, observer)
             record("baseline", affinity_cpus=observer.affinity_cpus)
             for cycle in range(1, 4 if case == "three-cycles" else 2):
@@ -639,11 +812,12 @@ def supervise(process, timeout, pause=time.sleep, clock=time.monotonic, cancel=N
             process.wait()
 
 
-def run_case(output, expected, case, cancel=None):
+def run_case(output, expected, case, cancel=None, profile="gcc-static"):
+    profile_name(profile)
     cancel = cancel if cancel is not None else threading.Event()
     work = output / "staging" / case
     timeout = CASE_TIMEOUT_SECONDS * (3 if case == "three-cycles" else 1)
-    receipt = {"schema": 1, "case": case, "core_sha256": expected,
+    receipt = {"schema": 1, "case": case, "core_sha256": expected, "profile": profile,
                "passed": False, "timeout_seconds": timeout}
     try:
         if cancel.is_set():
@@ -652,7 +826,7 @@ def run_case(output, expected, case, cancel=None):
             return receipt
         command = [sys.executable, "-I", "-B", str(Path(__file__).resolve()),
                    "--core", str(work.parent / "core.dll"), "--sha256", expected,
-                   "--output", str(work), "--_child", case]
+                   "--output", str(work), "--profile", profile, "--_child", case]
         process = subprocess.Popen(command, cwd=work, stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             creationflags=subprocess.CREATE_NO_WINDOW | subprocess.BELOW_NORMAL_PRIORITY_CLASS)
@@ -667,13 +841,14 @@ def run_case(output, expected, case, cancel=None):
     return {key: value for key, value in receipt.items() if key != "events"}
 
 
-def run_cases(output, expected):
+def run_cases(output, expected, profile="gcc-static"):
+    profile_name(profile)
     cancel = threading.Event()
     pool = ThreadPoolExecutor(max_workers=MAX_WORKERS)
     futures = []
     try:
         # Longest route first. Ctrl+C reaches this owner thread, not the workers.
-        futures = [pool.submit(run_case, output, expected, case, cancel) for case in CASES]
+        futures = [pool.submit(run_case, output, expected, case, cancel, profile) for case in CASES]
         return [future.result() for future in futures]
     except BaseException:
         cancel.set()
@@ -696,6 +871,7 @@ def main(argv=None):
     parser.add_argument("--core", type=Path, required=True)
     parser.add_argument("--sha256", required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--profile", choices=PROFILES, default="gcc-static")
     parser.add_argument("--_child", choices=CASES, help=argparse.SUPPRESS)
     try:
         args = parser.parse_args(argv)
@@ -703,10 +879,10 @@ def main(argv=None):
             raise ProbeError("wrong-platform")
         expected = candidate_sha(args.sha256)
         if args._child:
-            return child(args.core, expected, args.output, args._child)
+            return child(args.core, expected, args.output, args._child, args.profile)
         output = safe_path(args.output)
-        summary = prepare(args.core, expected, output)
-        summary["cases"] = run_cases(output, expected)
+        summary = prepare(args.core, expected, output, args.profile)
+        summary["cases"] = run_cases(output, expected, args.profile)
         summary["passed"] = all(case["passed"] for case in summary["cases"])
         save_new(output / "summary.json", summary)
         print(json.dumps({"scope": summary["scope"], "passed": summary["passed"],

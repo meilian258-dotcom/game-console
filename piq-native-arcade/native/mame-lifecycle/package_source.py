@@ -9,17 +9,29 @@ from pathlib import Path, PurePosixPath
 import stat
 import zipfile
 
-from build_candidate import CHANGED, COMMIT, PATCH, PATCH_SHA256, SOURCE_FILES, SOURCE_SHA256, sha
+from build_candidate import (CHANGED, COMMIT, PATCH, PATCH_SHA256, PROFILES, SOURCE_FILES,
+                             SOURCE_SHA256, changed_files, patch_identities,
+                             validate_source_profile, sha)
 
 HELPERS = ("lifecycle-4fc9a931.patch", "build_candidate.py", "package_source.py",
            "ci_prepare.py", "ci-toolchain-lock.json", "test_ci_build.py",
            "test_build_diagnostics.py", "BUILDING.txt", "LICENSE")
 
 
+def helpers(profile: str = "gcc-static") -> tuple[str, ...]:
+    if profile not in PROFILES:
+        raise ValueError("Unknown MAME source profile")
+    return HELPERS + (("clang64-shared-4fc9a931.patch", "ci-clang64-toolchain-lock.json",
+                       "preflight_shared.py", "test_preflight_shared.py",
+                       "test_shared_build.py", "CLANG64-SHARED.txt")
+                      if profile == "clang64-shared" else ())
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-zip", type=Path, required=True)
     parser.add_argument("--build-root", type=Path, required=True)
+    parser.add_argument("--profile", choices=PROFILES, default="gcc-static")
     output_mode = parser.add_mutually_exclusive_group(required=True)
     output_mode.add_argument("--output", type=Path)
     output_mode.add_argument("--verify-only", action="store_true")
@@ -29,8 +41,8 @@ def main() -> None:
     if sha(PATCH) != PATCH_SHA256:
         raise ValueError("Pinned lifecycle patch mismatch")
     receipt = json.loads((args.build_root / "source-receipt.json").read_text(encoding="utf-8"))
-    if receipt["commit"] != COMMIT or receipt["patch_sha256"] != sha(PATCH) or set(receipt["changed_files"]) != CHANGED:
-        raise ValueError("Candidate source receipt mismatch")
+    validate_source_profile(receipt, args.profile)
+    changed = changed_files(args.profile)
     source = args.build_root / "mame"
     original_prefix = f"mame-{COMMIT}/"
     output_prefix = "mame-0.289-piq-lifecycle1/"
@@ -58,7 +70,7 @@ def main() -> None:
                 if name not in {"3rdparty/zstd/tests/cli-tests/bin/unzstd", "3rdparty/zstd/tests/cli-tests/bin/zstdcat"} or data != b"zstd":
                     raise ValueError("Unexpected source symlink")
                 expected = hashlib.sha256(original.read(original_prefix + str(rel.parent / "zstd"))).hexdigest().upper()
-            if name in CHANGED:
+            if name in changed:
                 change = receipt["changed_files"][name]
                 if expected != change["before"]:
                     raise ValueError("Changed-file original hash mismatch")
@@ -79,7 +91,7 @@ def main() -> None:
             print(json.dumps({"source_files": checked, "status": "all pinned source inputs verified"}))
             return
         helper_hashes = {}
-        for name in HELPERS:
+        for name in helpers(args.profile):
             helper = Path(__file__).with_name(name)
             data = helper.read_bytes()
             helper_hashes[name] = hashlib.sha256(data).hexdigest().upper()
@@ -89,6 +101,7 @@ def main() -> None:
         public = {"upstream_repository": "https://github.com/libretro/mame", "upstream_commit": COMMIT,
                   "upstream_source_zip_sha256": SOURCE_SHA256, "upstream_version": "0.289",
                   "candidate": "piq-lifecycle1", "verified_input_files": checked,
+                  "profile": args.profile, "patches": patch_identities(args.profile),
                   "patch_sha256": receipt["patch_sha256"], "changed_files": receipt["changed_files"],
                   "helpers": helper_hashes, "full_driver_build": True, "save_format_changes": False,
                   "status": "source candidate; binary behavior validation required"}

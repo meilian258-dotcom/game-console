@@ -1,0 +1,20 @@
+diff --git a/scripts/genie.lua b/scripts/genie.lua
+--- a/scripts/genie.lua
++++ b/scripts/genie.lua
+@@ -1286,6 +1286,16 @@ configuration { "mingw*" }
+ 			"userenv",
+ 		}
+ 
++-- Only the Windows x64 libretro Clang DLL uses the host-owned LLVM runtime.
++configuration { "mingw-clang", "x64", "libretro*" }
++		flags { "LinkSupportCircularDependencies" }
++		removeflags { "StaticRuntime" }
++		removelinkoptions { "-static" }
++		removebuildoptions { "-femulated-tls" }
++		buildoptions { "-fno-emulated-tls" }
++		buildoptions_cpp { "-stdlib=libc++" }
++		linkoptions { "-stdlib=libc++" }
++
+ configuration { "vs20*" }
+ 		defines {
+ 			"XML_STATIC",
