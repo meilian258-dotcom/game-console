@@ -28,7 +28,8 @@ public final class NativeJniMediaSession implements AutoCloseable {
                 "mame_throttle","disabled","mame_boot_to_bios","disabled","mame_boot_to_osd","disabled",
                 "mame_read_config","disabled","mame_write_config","disabled","mame_auto_save","disabled"),
             Map.of("windows-x64",new LibretroProfile.Artifact(
-                "/native-runtime/win-x64-v1/piq-native-arcade/runtime/mame_libretro.dll",BridgeProtocol.CORE_SHA,372431360)));
+                "/core/mame-jni/windows-x64/mame_piq_lifecycle1.dll",
+                "00d1a8319378dc94f50cc6610a9947217bdf23f05f70d2fc4d5665357a50b603",309413888)));
     }
     /** Kept signature-compatible with the media adapter; no helper/JNA is loaded from runtime. */
     public NativeJniMediaSession(Path runtime,Path rom)throws IOException {

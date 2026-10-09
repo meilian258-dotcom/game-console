@@ -45,6 +45,54 @@ class InputTests(unittest.TestCase):
         self.assertTrue(set(subject.JNI_BUNDLE_INPUTS).isdisjoint(subject.NIGHTLY))
         self.assertFalse(any('libc++' in member or 'libcxx' in member or 'libretro-jni' in member
                              for _, member in subject.NIGHTLY.values()))
+        self.assertFalse(any('mame' in member for _, member in subject.NIGHTLY.values()))
+
+    def test_mame_scope_is_an_exact_pair_shared_with_build_validation(self):
+        import snapshot_build
+        expected = ('core/mame-jni/windows-x64/mame_piq_lifecycle1.dll',
+                    'META-INF/piq-native/mame-lifecycle/runtime.json')
+        self.assertEqual(expected, subject.MAME_LIFECYCLE_RESOURCES)
+        self.assertEqual(subject.BUCKETS['arcade'][2], snapshot_build.RESOURCE_SCOPES['arcade'])
+        self.assertEqual(expected, subject.BUCKETS['arcade'][2][-2:])
+
+    def extract_arcade_fixture(self, entries, validator):
+        fc = self.root / 'fc.jar'
+        with zipfile.ZipFile(fc, 'w'):
+            pass
+        arcade = self.make_zip(list(entries.items()))
+        with patch.object(subject, 'load_lock', return_value={}), \
+                patch.object(subject, 'require_published_jni_bundle'), \
+                patch.dict(subject.FC_RESOURCES, {}, clear=True), \
+                patch.dict(subject.BUCKETS, {'arcade': subject.BUCKETS['arcade']}, clear=True), \
+                patch.object(subject, 'verify_mame_lifecycle_resources', validator):
+            subject.extract_bootstrap({'fc': fc, 'arcade': arcade}, self.root / 'out', self.root / 'source')
+
+    def test_mame_extraction_keeps_both_files_and_invokes_fixed_validator(self):
+        from unittest.mock import Mock
+        entries = dict(zip(subject.MAME_LIFECYCLE_RESOURCES, (b'core fixture', b'notice fixture')))
+        validator = Mock()
+        self.extract_arcade_fixture(entries, validator)
+        for name, data in entries.items():
+            self.assertEqual(data, (self.root / 'out/resources/arcade' / name).read_bytes())
+        validator.assert_called_once_with(self.root / 'out/resources/arcade', self.root / 'source')
+
+    def test_mame_extraction_rejects_missing_pair_even_with_legacy_payload(self):
+        from unittest.mock import Mock
+        for omitted in ((subject.MAME_LIFECYCLE_RESOURCES[0],),
+                        (subject.MAME_LIFECYCLE_RESOURCES[1],), subject.MAME_LIFECYCLE_RESOURCES):
+            entries = {name: b'fixture' for name in subject.MAME_LIFECYCLE_RESOURCES if name not in omitted}
+            entries['native-runtime/legacy.bin'] = b'legacy is not the new core'
+            validator = Mock()
+            with self.subTest(omitted=omitted), self.assertRaisesRegex(ValueError, 'core/notice pair'):
+                self.extract_arcade_fixture(entries, validator)
+            validator.assert_not_called()
+
+    def test_mame_extraction_cannot_ignore_fixed_identity_failure(self):
+        from unittest.mock import Mock
+        validator = Mock(side_effect=ValueError('fixed identity mismatch'))
+        entries = dict.fromkeys(subject.MAME_LIFECYCLE_RESOURCES, b'fixture')
+        with self.assertRaisesRegex(ValueError, 'fixed identity mismatch'):
+            self.extract_arcade_fixture(entries, validator)
 
     def test_fc_mapping_includes_cache_to_packaged_runtime_rename(self):
         lock = subject.load_lock()

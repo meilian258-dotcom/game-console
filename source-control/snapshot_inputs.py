@@ -22,6 +22,7 @@ import urllib.request
 import zipfile
 
 from build_inputs import cache_path, load_lock, no_links, relative, verify
+from snapshot_build import MAME_LIFECYCLE_RESOURCES, verify_mame_lifecycle_resources
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = 'https://github.com/meilian258-dotcom/game-console/releases/download/full-test-20261007-r1/'
@@ -70,7 +71,8 @@ BUCKETS = {
     'sfc-home': ('sfc', 'piq-sfc-home', ('core/sfc-libretro/',)),
     'md': ('md', 'piq-md-home', ('core/windows-x64/',)),
     'pvz': ('pvz', 'piq-pvz-addon', ('core/pvz/', 'META-INF/pvz/licenses/')),
-    'arcade': ('arcade', 'piq-native-arcade', ('native-runtime/', 'META-INF/piq-native/fbneo/', 'META-INF/licenses/native-runtime17/')),
+    'arcade': ('arcade', 'piq-native-arcade', ('native-runtime/', 'META-INF/piq-native/fbneo/',
+                                           'META-INF/licenses/native-runtime17/', *MAME_LIFECYCLE_RESOURCES)),
 }
 CURRENT_HELPER = 'native-runtime/win-x64-v1/piq-native-arcade/runtime/piq-native-helper-v4.jar'
 MAX_CORE = 32 * 1024 * 1024
@@ -238,6 +240,8 @@ def extract_bootstrap(pins: dict[str, Path], output: Path, source: Path) -> None
         count = 0
         with zipfile.ZipFile(pins[ident]) as jar:
             index = members(jar)
+            if bucket == 'arcade' and not set(MAME_LIFECYCLE_RESOURCES).issubset(index):
+                raise ValueError('Bootstrap is missing the fixed MAME lifecycle core/notice pair')
             for name in index:
                 if not any(name == prefix or (prefix.endswith('/') and name.startswith(prefix)) for prefix in prefixes):
                     continue
@@ -256,6 +260,8 @@ def extract_bootstrap(pins: dict[str, Path], output: Path, source: Path) -> None
                 count += 1
         if count == 0:
             raise ValueError('No binary resources selected for ' + bucket)
+        if bucket == 'arcade':
+            verify_mame_lifecycle_resources(output / 'resources' / bucket, source)
 
 
 def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = None) -> dict:

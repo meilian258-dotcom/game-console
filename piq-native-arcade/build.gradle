@@ -7,7 +7,7 @@ base { archivesName = 'piq_native_arcade' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 neoForge { version = neo_version; mods { piq_native_arcade { sourceSet(sourceSets.main) } } }
 repositories { mavenCentral() }
-def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.45.jar'))
+def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.46.jar'))
 configurations {
     nativeHelperJna { canBeConsumed = false; canBeResolved = true }
 }
@@ -95,12 +95,29 @@ def prepareFbneo = tasks.register('prepareFbneoNetplay015', Exec) {
     commandLine providers.gradleProperty('embeddedRuntimePython').getOrElse('python'),
             file('tools/prepare_fbneo_netplay015.py').absolutePath, '--output', fbneoRuntime.get().asFile.absolutePath
 }
+// Reviewed JNI-only core; legacy MAME/FBNeo resources above remain byte-for-byte separate.
+// This stages an existing verified DLL; it never downloads or recompiles MAME.
+def mameLifecycleRuntime = layout.buildDirectory.dir('generated/mameLifecycle1')
+def mameLifecycleCore = providers.gradleProperty('mameLifecycleCore')
+        .map { file(it) }.getOrElse(file('build/verified-mame-lifecycle/core.dll'))
+def prepareMameLifecycle = tasks.register('prepareMameLifecycleRuntime', Exec) {
+    inputs.files('tools/prepare_mame_lifecycle_runtime.py', 'native/mame-lifecycle/runtime.json',
+            'native/mame-lifecycle/lifecycle-4fc9a931.patch', 'native/mame-lifecycle/clang64-shared-4fc9a931.patch')
+    inputs.file(mameLifecycleCore)
+    outputs.dir(mameLifecycleRuntime)
+    workingDir projectDir
+    commandLine providers.gradleProperty('embeddedRuntimePython').getOrElse('python'),
+            file('tools/prepare_mame_lifecycle_runtime.py').absolutePath,
+            '--core', mameLifecycleCore.absolutePath, '--output', mameLifecycleRuntime.get().asFile.absolutePath
+}
 jar {
     if (providers.gradleProperty('snapshotResourcesDir').isPresent()) {
         // The receipt-verified tree excludes this helper: compile it from this checkout.
         dependsOn buildHelper011
         from(helper011) { into 'native-runtime/win-x64-v1/piq-native-arcade/runtime' }
     } else {
+        dependsOn prepareMameLifecycle
+        from(mameLifecycleRuntime)
         dependsOn prepareFbneo
         from(fbneoRuntime)
         dependsOn prepareEmbeddedRuntime, prepareRuntime011

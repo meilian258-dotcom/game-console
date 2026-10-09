@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -37,12 +38,17 @@ BOOTSTRAP = {
     'arcade': '575f16d2123f1e91cadba12d8ace9dead63936770fcdec4476c260c13ce5d925',
     'pvz': 'e010b4185c8a9e51edcba3ef40718a81781068320681892cf869d68c3046f04a',
 }
+MAME_LIFECYCLE_RESOURCES = (
+    'core/mame-jni/windows-x64/mame_piq_lifecycle1.dll',
+    'META-INF/piq-native/mame-lifecycle/runtime.json',
+)
 RESOURCE_SCOPES = {
     'sfc-core': ('assets/piq_sfc_arcade/core/piq_sfc_wasm.wasm', 'META-INF/piq-sfc-wasm-privacy.json'),
     'sfc-home': ('core/sfc-libretro/',),
     'md': ('core/windows-x64/',),
     'pvz': ('core/pvz/', 'META-INF/pvz/licenses/'),
-    'arcade': ('native-runtime/', 'META-INF/piq-native/fbneo/', 'META-INF/licenses/native-runtime17/'),
+    'arcade': ('native-runtime/', 'META-INF/piq-native/fbneo/', 'META-INF/licenses/native-runtime17/',
+               *MAME_LIFECYCLE_RESOURCES),
 }
 EXPECTED_IDS = {'piq_fc_arcade', 'piq_sfc_arcade', 'piq_sfc_home', 'piq_md_home',
                 'piq_gba', 'piq_native_arcade', 'piq_computer', 'piq_pvz'}
@@ -84,6 +90,31 @@ def verify_file(path: Path, record: dict) -> None:
         raise ValueError('Snapshot input is absent or changed: ' + record.get('path', path.name))
 
 
+def verify_mame_lifecycle_resources(resource_root: Path, source_root: Path | None = None) -> None:
+    """Reuse the project's fixed identity checks; never prepare or execute a core."""
+    for name in MAME_LIFECYCLE_RESOURCES:
+        path = resource_root / name
+        no_links(path.absolute())
+        if not path.is_file():
+            raise ValueError('Missing fixed MAME lifecycle resource: ' + name)
+    project = (ROOT if source_root is None else source_root) / 'piq-native-arcade'
+    lock = project / 'native/mame-lifecycle/runtime.json'
+    tool_path = project / 'tools/prepare_mame_lifecycle_runtime.py'
+    no_links(lock.absolute())
+    no_links(tool_path.absolute())
+    if not lock.is_file():
+        raise ValueError('Reviewed MAME lifecycle manifest is required')
+    spec = importlib.util.spec_from_file_location('snapshot_mame_lifecycle_tool', tool_path)
+    tool = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(tool)
+    if (tool.RESOURCE, tool.NOTICE) != MAME_LIFECYCLE_RESOURCES:
+        raise ValueError('MAME lifecycle resource mapping changed; review snapshot scopes')
+    manifest = tool.load_manifest(lock, lock.parent / tool.PATCH.name, lock.parent / tool.SHARED_PATCH.name)
+    tool.verify_core(resource_root / tool.RESOURCE, manifest)
+    if (resource_root / tool.NOTICE).read_bytes() != tool.notice_bytes(manifest):
+        raise ValueError('MAME lifecycle notice differs from the reviewed manifest')
+
+
 def verify_resources(resource_root: Path, receipt_path: Path) -> None:
     """Called again by Gradle immediately before processResources."""
     input_root = receipt_path.absolute().parent
@@ -113,6 +144,8 @@ def verify_resources(resource_root: Path, receipt_path: Path) -> None:
         actual.add(name)
     if not actual or actual != set(expected):
         raise ValueError('Incomplete snapshot resource tree')
+    if bucket == 'arcade':
+        verify_mame_lifecycle_resources(resource_root)
 
 
 def verify_inputs(input_root: Path) -> dict:

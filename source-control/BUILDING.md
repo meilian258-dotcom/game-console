@@ -12,7 +12,17 @@
 完成整核验证、准备并获准公开新固定成品后，需要一起审核更新
 `snapshot_inputs.py` 的已发布 JNI 输入表及它与 `snapshot_build.py` 的
 bootstrap 身份；这里不预设尚未发布的 URL。普通本地开发可按锁表导入
-审核过的新桥和官方运行库后构建，产物仍是未完成街机整核验收的内部候选。
+审核过的新桥和官方运行库后构建。街机修复还使用独立固定的 MAME 核心，不能用普通 nightly 补位。
+
+街机 `0.1.5.8` 的普通构建需显式传入 `-PmameLifecycleCore=<已核验 core.dll 的路径>`；
+默认查找该组件的 `build/verified-mame-lifecycle/core.dll`，没有文件就停止，不自动下载。
+`native/mame-lifecycle/runtime.json` 固定源码、两份补丁、核心摘要及共享运行库身份；
+`prepareMameLifecycleRuntime` 只校验并打包既有 DLL，不重新编译 MAME。
+对应核心源码与构建说明应随候选保留。旧 MAME/FBNeo 资源仍使用原身份。
+
+快照准备和 Gradle 前置检查都要求新 MAME DLL 与公开 NOTICE 同时存在，且与固定清单完全一致。
+即使修改输入回执，也不能跳过清单中的核心和补丁校验；两项资源缺失、替换或不配套都失败。
+尚未发布匹配 bootstrap 成品时，保持原下载前阻断，不使用旧公开包假装包含这次修复。
 
 [snapshot.yml](../.github/workflows/snapshot.yml) 在进入 `main` 的每次 push 后触发，也支持在 Actions 中手动选择 `main` 运行。只有七个成品全部编译、检查和打包成功，才会创建独立预发行；失败不会覆盖已有发行版。workflow 合入 `main` 后才启用，不在拉取请求中使用发布权限。
 

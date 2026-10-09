@@ -2,6 +2,8 @@
 import hashlib
 import json
 from pathlib import Path
+import shutil
+import struct
 import tempfile
 import tomllib
 import unittest
@@ -51,6 +53,101 @@ class SnapshotBuildTests(unittest.TestCase):
         path.with_name('extra.dll').write_bytes(b'not in receipt')
         with self.assertRaises(ValueError):
             build.verify_resources(self.root / 'resources/md', receipt)
+
+    def mame_resources(self):
+        source = self.root / 'source'
+        project = source / 'piq-native-arcade'
+        tool = project / 'tools/prepare_mame_lifecycle_runtime.py'
+        tool.parent.mkdir(parents=True)
+        shutil.copyfile(Path(build.__file__).resolve().parents[1] / 'piq-native-arcade/tools' / tool.name, tool)
+        native = project / 'native/mame-lifecycle'
+        native.mkdir(parents=True)
+        patches = {'lifecycle-4fc9a931.patch': b'reviewed lifecycle fixture',
+                   'clang64-shared-4fc9a931.patch': b'reviewed shared-runtime fixture'}
+        for name, data in patches.items():
+            (native / name).write_bytes(data)
+        raw = bytearray(4096)
+        raw[:2] = b'MZ'
+        struct.pack_into('<I', raw, 0x3c, 0x80)
+        raw[0x80:0x84] = b'PE\0\0'
+        struct.pack_into('<H', raw, 0x84, 0x8664)
+        struct.pack_into('<H', raw, 0x96, 0x2000)
+        struct.pack_into('<H', raw, 0x98, 0x20b)
+        manifest = dict(schema=2, upstreamCommit='4fc9a9312baaf34963847f884961ad9793fbbc1d',
+                        resource=build.MAME_LIFECYCLE_RESOURCES[0], platform='windows-x64',
+                        savePolicy='separate-identity-no-migration', profile='clang64-shared',
+                        patches={name: hashlib.sha256(data).hexdigest() for name, data in patches.items()},
+                        runtime=dict(file='libc++.dll', bytes=1659392,
+                                     sha256='7344daed05388589e9bd691ed1d30c568c374da4b8b6a12e1502185948c03cd4'),
+                        artifact=dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()))
+        notice = (json.dumps(manifest, sort_keys=True, indent=2) + '\n').encode()
+        lock = native / 'runtime.json'
+        lock.write_bytes(notice)
+        resources = self.root / 'resources/arcade'
+        for name, data in {**dict(zip(build.MAME_LIFECYCLE_RESOURCES, (raw, notice))),
+                           'native-runtime/legacy.bin': b'legacy fixture'}.items():
+            target = resources / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
+        return source, resources, lock
+
+    def arcade_receipt(self, resources):
+        receipt = self.root / 'receipt.json'
+        records = [dict(path=p.relative_to(self.root).as_posix(), bytes=p.stat().st_size,
+                        sha256=hashlib.sha256(p.read_bytes()).hexdigest())
+                   for p in resources.rglob('*') if p.is_file()]
+        receipt.write_text(json.dumps(dict(schema=1, files=records)))
+        return receipt
+
+    def test_mame_validates_real_packaging_tool_with_small_shared_pe_fixture(self):
+        source, resources, _ = self.mame_resources()
+        with patch.object(build, 'ROOT', source):
+            build.verify_resources(resources, self.arcade_receipt(resources))
+
+    def test_mame_requires_both_resources_even_when_receipt_omits_them(self):
+        source, resources, _ = self.mame_resources()
+        originals = {name: (resources / name).read_bytes() for name in build.MAME_LIFECYCLE_RESOURCES}
+        for missing in ((build.MAME_LIFECYCLE_RESOURCES[0],),
+                        (build.MAME_LIFECYCLE_RESOURCES[1],), build.MAME_LIFECYCLE_RESOURCES):
+            for name, data in originals.items():
+                (resources / name).write_bytes(data)
+            for name in missing:
+                (resources / name).unlink()
+            with self.subTest(missing=missing), patch.object(build, 'ROOT', source), \
+                    self.assertRaisesRegex(ValueError, 'Missing fixed MAME lifecycle resource'):
+                build.verify_resources(resources, self.arcade_receipt(resources))
+
+    def test_mame_missing_reviewed_manifest_fails_closed(self):
+        source, resources, lock = self.mame_resources()
+        lock.unlink()
+        with patch.object(build, 'ROOT', source), self.assertRaisesRegex(ValueError, 'manifest is required'):
+            build.verify_resources(resources, self.arcade_receipt(resources))
+
+    def test_mame_changed_dll_or_notice_cannot_hide_in_rewritten_receipt(self):
+        source, resources, _ = self.mame_resources()
+        for name in build.MAME_LIFECYCLE_RESOURCES:
+            target = resources / name
+            original = target.read_bytes()
+            target.write_bytes(original + b' ')
+            with self.subTest(name=name), patch.object(build, 'ROOT', source), self.assertRaises(ValueError):
+                build.verify_resources(resources, self.arcade_receipt(resources))
+            target.write_bytes(original)
+
+    def test_mame_changed_source_patch_still_fails(self):
+        source, resources, lock = self.mame_resources()
+        lock.with_name('lifecycle-4fc9a931.patch').write_bytes(b'not reviewed')
+        with patch.object(build, 'ROOT', source), self.assertRaisesRegex(ValueError, 'source patches changed'):
+            build.verify_resources(resources, self.arcade_receipt(resources))
+
+    def test_mame_scope_does_not_admit_neighboring_core_or_notice(self):
+        source, resources, _ = self.mame_resources()
+        for name in ('core/mame-jni/windows-x64/other.dll', 'META-INF/piq-native/mame-lifecycle/other.json'):
+            target = resources / name
+            target.write_bytes(b'unapproved neighbor')
+            with self.subTest(name=name), patch.object(build, 'ROOT', source), \
+                    self.assertRaisesRegex(ValueError, 'Foreign snapshot resource'):
+                build.verify_resources(resources, self.arcade_receipt(resources))
+            target.unlink()
 
     def test_mod_class_and_retired_core_are_refused(self):
         for name in ('core/windows-x64/Forged.class', 'core/windows-x64/blastem_libretro.dll'):
