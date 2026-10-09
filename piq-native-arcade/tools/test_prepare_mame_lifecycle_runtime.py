@@ -105,6 +105,114 @@ class LifecyclePackagingTest(unittest.TestCase):
                 target.load_manifest(self.lock, self.patch)
             self.manifest[key] = old
 
+    def shared_manifest(self):
+        self.shared_patch = self.root / "shared.patch"
+        self.shared_patch.write_bytes(b"reviewed shared-runtime build patch")
+        self.manifest.pop("patchSha256")
+        self.manifest.update(schema=2, profile="clang64-shared", runtime=dict(target.SHARED_RUNTIME),
+                             patches={target.PATCH.name: target.sha(self.patch),
+                                      target.SHARED_PATCH.name: target.sha(self.shared_patch)})
+        self.save_lock()
+
+    def load_shared(self):
+        return target.load_manifest(self.lock, self.patch, self.shared_patch)
+
+    def test_shared_stages_same_two_resources_with_explicit_public_notice(self):
+        self.shared_manifest()
+        manifest = self.load_shared()
+        self.assertEqual(self.manifest, manifest)
+        out = self.root / "shared-resources"
+        self.assertFalse(target.prepare(self.core, manifest, out)["reused"])
+        self.assertTrue(target.prepare(self.core, manifest, out)["reused"])
+        self.assertEqual({target.RESOURCE, target.NOTICE},
+                         {p.relative_to(out).as_posix() for p in out.rglob("*") if p.is_file()})
+        self.assertEqual(manifest, json.loads((out / target.NOTICE).read_text(encoding="utf-8")))
+
+    def test_shared_requires_exact_two_source_patches(self):
+        self.shared_manifest()
+        expected = self.manifest["patches"]
+        for patches in (None, {}, {target.PATCH.name: expected[target.PATCH.name]},
+                        {target.SHARED_PATCH.name: expected[target.SHARED_PATCH.name]},
+                        {**expected, "extra.patch": "0" * 64},
+                        {**expected, target.SHARED_PATCH.name: "0" * 64}):
+            with self.subTest(patches=patches):
+                self.manifest["patches"] = patches
+                self.save_lock()
+                with self.assertRaises(ValueError):
+                    self.load_shared()
+
+    def test_shared_rejects_either_changed_source_patch(self):
+        self.shared_manifest()
+        for patch in (self.patch, self.shared_patch):
+            with self.subTest(patch=patch.name):
+                original = patch.read_bytes()
+                patch.write_bytes(b"unreviewed change")
+                with self.assertRaises(ValueError):
+                    self.load_shared()
+                patch.write_bytes(original)
+
+    def test_shared_requires_explicit_profile_and_fixed_runtime(self):
+        self.shared_manifest()
+        for key, value in (("profile", None), ("profile", "gcc-static"),
+                           ("runtime", None), ("runtime", {}),
+                           ("runtime", {**target.SHARED_RUNTIME, "file": "other.dll"}),
+                           ("runtime", {**target.SHARED_RUNTIME, "bytes": 1659393}),
+                           ("runtime", {**target.SHARED_RUNTIME, "bytes": 1659392.0}),
+                           ("runtime", {**target.SHARED_RUNTIME, "sha256": "0" * 64}),
+                           ("runtime", {**target.SHARED_RUNTIME, "sourcePath": "private"})):
+            with self.subTest(key=key, value=value):
+                original = self.manifest[key]
+                self.manifest[key] = value
+                self.save_lock()
+                with self.assertRaises(ValueError):
+                    self.load_shared()
+                self.manifest[key] = original
+
+    def test_shared_notice_omits_private_fields_and_acceptance_claims(self):
+        self.shared_manifest()
+        self.manifest.update(sourceRoot="private-local-path", commandLine="private-command", passed=True)
+        self.manifest["artifact"]["sourcePath"] = "private-core-path"
+        self.save_lock()
+        manifest = self.load_shared()
+        self.assertNotIn(b"private", target.notice_bytes(manifest))
+        self.assertNotIn("passed", manifest)
+        self.assertEqual({"bytes", "sha256"}, set(manifest["artifact"]))
+
+    def test_shared_keeps_pe_identity_and_no_overwrite_rules(self):
+        self.shared_manifest()
+        manifest = self.load_shared()
+        out = self.root / "shared-resources"
+        target.prepare(self.core, manifest, out)
+        (out / target.NOTICE).write_bytes(b"preserve existing notice")
+        with self.assertRaises(ValueError):
+            target.prepare(self.core, manifest, out)
+        self.assertEqual(b"preserve existing notice", (out / target.NOTICE).read_bytes())
+        raw = bytearray(self.core.read_bytes())
+        struct.pack_into("<H", raw, 0x84, 0x14c)
+        self.core.write_bytes(raw)
+        manifest["artifact"]["sha256"] = target.sha(self.core)
+        with self.assertRaises(ValueError):
+            target.prepare(self.core, manifest, self.root / "wrong-architecture")
+
+    def test_schema_one_notice_remains_byte_identical_without_shared_fields(self):
+        manifest = target.load_manifest(self.lock, self.patch)
+        self.assertEqual(self.manifest, manifest)
+        self.assertEqual((json.dumps(self.manifest, sort_keys=True, indent=2) + "\n").encode("utf-8"),
+                         target.notice_bytes(manifest))
+
+    def test_schema_requires_integer_not_boolean_or_float(self):
+        for schema in (True, 1.0):
+            with self.subTest(schema=schema):
+                self.manifest["schema"] = schema
+                self.save_lock()
+                with self.assertRaises(ValueError):
+                    target.load_manifest(self.lock, self.patch)
+        self.shared_manifest()
+        self.manifest["schema"] = 2.0
+        self.save_lock()
+        with self.assertRaises(ValueError):
+            self.load_shared()
+
 
 if __name__ == "__main__":
     unittest.main()

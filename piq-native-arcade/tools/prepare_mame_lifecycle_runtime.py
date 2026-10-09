@@ -2,6 +2,10 @@
 
 Only a fixed manifest identity is accepted. This command never downloads or
 executes a library, and never overwrites an existing generated resource tree.
+Schema 1 retains the legacy single-patch format. Schema 2 explicitly identifies
+the shared-runtime profile and both source patches; its fixed libc++ dependency
+is supplied by the public JNI bridge, not packaged by this tool. Preparing these
+resources is not native/JNI acceptance or an authorization to install them.
 """
 from __future__ import annotations
 
@@ -18,9 +22,12 @@ import tempfile
 PROJECT = Path(__file__).resolve().parents[1]
 LOCK = PROJECT / "native/mame-lifecycle/runtime.json"
 PATCH = PROJECT / "native/mame-lifecycle/lifecycle-4fc9a931.patch"
+SHARED_PATCH = PROJECT / "native/mame-lifecycle/clang64-shared-4fc9a931.patch"
 RESOURCE = "core/mame-jni/windows-x64/mame_piq_lifecycle1.dll"
 NOTICE = "META-INF/piq-native/mame-lifecycle/runtime.json"
 UPSTREAM = "4fc9a9312baaf34963847f884961ad9793fbbc1d"
+SHARED_RUNTIME = {"file": "libc++.dll", "bytes": 1659392,
+                  "sha256": "7344daed05388589e9bd691ed1d30c568c374da4b8b6a12e1502185948c03cd4"}
 
 
 def no_links(path: Path) -> Path:
@@ -38,14 +45,26 @@ def sha(path: Path) -> str:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def load_manifest(path: Path, patch: Path) -> dict:
+def load_manifest(path: Path, patch: Path, shared_patch: Path = SHARED_PATCH) -> dict:
     data = json.loads(no_links(path).read_text(encoding="utf-8"))
-    if (data.get("schema") != 1 or data.get("upstreamCommit") != UPSTREAM
+    if (type(data.get("schema")) is not int or data["schema"] not in (1, 2)
+            or data.get("upstreamCommit") != UPSTREAM
             or data.get("resource") != RESOURCE or data.get("platform") != "windows-x64"
             or data.get("savePolicy") != "separate-identity-no-migration"):
         raise ValueError("Unsupported MAME lifecycle manifest")
-    if data.get("patchSha256") != sha(no_links(patch)):
-        raise ValueError("MAME lifecycle source patch changed; identity review required")
+    if data["schema"] == 1:
+        if data.get("patchSha256") != sha(no_links(patch)):
+            raise ValueError("MAME lifecycle source patch changed; identity review required")
+        source = {"patchSha256": data["patchSha256"]}
+    else:
+        runtime = data.get("runtime")
+        if (data.get("profile") != "clang64-shared" or not isinstance(runtime, dict)
+                or type(runtime.get("bytes")) is not int or runtime != SHARED_RUNTIME):
+            raise ValueError("Unsupported MAME shared-runtime profile or dependency")
+        patches = {PATCH.name: sha(no_links(patch)), SHARED_PATCH.name: sha(no_links(shared_patch))}
+        if data.get("patches") != patches:
+            raise ValueError("MAME shared source patches changed; identity review required")
+        source = {"profile": "clang64-shared", "patches": patches, "runtime": dict(SHARED_RUNTIME)}
     artifact = data.get("artifact", {})
     if (not re.fullmatch(r"[0-9a-f]{64}", artifact.get("sha256", ""))
             or type(artifact.get("bytes")) is not int
@@ -53,7 +72,8 @@ def load_manifest(path: Path, patch: Path) -> dict:
         raise ValueError("Missing reviewed lifecycle artifact identity; build and verify the core first")
     # The embedded notice is a small allowlist, not a copy of a private build receipt.
     result = {key: data[key] for key in ("schema", "upstreamCommit", "resource", "platform",
-                                        "savePolicy", "patchSha256")}
+                                        "savePolicy")}
+    result.update(source)
     result["artifact"] = {key: artifact[key] for key in ("bytes", "sha256")}
     return result
 
