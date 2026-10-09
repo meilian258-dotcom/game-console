@@ -7,6 +7,8 @@ import cn.piq.fcarcade.client.cabinet.CabinetBackend;
 import cn.piq.fcarcade.client.rom.LocalRomLibrary;
 import cn.piq.nativearcade.bridge.NativeProcessSession;
 import cn.piq.nativearcade.bridge.NativeJniMediaSession;
+import cn.piq.nativearcade.bridge.NativeMediaBackend;
+import cn.piq.nativearcade.bridge.NativeRetroArchMediaSession;
 import cn.piq.nativearcade.NativeSnapshotProfile;
 import cn.piq.fcarcade.cabinet.CabinetRomBindings;
 import cn.piq.fcarcade.cabinet.CabinetSyncCore;
@@ -24,14 +26,18 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /** FC owns cabinet/GUI/leases. Media uses common JNI; legacy snapshot sync retains its verified worker. */
 public final class NativeCabinetBackend implements CabinetBackend {
-    @Override public String description(){return "JNI Netplay 使用可精确恢复的 FBNeo 游戏；普通音画使用 MAME JNI。旧本地同步仍为兼容后端";}
+    @Override public String description(){
+        try{return "JNI Netplay 使用 FBNeo；普通音画使用 MAME · "+(NativeMediaBackend.selected()==NativeMediaBackend.RETROARCH?"RetroArch 独立进程（试验）":"JNI")+"。旧本地同步保持兼容";}
+        catch(IllegalArgumentException invalid){return invalid.getMessage();}
+    }
     @Override public String extensions(){return ".zip（如 dino.zip、kov.zip；独立完整 ROM 集，BIOS 放同目录）";}
     @Override public Path defaultRom(){return NativeArcadeClient.dataRoot().resolve("diagnostic/invaders.zip");}
     @Override public Path romDirectory(){return LocalRomLibrary.arcadeDirectory(Minecraft.getInstance().gameDirectory.toPath());}
     @Override public Set<String> romExtensions(){return Set.of(".zip");}
     @Override public Set<String> romExcludedNames(){return cn.piq.fcarcade.cabinet.CabinetGameManifest.BIOS;}
     @Override public String unavailableReason(){
-        return NativeJniMediaSession.unavailableReason();
+        try{return NativeMediaBackend.selected()==NativeMediaBackend.RETROARCH?NativeRetroArchMediaSession.unavailableReason():NativeJniMediaSession.unavailableReason();}
+        catch(IllegalArgumentException invalid){return invalid.getMessage();}
     }
     @Override public String syncUnavailableReason(){
         if(!System.getProperty("os.name","").startsWith("Windows")||!System.getProperty("os.arch","").matches("amd64|x86_64"))
@@ -69,6 +75,7 @@ public final class NativeCabinetBackend implements CabinetBackend {
         @Override public void requestClose(){cancelled.set(true);Runnable closer=signal.get();if(closer!=null)closer.run();}
     }
     @Override public CabinetEmulator open(Path rom)throws Exception{
+        if(NativeMediaBackend.selected()==NativeMediaBackend.RETROARCH)return new NativeRetroArchMediaSession(rom);
         NativeJniMediaSession core=new NativeJniMediaSession(NativeArcadeClient.dataRoot().resolve("runtime"),rom);
         return new CabinetEmulator(){
             @Override public int maxPlayers(){return core.maxPlayers();}

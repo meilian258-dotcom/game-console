@@ -1,5 +1,11 @@
 # 当前桥接构建入口
 
+## 当前固定输入
+
+当前 Java 构建按仓库根 `source-control/build-inputs.json` 的 `retroarch-netplay` 导入固定 RetroArch 1.22.2 运行器：2,752,000 字节，SHA-256 `1335c34b04d8c3e55afe010a421ff373d938929ec196a6e93a9657972fe034e1`。PNP7／8 输入字保持；最外层 `core_run` 才进行输入请求和保存捕获，回滚递归不能重复采样。下面的 C841…、PNP6 和本目录早期 `build.py` 是历史材料，不能用于替代当前锁定输入。
+
+统一后端首批复用这个既有 EXE，没有重新编译 RetroArch 或更换模拟器核心。LOCAL 启动不传 `--host`／`--connect`，不创建 Netplay 房间或代理，只使用认证的本机音画 IPC。它自行计时，不具备同步逐帧、暂停后激活、运行中恢复或独立 SRAM 命令；当前关闭结束整个子进程，必须确认进程退出和工作目录释放，不能称为核心正常卸载。构建输入和普通固定版导入方法见[构建指南](../../source-control/BUILDING.md)。
+
 ## FC76.21 保存候选（2026-09-28）
 
 当前开发及交付使用 `outputs/netplay-latency7620/native-save` 的 **PNP7 / 8 输入字** EXE，SHA256 `C84161B49D0ED02816454409F20E00FDC99D72C886ABFC0E230214F90D3A5CE6`。由该目录完整修改后的RetroArch1.22.2源码构建，命令、补丁、编译器见build.json；构建入口为 `outputs/netplay-latency7620/build_native.py save`。保留76.20 PRE_FRAME前最新输入采样，第8字为保存请求；不可混入PNP6运行器。MC netplay-4与netplay-save-1配合主包主持校验和服务器原子保存，SFC42/街机1.5.3提供对应归属授权。使用/验证见 `design/Netplay存档-FC76.21-SFC42-使用说明.md` 和 `outputs/netplay7621/VERIFICATION.md`；下方保存“未交付”描述仅是76.20当时历史。
