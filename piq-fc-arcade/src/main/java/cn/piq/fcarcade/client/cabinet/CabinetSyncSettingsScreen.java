@@ -37,7 +37,8 @@ final class CabinetSyncSettingsScreen extends DeviceScreen {
         int third=(w-28)/3;
         boolean editable=!pending&&!timedOut&&cooldown==0&&setting!=null&&setting.editable()&&!backend.equals(CabinetBackends.NES);
         int current=backend.equals(CabinetBackends.NES)?1:setting==null?-1:setting.mode();
-        addRenderableWidget(DeviceUi.button(font,(current==0?"✓ ":"")+"玩家托管",x+10,y+44,third,20,()->apply(0),editable&&setting.playerMedia()&&current!=0,DeviceUi.Tone.NORMAL));
+        var playerMediaButton=addRenderableWidget(DeviceUi.button(font,(current==0?"✓ ":"")+"玩家音画串流",x+10,y+44,third,20,()->apply(0),editable&&setting.playerMedia()&&current!=0,DeviceUi.Tone.NORMAL));
+        playerMediaButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal("原“玩家托管”：一位玩家运行游戏，其他玩家接收音画；实际运行器见音画诊断，不等同 Netplay。")));
         addRenderableWidget(DeviceUi.button(font,(current==1?"✓ ":"")+"本地同步",x+14+third,y+44,third,20,()->apply(1),editable&&setting.supported()&&current!=1,DeviceUi.Tone.NORMAL));
         var hostedButton=addRenderableWidget(DeviceUi.button(font,(current==2?"✓ ":"")+"服务器托管",x+18+third*2,y+44,third,20,()->apply(2),editable&&setting.hosted()&&current!=2,DeviceUi.Tone.NORMAL));
         if(setting!=null)hostedButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal(setting.hostedReason())));

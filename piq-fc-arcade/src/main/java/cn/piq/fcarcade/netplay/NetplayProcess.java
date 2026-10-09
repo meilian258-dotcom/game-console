@@ -59,7 +59,7 @@ public final class NetplayProcess implements AutoCloseable {
     private volatile int nativePort;
     private Path directory;
     private cn.piq.retro.storage.RuntimeWorkspace workspace;
-    private final StringBuilder logTail=new StringBuilder();
+    private final RetroArchProcessLog processLog=new RetroArchProcessLog(token);
     private volatile long framesReceived;
     private volatile String phase="等待启动";
     public interface Persistence {
@@ -245,7 +245,7 @@ public final class NetplayProcess implements AutoCloseable {
     private void run() {
         try {
             if(localCloseRequested.get())return;
-            String unavailable=unavailableReason();if(unavailable!=null)throw new IOException(unavailable);
+            String unavailable=unavailableReason();if(unavailable!=null)throw new IOException(role==Role.LOCAL?"RetroArch 本机运行仅支持 Windows x64 客户端":unavailable);
             phase("准备游戏与核心");
             LibretroContentFiles files=localFiles==null?null:Objects.requireNonNull(localFiles.call(),"LOCAL content files");
             byte[] rom=files==null?content.call():null;
@@ -353,17 +353,17 @@ public final class NetplayProcess implements AutoCloseable {
                 }
             }else synchronized(this){if(closed)return;child=workspace.start(builder);CHILDREN.add(child);}
             Process owned=child;
-            daemon("PIQ-Netplay-log",()->readLog(owned));
+            daemon("PIQ-Netplay-log",()->processLog.read(owned.getInputStream()));
             long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(25);
             while(!closed&&ipc==null&&System.nanoTime()<deadline) {
-                if(!owned.isAlive())throw new IOException("Netplay 原生端启动退出："+owned.exitValue());
+                if(!owned.isAlive())throw new IOException(runtimeLabel()+" 原生端启动退出："+owned.exitValue());
                 try {
                     Socket candidate=sockets.own(ipcListener.accept());candidate.setTcpNoDelay(true);candidate.setSoTimeout(1000);
                     try {if(Arrays.equals(candidate.getInputStream().readNBytes(32),token.getBytes(StandardCharsets.US_ASCII)))ipc=candidate;}
                     finally {if(ipc!=candidate)sockets.release(candidate);}
                 }catch(SocketTimeoutException ignored){}
             }
-            if(ipc==null)throw new IOException("Netplay 音画桥启动超时");
+            if(ipc==null)throw new IOException(runtimeLabel()+" 音画桥启动超时");
             phase("等待游戏画面");
             ipc.setSoTimeout(15000);
             var in=new DataInputStream(new BufferedInputStream(ipc.getInputStream()));var out=new DataOutputStream(ipc.getOutputStream());
@@ -372,11 +372,11 @@ public final class NetplayProcess implements AutoCloseable {
                 int message=in.readInt();
                 if(message==0x504e5356){readCheckpoint(in);continue;}
                 if(message==0x504e5049){writeInputs(out);continue;}
-                if(message!=0x504e5037)throw new IOException("Netplay 帧协议不匹配");
+                if(message!=0x504e5037)throw new IOException(runtimeLabel()+" 帧协议不匹配");
                 long number=Integer.toUnsignedLong(in.readInt());int pixels=in.readInt(),audio=in.readInt(),rate=in.readInt();
                 int width=in.readInt(),height=in.readInt(),aspect=in.readInt();
-                int rotation=in.readInt();if(rotation<0||rotation>3)throw new IOException("Netplay 旋转边界异常");
-                if(width<1||height<1||width>1024||height>1024||pixels!=0&&pixels!=width*height*4||audio<0||audio>32768||audio%4!=0||rate!=profile.sampleRate()||aspect<10000||aspect>800000)throw new IOException("Netplay 音画边界异常");
+                int rotation=in.readInt();if(rotation<0||rotation>3)throw new IOException(runtimeLabel()+" 旋转边界异常");
+                if(width<1||height<1||width>1024||height>1024||pixels!=0&&pixels!=width*height*4||audio<0||audio>32768||audio%4!=0||rate!=profile.sampleRate()||aspect<10000||aspect>800000)throw new IOException(runtimeLabel()+" 音画边界异常");
                 byte[] bgra=new byte[pixels];in.readFully(bgra);byte[] pcm=new byte[audio];in.readFully(pcm);
                 for(int i=0;i<bgra.length;i+=4){byte b=bgra[i];bgra[i]=bgra[i+2];bgra[i+2]=b;bgra[i+3]=(byte)255;}
                 short[] stereo=new short[audio/2];float[] mono=new float[audio/4];for(int i=0;i<mono.length;i++){
@@ -389,13 +389,20 @@ public final class NetplayProcess implements AutoCloseable {
                 if(persistence!=null&&!closing&&System.nanoTime()>=nextSaveNanos){nextSaveNanos=System.nanoTime()+TimeUnit.SECONDS.toNanos(30);saveNow();}
             }
         }catch(Exception|LinkageError failure){
-            String reason=failure instanceof SocketTimeoutException?"Netplay 音画中断或同步等待超时，请重新加入":
-                    failure instanceof EOFException?"Netplay 核心输出已结束，请查看诊断":
-                    failure.getMessage()==null?failure.getClass().getSimpleName():failure.getMessage();
+            // EOF/exit and stdout delivery race. Wait only on the background owner, before
+            // publishing error(), so adapters can capture the final rejection diagnostic.
+            if(role==Role.LOCAL&&child!=null&&!closed&&!localCloseRequested.get())processLog.awaitDrain(500);
+            String reason=failureReason(failure);
             if(workspace!=null)reason=workspace.failureMessage(reason);
             fail(reason);log("Failure during "+phase+": "+failure.getClass().getSimpleName()+" / "+reason);
         }
         finally{try{terminate();}finally{cleanup();}}
+    }
+    String runtimeLabel(){return role==Role.LOCAL?"RetroArch":"Netplay";}
+    String failureReason(Throwable failure){
+        if(failure instanceof SocketTimeoutException)return role==Role.LOCAL?"RetroArch 音画输出超时，请查看诊断后重试":"Netplay 音画中断或同步等待超时，请重新加入";
+        if(failure instanceof EOFException)return runtimeLabel()+" 核心输出已结束，请查看诊断";
+        return failure.getMessage()==null?failure.getClass().getSimpleName():failure.getMessage();
     }
     private void checkOpen()throws IOException{if(closed||Thread.currentThread().isInterrupted())throw new IOException("运行会话已取消");}
     private static void checkLocalContentName(String name)throws IOException{
@@ -432,9 +439,9 @@ public final class NetplayProcess implements AutoCloseable {
     private void readCheckpoint(DataInputStream in)throws IOException{
         int request=in.readInt();long frame=in.readLong();int ns=in.readInt(),nr=in.readInt(),nc=in.readInt();
         CompletableFuture<byte[]> pending;
-        synchronized(this){pending=capture;if(!ownsPersistence()||request!=saveSent||pending==null||pending.isDone())throw new IOException("非预期的 Netplay 存档回复");}
+        synchronized(this){pending=capture;if(!ownsPersistence()||request!=saveSent||pending==null||pending.isDone())throw new IOException("非预期的 "+runtimeLabel()+" 存档回复");}
         if(ns==0&&nr==0&&nc==0){pending.completeExceptionally(new IOException("核心无法生成保存状态"));return;}
-        if(frame<0||ns<1||ns>NetplaySaveState.MAX_STATE||nr<0||nr>NetplaySaveState.MAX_RAM||nc<0||nc>NetplaySaveState.MAX_RTC)throw new IOException("Netplay 存档边界异常");
+        if(frame<0||ns<1||ns>NetplaySaveState.MAX_STATE||nr<0||nr>NetplaySaveState.MAX_RAM||nc<0||nc>NetplaySaveState.MAX_RTC)throw new IOException(runtimeLabel()+" 存档边界异常");
         byte[] state=new byte[ns],ram=new byte[nr],rtc=new byte[nc];in.readFully(state);in.readFully(ram);in.readFully(rtc);
         pending.complete(NetplaySaveState.encode(new NetplaySaveState.Parts(saveIdentity,frame,state,ram,rtc)));
     }
@@ -503,12 +510,9 @@ public final class NetplayProcess implements AutoCloseable {
         config(false,false).lines().filter(line->!line.startsWith("netplay_")).forEach(line->out.append(line).append('\n'));
         return out.append("network_cmd_enable = \"false\"\nstdin_cmd_enable = \"false\"\n").toString();
     }
-    private void readLog(Process owned) {
-        try(var in=owned.getInputStream()){byte[] b=new byte[1024];int n;while((n=in.read(b))>=0){synchronized(logTail){logTail.append(new String(b,0,n,StandardCharsets.UTF_8).replace(token,"[redacted]"));if(logTail.length()>8192)logTail.delete(0,logTail.length()-8192);}}}catch(IOException ignored){}
-    }
-    public String diagnostic(){if(jni!=null)return jni.diagnostic();synchronized(logTail){return (role==Role.LOCAL?"RetroArch LOCAL 状态：":"Netplay 状态：")+status()+"\n存档："+saveStatus+"\n已接收帧："+framesReceived+"\n关闭方式："+(forcedTermination?"已请求强制结束子进程（不等于原生正常卸载）":"未请求强制结束")+"\n"+logTail;}}
-    private void log(String text){synchronized(logTail){logTail.append("\n[PIQ transport] ").append(text).append('\n');if(logTail.length()>8192)logTail.delete(0,logTail.length()-8192);}}
-    private static InputStream resource(String path)throws IOException{var in=NetplayProcess.class.getResourceAsStream(path);if(in==null)throw new IOException("缺少内置 Netplay 组件："+path);return in;}
+    public String diagnostic(){if(jni!=null)return jni.diagnostic();return (role==Role.LOCAL?"RetroArch LOCAL 状态：":"Netplay 状态：")+status()+"\n存档："+saveStatus+"\n已接收帧："+framesReceived+"\n关闭方式："+(forcedTermination?"已请求强制结束子进程（不等于原生正常卸载）":"未请求强制结束")+"\n"+processLog.snapshot();}
+    private void log(String text){processLog.append("\n[PIQ transport] "+text+'\n');}
+    private InputStream resource(String path)throws IOException{var in=NetplayProcess.class.getResourceAsStream(path);if(in==null)throw new IOException("缺少内置 "+runtimeLabel()+" 组件："+path);return in;}
     private void extract(String resource,String sha,String name,long max)throws Exception {
         extract(NetplayProcess.class,resource,sha,name,max);
     }
@@ -581,7 +585,7 @@ public final class NetplayProcess implements AutoCloseable {
     }
     private void terminate() {
         synchronized(this){if(closed)return;closed=true;ready=false;input=0;gunInputs.close();cabinetInputs.close();}
-        if(capture!=null&&!capture.isDone())capture.completeExceptionally(new IOException("Netplay 已终止，未取得新存档"));
+        if(capture!=null&&!capture.isDone())capture.completeExceptionally(new IOException(runtimeLabel()+" 已终止，未取得新存档"));
         if(persistence!=null)try{persistence.abort();}catch(RuntimeException failure){log("Persistence abort failed: "+failure.getClass().getSimpleName());}
         if(role!=Role.LOCAL)try{sender.accept(new NetplayChunk(grant.session(),grant.ticket(),NetplayChunk.CLOSE,0,new byte[0]));}catch(RuntimeException ignored){}
         connected.countDown();

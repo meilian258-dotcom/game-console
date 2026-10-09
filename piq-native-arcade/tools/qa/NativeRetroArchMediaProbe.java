@@ -145,8 +145,10 @@ public final class NativeRetroArchMediaProbe {
                 }
                 media.terminated().get(1,TimeUnit.SECONDS);
                 check(media.error()!=null&&!media.isReady(),"Malformed ZIP was not rejected");
-                check(owned.directory!=null&&(media.error().contains("原生端启动退出")
-                        ||media.error().contains("核心输出已结束")),"Expected native load rejection, not unrelated Java setup failure");
+                check(owned.directory!=null&&media.error().contains("MAME 游戏数据缺失")
+                        &&media.failureDiagnostic().contains("Fatal error: Required files are missing")
+                        &&media.failureDiagnostic().contains("NOT FOUND"),
+                        "Expected classified native missing-content evidence, not unrelated Java setup failure");
                 metric(name+".error",media.error());
             }else{
                 while(!media.isReady()){

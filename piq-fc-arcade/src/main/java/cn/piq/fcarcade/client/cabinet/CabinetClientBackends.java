@@ -472,7 +472,13 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         if(++ticks%10==0)CabinetNetwork.send(new CabinetNetwork.Heartbeat(launch.lease()));
         if(room!=null&&playing&&running()&&ticks%5==0)input(mixedInputMask,0);
         if(launch==null)return;
-        if(emulator!=null&&emulator.error()!=null){stop(emulator.error(),true);return;}
+        if(emulator!=null){
+            String failure=emulator.error();
+            if(failure!=null){
+                boolean captured=CabinetFailureNotices.capture(emulator,failure);
+                stop(captured?null:failure,true);return;
+            }
+        }
         if(media!=null&&media.error()!=null){stop(media.error(),true);return;}
         drainMedia();
         if(audio!=null){

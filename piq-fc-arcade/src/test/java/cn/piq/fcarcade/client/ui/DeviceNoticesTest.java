@@ -87,4 +87,54 @@ class DeviceNoticesTest {
         assertFalse(DeviceNoticePolicy.errorKey("message.piq_fc_arcade.join_request_denied"));
         assertFalse(DeviceNoticePolicy.errorKey("message.piq_fc_arcade.unknown_future_error_failed"));
     }
+    @Test void retroArchLocalFailuresDoNotBecomeNetplayReconnectAdvice() {
+        assertEquals("RetroArch 核心已退出，请复制诊断", DeviceNotices.summarize("RetroArch 原生端启动退出：1"));
+        assertEquals("RetroArch 核心已退出，请复制诊断", DeviceNotices.summarize("RetroArch 核心输出已结束，请查看诊断"));
+        assertEquals("RetroArch 本机运行超时，请查看诊断", DeviceNotices.summarize("RetroArch 音画桥启动超时"));
+        assertEquals("RetroArch 组件不匹配，请核对配套版本", DeviceNotices.summarize("RetroArch 帧协议不匹配"));
+        assertEquals("RetroArch 需要 Windows x64 客户端", DeviceNotices.summarize("RetroArch 本机运行仅支持 Windows x64 客户端"));
+    }
+    @Test void nativeDetailStaysInLocalMemoryAndOnlySafeSummaryIsLogged() {
+        var messages = new java.util.ArrayList<String>();
+        var logger = java.util.logging.Logger.getLogger("PIQ-DeviceNotices");
+        var handler = new java.util.logging.Handler() {
+            public void publish(java.util.logging.LogRecord record) { messages.add(record.getMessage()); }
+            public void flush() {}
+            public void close() {}
+        };
+        logger.addHandler(handler);
+        try {
+            String privateDetail = "Loaded C:/private/example/core.dll; final native output";
+            var entry = DeviceNotices.recordLocalDiagnostic("街机", "RetroArch 原生端启动退出：1", privateDetail);
+            assertEquals("RetroArch 核心已退出，请复制诊断", entry.summary());
+            assertTrue(entry.detail().contains(privateDetail));
+            assertEquals(entry, DeviceNotices.recordLocalDiagnostic("街机", "RetroArch 原生端启动退出：1", privateDetail));
+            assertEquals(1, DeviceNotices.snapshot().size());
+            assertTrue(messages.stream().anyMatch(message -> message.contains(entry.summary())));
+            assertTrue(messages.stream().noneMatch(message -> message.contains("C:/private") || message.contains("final native output")));
+        } finally { logger.removeHandler(handler); }
+    }
+    @Test void classifiedMissingGameDataIsNotOverriddenByIncidentalNativeLogs() {
+        String reason = "MAME 游戏数据缺失：example.bin、chip1 等；请查看诊断";
+        String summary = "游戏数据不完整，请复制诊断查看缺失文件";
+        assertEquals(summary, DeviceNotices.summarize(reason));
+        assertEquals(summary, DeviceNotices.summarize("其他核心 游戏数据缺失：example.bin"));
+        var notice = DeviceNotices.recordLocalDiagnostic("街机", reason,
+                "Loaded C:/private/example/core.dll; Netplay 连接已结束; unrelated startup text");
+        assertEquals(summary, notice.summary());
+        assertTrue(notice.detail().contains("core.dll"));
+        assertTrue(notice.detail().contains("Netplay"));
+        assertEquals(1, DeviceNotices.snapshot().size());
+    }
+    @Test void localDiagnosticRetentionIsBoundedWithoutClaimingAFullDiskLogExists() {
+        var entry = DeviceNotices.recordLocalDiagnostic("街机", "RetroArch 核心输出已结束", "x".repeat(17_000));
+        assertTrue(entry.detail().length() < 16_500);
+        assertTrue(entry.detail().endsWith("原生输出未写入客户端日志]"));
+        assertFalse(entry.detail().contains("完整记录见客户端日志"));
+        var snapshot = DeviceNotices.snapshot();
+        for (int i = 0; i < 40; i++) DeviceNotices.recordLocalDiagnostic("街机", "RetroArch 原生端启动退出：1", "failure " + i);
+        assertEquals(32, DeviceNotices.snapshot().size());
+        assertEquals(1, snapshot.size());
+        assertTrue(DeviceNotices.last().detail().endsWith("failure 39"));
+    }
 }

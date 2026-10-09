@@ -59,6 +59,20 @@ class RetroArchLocalContractTest {
             assertTrue(config.contains("stdin_cmd_enable = \"false\""));
         }
     }
+    @Test void localStartupFailuresDoNotClaimToBeNetplayFailures() {
+        try(var process=local(2)) {
+            assertEquals("RetroArch",process.runtimeLabel());
+            assertEquals("RetroArch 核心输出已结束，请查看诊断",process.failureReason(new EOFException()));
+            assertEquals("RetroArch 音画输出超时，请查看诊断后重试",process.failureReason(new java.net.SocketTimeoutException()));
+            assertEquals("specific failure",process.failureReason(new IOException("specific failure")));
+            assertEquals("IOException",process.failureReason(new IOException()));
+        }
+        try(var process=new NetplayProcess(new NetplayProcess.Grant(1,UUID.randomUUID(),true,true),()->new byte[16],chunk->{})) {
+            assertEquals("Netplay",process.runtimeLabel());
+            assertEquals("Netplay 核心输出已结束，请查看诊断",process.failureReason(new EOFException()));
+            assertEquals("Netplay 音画中断或同步等待超时，请重新加入",process.failureReason(new java.net.SocketTimeoutException()));
+        }
+    }
     @Test void localDoesNotAcceptRemoteAuthorityOrReserveJniSlots()throws Exception {
         try(var process=local(2)) {
             for(int kind:List.of(NetplayChunk.OPEN,NetplayChunk.ACK,NetplayChunk.CLOSE))

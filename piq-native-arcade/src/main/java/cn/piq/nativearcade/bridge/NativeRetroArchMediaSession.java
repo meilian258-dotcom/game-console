@@ -21,7 +21,9 @@ public final class NativeRetroArchMediaSession implements CabinetEmulator {
     private final NativeJniInputBuffer inputs = new NativeJniInputBuffer();
     private final AtomicBoolean closing = new AtomicBoolean();
     private final RetroArchSession session;
+    private final String contentName;
     private volatile String failure;
+    private volatile NativeMameLoadFailure.Report loadFailure;
     private CabinetFrame image;
 
     public static RetroArchSession.Config config(String contentName) {
@@ -42,6 +44,7 @@ public final class NativeRetroArchMediaSession implements CabinetEmulator {
         if (reason != null) throw new IOException(reason);
         Path source = rom.toAbsolutePath().normalize();
         String name = source.getFileName().toString();
+        contentName = name;
         session = new RetroArchSession(config(name), () -> inspect(source, name));
         session.inputProvider(() -> {
             int[] pads = inputs.nextFrame();
@@ -63,10 +66,26 @@ public final class NativeRetroArchMediaSession implements CabinetEmulator {
                 () -> { if (closing.get()) throw new IOException("街机开局已取消"); });
     }
 
-    public static String unavailableReason() { return NetplayProcess.unavailableReason(); }
+    public static String unavailableReason() {
+        return NetplayProcess.unavailableReason() == null ? null : "RetroArch 本机运行目前仅支持 Windows x64";
+    }
     @Override public int maxPlayers() { return 4; }
     @Override public boolean isReady() { return !closing.get() && failure == null && session.ready(); }
-    @Override public String error() { return failure != null ? failure : session.error(); }
+    @Override public String error() {
+        if (failure != null) return failure;
+        String reason = session.error();
+        if (reason == null) return null;
+        var report = loadFailure;
+        if (report == null) loadFailure = report = NativeMameLoadFailure.interpret(contentName, session.diagnostic());
+        return report == null ? reason : report.summary();
+    }
+    /** Captured locally before the cabinet retires this adapter; never sent to other players. */
+    @Override public String failureDiagnostic() {
+        String reason = error();
+        var report = loadFailure;
+        return (report == null ? "RetroArch 本机运行／玩家音画串流：" + (reason == null ? "尚无失败" : reason)
+                : report.detail()) + "\n\n原生诊断（仅本机；分享前检查私人路径）：\n" + session.diagnostic();
+    }
     public CompletableFuture<Void> terminated() { return session.terminated(); }
     @Override public void offerInput(int a, int b) { offerInputs(a, b, 0, 0); }
     @Override public void offerInputs(int a, int b, int c, int d) {

@@ -8,6 +8,8 @@ import cn.piq.retro.api.RetroFrame;
 public interface CabinetEmulator extends AutoCloseable {
     boolean isReady();
     String error();
+    /** Bounded local failure detail, read before close; never wait, poll a core, log or transmit it. */
+    default String failureDiagnostic() { return ""; }
     /** Optional local read-only measurements, without native calls or input/frame consumption. */
     default java.util.List<String> diagnostics() { return java.util.List.of(); }
     void offerInput(int p1, int p2);
@@ -37,6 +39,7 @@ public interface CabinetEmulator extends AutoCloseable {
         return new RetroEmulator() {
             @Override public boolean isReady() { return legacy.isReady(); }
             @Override public String error() { return legacy.error(); }
+            @Override public String failureDiagnostic() { return legacy.failureDiagnostic(); }
             @Override public java.util.List<String> diagnostics() { return legacy.diagnostics(); }
             @Override public void offerInput(int p1, int p2) { legacy.offerInput(p1, p2); }
             @Override public int maxPlayers() { return legacy.maxPlayers(); }
