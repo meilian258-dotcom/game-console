@@ -25,7 +25,7 @@ class CabinetPowerSettingsTest {
         assertTrue(legacy.contains("instanceof cn.piq.fcarcade.world.LegacyFcArcadeBlockEntity cabinet"));
         assertTrue(legacy.indexOf("CabinetClientSettings.rules().visible")<legacy.indexOf("session.textureAt"));
         assertFalse(Files.readString(Path.of(base+"client/HomeVideoDisplay.java")).contains("CabinetPowerSettings"));
-        var network=Files.readString(Path.of(base+"cabinet/CabinetSyncNetwork.java"));assertTrue(network.contains("cabinet-sync-10"));
+        var network=Files.readString(Path.of(base+"cabinet/CabinetSyncNetwork.java"));assertTrue(network.contains("cabinet-sync-11"));
         var rooms=Files.readString(Path.of(base+"cabinet/CabinetRooms.java"));assertFalse(rooms.contains("screenRenderDistance"));
         var server=Files.readString(Path.of(base+"cabinet/CabinetSyncSettings.java"));assertFalse(server.contains(".setPowerSettings("));
     }

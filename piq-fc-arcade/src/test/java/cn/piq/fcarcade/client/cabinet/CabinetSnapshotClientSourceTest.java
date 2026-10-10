@@ -36,7 +36,7 @@ class CabinetSnapshotClientSourceTest {
         assertTrue(admission.contains("netplay ? CabinetNetplay.maxPlayers(assignment.backend())"));
         assertTrue(admission.contains(": CabinetBackends.syncMaxPlayers(assignment.backend())"));
         assertTrue(s.contains("CabinetBackends.syncMaxPlayers(request.backend())<assignment.capacity()"));
-        assertTrue(s.contains("hosted()?null:netplay()?selected.netplayUnavailableReason():synchronous()?selected.syncUnavailableReason():selected.unavailableReason()"));
+        assertTrue(s.contains("hosted()?null:netplay()?selected.netplayUnavailableReason(netplayGrant.launch().variant()):synchronous()?selected.syncUnavailableReason():selected.unavailableReason()"));
         String menu=source("client/cabinet/CabinetMenuScreen");
         assertTrue(menu.contains("provider==null?\"客户端未安装\":null"));
         assertFalse(menu.contains("provider.unavailableReason()"),"Menu selection must not require a client DLL before server mode is known");

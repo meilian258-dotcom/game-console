@@ -7,7 +7,7 @@ base { archivesName = 'piq_native_arcade' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 neoForge { version = neo_version; mods { piq_native_arcade { sourceSet(sourceSets.main) } } }
 repositories { mavenCentral() }
-def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.48.jar'))
+def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.49.jar'))
 configurations {
     nativeHelperJna { canBeConsumed = false; canBeResolved = true }
 }
@@ -95,6 +95,23 @@ def prepareFbneo = tasks.register('prepareFbneoNetplay015', Exec) {
     commandLine providers.gradleProperty('embeddedRuntimePython').getOrElse('python'),
             file('tools/prepare_fbneo_netplay015.py').absolutePath, '--output', fbneoRuntime.get().asFile.absolutePath
 }
+// Independent, unmodified upstream core. Never replace state-v3 or its notices.
+// Both normal and receipt-based snapshot builds must provide these pinned inputs.
+def fbneoStockRuntime = layout.buildDirectory.dir('generated/fbneoStockV1Notices')
+def fbneoStockCore = providers.gradleProperty('fbneoStockCore')
+        .map { file(it) }.getOrElse(file('design/fbneo-study/vendor/fbneo_libretro.dll'))
+def fbneoStockSource = providers.gradleProperty('fbneoStockSource')
+        .map { file(it) }.getOrElse(file('design/fbneo-study/vendor/FBNeo-a251c76229f1637e433b93e29845039752771b6d.zip'))
+def prepareFbneoStock = tasks.register('prepareFbneoStockRuntime', Exec) {
+    inputs.files('tools/prepare_fbneo_stock_runtime.py', 'design/fbneo-study/vendor/license.txt')
+    inputs.files(fbneoStockCore, fbneoStockSource)
+    outputs.dir(fbneoStockRuntime)
+    workingDir projectDir
+    commandLine providers.gradleProperty('embeddedRuntimePython').getOrElse('python'),
+            file('tools/prepare_fbneo_stock_runtime.py').absolutePath,
+            '--core', fbneoStockCore.absolutePath, '--source-archive', fbneoStockSource.absolutePath,
+            '--output', fbneoStockRuntime.get().asFile.absolutePath
+}
 // Reviewed JNI-only core; legacy MAME/FBNeo resources above remain byte-for-byte separate.
 // This stages an existing verified DLL; it never downloads or recompiles MAME.
 def mameLifecycleRuntime = layout.buildDirectory.dir('generated/mameLifecycle1')
@@ -111,6 +128,8 @@ def prepareMameLifecycle = tasks.register('prepareMameLifecycleRuntime', Exec) {
             '--core', mameLifecycleCore.absolutePath, '--output', mameLifecycleRuntime.get().asFile.absolutePath
 }
 jar {
+    dependsOn prepareFbneoStock
+    from(fbneoStockRuntime)
     if (providers.gradleProperty('snapshotResourcesDir').isPresent()) {
         // The receipt-verified tree excludes this helper: compile it from this checkout.
         dependsOn buildHelper011

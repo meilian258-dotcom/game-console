@@ -18,6 +18,9 @@ import cn.piq.retro.libretro.LibretroContentFiles;
  * Persistence is opt-in and host-only. The caller owns authorization and durable storage.
  */
 public final class NetplayProcess implements AutoCloseable {
+    /** Trusted frontend identity, shared with server-selected launch contracts. */
+    public static final String RETROARCH_SHA="1335c34b04d8c3e55afe010a421ff373d938929ec196a6e93a9657972fe034e1";
+    public static final String RETROARCH_PROTOCOL="PNP7";
     public enum Role { HOST, PARTICIPANT, SPECTATOR, LOCAL }
     private JniNetplaySession jni;
     public record Frame(long number, byte[] rgba, float[] mono,int width,int height,float aspect,short[] stereo,int sampleRate,int rotation) {
@@ -34,6 +37,7 @@ public final class NetplayProcess implements AutoCloseable {
     private final Role role;
     private final RetroArchSession.Config localConfig;
     private final Callable<LibretroContentFiles> localFiles;
+    private LibretroContentFiles verifiedFiles;
     private final AtomicBoolean localCloseRequested=new AtomicBoolean();
     private Supplier<int[]> localInputProvider;
     private final NetplayProfile profile;
@@ -81,6 +85,7 @@ public final class NetplayProcess implements AutoCloseable {
     private volatile CompletableFuture<Void> commit=CompletableFuture.completedFuture(null);
     private long nextSaveNanos;
     private final CompletableFuture<Void> terminated=new CompletableFuture<>();
+    private final CompletableFuture<Void> transportTerminated=new CompletableFuture<>();
     /** Call before start, never on a participant or observer. */
     public synchronized void persistence(Persistence value){
         if(jni!=null){jni.persistence(value);return;}
@@ -173,10 +178,12 @@ public final class NetplayProcess implements AutoCloseable {
     public void localRelease(int port){requireLocal();checkAuthorityPort(port);cabinetInputs.release(port);}
     private void requireLocal(){if(role!=Role.LOCAL)throw new IllegalStateException("Not a LOCAL session");}
     private boolean started;
-    /** Captured immutable files are checked on the JNI owner thread, never loaded on the caller. */
+    /** Bind captured files before start. Hashing/staging stays on the runtime owner thread. */
     public synchronized void fileContent(cn.piq.retro.libretro.LibretroContentFiles files){
-        if(started||closed||jni==null)throw new IllegalStateException("Verified files require an unstarted JNI process");
-        jni.fileContent(files);
+        if(started||closed||localCloseRequested.get()||role==Role.LOCAL)
+            throw new IllegalStateException("Verified files require an unstarted Netplay process");
+        Objects.requireNonNull(files);
+        if(jni!=null)jni.fileContent(files);else verifiedFiles=files;
     }
     public synchronized void start(){if(started||closed||localCloseRequested.get())return;started=true;if(jni!=null){jni.start();return;}daemon("PIQ-Netplay-owner",this::run);}
     public static String unavailableReason() {
@@ -187,7 +194,7 @@ public final class NetplayProcess implements AutoCloseable {
     public void activate(){if(jni==null)throw new IllegalStateException("Prepared activation requires JNI");jni.activate();}
     public String error(){return jni!=null?jni.error():error;}
     /** Presentation only, never an authority/handshake decision. ready() still means local AV bridge ready. */
-    public String status(){return jni!=null?jni.status():error!=null?"已停止："+error:closed?(terminated.isDone()?"已结束":"正在关闭，等待子进程回收"):closing?"正在确认最后保存":phase;}
+    public String status(){return jni!=null?jni.status():error!=null?"已停止："+error:closed?(terminated.isDone()?"已结束":"正在关闭，等待子进程回收"):closing?(persistence==null?"正在关闭":"正在确认最后保存"):phase;}
     private synchronized void phase(String value){if(!closed)phase=value;}
     private synchronized void fail(String reason){if(!closed&&error==null)error=reason;}
     public long framesReceived(){return jni!=null?jni.framesReceived():framesReceived;}
@@ -208,7 +215,7 @@ public final class NetplayProcess implements AutoCloseable {
     public void authoritativeGun(long revision,long sequence,int buttons,int aim){
         if(role==Role.LOCAL)throw new IllegalStateException("LOCAL light gun is not adapted");
         if(jni!=null){jni.authoritativeGun(revision,sequence,buttons,aim);return;}
-        if(!closed&&grant.host()&&gunMode)gunInputs.offer(revision,sequence,buttons,aim,System.nanoTime());
+        if(!closed&&!closing&&!localCloseRequested.get()&&grant.host()&&gunMode)gunInputs.offer(revision,sequence,buttons,aim,System.nanoTime());
     }
     public static int retroPad(int nes){return (nes&1)<<8 | (nes&2)>>>1 | nes&252;}
     public void receive(NetplayChunk chunk,boolean mayPlay) {
@@ -247,17 +254,14 @@ public final class NetplayProcess implements AutoCloseable {
             if(localCloseRequested.get())return;
             String unavailable=unavailableReason();if(unavailable!=null)throw new IOException(role==Role.LOCAL?"RetroArch 本机运行仅支持 Windows x64 客户端":unavailable);
             phase("准备游戏与核心");
-            LibretroContentFiles files=localFiles==null?null:Objects.requireNonNull(localFiles.call(),"LOCAL content files");
+            LibretroContentFiles files=localFiles==null?verifiedFiles:Objects.requireNonNull(localFiles.call(),"LOCAL content files");
             byte[] rom=files==null?content.call():null;
             Map<String,byte[]> extras=files==null?auxiliary.call():Map.of();
             Map<String,String> auxiliaryHashes=new TreeMap<>();
             String romHash;
             long contentBytes;
             if(files!=null){
-                if(!files.mainName().equals(profile.contentName())||files.main().size()<16
-                        ||files.main().size()>profile.maxRomBytes()||files.size()>LibretroContentFiles.MAX_TOTAL)
-                    throw new IOException("LOCAL content identity or size mismatch");
-                for(String name:files.files().keySet())checkLocalContentName(name);
+                validateFileContent(profile,files);
                 romHash=files.main().sha256();auxiliaryHashes.putAll(files.auxiliaryHashes());contentBytes=files.size();
             }else{
                 if(rom==null||rom.length<16||rom.length>profile.maxRomBytes())throw new IOException("ROM 大小异常");
@@ -286,6 +290,7 @@ public final class NetplayProcess implements AutoCloseable {
             if(closed)return;
             Properties props=new Properties();try(var in=resource("/core/netplay/runtime.properties")){props.load(in);}
             String runnerHash=props.getProperty("exe.sha256");
+            if(!RETROARCH_SHA.equalsIgnoreCase(runnerHash))throw new IOException("RetroArch 运行器身份不匹配，请使用配套主包");
             long required=contentBytes+160L*1024*1024;
             if(role==Role.LOCAL){
                 required+=localConfig.core().maxBytes();
@@ -342,16 +347,11 @@ public final class NetplayProcess implements AutoCloseable {
             builder.environment().remove("PIQ_SAVE_SEED");
             if(initialSave!=null)builder.environment().put("PIQ_SAVE_SEED","checkpoint.seed");
             builder.environment().put("TEMP",directory.toString());builder.environment().put("TMP",directory.toString());
-            if(role==Role.LOCAL){
-                if(closed||localCloseRequested.get())return;
-                // ProcessBuilder and workspace marker IO must never hold the public session lock.
-                // A close can win while start() is in the OS; publish, then retire that late child.
-                child=workspace.start(builder);CHILDREN.add(child);
-                if(closed||localCloseRequested.get()){
-                    if(child.isAlive()){forcedTermination=true;child.destroyForcibly();}
-                    return;
-                }
-            }else synchronized(this){if(closed)return;child=workspace.start(builder);CHILDREN.add(child);}
+            if(closed||localCloseRequested.get())return;
+            // Process creation and workspace marker IO never hold the public session lock.
+            // If close wins inside the OS, the owner still retires this late child in cleanup().
+            child=workspace.start(builder);CHILDREN.add(child);
+            if(closed||localCloseRequested.get())return;
             Process owned=child;
             daemon("PIQ-Netplay-log",()->processLog.read(owned.getInputStream()));
             long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(25);
@@ -385,16 +385,18 @@ public final class NetplayProcess implements AutoCloseable {
                 }
                 // PNP7 keeps libretro's CCW rotation; its bridge already supplies unrotated DAR.
                 Frame frame=new Frame(number,bgra,mono,width,height,aspect/100000f,stereo,rate,legacyClockwiseRotation(rotation));
-                synchronized(this){if(closed)break;while(!frames.offer(frame))frames.poll();framesReceived++;ready=true;phase="音画已就绪";}
+                synchronized(this){if(closed)break;while(!frames.offer(frame))frames.poll();framesReceived++;ready=true;phase=role==Role.LOCAL?"音画已就绪":"本机音画已就绪（不代表所有玩家已同步）";}
                 if(persistence!=null&&!closing&&System.nanoTime()>=nextSaveNanos){nextSaveNanos=System.nanoTime()+TimeUnit.SECONDS.toNanos(30);saveNow();}
             }
         }catch(Exception|LinkageError failure){
             // EOF/exit and stdout delivery race. Wait only on the background owner, before
             // publishing error(), so adapters can capture the final rejection diagnostic.
-            if(role==Role.LOCAL&&child!=null&&!closed&&!localCloseRequested.get())processLog.awaitDrain(500);
+            if(child!=null&&!closed&&!localCloseRequested.get())processLog.awaitDrain(500);
             String reason=failureReason(failure);
             if(workspace!=null)reason=workspace.failureMessage(reason);
-            fail(reason);log("Failure during "+phase+": "+failure.getClass().getSimpleName()+" / "+reason);
+            if(!closed&&!localCloseRequested.get()){
+                fail(reason);log("Failure during "+phase+": "+failure.getClass().getSimpleName()+" / "+reason);
+            }
         }
         finally{try{terminate();}finally{cleanup();}}
     }
@@ -404,7 +406,13 @@ public final class NetplayProcess implements AutoCloseable {
         if(failure instanceof EOFException)return runtimeLabel()+" 核心输出已结束，请查看诊断";
         return failure.getMessage()==null?failure.getClass().getSimpleName():failure.getMessage();
     }
-    private void checkOpen()throws IOException{if(closed||Thread.currentThread().isInterrupted())throw new IOException("运行会话已取消");}
+    private void checkOpen()throws IOException{if(closed||localCloseRequested.get()||Thread.currentThread().isInterrupted())throw new IOException("运行会话已取消");}
+    static void validateFileContent(NetplayProfile profile,LibretroContentFiles files)throws IOException{
+        if(!files.mainName().equals(profile.contentName())||files.main().size()<16
+                ||files.main().size()>profile.maxRomBytes()||files.size()>LibretroContentFiles.MAX_TOTAL)
+            throw new IOException("游戏文件身份或大小不符合本局声明");
+        for(String name:files.files().keySet())checkLocalContentName(name);
+    }
     private static void checkLocalContentName(String name)throws IOException{
         if(!NetplaySaveState.safeLocalName(name)||Set.of("retroarch.exe","core.dll","retroarch.cfg","options.cfg","checkpoint.seed","libunwind.dll").contains(name.toLowerCase(Locale.ROOT)))
             throw new IOException("Unsafe or reserved LOCAL content name");
@@ -421,16 +429,17 @@ public final class NetplayProcess implements AutoCloseable {
     }
     /** Sample once immediately before Netplay records the next frame, not on AV delivery. */
     void writeInputs(DataOutputStream out)throws IOException {
-        var aim=gunMode&&grant.host()?gunInputs.next(System.nanoTime()):NetplayGunMailbox.NEUTRAL;
+        boolean stopping=closing||closed||localCloseRequested.get();
+        var aim=!stopping&&gunMode&&grant.host()?gunInputs.next(System.nanoTime()):NetplayGunMailbox.NEUTRAL;
         int[] pads;
-        if(role==Role.LOCAL&&localInputProvider!=null&&!closing&&!closed){
+        if(role==Role.LOCAL&&localInputProvider!=null&&!stopping){
             pads=Objects.requireNonNull(localInputProvider.get(),"LOCAL input provider returned null").clone();
             if(pads.length!=profile.ports())throw new IOException("LOCAL input port count");
             for(int mask:pads)if((mask&~4095)!=0)throw new IOException("LOCAL input exceeds 12-bit mask");
             pads=Arrays.copyOf(pads,4);
-        }else pads=closing||closed?new int[4]:cabinetInputs.next(System.nanoTime());
-        if(closing||closed)Arrays.fill(pads,0);
-        out.writeInt(closing||closed?0:gunMode?retroPad(aim.buttons()):input);
+        }else pads=stopping?new int[4]:cabinetInputs.next(System.nanoTime());
+        if(stopping)Arrays.fill(pads,0);
+        out.writeInt(stopping?0:gunMode?retroPad(aim.buttons()):input);
         out.writeInt(aim.coordinates());out.writeInt(aim.flags());
         for(int mask:pads)out.writeInt(mask);
         synchronized(this){out.writeInt(saveRequest!=saveSent?saveRequest:0);saveSent=saveRequest;}
@@ -510,7 +519,10 @@ public final class NetplayProcess implements AutoCloseable {
         config(false,false).lines().filter(line->!line.startsWith("netplay_")).forEach(line->out.append(line).append('\n'));
         return out.append("network_cmd_enable = \"false\"\nstdin_cmd_enable = \"false\"\n").toString();
     }
-    public String diagnostic(){if(jni!=null)return jni.diagnostic();return (role==Role.LOCAL?"RetroArch LOCAL 状态：":"Netplay 状态：")+status()+"\n存档："+saveStatus+"\n已接收帧："+framesReceived+"\n关闭方式："+(forcedTermination?"已请求强制结束子进程（不等于原生正常卸载）":"未请求强制结束")+"\n"+processLog.snapshot();}
+    public String diagnostic(){if(jni!=null)return jni.diagnostic();return (role==Role.LOCAL?"RetroArch LOCAL 状态：":"RetroArch Netplay 状态：")+status()
+            +"\n角色："+role+" · 协议："+RETROARCH_PROTOCOL+"\n运行器 SHA-256："+RETROARCH_SHA+"\n核心 SHA-256："+profile.sha()
+            +(role==Role.LOCAL?"":"\n当前传输通道："+pipes.size()+"（仅传输计数，不代表同步验收）")
+            +"\n存档："+saveStatus+"\n已接收画面："+framesReceived+"\n关闭方式："+(forcedTermination?"已请求强制结束子进程（不等于原生正常卸载）":"未请求强制结束")+"\n"+processLog.snapshot();}
     private void log(String text){processLog.append("\n[PIQ transport] "+text+'\n');}
     private InputStream resource(String path)throws IOException{var in=NetplayProcess.class.getResourceAsStream(path);if(in==null)throw new IOException("缺少内置 "+runtimeLabel()+" 组件："+path);return in;}
     private void extract(String resource,String sha,String name,long max)throws Exception {
@@ -558,17 +570,14 @@ public final class NetplayProcess implements AutoCloseable {
     }
     @Override public void close() {
         if(jni!=null){jni.close();return;}
-        if(role==Role.LOCAL){
-            if(!localCloseRequested.compareAndSet(false,true))return;
-            closing=true;input=0;
-            // Even abort() and CompletableFuture continuations belong off the caller thread.
-            daemon("PIQ-RetroArch-close",this::closeInternal);
-            return;
-        }
-        closeInternal();
+        if(!localCloseRequested.compareAndSet(false,true))return;
+        closing=true;input=0;
+        // Abort callbacks, transport and CompletableFuture continuations may do IO.
+        // Every RetroArch role closes off the caller thread, not just LOCAL.
+        daemon("PIQ-RetroArch-close",this::closeInternal);
     }
     private void closeInternal(){
-        synchronized(this){if(closed||role!=Role.LOCAL&&closing)return;closing=true;input=0;gunInputs.close();cabinetInputs.close();}
+        synchronized(this){if(closed)return;closing=true;input=0;gunInputs.close();cabinetInputs.close();}
         if(persistence==null||!ready||error!=null){terminate();return;}
         // Gameplay routes may already have retired. Disconnect native peers so the final completed
         // frame cannot wait forever for input from a seat that the server has just revoked.
@@ -585,23 +594,34 @@ public final class NetplayProcess implements AutoCloseable {
     }
     private void terminate() {
         synchronized(this){if(closed)return;closed=true;ready=false;input=0;gunInputs.close();cabinetInputs.close();}
-        if(capture!=null&&!capture.isDone())capture.completeExceptionally(new IOException(runtimeLabel()+" 已终止，未取得新存档"));
-        if(persistence!=null)try{persistence.abort();}catch(RuntimeException failure){log("Persistence abort failed: "+failure.getClass().getSimpleName());}
-        if(role!=Role.LOCAL)try{sender.accept(new NetplayChunk(grant.session(),grant.ticket(),NetplayChunk.CLOSE,0,new byte[0]));}catch(RuntimeException ignored){}
-        connected.countDown();
-        sockets.close();
-        for(Pipe pipe:List.copyOf(pipes.values()))pipe.close(false);
-        Process owned=child;if(owned!=null&&owned.isAlive()){forcedTermination=true;owned.destroyForcibly();}frames.clear();
-        if(!started)terminated.complete(null);
+        try{
+            // Release native IO before any caller callback can block. The owner may
+            // reclaim its process concurrently, but cannot confirm full termination yet.
+            connected.countDown();sockets.close();
+            for(Pipe pipe:List.copyOf(pipes.values()))pipe.close(false);
+            frames.clear();
+            if(capture!=null&&!capture.isDone())capture.completeExceptionally(new IOException(runtimeLabel()+" 已终止，未取得新存档"));
+            if(persistence!=null)persistence.abort();
+            if(role!=Role.LOCAL)try{sender.accept(new NetplayChunk(grant.session(),grant.ticket(),NetplayChunk.CLOSE,0,new byte[0]));}catch(RuntimeException failure){log("Close notification failed: "+failure.getClass().getSimpleName());}
+            transportTerminated.complete(null);
+            if(!started)terminated.complete(null);
+        }catch(Exception failure){
+            transportTerminated.completeExceptionally(failure);cleanupFailed(failure);
+        }
     }
     private void cleanup() {
         Process owned=child;
         try{
             if(owned!=null){
+                if(!owned.waitFor(1500,TimeUnit.MILLISECONDS)){
+                    forcedTermination=true;owned.destroyForcibly();
+                }
                 if(!owned.waitFor(5,TimeUnit.SECONDS)){
                     owned.onExit().thenRun(()->{CHILDREN.remove(owned);if(workspace!=null)workspace.close();});
                     throw new IOException("子进程退出尚未确认，运行目录保留；不能启动替代会话");
                 }
+                processLog.awaitDrain(500);
+                log("Child exit="+owned.exitValue()+"; forced="+forcedTermination);
                 CHILDREN.remove(owned);
             }
             if(workspace!=null){
@@ -612,6 +632,9 @@ public final class NetplayProcess implements AutoCloseable {
                 while(!Files.notExists(directory,LinkOption.NOFOLLOW_LINKS)&&System.nanoTime()<end)Thread.sleep(25);
                 if(!Files.notExists(directory,LinkOption.NOFOLLOW_LINKS))throw new IOException("子进程已退出，但运行目录清理未确认；保留待安全回收");
             }
+            // A different close thread may still own abort/transport callbacks.
+            // Unknown residual work is a close failure, never a successful retirement.
+            transportTerminated.get(5,TimeUnit.SECONDS);
             terminated.complete(null);
         }catch(InterruptedException interrupted){
             Thread.currentThread().interrupt();cleanupFailed(interrupted);

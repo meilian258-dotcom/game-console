@@ -34,8 +34,8 @@ class NetplaySocketsTest {
             thread.start();gate.countDown();owner.close();thread.join(1000);assertFalse(thread.isAlive());assertEquals(1,count.get());
         }
     }
-    @Test void cancelBeforeStartHasNoSideEffects(){
+    @Test void cancelBeforeStartHasNoSideEffects()throws Exception {
         var reads=new AtomicInteger();var process=new NetplayProcess(new NetplayProcess.Grant(1,java.util.UUID.randomUUID(),true,true),()->{reads.incrementAndGet();return null;},c->{});
-        process.close();process.start();assertFalse(process.ready());assertEquals("已结束",process.status());assertEquals(0,reads.get());assertNull(process.error());
+        process.close();process.start();process.terminated().get(2,TimeUnit.SECONDS);assertFalse(process.ready());assertEquals("已结束",process.status());assertEquals(0,reads.get());assertNull(process.error());
     }
 }

@@ -13,13 +13,34 @@ public final class CabinetNetplay {
     private CabinetNetplay(){}
     private static final Map<ResourceLocation,Integer> SUPPORTED=new HashMap<>();
     private static final Map<ResourceLocation,java.util.function.Function<String,NetplayProfile>> PROFILES=new HashMap<>();
+    private static final Map<ResourceLocation,Map<String,NetplayVariant>> VARIANTS=new HashMap<>();
+    private static final Map<ResourceLocation,String> DEFAULT_VARIANTS=new HashMap<>();
     private record Run(MinecraftServer server,long wire,NetplayRelay<Connection> relay,Connection host,
             java.util.function.Function<String,NetplayProfile> profile,int saveMode,String owner,
-            CabinetNetplayContentBinding content){}
+            CabinetNetplayContentBinding content,NetplayLaunchSpec launch){}
     private static final Map<UUID,Run> RUNS=new HashMap<>();
     public static synchronized void register(ResourceLocation backend){register(backend,2);}
     public static synchronized void register(ResourceLocation backend,int ports){if(ports<1||ports>4)throw new IllegalArgumentException("Ports");SUPPORTED.put(Objects.requireNonNull(backend),ports);}
     public static synchronized void register(ResourceLocation backend,int ports,java.util.function.Function<String,NetplayProfile> profile){register(backend,ports);PROFILES.put(backend,Objects.requireNonNull(profile));}
+    public static synchronized void registerVariants(ResourceLocation backend,String defaultVariant,List<NetplayVariant> variants){
+        if(variants.isEmpty()||variants.size()>4)throw new IllegalArgumentException("Netplay variants");
+        var catalog=new LinkedHashMap<String,NetplayVariant>();
+        for(var variant:variants)if(catalog.putIfAbsent(variant.id(),variant)!=null)throw new IllegalArgumentException("Duplicate Netplay variant");
+        var selected=catalog.get(defaultVariant);if(selected==null)throw new IllegalArgumentException("Missing default Netplay variant");
+        register(backend,variants.stream().mapToInt(v->v.template().ports()).max().orElseThrow(),selected::profile);
+        VARIANTS.put(backend,Collections.unmodifiableMap(catalog));DEFAULT_VARIANTS.put(backend,defaultVariant);
+    }
+    public static synchronized List<NetplayVariant> variants(ResourceLocation backend){return List.copyOf(VARIANTS.getOrDefault(backend,Map.of()).values());}
+    public static synchronized String defaultVariant(ResourceLocation backend){return DEFAULT_VARIANTS.getOrDefault(backend,NetplayLaunchSpec.LEGACY);}
+    public static synchronized NetplayVariant variant(ResourceLocation backend,String id){return VARIANTS.getOrDefault(backend,Map.of()).get(id);}
+    /** Both controller and watch clients check the same local trusted declaration before starting. */
+    public static synchronized void verify(ResourceLocation backend,NetplayLaunchSpec grant,NetplayProfile actual){
+        var catalog=VARIANTS.get(backend);
+        if(catalog==null){if(!NetplayLaunchSpec.UNSPECIFIED.equals(grant))throw new IllegalArgumentException("未安装此 Netplay 后端变体");return;}
+        var variant=catalog.get(grant.variant());
+        if(variant==null)throw new IllegalArgumentException("未安装本局选择的 Netplay 后端，请更新配套附属；不会自动切换");
+        variant.verify(grant,actual);
+    }
     public static synchronized boolean supported(ResourceLocation backend){return SUPPORTED.containsKey(backend);}
     public static synchronized int maxPlayers(ResourceLocation backend){return SUPPORTED.getOrDefault(backend,0);}
     static boolean active(UUID room){return RUNS.containsKey(room);}
@@ -27,7 +48,7 @@ public final class CabinetNetplay {
         var run=RUNS.get(source);var room=CabinetRooms.syncRoom(server,source);
         if(run==null||run.server()!=server||room==null||!room.ready||run.relay().closed())return null;
         var manifest=CabinetSharedGameData.get(server).find(room.target,room.backend);
-        return !run.content().matches(manifest)?null:new WatchNetplay.Offer(run.wire(),run.relay(),ResourceLocation.parse(room.backend),manifest.gameHash(),room.target);
+        return !run.content().matches(manifest)?null:new WatchNetplay.Offer(run.wire(),run.relay(),ResourceLocation.parse(room.backend),manifest.gameHash(),room.target,run.launch());
     }
     static void open(MinecraftServer server,CabinetRoomLedger.Room<CabinetTarget> room){
         if(!server.isSameThread()||RUNS.containsKey(room.id))throw new IllegalStateException("Netplay 房间重复或线程无效");
@@ -35,13 +56,21 @@ public final class CabinetNetplay {
         try{
             var backend=ResourceLocation.parse(room.backend);var profile=PROFILES.get(backend);
             if(profile==null)throw new IllegalStateException("Netplay 附属缺少服务器保存能力声明，请更新配套附属");
+            String choice=CabinetSyncSettings.netplayVariant(server,room.target,backend);
+            var selected=variant(backend,choice);var launch=NetplayLaunchSpec.UNSPECIFIED;
+            if(VARIANTS.containsKey(backend)){
+                if(selected==null)throw new IllegalStateException("本机柜 Netplay 后端已不可用，请明确重新选择；不会自动切换");
+                if(room.capacity>selected.template().ports())throw new IllegalStateException("本局席位超过所选 Netplay 后端上限");
+                profile=selected::profile;launch=selected.launch();
+            }else if(!choice.equals(NetplayLaunchSpec.LEGACY))throw new IllegalStateException("未注册的 Netplay 后端变体");
             int mode=CabinetSyncSettings.saveMode(server,room.target,backend);
+            if(!launch.persistenceSupported())mode=0; // Explicit experimental selection never reads/writes old saves.
             String owner=mode==1?"arcade-personal|"+room.host().player: "arcade-machine|"+room.target.dimension()+"|"+room.target.identity();
             Connection host=(Connection)room.host().connection;
             // The host may upload/select another ROM or add BIOS after the start grant.
             // Register saves only from the verified END manifest, before its success reply.
             RUNS.put(room.id,new Run(server,wire,relay,host,profile,mode,owner,
-                    new CabinetNetplayContentBinding(host,room.host().player,room.host().id,room.backend)));
+                    new CabinetNetplayContentBinding(host,room.host().player,room.host().id,room.backend),launch));
         }catch(RuntimeException failure){NetplayNetwork.retire(relay);throw failure;}
     }
     /** Called on the server thread after END verification, before publishing the manifest/grant
@@ -65,6 +94,7 @@ public final class CabinetNetplay {
             if(member!=host||run.relay().closed()||!run.content().owns(player.connection.getConnection(),player.getUUID(),lease,backend.toString()))
                 throw new IllegalStateException("Netplay 主持内容授权已失效");
             run.content().bind(player.connection.getConnection(),player.getUUID(),lease,backend.toString(),room.ready,manifest,()->{
+                if(!run.launch().persistenceSupported())return;
                 var extra=new TreeMap<String,String>();
                 for(var file:manifest.files().subList(1,manifest.files().size()))extra.put(file.name().toLowerCase(Locale.ROOT),file.sha256());
                 var identity=NetplaySaveState.identity(run.profile().apply(manifest.files().getFirst().name().toLowerCase(Locale.ROOT)),manifest.gameHash(),extra);
@@ -97,7 +127,7 @@ public final class CabinetNetplay {
         var ticket=run.relay().grant(p.connection.getConnection(),member.port);
         if(ticket==null)throw new IllegalStateException("Netplay room full");
         NetplayNetwork.authorize(run.wire(),p.connection.getConnection(),run.relay());
-        PacketDistributor.sendToPlayer(p,new CabinetRoomNetwork.NetplayStart(a,run.wire(),ticket.id()));return true;
+        PacketDistributor.sendToPlayer(p,new CabinetRoomNetwork.NetplayStart(a,run.wire(),ticket.id(),run.launch()));return true;
     }
     static void removed(UUID room,Object connection,boolean host){var run=RUNS.get(room);if(run==null)return;if(host)close(room);else run.relay().revoke((Connection)connection);}
     static void close(UUID room){var run=RUNS.remove(room);if(run!=null){run.content().retire();NetplaySaveServer.retire(run.server(),run.wire());NetplayNetwork.retire(run.relay());}}

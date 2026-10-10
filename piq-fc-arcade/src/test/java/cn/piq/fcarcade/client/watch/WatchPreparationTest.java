@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class WatchPreparationTest {
     private static NetplayProcess.Grant observer(long wire){return new NetplayProcess.Grant(wire,UUID.randomUUID(),false,false);}
     private static CabinetBackend.NetplayContent content(){return new CabinetBackend.NetplayContent(NetplayProfile.fc(),new byte[16],Map.of());}
-    @Test void legacyPreparationCreatesOnlyAnObserverAndKeepsExactWire(){
+    @Test void legacyPreparationCreatesOnlyAnObserverAndKeepsExactWire()throws Exception{
         var data=content();var p=new NetplayWatchContent.Preparation(()->data,()->{});
         var grant=observer(41);var run=p.open(grant,data,c->{});
         assertEquals(grant,run.grant());assertFalse(run.nativeSlotHeld());
-        run.close();assertTrue(run.terminated().isDone());
+        run.close();run.terminated().get(2,java.util.concurrent.TimeUnit.SECONDS);assertFalse(run.ready());assertEquals(grant,run.grant());
     }
     @Test void trustedFactoryCannotBeCalledWithHostOrPlayerAuthority(){
         var calls=new AtomicInteger();var data=content();

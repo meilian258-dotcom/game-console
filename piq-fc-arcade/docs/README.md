@@ -11,6 +11,7 @@
 | 想玩哪一种设备 | [主包](../README.md)、[SFC](../../piq-sfc-home/README.md)、[MD](../../piq-md-home/README.md)、[GBA](../../piq-gba/README.md)、[街机](../../piq-native-arcade/README.md)、[电脑](../../piq-computer/README.md) |
 | 服务端 ROM 和 BIOS 在哪里 | [玩家指南的目录部分](玩家指南.md#服主怎样找-rom-和-bios) |
 | 什么是串流、JNI Netplay 和旁观 | [模式区别](玩家指南.md#联机和观看有什么区别) |
+| 原版 FBNeo 的 RetroArch Netplay 试验怎么选、有哪些限制 | [街机试验入口与公共接口](../design/RetroArch-Netplay-街机试验接入.md) |
 | 闪退、光影、菜单或游戏不能运行 | [反馈清单](玩家指南.md#遇到问题时提供什么) |
 
 [GitHub 整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)提供主模组与当前配套附属共 7 个独立 JAR。首次安装与升级请看[本套版本、安装步骤及限制](整套测试版-20261007.md)；旧 MD15 补丁仅保留作历史下载。

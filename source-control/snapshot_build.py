@@ -23,6 +23,7 @@ import tomllib
 import zipfile
 
 from release_artifacts import inspect, sha256
+import snapshot_stock
 
 ROOT = Path(__file__).resolve().parents[1]
 META = 'META-INF/neoforge.mods.toml'
@@ -136,8 +137,9 @@ def verify_resources(resource_root: Path, receipt_path: Path) -> None:
         if not any(resource == prefix or (prefix.endswith('/') and resource.startswith(prefix))
                    for prefix in RESOURCE_SCOPES[bucket]):
             raise ValueError('Foreign snapshot resource: ' + resource)
-        if resource.endswith('.class') or resource == HELPER or resource.lower().endswith('blastem_libretro.dll'):
-            raise ValueError('Compiled MOD classes/current helper/retired core must not be bootstrapped')
+        if (resource.endswith('.class') or resource == HELPER or resource.lower().endswith('blastem_libretro.dll')
+                or snapshot_stock.generated_resource(resource)):
+            raise ValueError('Compiled MOD classes/current helper/stock resource/retired core must not be bootstrapped')
         if name not in expected:
             raise ValueError('Unreceipted resource: ' + resource)
         verify_file(path, expected[name])
@@ -153,6 +155,7 @@ def verify_inputs(input_root: Path) -> dict:
     receipt, records = load_receipt(receipt_path)
     for name, record in records.items():
         verify_file(input_root / name, record)
+    stock = snapshot_stock.verify_receipt(input_root, records)
     pins = {}
     for entry in receipt.get('bootstrap', []):
         ident = entry.get('id')
@@ -166,7 +169,13 @@ def verify_inputs(input_root: Path) -> dict:
         raise ValueError('Exactly the six approved native input distributions are required')
     for bucket in RESOURCE_SCOPES:
         verify_resources(input_root / 'resources' / bucket, receipt_path)
-    return dict(receipt=receipt, bootstrap=pins, receipt_path=receipt_path)
+    return dict(receipt=receipt, bootstrap=pins, receipt_path=receipt_path, fbneo_stock=stock)
+
+
+def arcade_gradle_properties(fc: Path, inputs: dict) -> dict:
+    stock = inputs['fbneo_stock']
+    return dict(gameConsoleJar=str(fc), embeddedRuntimePython=sys.executable,
+                fbneoStockCore=str(stock['core']), fbneoStockSource=str(stock['source']))
 
 
 def archive_entries(path: Path) -> dict[str, bytes]:
@@ -426,7 +435,7 @@ def build(work: Path, output: Path) -> dict:
     sfc = merge_sfc(sfc_core, sfc_home, work / 'merged/sfc-complete.jar')
     gradle('piq-md-home', ['clean', 'check', 'jar'], common, 'md')
     md = ROOT / 'piq-md-home/build/libs' / ('game_console_md-' + version('piq-md-home') + '.jar')
-    gradle('piq-native-arcade', ['clean', 'check', 'jar'], dict(common, embeddedRuntimePython=sys.executable), 'arcade')
+    gradle('piq-native-arcade', ['clean', 'check', 'jar'], arcade_gradle_properties(fc, inputs), 'arcade')
     arcade = ROOT / 'piq-native-arcade/build/libs' / ('piq_native_arcade-' + version('piq-native-arcade') + '.jar')
     gradle('piq-pvz-addon', ['clean', 'check', 'jar'], common, 'pvz')
     pvz = ROOT / 'piq-pvz-addon/build/libs/game_console_pvz-0.1.0-prototype.12.jar'

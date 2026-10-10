@@ -23,8 +23,11 @@ class CabinetClientSafetyTest {
         assertTrue(s.contains("generation++;var previous=launch;var previousRoom=room;var previousConnection=sessionConnection;launch=null;backend=null;room=null;netplayGrant=null;peers=null"));
         assertTrue(s.contains("mc.getConnection()==previousConnection"));
         assertTrue(s.contains("if(media!=null){media.close();media=null;}"));
-        assertTrue(s.contains("var old=emulator;emulator=null;CabinetCleanup.closeRetro(old)"));
-        assertTrue(s.contains("if(pending!=old)CabinetCleanup.closeRetro(pending)"));
+        assertTrue(s.contains("var old=emulator;emulator=null;retireEmulator(old)"));
+        assertTrue(s.contains("if(pending!=old)retireEmulator(pending)"));
+        String stop=s.substring(s.indexOf("static void stop(String reason,boolean notifyServer){"),s.indexOf("private static void release(UUID id)"));
+        assertTrue(stop.indexOf("retainRetirement(emulator)")<stop.indexOf("launch=null"));
+        assertTrue(stop.contains("retainRetirement(value);\n        CabinetCleanup.closeRetro(value);")||stop.contains("retainRetirement(value);\r\n        CabinetCleanup.closeRetro(value);"));
     }
     @Test void focusClearChecksKeyboardCallbacksAsWellAsTickAndRender()throws Exception{var s=source("CabinetPlayScreen");assertTrue(s.contains("if(!active&&focused){keys.clear();CabinetClientBackends.clearInput();}"));assertTrue(s.contains("keyReleased(int key,int scan,int modifiers){checkFocus();"));assertTrue(s.contains("keyPressed(int key,int scan,int modifiers){\n        checkFocus();")||s.contains("keyPressed(int key,int scan,int modifiers){\r\n        checkFocus();"));assertTrue(s.contains("removed(){keys.clear();CabinetClientBackends.clearInput();}"));assertFalse(s.contains("setKey("));assertFalse(s.contains("mouseHandler.grabMouse"));}
     @Test void longLabelsUsePixelFitAndDescriptionsWrap()throws Exception{assertTrue(source("CabinetMenuScreen").contains("DeviceUi.row(font,"));assertTrue(source("CabinetMenuScreen").contains("page=layout.page()"));assertTrue(source("CabinetSetupScreen").contains("extends cn.piq.fcarcade.client.ui.DeviceScreen"));assertTrue(source("CabinetSetupScreen").contains("Tooltip.create"));assertTrue(source("CabinetSetupScreen").contains("DeviceUi.row(font,"));String picker=source("../rom/LocalRomPickerScreen");assertTrue(picker.contains("DeviceUi.button(font,"));assertTrue(source("../ui/DeviceUi").contains("fit(font,getMessage().getString(),w-14)"));assertTrue(picker.contains("font.plainSubstrByWidth"));assertTrue(picker.contains("font.split(Component.literal(clean(text)),w)"));assertTrue(picker.contains("Tooltip.create"));assertTrue(source("CabinetPlayScreen").contains("font.split(Component.literal(line),boxWidth)"));}

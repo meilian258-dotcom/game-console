@@ -20,6 +20,8 @@ Retro Platform 是主模组与附属共用的 Java 源码库，负责核心运�
 
 ## 统一 RetroArch 后端与兼容边界
 
+FC76.49／街机1.5.11 后续新增公共机柜的 `NetplayVariant`／`NetplayLaunchSpec` 与 RetroArch 文件内容适配，由原版 FBNeo 首批试验；这些 Minecraft 选择／房间接口仍留在主包，不反向放进本库。完整状态一致性尚未通过、旧 JNI 保持，见[试验接口与边界](../piq-fc-arcade/design/RetroArch-Netplay-街机试验接入.md)。下文 LOCAL 首批不等于此 Netplay 试验。
+
 后续方向是整个模组统一公共 RetroArch 后端，JNI 暂时保留兼容；不是把所有现有运行器改成同名枚举就已迁移。FC76.47 的主包入口 `cn.piq.fcarcade.retroarch.RetroArchSession` 复用 `NetplayProcess.Role.LOCAL`，由 RetroArch 自主计时，提供输入、音画、检查点及异步关闭；LOCAL 不启用 Netplay 网络。它不是 `LibretroRuntime` 实现，不提供逐帧 STEP、暂停、RESET 或运行中恢复。
 
 纯基础类型、可信资源描述和 `LibretroContentFiles` 继续留在本库；与现有进程协议、主包服务有关的会话留在主包，不为调用它引入本库到主包的反向依赖。`LibretroRuntimes` 的现行逐帧 JNI／旧进程路线保持兼容；需要逐帧内存读取、状态封装、准备后激活或特殊外设的调用者须分别适配，不能直接替换工厂。

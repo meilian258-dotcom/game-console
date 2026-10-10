@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /** FC owns cabinet/GUI/leases. Media uses common JNI; legacy snapshot sync retains its verified worker. */
 public final class NativeCabinetBackend implements CabinetBackend {
     @Override public String description(){
-        try{return "JNI Netplay 使用 FBNeo；普通音画使用 MAME · "+(NativeMediaBackend.selected()==NativeMediaBackend.RETROARCH?"RetroArch 独立进程（试验）":"JNI")+"。旧本地同步保持兼容";}
+        try{return "Netplay 可选 JNI · FBNeo state-v3 或 RetroArch · 原版 FBNeo（实验、不存档）；普通音画使用 MAME · "+(NativeMediaBackend.selected()==NativeMediaBackend.RETROARCH?"RetroArch 独立进程（试验）":"JNI")+"。旧本地同步保持兼容";}
         catch(IllegalArgumentException invalid){return invalid.getMessage();}
     }
     @Override public String extensions(){return ".zip（如 dino.zip、kov.zip；独立完整 ROM 集，BIOS 放同目录）";}
@@ -56,6 +56,15 @@ public final class NativeCabinetBackend implements CabinetBackend {
     @Override public String netplayUnavailableReason(){return System.getProperty("os.name","").startsWith("Windows")&&System.getProperty("os.arch","").matches("amd64|x86_64")?null:"Netplay 实验当前仅支持 Windows x64";}
     @Override public NetplayFactory prepareNetplayFactory(){
         return NativeNetplayContent::loadFiles;
+    }
+    @Override public String netplayUnavailableReason(String variant){
+        try{cn.piq.nativearcade.NativeNetplayProfile.variant(variant);}
+        catch(IllegalArgumentException invalid){return invalid.getMessage();}
+        return netplayUnavailableReason();
+    }
+    @Override public NetplayFactory prepareNetplayFactory(String variant){
+        String trusted=cn.piq.nativearcade.NativeNetplayProfile.variant(variant).id();
+        return rom->NativeNetplayContent.loadFiles(rom,trusted);
     }
     @Override public CabinetSyncCore openSync(Path rom)throws Exception{
         throw new java.io.IOException("本地同步必须使用主线程捕获的开局上下文");

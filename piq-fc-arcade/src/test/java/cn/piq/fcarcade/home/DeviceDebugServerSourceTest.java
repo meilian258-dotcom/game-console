@@ -68,7 +68,7 @@ class DeviceDebugServerSourceTest {
         assertTrue(home.contains("DeviceDebugPolicy.validRequest(revision,mode,occupancy,approval)"));
         assertTrue(menu.contains("TrafficPayloadRegistrar.create(event,\"cabinet-4\")"));assertTrue(menu.contains("entries.isEmpty()"));
         assertTrue(menu.contains("this(target,token,entries,selected,false)"));assertTrue(menu.contains("b.writeBoolean(p.debugTool())"));
-        assertTrue(sync.contains("TrafficPayloadRegistrar.create(event,\"cabinet-sync-10\")"));assertTrue(sync.contains("this(target,backend,mode,null)"));
+        assertTrue(sync.contains("TrafficPayloadRegistrar.create(event,\"cabinet-sync-11\")"));assertTrue(sync.contains("this(target,backend,mode,null)"));
         assertTrue(sync.contains("writeDebugToken(b,p.debugToken)"));assertTrue(sync.contains("readDebugToken(b)"));
     }
 }

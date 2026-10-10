@@ -35,6 +35,7 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
     private static final ExecutorService STARTER=Executors.newSingleThreadExecutor(r->{var t=new Thread(r,"PIQ-Cabinet-Open");t.setDaemon(true);return t;});
     private static final AtomicBoolean OPENING=new AtomicBoolean();
     private static final AtomicReference<RetroEmulator> PENDING=new AtomicReference<>();
+    private static final CabinetRetirementGate RETIRING_NETPLAY=new CabinetRetirementGate();
     private static CabinetNetwork.Launch launch;
     private static CabinetRoomNetwork.Assignment room;
     private static CabinetRoomNetwork.NetplayStart netplayGrant;
@@ -81,8 +82,8 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         var target=CabinetTarget.resolve(mc.level,d.origin().pos());
         if(target==null||!target.identity().equals(d.origin().identity()))throw new IllegalStateException("旁观机柜已改变");
         var provider=find(start.backend());if(provider==null)throw new IllegalStateException("未安装此街机核心附属");
-        String problem=provider.netplayUnavailableReason();if(problem!=null)throw new IllegalStateException(problem);
-        var factory=provider.prepareNetplayFactory();
+        String problem=provider.netplayUnavailableReason(start.launch().variant());if(problem!=null)throw new IllegalStateException(problem);
+        var factory=provider.prepareNetplayFactory(start.launch().variant());
         var key=CabinetGameSelection.key(target.dimension(),target.identity(),start.backend()).orElseThrow();
         var request=new CabinetNetwork.Launch(target,start.backend(),start.watch().lease());
         // Match the host timeline shape, not its authority: WatchClient still grants port -1 and host/player=false.
@@ -93,7 +94,7 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         return new cn.piq.fcarcade.client.watch.NetplayWatchContent.Preparation(()->{
             Path path=CabinetSharedGames.resolve(request,null,false,provider,key,connection);
             if(!start.romHash().equals(CabinetSharedGames.resolvedHash(request.lease())))throw new IllegalStateException("旁观游戏已改变");
-            return factory.open(path);
+            var content=factory.open(path);CabinetNetplay.verify(start.backend(),start.launch(),content.profile());return content;
         },()->CabinetSharedGames.cancel(request.lease()),cabinetTopology);
     }
     static boolean configure(CabinetNetwork.Menu menu,ResourceLocation selected){
@@ -125,6 +126,7 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         if(controlEnabled)CabinetClientOwner.acquire(INPUT_OWNER);else CabinetClientOwner.release(INPUT_OWNER);
     }
     @Override public void netplay(CabinetRoomNetwork.NetplayStart value){
+        String retiring=netplayRetirementReason();if(retiring!=null){release(value.assignment().member());notice(retiring);return;}
         cn.piq.fcarcade.client.watch.WatchClient.controlStarting(value.wire());
         if(room!=null&&room.member().equals(value.assignment().member())&&Minecraft.getInstance().getConnection()==sessionConnection)return;
         if(shuttingDown||launch!=null||room!=null||OPENING.get()){release(value.assignment().member());return;}
@@ -146,6 +148,8 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         var mc=Minecraft.getInstance();
         if(room!=null&&room.member().equals(request.member())&&mc.getConnection()==sessionConnection)return;
         if(!HISTORY.accept(mc.getConnection(),request.member())){notice("已忽略过期街机席位；若频繁切换请重新连接服务器");return;}
+        String retiring=netplayRetirementReason();
+        if(retiring!=null&&request.mode()!=CabinetSyncMode.SERVER_MEDIA&&(request.port()==0||request.mode()==CabinetSyncMode.LOCAL_SYNC)){release(request.member());notice(retiring);return;}
         var selected=find(request.backend());
         if(shuttingDown||launch!=null||room!=null||OPENING.get()||mc.player==null||mc.getConnection()==null
                 ||!request.target().matches(mc.level)||CabinetUseGuard.blocked()||cn.piq.fcarcade.client.ClientArcadeEvents.isControlling()
@@ -183,7 +187,9 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
                 ||!d.origin().pos().equals(room.primary().anchor())||!d.origin().identity().equals(room.primary().identity()))return;
         watchers=value.watchers();watchExpires=System.nanoTime()+6_000_000_000L;updateMediaDemand();
     }
-    public static boolean hasLocalSession(){return launch!=null||room!=null||OPENING.get();}
+    public static boolean hasLocalSession(){return launch!=null||room!=null||OPENING.get()||netplayRetirementReason()!=null;}
+    /** Read-only client-wide closing status; no timeout or reconnect can convert failure to success. */
+    public static String netplayRetirementReason(){return RETIRING_NETPLAY.reason();}
     /** Only the currently admitted local core is inspected; receivers do not pretend to measure the host. */
     static List<String> mediaDiagnostics(){
         if(!playing||emulator==null||!current())return List.of();
@@ -267,7 +273,8 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         if(!network&&!HISTORY.accept(mc.getConnection(),request.lease()))return;
         boolean configuring=CONFIGURE.consume(mc.getConnection(),request.target(),request.backend().toString(),System.nanoTime());
         var selectedKey=CabinetGameSelection.key(request.target().dimension(),request.target().identity(),request.backend());
-        String error=selected==null?"客户端没有安装对应的模拟器附属":hosted()?null:netplay()?selected.netplayUnavailableReason():synchronous()?selected.syncUnavailableReason():selected.unavailableReason();
+        String error=selected==null?"客户端没有安装对应的模拟器附属":hosted()?null:netplay()?selected.netplayUnavailableReason(netplayGrant.launch().variant()):synchronous()?selected.syncUnavailableReason():selected.unavailableReason();
+        if(error==null&&!hosted())error=netplayRetirementReason();
         if(CabinetUseGuard.blocked()){release(request.lease());return;}
         var metadata=CabinetBackends.find(request.backend());
         if(error==null&&metadata==null)error="客户端与服务器的模拟器声明不一致";
@@ -311,6 +318,7 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         startGame(null,false);
     }
     private static void startGame(Path chosen,boolean remember){
+        String retiring=netplayRetirementReason();if(retiring!=null&&!hosted()){stop(retiring,true);return;}
         if(!current()||emulator!=null||!OPENING.compareAndSet(false,true))return;
         if(hosted()){startHosted(chosen,remember);return;}
         if(netplay()){startNetplay(chosen,remember);return;}
@@ -435,6 +443,7 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         stop(null,notifyServer);
     }
     static void stop(String reason,boolean notifyServer){
+        retainRetirement(emulator); // Publish the closing claim before releasing UI/input/session ownership.
         generation++;var previous=launch;var previousRoom=room;var previousConnection=sessionConnection;launch=null;backend=null;room=null;netplayGrant=null;peers=null;watchers=0;watchExpires=0;
         PGM_START.cancel();
         if(previous!=null)CabinetSharedGames.cancel(previous.lease());else if(previousRoom!=null)CabinetSharedGames.cancel(previousRoom.member());
@@ -445,12 +454,18 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         GamepadInput.release(INPUT_OWNER);mixedInputMask=0;
         cn.piq.retro.client.KeyboardInput.release(INPUT_OWNER);
         CabinetClientOwner.release(INPUT_OWNER);
-        var old=emulator;emulator=null;CabinetCleanup.closeRetro(old);
-        var pending=PENDING.getAndSet(null);if(pending!=old)CabinetCleanup.closeRetro(pending);
+        var old=emulator;emulator=null;retireEmulator(old);
+        var pending=PENDING.getAndSet(null);if(pending!=old)retireEmulator(pending);
         if(audio!=null){audio.close();audio=null;}dropTexture();
         var mc=Minecraft.getInstance();if(mc.screen instanceof CabinetSetupScreen||mc.screen instanceof CabinetPlayScreen)mc.setScreen(null);
         if(notifyServer&&mc.getConnection()==previousConnection){if(previous!=null)release(previous.lease());else if(previousRoom!=null)release(previousRoom.member());}if(reason!=null)notice(reason);
     }
+    private static void retireEmulator(RetroEmulator value){
+        // Register before dispatching asynchronous close, while this exact instance is still owned.
+        retainRetirement(value);
+        CabinetCleanup.closeRetro(value);
+    }
+    private static void retainRetirement(RetroEmulator value){if(value instanceof CabinetNetplayEmulator netplay)netplay.processRetirement().ifPresent(RETIRING_NETPLAY::retain);}
     private static void release(UUID id){if(Minecraft.getInstance().getConnection()!=null)CabinetNetwork.send(new CabinetNetwork.Release(id));}
     static void notice(String text){cn.piq.fcarcade.client.ui.DeviceNoticesClient.message("街机",text);}
     static String shortText(String text,int max){if(text==null)return "";String clean=text.replaceAll("[\\p{Cntrl}]"," ");return clean.length()>max?clean.substring(0,max)+"…":clean;}
@@ -532,8 +547,8 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
         var mc=Minecraft.getInstance();var request=launch;var assignment=room;var grant=netplayGrant;var provider=backend;var key=selectionKey;
         var connection=mc.getConnection().getConnection();int token=++generation;
         try{
-            String problem=provider.netplayUnavailableReason();if(problem!=null)throw new IllegalStateException(problem);
-            var factory=Objects.requireNonNull(provider.prepareNetplayFactory());
+            String problem=provider.netplayUnavailableReason(grant.launch().variant());if(problem!=null)throw new IllegalStateException(problem);
+            var factory=Objects.requireNonNull(provider.prepareNetplayFactory(grant.launch().variant()));
             if(!netplay()||grant!=netplayGrant||!current())throw new IllegalStateException("Netplay launch cancelled");
             configureSelection=false;playing=true;announced=false;INPUT.reset();mc.setScreen(null);
             STARTER.execute(()->{
@@ -543,6 +558,7 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
                     if(shuttingDown||generation!=token)return;
                     CabinetGameSelection.validate(path,provider.romExtensions(),provider.romExcludedNames());
                     var content=factory.open(path);
+                    CabinetNetplay.verify(assignment.backend(),grant.launch(),content.profile());
                     if(shuttingDown||generation!=token)return;
                     mc.execute(()->{
                         if(generation!=token||launch!=request||room!=assignment||netplayGrant!=grant||!current()||mc.getConnection().getConnection()!=connection)return;

@@ -20,6 +20,16 @@ bootstrap 身份；这里不预设尚未发布的 URL。普通本地开发可按
 `prepareMameLifecycleRuntime` 只校验并打包既有 DLL，不重新编译 MAME。
 对应核心源码与构建说明应随候选保留。旧 MAME/FBNeo 资源仍使用原身份。
 
+街机 `0.1.5.11` 的原版 FBNeo 试验使用独立固定 DLL 和源码 ZIP，普通本地候选已完成
+`check jar`；这不表示自动快照或云端构建已可用。普通构建显式传入
+`-PfbneoStockCore=<已核验原版 DLL>`、`-PfbneoStockSource=<固定源码 ZIP>` 及
+`-PembeddedRuntimePython=<Python 路径>`。快照输入准备额外要求成对传入
+`--fbneo-stock-core <原版 DLL>`、`--fbneo-stock-source <固定源码 ZIP>`，按
+`snapshot_stock.py` 的固定大小与 SHA 导入同一回执；构建与临时源码复制后会复验，并将
+回执中的路径显式传给街机 Gradle。缺件或身份不符即停止，不读取私有 vendor 缓存、
+下载最新核心或跳过 stock 资源。匹配的固定公开输入尚未发布，现有 JNI bootstrap
+下载前阻断仍保留；本分支自动 CI 尚未通过，不能据本地候选成功声称云端已就绪。
+
 快照准备和 Gradle 前置检查都要求新 MAME DLL 与公开 NOTICE 同时存在，且与固定清单完全一致。
 即使修改输入回执，也不能跳过清单中的核心和补丁校验；两项资源缺失、替换或不配套都失败。
 尚未发布匹配 bootstrap 成品时，保持原下载前阻断，不使用旧公开包假装包含这次修复。

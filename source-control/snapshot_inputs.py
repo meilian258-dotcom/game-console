@@ -3,6 +3,8 @@
 Only ordinary supported libretro cores come from the two official nightly
 directories. Project-specific Netplay/bridge libraries and legacy runtimes are
 extracted from a SHA-pinned public release, never from a developer's machine.
+The fixed FBNeo stock core/source pair is an explicit, verified local input;
+it has no implicit vendor cache or download fallback.
 No downloaded native library is executed by this preparation command.
 """
 from __future__ import annotations
@@ -23,6 +25,7 @@ import zipfile
 
 from build_inputs import cache_path, load_lock, no_links, relative, verify
 from snapshot_build import MAME_LIFECYCLE_RESOURCES, verify_mame_lifecycle_resources
+import snapshot_stock
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = 'https://github.com/meilian258-dotcom/game-console/releases/download/full-test-20261007-r1/'
@@ -245,8 +248,8 @@ def extract_bootstrap(pins: dict[str, Path], output: Path, source: Path) -> None
             for name in index:
                 if not any(name == prefix or (prefix.endswith('/') and name.startswith(prefix)) for prefix in prefixes):
                     continue
-                if name == CURRENT_HELPER:
-                    continue  # the current native worker is compiled from source
+                if name == CURRENT_HELPER or snapshot_stock.generated_resource(name):
+                    continue  # Current helper/stock resources have their own preparation tasks.
                 if name.endswith('.class') or 'blastem' in name.lower():
                     raise ValueError('Foreign class or retired core in native resources')
                 data = jar.read(index[name])
@@ -264,7 +267,8 @@ def extract_bootstrap(pins: dict[str, Path], output: Path, source: Path) -> None
             verify_mame_lifecycle_resources(output / 'resources' / bucket, source)
 
 
-def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = None) -> dict:
+def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = None,
+            fbneo_stock_core: Path | None = None, fbneo_stock_source: Path | None = None) -> dict:
     output = no_links(output.absolute())
     # Nightly is resolved exactly once per run. Resume by invoking the build with
     # its verified receipt, not by accidentally mixing two downloads of latest.
@@ -273,7 +277,9 @@ def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = N
     # Fail before network or even offline bootstrap copying; never silently
     # satisfy the new API from an old bridge or an unrelated nightly runtime.
     require_published_jni_bundle(load_lock(source / 'source-control/build-inputs.json'))
+    stock_sources = snapshot_stock.inspect_pair(fbneo_stock_core, fbneo_stock_source)
     output.mkdir(parents=True, exist_ok=True)
+    snapshot_stock.import_pair(output, stock_sources)
     pins, boot_records, sources = {}, [], []
     for ident, (filename, size, sha) in BOOTSTRAP.items():
         destination = output / 'bootstrap' / filename
@@ -306,6 +312,7 @@ def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = N
             files.append(record(path, output))
     receipt = dict(schema=1, resolvedAt=datetime.now(timezone.utc).isoformat(),
                    bootstrap=boot_records, files=files, nightly=nightly, sources=sources)
+    snapshot_stock.verify_receipt(output, {entry['path']: entry for entry in files})
     put(output / 'receipt.json', (json.dumps(receipt, indent=2, ensure_ascii=True)+'\n').encode())
     return receipt
 
@@ -314,9 +321,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('.snapshot-build/inputs'))
     parser.add_argument('--bootstrap-dir', type=Path, help='Optional offline copies of the six exact public release JARs')
+    parser.add_argument('--fbneo-stock-core', type=Path, help='Explicit reviewed original FBNeo DLL; fixed SHA/size, no download')
+    parser.add_argument('--fbneo-stock-source', type=Path, help='Matching fixed FBNeo source ZIP; required with --fbneo-stock-core')
     args = parser.parse_args()
     try:
-        receipt = prepare(args.output, bootstrap_dir=args.bootstrap_dir)
+        receipt = prepare(args.output, bootstrap_dir=args.bootstrap_dir,
+                          fbneo_stock_core=args.fbneo_stock_core, fbneo_stock_source=args.fbneo_stock_source)
         print(json.dumps(dict(ok=True, bootstrap=len(receipt['bootstrap']), nightly=len(receipt['nightly']),
                               files=len(receipt['files'])), sort_keys=True))
         return 0

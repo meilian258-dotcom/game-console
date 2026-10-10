@@ -215,7 +215,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         if(r.task==null)return "排队准备";
         if(!r.task.done())return "准备游戏内容";
         if(r.netplay==null)return "准备核心";
-        return r.netplay.ready()?"正在旁观":r.netplay.status();
+        return r.netplay.ready()?(Boolean.FALSE.equals(r.nativeMode)?"本机音画就绪 / 同步未验":"正在旁观"):r.netplay.status();
     }
     /** Main-thread snapshot. Includes closing owners; a closed window is not a freed native slot. */
     public static ManagementView managementView(){

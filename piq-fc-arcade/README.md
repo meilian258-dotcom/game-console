@@ -11,7 +11,7 @@
 - 目标环境是 Minecraft 1.21.1、NeoForge 21.1 和 Java 21；当前最低声明为 NeoForge 21.1.229，不是 Forge 1.20.1 或其他 Minecraft 版本的安装包。
 - 客户端和服务器都要安装主模组，附属按同批配套清单安装。使用原生模拟器的运行端目前以 Windows x64 为支持目标，不能从服务端能够启动推断所有平台都能运行游戏。
 - 主包已经提供内部公共库，不要另装 `piq-retro-platform`。WaterFrames 是可选兼容对象，不是必装前置。
-- GitHub 提供源码和限定的 [MD15 补丁测试版](https://github.com/meilian258-dotcom/game-console/releases)，目前不提供完整主包发行。补丁需要已有配套 FC76.43；网页的 Code → Download ZIP 仍是源码，不能放进 `mods`，测试版也不等于稳定版。
+- GitHub 已有[整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)，它不是下文的新开发候选。网页的 Code → Download ZIP 是源码，不能放进 `mods`；测试版不等于稳定版，不从不同批次随意拼包。
 - 不附带商业游戏 ROM 或 BIOS。请自行准备有权使用的内容，服务器上传还需服主授权。
 
 ## 先玩一台 FC
@@ -39,7 +39,9 @@
 
 目前仍是测试候选。源码版本见本目录 `gradle.properties`；配套关系、已验证项目与未验场景以对应交付说明为准，不凭版本号认定稳定。
 
-后续方向是整个模组统一 RetroArch 后端，JNI 暂时保留兼容。FC76.47／原生街机1.5.9 首批只接入街机公共机柜的客户端音画串流试用：本机显式设置 `-Dpiq.arcade.mediaBackend=retroarch` 才选择新路线，默认仍是 `jni`，不迁移旧存档，也不改变服务器的席位、投币或内容权限。固定 MAME 的隔离音画、输入及进程回收首验通过，Minecraft 多人和长局仍待验；FC、SFC、MD、GBA 及街机其他路线仍待迁移。详细能力和待验范围见[统一 RetroArch 后端制作记录](design/统一RetroArch后端-20261009.md)。
+后续方向是整个模组统一 RetroArch 后端，JNI 暂时保留兼容。当前 FC76.49／街机1.5.11 增加[街机 RetroArch Netplay 试验入口](design/RetroArch-Netplay-街机试验接入.md)：管理员在设备菜单显式选择原版 FBNeo，服务器为全局参与者固定同一后端，默认不变、旧档不迁移。隔离双人操作已跑通，但同模拟帧状态 CRC 存在差异，完整同步验收未通过；不要当作稳定版替换现用路线。此入口无需启动参数，暂不保存进度。
+
+此前的 MAME 音画串流试用仍由 `-Dpiq.arcade.mediaBackend=retroarch` 单独控制，它不是 Netplay 开关。FC、SFC、MD、GBA 尚未迁移；Minecraft 多人和长局仍待验。首批记录保留在[统一 RetroArch 后端制作记录](design/统一RetroArch后端-20261009.md)。
 
 公共流程、存档及旁观已被多个组件复用，但不是所有历史机器、保存格式和运行模式都统一完成。FC76.43 已修正 Iris 下公共屏幕误用加法混合通道的问题；隔离 GPU 检查通过，具体光影包仍需 Minecraft 实机验证。范围和配套见[光影与 MD 图标修复说明](design/光影透屏与MD图标修复-20261006.md)，不能据自动测试宣称全部光影兼容。
 

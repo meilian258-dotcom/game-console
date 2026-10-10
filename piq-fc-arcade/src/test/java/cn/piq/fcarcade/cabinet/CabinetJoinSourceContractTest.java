@@ -67,6 +67,6 @@ class CabinetJoinSourceContractTest {
         assertFalse(network.contains("readBlockPos"));assertFalse(network.contains("net.minecraft.client"));
         assertTrue(source("CabinetNetwork").contains("CabinetJoinNetwork.register(event)"));
         // Mixed physical seat ranges require the new mandatory room cohort; join consent stays additive.
-        assertTrue(source("CabinetRoomNetwork").contains("TrafficPayloadRegistrar.create(event,\"cabinet-room-10\")"));
+        assertTrue(source("CabinetRoomNetwork").contains("TrafficPayloadRegistrar.create(event,\"cabinet-room-11\")"));
     }
 }

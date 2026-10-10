@@ -123,8 +123,8 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
             # Unified content paths / file-backed JNI content require FC 76.40.
             'piq-sfc-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
             'piq-md-home': '[0.31.0-alpha.76.36,0.31.0-alpha.77)',
-            # Lifecycle core requires FC 76.46's JNI dependency API 1 and shared libc++.
-            'piq-native-arcade': '[0.31.0-alpha.76.46,0.31.0-alpha.77)',
+            # RetroArch Netplay variants require FC 76.49's shared launch contract.
+            'piq-native-arcade': '[0.31.0-alpha.76.49,0.31.0-alpha.77)',
             'piq-gba': '[0.31.0-alpha.76.31,0.31.0-alpha.77)',
             'piq-computer': '[0.31.0-alpha.76.26,0.31.0-alpha.77)',
             'piq-pvz-addon': '[0.31.0-alpha.76.22,0.31.0-alpha.77)',

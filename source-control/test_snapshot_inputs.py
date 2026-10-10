@@ -76,6 +76,17 @@ class InputTests(unittest.TestCase):
             self.assertEqual(data, (self.root / 'out/resources/arcade' / name).read_bytes())
         validator.assert_called_once_with(self.root / 'out/resources/arcade', self.root / 'source')
 
+    def test_bootstrap_stock_is_excluded_so_current_task_is_single_packaging_owner(self):
+        from unittest.mock import Mock
+        entries = dict(zip(subject.MAME_LIFECYCLE_RESOURCES, (b'core fixture', b'notice fixture')))
+        stock = {prefix + 'old-stock-input': b'must not be bootstrapped'
+                 for prefix in subject.snapshot_stock.GENERATED_PREFIXES}
+        self.extract_arcade_fixture({**entries, **stock}, Mock())
+        for name in stock:
+            self.assertFalse((self.root / 'out/resources/arcade' / name).exists())
+        for name, data in entries.items():
+            self.assertEqual(data, (self.root / 'out/resources/arcade' / name).read_bytes())
+
     def test_mame_extraction_rejects_missing_pair_even_with_legacy_payload(self):
         from unittest.mock import Mock
         for omitted in ((subject.MAME_LIFECYCLE_RESOURCES[0],),

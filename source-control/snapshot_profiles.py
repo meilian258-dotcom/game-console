@@ -39,9 +39,9 @@ ARTIFACTS = {
 UNCOMMITTED_BUILD_FILES = (
     '.github/workflows/snapshot.yml', 'source-control/snapshot-resources.gradle',
     'source-control/snapshot_build.py', 'source-control/snapshot_inputs.py',
-    'source-control/snapshot_profiles.py', 'source-control/snapshot_release.py',
+    'source-control/snapshot_profiles.py', 'source-control/snapshot_release.py', 'source-control/snapshot_stock.py',
     'source-control/test_snapshot_build.py', 'source-control/test_snapshot_inputs.py',
-    'source-control/test_snapshot_profiles.py', 'source-control/test_snapshot_release.py',
+    'source-control/test_snapshot_profiles.py', 'source-control/test_snapshot_release.py', 'source-control/test_snapshot_stock.py',
 )
 FC = 'piq-fc-arcade/src/main/java/cn/piq/fcarcade/'
 GBA = 'piq-gba/src/main/java/cn/piq/gba/bridge/'
@@ -337,6 +337,23 @@ def write_json(path: Path, value: dict) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
 
+def copy_receipted_inputs(inputs: Path, dest: Path, receipt: dict) -> None:
+    all_records = {}
+    for entry in [*receipt['files'], *receipt['bootstrap'], *receipt['nightly']]:
+        name = safe_name(entry['path'])
+        if name in all_records and (all_records[name]['sha256'], all_records[name]['bytes']) != (entry['sha256'], entry['bytes']):
+            raise ValueError('Conflicting receipt record')
+        all_records[name] = entry
+    for name, entry in sorted(all_records.items()):
+        source = checked(inputs, entry)
+        target = dest / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+    # Fixed stock is copied only from the verified receipt, never ignored vendor files.
+    from snapshot_stock import verify_receipt as verify_stock_receipt
+    verify_stock_receipt(dest, all_records)
+
+
 def prepare(root: Path, inputs: Path, output: Path, jdk: Path) -> dict:
     root, inputs, output, jdk = [p.absolute() for p in (root, inputs, output, jdk)]
     for p in (root, inputs, output, jdk):
@@ -353,17 +370,7 @@ def prepare(root: Path, inputs: Path, output: Path, jdk: Path) -> dict:
     copy_checkout(root, output)
     dest = output / 'snapshot-inputs'
     dest.mkdir()
-    all_records = {}
-    for entry in [*receipt['files'], *receipt['bootstrap'], *receipt['nightly']]:
-        name = safe_name(entry['path'])
-        if name in all_records and (all_records[name]['sha256'], all_records[name]['bytes']) != (entry['sha256'], entry['bytes']):
-            raise ValueError('Conflicting receipt record')
-        all_records[name] = entry
-    for name, entry in sorted(all_records.items()):
-        source = checked(inputs, entry)
-        target = dest / name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
+    copy_receipted_inputs(inputs, dest, receipt)
     lockfile = output / 'source-control/build-inputs.json'
     lock = json.loads(lockfile.read_text(encoding='utf-8'))
     for ident in ('mesen-windows', 'mesen-linux'):
