@@ -50,7 +50,7 @@ public final class HomeLaunchScreen extends DeviceScreen {
     @Override public boolean isPauseScreen(){return false;}
     @Override public void render(GuiGraphics g,int mx,int my,float dt){g.fill(0,0,width,height,DeviceUi.BG);var p=layout.panel();String heading=data.stage()==Stage.JOIN_CONFIRM?"是否允许第二名玩家加入？":data.stage()==Stage.SAVE_SELECTION?"选择存档":"开局准备";
         DeviceUi.panel(g,font,p.x(),p.y(),p.width(),p.height(),data.label()+" / "+heading,data.title());
-        if(width>=320&&height>=240){String info=confirmFresh?"旧进度不会立即删除；下一次成功保存才替换。":data.stage()==Stage.JOIN_CONFIRM?"只决定本局加入许可；不会修改存档单双人标签。":data.stage()==Stage.SAVE_SELECTION?(data.maxPlayers()>1?"选择进度后再确认本局是否允许 2P。":"选择进度后开始本局单人游戏。"):"正在准备，尚未开放输入和公开音画。";
+        if(width>=320&&height>=240){String info=confirmFresh?"旧进度不会立即删除；下一次成功保存才替换。":data.stage()==Stage.JOIN_CONFIRM?"只决定本局加入许可；不会修改存档单双人标签。":data.stage()==Stage.SAVE_SELECTION?(data.maxPlayers()>1?"选择进度后准备本局；存档人数标签不改变 2P 许可。":"选择进度后开始本局单人游戏。"):"正在准备，尚未开放输入和公开音画。";
             DeviceUi.text(g,font,info,layout.left(),layout.rowY(1)+6,layout.bodyWidth(),DeviceUi.MUTED);if(data.stage()==Stage.SAVE_SELECTION&&!confirmFresh)DeviceUi.text(g,font,"存档名称",layout.left(),layout.rowY(2)+6,layout.labelWidth(),DeviceUi.TEXT);
             DeviceUi.status(g,font,data.message(),layout.left(),layout.statusY(),layout.bodyWidth(),false);
         }else DeviceUi.text(g,font,"请降低 GUI 缩放或放大窗口",layout.left(),layout.rowY(0),layout.bodyWidth(),DeviceUi.MUTED);

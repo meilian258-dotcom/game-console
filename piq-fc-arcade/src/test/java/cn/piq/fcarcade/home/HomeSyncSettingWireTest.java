@@ -10,6 +10,22 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HomeSyncSettingWireTest {
+    @Test void secondPortStateAndCapabilityRoundTripIndependentlyOfOldApproval(){
+        for(boolean allowed:new boolean[]{false,true})for(boolean supported:new boolean[]{false,true})for(boolean approval:new boolean[]{false,true}){
+            var expected=new HomeSyncNetwork.Setting(UUID.randomUUID(),1,ResourceLocation.parse("minecraft:overworld"),BlockPos.ZERO,UUID.randomUUID(),"SFC",4,18,true,"",true,true,approval,true,true,Collections.nCopies(5,""),allowed,supported);
+            var b=buffer();try{HomeSyncNetwork.Setting.CODEC.encode(b,expected);assertEquals(expected,HomeSyncNetwork.Setting.CODEC.decode(b));assertEquals(0,b.readableBytes());}finally{b.release();}
+        }
+    }
+    @Test void secondPortRequestsRoundTripAndRejectMixedOrTruncatedWire(){
+        for(int allowed=0;allowed<2;allowed++){
+            var expected=new HomeSyncNetwork.Request(UUID.randomUUID(),5,-1,-1,-1,allowed);var b=buffer();
+            try{HomeSyncNetwork.Request.CODEC.encode(b,expected);assertEquals(expected,HomeSyncNetwork.Request.CODEC.decode(b));assertEquals(0,b.readableBytes());
+                b.readerIndex(0);b.writerIndex(b.writerIndex()-4);assertThrows(RuntimeException.class,()->HomeSyncNetwork.Request.CODEC.decode(b));
+            }finally{b.release();}
+        }
+        assertEquals(-1,new HomeSyncNetwork.Request(UUID.randomUUID(),0,4,-1,-1).secondPort());
+        var b=buffer();try{b.writeUUID(UUID.randomUUID());b.writeVarInt(1);b.writeInt(4);b.writeInt(-1);b.writeInt(-1);b.writeInt(1);assertThrows(IllegalArgumentException.class,()->HomeSyncNetwork.Request.CODEC.decode(b));}finally{b.release();}
+    }
     private static RegistryFriendlyByteBuf buffer(){return new RegistryFriendlyByteBuf(Unpooled.buffer(),RegistryAccess.EMPTY);}
     private static HomeSyncNetwork.Setting setting(List<String> reasons,int mode,int mask){
         return new HomeSyncNetwork.Setting(UUID.randomUUID(),7,ResourceLocation.parse("minecraft:overworld"),new BlockPos(1,2,3),UUID.randomUUID(),"MD",
@@ -47,7 +63,7 @@ class HomeSyncSettingWireTest {
     @Test void oversizedReasonOnWireRejected(){
         var b=buffer();try{
             HomeSyncNetwork.Setting.CODEC.encode(b,setting(Collections.nCopies(5,""),0,1));
-            b.writerIndex(b.writerIndex()-5);b.writeUtf("x".repeat(257));
+            b.writerIndex(b.writerIndex()-7);b.writeUtf("x".repeat(257));
             for(int i=0;i<4;i++)b.writeUtf("");
             assertThrows(RuntimeException.class,()->HomeSyncNetwork.Setting.CODEC.decode(b));
         }finally{b.release();}

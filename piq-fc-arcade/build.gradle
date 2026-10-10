@@ -208,10 +208,8 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-def asciiClasspathRoot = new File(
-        System.getProperty('java.io.tmpdir'),
-        "piq-fc-arcade-gradle-${Integer.toUnsignedString(rootDir.absolutePath.hashCode())}"
-)
+apply from: '../source-control/build-workspace.gradle'
+def asciiClasspathRoot = piqAsciiClasspathRoot
 def asciiTestOutput = new File(asciiClasspathRoot, 'test-output')
 def asciiMainOutput = new File(asciiClasspathRoot, 'main-output')
 def asciiRuntimeJar = new File(asciiClasspathRoot, "${mod_id}-runtime.jar")
@@ -286,9 +284,10 @@ jar {
 }
 
 tasks.register('packagedRuntimeSmoke', JavaExec) {
+    piqUseBuildWorkspace(delegate)
     dependsOn tasks.named('jar'), prepareAsciiTestOutput
     doFirst {
-        asciiClasspathRoot.mkdirs()
+        piqPrepareBuildDirectory(asciiClasspathRoot)
         copy {
             from tasks.named('jar').get().archiveFile
             into asciiClasspathRoot
@@ -304,6 +303,7 @@ tasks.named('check') {
 }
 
 tasks.register('packagedLibretroSmoke', JavaExec) {
+    piqUseBuildWorkspace(delegate)
     dependsOn tasks.named('packagedRuntimeSmoke')
     classpath = files(asciiTestOutput, asciiRuntimeJar)
     mainClass = 'cn.piq.fcarcade.core.libretro.LibretroPackagedSmoke'
@@ -311,6 +311,7 @@ tasks.register('packagedLibretroSmoke', JavaExec) {
 tasks.named('check') { dependsOn tasks.named('packagedLibretroSmoke') }
 
 tasks.register('packagedGenericLibretroSmoke', JavaExec) {
+    piqUseBuildWorkspace(delegate)
     dependsOn tasks.named('packagedRuntimeSmoke')
     classpath = files(asciiTestOutput, asciiRuntimeJar)
     mainClass = 'cn.piq.fcarcade.core.libretro.GenericLibretroCompatibilitySmoke'

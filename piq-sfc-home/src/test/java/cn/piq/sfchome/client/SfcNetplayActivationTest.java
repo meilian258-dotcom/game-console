@@ -79,8 +79,40 @@ class SfcNetplayActivationTest {
         assertFalse(gate.active());gate.close();
         assertFalse(gate.activate(activation(grant),calls::incrementAndGet));assertEquals(0,calls.get());
     }
+    @Test void peerFailureAfterVideoKeepsOneClassifiedNoticeAndClosesAllResources()throws Exception{
+        for(String reason:new String[]{"JNI Netplay 确认状态 CRC 不一致","Netplay 连接已结束，请重新加入"}){
+            cn.piq.fcarcade.client.ui.DeviceNotices.clear();
+            var grant=grant(false);var host=new Host();
+            try(var playback=new SfcPlayback(grant.session(),new byte[32768],new SfcStartupProgress(),host,grant)){
+                await(()->host.frames.get()>0&&host.audio.get()>0);assertTrue(playback.started());
+                host.runtime.failure=reason;
+                await(()->playback.error()!=null&&host.runtime.closed&&!SfcCoreLease.occupied());
+                var entries=cn.piq.fcarcade.client.ui.DeviceNotices.snapshot();assertEquals(1,entries.size());
+                var entry=entries.getFirst();
+                assertEquals(cn.piq.fcarcade.client.ui.NetplayFailureCode.classifyReason(reason).summary(),entry.summary());
+                assertFalse(entry.summary().contains("本机依赖"));assertTrue(entry.detail().contains(reason));assertTrue(entry.detail().contains("core.dll"));
+                assertNull(playback.errorForLeaveNotice(),"Client cleanup must not publish a second generic failure");
+                for(int i=0;i<3;i++){
+                    String notice=playback.errorForLeaveNotice();if(notice!=null)cn.piq.fcarcade.client.ui.DeviceNotices.record("SFC",notice);
+                }
+                assertSame(entry,cn.piq.fcarcade.client.ui.DeviceNotices.last());assertEquals(1,cn.piq.fcarcade.client.ui.DeviceNotices.snapshot().size());
+                assertEquals(1,host.closes.get());assertFalse(playback.activateNetplay(activation(grant)));
+                int frames=host.frames.get(),audio=host.audio.get();Thread.sleep(30);
+                assertEquals(frames,host.frames.get());assertEquals(audio,host.audio.get());
+            }finally{cn.piq.fcarcade.client.ui.DeviceNotices.clear();}
+        }
+    }
+    @Test void normalCloseDoesNotReportTheTransportErrorProducedByCancellation()throws Exception{
+        cn.piq.fcarcade.client.ui.DeviceNotices.clear();var grant=grant(false);var host=new Host();
+        try(var playback=new SfcPlayback(grant.session(),new byte[32768],new SfcStartupProgress(),host,grant)){
+            await(()->host.frames.get()>0);playback.close();
+            await(()->host.runtime.closed&&!SfcCoreLease.occupied());
+            assertNull(playback.error());assertTrue(cn.piq.fcarcade.client.ui.DeviceNotices.snapshot().isEmpty());
+        }
+    }
     static final class Runtime implements SfcPlayback.Netplay {
         volatile boolean started,active,closed;
+        volatile String failure;
         final AtomicInteger activations=new AtomicInteger(),polls=new AtomicInteger(),nonzeroInputs=new AtomicInteger();
         public void start(){started=true;}public boolean ready(){return started&&!closed;}
         public void activate(){if(!ready())throw new IllegalStateException("not prepared");active=true;activations.incrementAndGet();}
@@ -92,8 +124,8 @@ class SfcNetplayActivationTest {
             if(polls.get()>1)return null;
             return new NetplayProcess.Frame(1,new byte[]{0,0,0,(byte)255},new float[0],1,1,1,new short[]{1,1},48000);
         }
-        public String error(){return null;}public String diagnostic(){return "fixture";}
-        public void close(){closed=true;active=false;}
+        public String error(){return failure;}public String diagnostic(){return "fixture: loaded core.dll and rom.zip successfully; 运行环境已就绪";}
+        public void close(){failure="Netplay 连接已结束";closed=true;active=false;}
     }
     static final class Host implements SfcPlayback.Host {
         final Runtime runtime=new Runtime();final ConcurrentLinkedQueue<Runnable> actions=new ConcurrentLinkedQueue<>();

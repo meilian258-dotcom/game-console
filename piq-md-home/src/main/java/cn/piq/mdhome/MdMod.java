@@ -40,6 +40,7 @@ public final class MdMod {
             public boolean occupancyDisplaySupported(){return true;}
             public boolean synchronizationSettingsAvailable(){return true;}
             public boolean jniNetplaySettingsAvailable(){return MdNetplayProfile.AVAILABLE;}
+            public boolean secondPortSettingsAvailable(){return true;}
             public int synchronizationSupportedModes(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){return MdNetplayProfile.AVAILABLE?1|16:1;}
             public boolean synchronizationSettingsBusy(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){return ((MdConsole)c).busy();}
             public boolean pendingStart(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){return cn.piq.mdhome.save.MdPublicSaves.pending(l.getServer(),c.hardwareId())||MdPrivateServer.pending((MdConsole)c);}
@@ -48,7 +49,7 @@ public final class MdMod {
             public String deviceSettingsStatus(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){
                 var md=(MdConsole)c;
                 return (md.running()?(md.publicPlay()?(md.netplayJniTrial()?"公开 JNI Netplay":"公开玩家串流 · JNI"):"私人单人")+" · 运行中":md.busy()?"正在准备或结束保存":"关机 · 下次 "+(md.netplayJniTrial()?"JNI Netplay":"JNI 串流"))+" · "+(md.televisionPos()==null?"未接电视":"已接电视")
-                        +"\n卡带："+md.cartridgeTitle()+"\n1P："+(md.borrower(0)==null?"未借出":"已借出")+" · 2P："+(md.borrower(1)==null?"未借出":"已借出")+"；第二端口由开局选择允许。";
+                        +"\n卡带："+md.cartridgeTitle()+"\n1P："+(md.borrower(0)==null?"未借出":"已借出")+" · 2P："+(md.borrower(1)==null?"未借出":"已借出")+"；设备 2P 许可："+(md.secondPortAllowed()?"允许":"禁止")+"（下次开机生效）。";
             }
             public boolean onPowerOn(net.minecraft.server.level.ServerPlayer p,HomeSystems.Connection c){return ((MdConsole)c.console()).powerOn(p,c);}
             public void onPowerOff(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){((MdConsole)c).powerOff();}

@@ -3,6 +3,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.141'
 }
 apply from: '../source-control/neoforge-compat.gradle'
+apply from: '../source-control/build-workspace.gradle'
 apply from: '../source-control/snapshot-resources.gradle'
 group = 'cn.piq.sfchome'
 version = mod_version
@@ -33,7 +34,7 @@ def metadata = tasks.register('generateModMetadata', ProcessResources) {
 }
 sourceSets.main.resources.srcDir metadata
 neoForge.ideSyncTask metadata
-def asciiRoot = new File(System.getProperty('java.io.tmpdir'), 'piq-sfc-home-tests')
+def asciiRoot = piqAsciiClasspathRoot
 def asciiTests = new File(asciiRoot, 'tests')
 def asciiMain = new File(asciiRoot, 'main')
 def asciiDependencies = new File(asciiRoot, 'dependencies')

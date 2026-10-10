@@ -182,6 +182,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
                         r.nativeMode=content.profile().jni()!=null;
                         if(!r.nativeMode&&(RECEIVERS.size()!=1||operating()))throw new IllegalStateException("Process Netplay supports one idle observer only");
                         var grant=r.grant;
+                        WatchStartConsent.requireAllowed(r.nativeMode,cn.piq.fcarcade.client.JniNetplayConsent::allowed);
                         r.netplay=captured.open(new NetplayProcess.Grant(grant.wire(),grant.ticket(),false,false),content,
                                 chunk->NetplayNetwork.upstream(r.connection,chunk));
                         NetplayNetwork.bind(r.connection,r.netplay);r.netplay.start();r.audio=new WatchAudio();

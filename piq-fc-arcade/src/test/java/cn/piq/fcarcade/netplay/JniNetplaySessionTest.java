@@ -52,6 +52,7 @@ class JniNetplaySessionTest {
         final boolean gun;
         final Core hostCore;
         volatile int delay=0;
+        volatile java.util.function.UnaryOperator<NetplayChunk> peerPackets=java.util.function.UnaryOperator.identity();
         volatile JniNetplaySession bufferedTarget;
         final Queue<Runnable> buffered=new ConcurrentLinkedQueue<>();
         Room(boolean persist){
@@ -80,7 +81,7 @@ class JniNetplaySessionTest {
             synchronized(runs){
             Object key=new Object();var ticket=relay.grant(key,port);
             var run=new JniNetplaySession(new NetplayProcess.Grant(700,ticket.id(),false,port>=0,port),()->ROM,
-                    packet->wire.schedule(()->relay.receive(key,packet),delay,TimeUnit.MILLISECONDS),gun,()->new Core(gun));
+                    packet->wire.schedule(()->relay.receive(key,peerPackets.apply(packet)),delay,TimeUnit.MILLISECONDS),gun,()->new Core(gun));
             runs.put(key,run);run.start();return run;
             }
         }

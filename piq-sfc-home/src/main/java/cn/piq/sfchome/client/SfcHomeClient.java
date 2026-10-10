@@ -207,7 +207,12 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
     }
     @Override public void stopped(SfcHomeNetwork.Stopped message) {
         var s=currentSession();
-        if(sessionCurrent(s,sessionConnection)&&s.sessionId()==message.sessionId()&&s.epoch()==message.epoch()){SfcJoinClient.stopped(message.sessionId(),message.epoch());closeLocal();toast(message.reason());}
+        if(sessionCurrent(s,sessionConnection)&&s.sessionId()==message.sessionId()&&s.epoch()==message.epoch()){
+            // A server close can race the worker's failure before the next client tick.
+            String reason=playback!=null&&playback.error()!=null?playback.errorForLeaveNotice():message.reason();
+            SfcJoinClient.stopped(message.sessionId(),message.epoch());closeLocal();
+            if(reason!=null&&!reason.isBlank())toast(reason);
+        }
     }
     @Override public void control(SfcHomeNetwork.Control message){
         var s=currentSession();if(!sessionCurrent(s,sessionConnection)||s.sessionId()!=message.sessionId()||s.epoch()!=message.epoch()||!s.executionHost())return;
@@ -293,7 +298,7 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
         showStartup();
         if(playback!=null) {
             if(!mc.level.dimension().location().equals(playback.session.dimension())){leave("");return;}
-            if(playback.error()!=null){leave(playback.error());return;}
+            if(playback.error()!=null){leave(playback.errorForLeaveNotice());return;}
             String mediaNotice=playback.pollMediaNotice();if(mediaNotice!=null)cn.piq.fcarcade.client.ui.DeviceNoticesClient.workflow(mediaNotice);
             String audioNotice=playback.pollAudioNotice();if(audioNotice!=null)cn.piq.fcarcade.client.ui.DeviceNoticesClient.workflow(audioNotice);
             double distance=mc.player.distanceToSqr(playback.session.tvPos().getX()+.5,playback.session.tvPos().getY()+.5,playback.session.tvPos().getZ()+.5);

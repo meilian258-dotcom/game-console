@@ -44,6 +44,7 @@ public final class JniNetplaySession implements AutoCloseable {
     private volatile boolean activated;
     private volatile int input;
     private volatile long delivered,replayed,confirmedVisible,rejectedPeers;
+    private final NetplayPeerRejections peerRejections=new NetplayPeerRejections();
     private volatile String failure,phase="准备 FC JNI Netplay",saveStatus="不保存进度";
     private volatile NetplayProcess.Persistence persistence;
     private CompletableFuture<byte[]> capture;
@@ -157,7 +158,12 @@ public final class JniNetplaySession implements AutoCloseable {
     public CompletableFuture<Void> terminated(){return terminated;}
     /** No core invocation; includes a reserved, loading or still-closing native owner. */
     public boolean nativeSlotHeld(){var value=core;return value instanceof LibretroJniRuntime runtime&&runtime.nativeSlotHeld();}
-    public String diagnostic(){return status()+"\nJNI 试验；确认帧："+confirmedVisible+"；呈现帧："+delivered+"；重演帧："+replayed+"；拒绝异常连接："+rejectedPeers+"\n存档："+saveStatus;}
+    public String diagnostic(){return status()+"\nJNI 试验；确认帧："+confirmedVisible+"；呈现帧："+delivered+"；重演帧："+replayed+"；拒绝异常连接："+rejectedPeers+"\n"+peerRejections.snapshot().text()+"\n存档："+saveStatus;}
+    private void rejected(int port,NetplayPeerRejections.Code code){
+        rejectedPeers++;
+        var evidence=peerRejections.record(code,port,confirmed,timeline==null?-1:timeline.next());
+        if(NetplayPeerRejections.shouldLog(evidence.count()))System.getLogger("PIQ-Netplay-Rejection").log(System.Logger.Level.WARNING,evidence.text());
+    }
     public synchronized CompletableFuture<byte[]> checkpoint() {
         if(!grant.host()||!active()||!ready())return CompletableFuture.failedFuture(new IllegalStateException("JNI 主持未就绪或尚未激活"));
         if(capture==null||capture.isDone())capture=new CompletableFuture<byte[]>().orTimeout(15,TimeUnit.SECONDS);
@@ -304,7 +310,7 @@ public final class JniNetplaySession implements AutoCloseable {
             var chunk=event.chunk();var peer=peers.get(chunk.ticket());
             if(chunk.kind()==NetplayChunk.CLOSE){if(peer!=null)drop(peer,false);continue;}
             if(grant.host()&&chunk.kind()==NetplayChunk.OPEN) {
-                if(gunMode&&event.port()!=-1){rejectedPeers++;continue;}
+                if(gunMode&&event.port()!=-1){rejected(event.port(),NetplayPeerRejections.Code.INPUT_DEVICE);continue;}
                 if(peer==null&&peers.size()<8&&event.port()!=0){peer=new Peer(chunk.ticket(),event.port());peers.put(peer.ticket,peer);control(peer,NetplayChunk.ACK);}continue;
             }
             if(peer==null)continue;
@@ -318,13 +324,13 @@ public final class JniNetplaySession implements AutoCloseable {
                 // A bad spectator/controller must not terminate the host or overwrite its good save.
                 // A client cannot continue without a valid authority, so its host failure still stops it.
                 if(!grant.host())throw invalidPeer;
-                rejectedPeers++;drop(peer,true);
+                rejected(peer.port,NetplayPeerRejections.classify(invalidPeer));drop(peer,true);
             }
         }
     }
     private void hostMessage(Peer peer,Message message) {
         if(message instanceof Hello hello&&!peer.hello) {
-            if(!identity.equals(hello.identity())){drop(peer,true);return;}
+            if(!identity.equals(hello.identity())){rejected(peer.port,NetplayPeerRejections.Code.IDENTITY);drop(peer,true);return;}
             peer.hello=true;return;
         }
         if(message instanceof Ready value&&joining==peer&&peer.seed!=null&&peer.seedOffset==peer.seed.length&&value.frame()==peer.seedFrame) {
@@ -466,9 +472,9 @@ public final class JniNetplaySession implements AutoCloseable {
     }
     private void expire() {
         long now=System.nanoTime();
-        for(var p:List.copyOf(peers.values()))if(now>p.deadline)drop(p,true);
+        for(var p:List.copyOf(peers.values()))if(now>p.deadline){if(grant.host())rejected(p.port,NetplayPeerRejections.Code.PREPARATION_TIMEOUT);drop(p,true);}
         if(!grant.host()&&now-lastTraffic>TIMEOUT)throw new IllegalStateException("JNI 主持超时，请重新加入");
-        if(grant.host()&&remote!=null&&now-remote.lastInput>TIMEOUT)drop(remote,true);
+        if(grant.host()&&remote!=null&&now-remote.lastInput>TIMEOUT){rejected(remote.port,NetplayPeerRejections.Code.INPUT_TIMEOUT);drop(remote,true);}
     }
     private void drop(Peer peer,boolean notify) {
         peers.remove(peer.ticket);if(joining==peer)joining=null;

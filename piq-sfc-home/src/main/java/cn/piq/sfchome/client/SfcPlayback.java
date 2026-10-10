@@ -147,6 +147,8 @@ final class SfcPlayback implements AutoCloseable {
     private volatile boolean started;
     private volatile float gain;
     private volatile String error;
+    // Published before error: the client cleanup must not replace the detailed notice.
+    private boolean errorNoticeRecorded;
     private volatile SfcJoinNetwork.Capture capture;
     private volatile Restore restore;
     private DynamicTexture texture;
@@ -188,7 +190,8 @@ final class SfcPlayback implements AutoCloseable {
             run=host.openNetplay(grant,rom,session.executionHost());netplay=run;
             if(!running)return;run.start();
             while(running){
-                if(run.error()!=null)throw new IllegalStateException(run.error()+"\n"+run.diagnostic());
+                String reason=run.error();
+                if(reason!=null)throw new cn.piq.fcarcade.client.ui.NetplayFailureCode.Failure(reason);
                 if(run.ready()&&netplayStart.prepared()){
                     startup.enter(SfcStartupProgress.Stage.READY);
                     host.execute(()->{if(running&&host.isCurrent(this))host.ready(this,new SfcHomeNetwork.Ready(session.sessionId(),session.epoch(),session.romSha(),SfcHomeNetwork.CORE_BUILD,60,session.romSha()));});
@@ -205,7 +208,12 @@ final class SfcPlayback implements AutoCloseable {
                 if(frame.stereo().length>0)audio.submit(frame.stereo(),frame.stereo().length/2,gain);observeAudioFailure(audio);
             }
         }catch(InterruptedException interrupted){Thread.currentThread().interrupt();}
-        catch(Exception|LinkageError failure){if(running){LoggerFactory.getLogger("PIQ SFC Home").warn("Netplay stopped",failure);cn.piq.fcarcade.client.ui.DeviceNotices.record("SFC",run==null?"Netplay 启动失败":run.diagnostic(),failure);error="SFC Netplay 已停止，请查看运行环境诊断";}}
+        catch(Exception|LinkageError failure){if(running){
+            var code=cn.piq.fcarcade.client.ui.NetplayFailureCode.classify(failure);
+            cn.piq.fcarcade.client.ui.DeviceNotices.recordFailure("SFC",code,run==null?"Netplay 启动失败":run.diagnostic(),failure);
+            errorNoticeRecorded=true;
+            error=code.summary();
+        }}
         finally{running=false;netplayStart.close();try{if(run!=null)run.close();}finally{netplay=null;try{if(audio!=null)audio.close();}finally{lease.close();}}}
     }
     boolean matches(long id,int epoch) { return session.sessionId()==id && session.epoch()==epoch; }
@@ -281,6 +289,8 @@ final class SfcPlayback implements AutoCloseable {
         host.execute(()->{if(running&&host.isCurrent(this))host.repairedFrames(this,done,true);});return true;}
     boolean started(){return started;}
     String error() { return error; }
+    /** Null means the single detailed failure notice is already published. */
+    String errorForLeaveNotice(){return errorNoticeRecorded?null:error;}
     /** Required player-hosted media must never fail silently while the authoritative core advances. */
     void playerMediaFailed(){
         if(!running||!session.playerHosted()||!session.executionHost())return;

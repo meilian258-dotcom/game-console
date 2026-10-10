@@ -84,7 +84,7 @@ public final class MdPublicClient implements MdPublicNetwork.Client,WatchClient.
         HomeSyncSettingsScreen.registerDeviceActions(MdMod.SYSTEM,new HomeSyncSettingsScreen.DeviceActions(){
             public void open(Screen parent,net.minecraft.core.BlockPos pos){Minecraft.getInstance().setScreen(new Options(parent));}
             public boolean choosesSecondPortAtStartup(){return true;}
-            public String footer(net.minecraft.core.BlockPos pos){return "公开："+(MdNetplayProfile.AVAILABLE?"串流 / JNI Netplay 分档":"JNI 玩家串流")+" · 个人/卡带服务器档 · 2P开局选择 · 自动旁观；私人：独立本机档。";}
+            public String footer(net.minecraft.core.BlockPos pos){return "公开："+(MdNetplayProfile.AVAILABLE?"串流 / JNI Netplay 分档":"JNI 玩家串流")+" · 个人/卡带服务器档 · 2P按设备设置 · 自动旁观；私人：独立本机档。";}
         });
     }
     private static boolean same(ContentCardNetwork.Message m){return host!=null&&host.content().equals(m.token())&&host.display().descriptor().origin().pos().equals(m.pos())&&MdMod.SYSTEM.equals(m.system());}

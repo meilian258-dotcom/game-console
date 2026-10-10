@@ -172,7 +172,14 @@ public final class SfcHomeServer {
             @Override public void onControllerDock(ServerPlayer p,ExternalHomeConsoleBlockEntity c,int port){if(c instanceof SfcHomeConsoleBlockEntity console)claim(p,console,state(p.getServer()),port);}
             @Override public boolean isRunning(ServerLevel l,ExternalHomeConsoleBlockEntity c){var st=state(l.getServer());var s=st.sessions.get(c.hardwareId());if(s==null)s=st.stopping.get(c.hardwareId());return s!=null&&s.connection.console()==c;}
             @Override public boolean synchronizationSettingsAvailable(){return true;}
-            @Override public int synchronizationSupportedModes(ServerLevel l,ExternalHomeConsoleBlockEntity c){return (cn.piq.fcarcade.cabinet.CabinetHostingConfig.playerAllowed()?1:0)|(cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed()?10:0)|(hostedUnavailable(l,c)==null?4:0);}
+            @Override public boolean jniNetplaySettingsAvailable(){return true;}
+            @Override public boolean secondPortSettingsAvailable(){return true;}
+            @Override public int synchronizationSupportedModes(ServerLevel l,ExternalHomeConsoleBlockEntity c){return cn.piq.sfchome.world.SfcNetplaySettings.supportedModes(cn.piq.fcarcade.cabinet.CabinetHostingConfig.playerAllowed(),cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed(),hostedUnavailable(l,c)==null);}
+            @Override public String synchronizationUnavailableReason(ServerLevel l,ExternalHomeConsoleBlockEntity c,int mode){
+                if(mode==3)return "SFC 的此联机路线实际使用 JNI，不提供 RetroArch Netplay；请选择 JNI Netplay。";
+                if(mode==4)return cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed()?"SFC JNI Netplay 可用；沿用原有核心及存档身份。":"服主已禁用本地输入同步及 Netplay。";
+                return HomeSystems.ServerHooks.super.synchronizationUnavailableReason(l,c,mode);
+            }
             @Override public String synchronizationUnavailableReason(ServerLevel l,ExternalHomeConsoleBlockEntity c,cn.piq.fcarcade.cabinet.CabinetSyncMode mode){return mode==cn.piq.fcarcade.cabinet.CabinetSyncMode.SERVER_MEDIA?Objects.requireNonNullElse(hostedUnavailable(l,c),"服务端托管可用。"):mode==cn.piq.fcarcade.cabinet.CabinetSyncMode.MEDIA&&cn.piq.fcarcade.cabinet.CabinetHostingConfig.playerAllowed()?"玩家音画串流可用；主持退出会安全停机，不自动转交进度。":HomeSyncPolicy.unavailable(mode);}
             @Override public boolean synchronizationSettingsBusy(ServerLevel l,ExternalHomeConsoleBlockEntity c){var st=state(l.getServer());return st.sessions.containsKey(c.hardwareId())||st.stopping.containsKey(c.hardwareId())||HomeLaunchServer.busy(l.getServer(),launchKey(c));}
             @Override public void onPlaybackStopped(ServerLevel l,ExternalHomeConsoleBlockEntity c,HomeSystems.StopReason reason){if(c instanceof SfcHomeConsoleBlockEntity console)stop(state(l.getServer()),console.hardwareId(),"电视连接已停止；手柄仍保留");}
@@ -371,7 +378,8 @@ public final class SfcHomeServer {
         if(!(connection.console() instanceof SfcHomeConsoleBlockEntity c)||preflight(p,c,true)==null)return false;
         var server=p.getServer();var st=state(server);var key=launchKey(c);
         if(HomeLaunchServer.busy(server,key)||st.sessions.containsKey(c.hardwareId())||st.stopping.containsKey(c.hardwareId()))return false;
-        final ItemStack snapshot=c.insertedCartridge();final var mode=c.synchronizationMode();final boolean netplay=c.netplayExperimental();
+        final ItemStack snapshot=c.insertedCartridge();final var mode=c.synchronizationMode();final boolean netplay=c.netplayJniTrial();
+        final boolean secondPort=c.secondPortAllowed();
         final int oldSave=netplay?SfcCartridgeData.saveMode(snapshot):0;
         final int commonSave=SfcHomeStartPolicy.commonSaveMode(oldSave);
         final int players=SfcCartridgeData.maxPlayers(snapshot);
@@ -386,9 +394,9 @@ public final class SfcHomeServer {
             private Session loaded;
             public HomeLaunchServer.Definition definition(){return new HomeLaunchServer.Definition("SFC",title,players,commonSave,false,
                 netplay?(oldSave==0?"本局不保存，原档保留":oldSave==1?"个人：每个游戏保留原有一份进度；旧档名称和标签只读":"卡带：保留原有一份进度；旧档名称和标签只读"):
-                "此模式沿用原保存机制，不读取或迁移 Netplay 存档");}
+                "此模式沿用原保存机制，不读取或迁移 Netplay 存档",secondPort);}
             public boolean valid(){return STATES.get(server)==st&&HomeSystems.isCurrent(connection)&&basic(p,c)
-                &&ItemStack.matches(snapshot,c.insertedCartridge())&&c.synchronizationMode()==mode&&c.netplayExperimental()==netplay&&modeSupported(c)
+                &&ItemStack.matches(snapshot,c.insertedCartridge())&&c.synchronizationMode()==mode&&c.netplayJniTrial()==netplay&&c.secondPortAllowed()==secondPort&&modeSupported(c)
                 &&!st.stopping.containsKey(c.hardwareId())&&(st.sessions.get(c.hardwareId())==null||st.sessions.get(c.hardwareId())==loaded)
                 &&st.sessions.values().stream().noneMatch(s->s!=loaded&&s.host.player.equals(p.getUUID()));}
             public void list(java.util.function.Consumer<List<HomeLaunchNetwork.Row>> success,java.util.function.Consumer<String> failure){
@@ -424,7 +432,7 @@ if(st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size(
         long id=++st.nextSession;if(id<=0)throw new IllegalStateException("Session IDs exhausted");
         Session s=new Session(id,1,checked,rom,new Host(p),new Lease[2],st.tick,mode);
         s.flow=flow;s.saveEnabled=save.enabled();
-        if(c.netplayExperimental()){
+        if(c.netplayJniTrial()){
             if(mode!=cn.piq.fcarcade.cabinet.CabinetSyncMode.LOCAL_SYNC){feedback(p,"请重新选择 Netplay 模式");return false;}
             long wire=NetplayNetwork.nextAddonId();var relay=NetplayNetwork.room(wire,p.connection.getConnection());
             try{
@@ -434,7 +442,7 @@ if(st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size(
                 NETPLAY.put(s,new NetplayRun(wire,relay,ticket));
             }catch(RuntimeException failure){NetplayNetwork.retire(relay);feedback(p,"Netplay 存档未就绪："+failure.getMessage());return false;}
         }
-        s.multiplayer=allowSecond;
+        s.multiplayer=SfcHomeStartPolicy.secondPortAllowed(SfcCartridgeData.maxPlayers(card),c.secondPortAllowed(),allowSecond);
         if(mode==cn.piq.fcarcade.cabinet.CabinetSyncMode.SERVER_MEDIA){
             var permit=cn.piq.fcarcade.server.hosted.HostedServerLimits.tryAcquire(p.getServer());
             if(permit==null){feedback(p,"服务端托管未启用或全服容量已满；主机未开机");return false;}
@@ -494,8 +502,12 @@ if(st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size(
     public static void allowJoin(ServerPlayer p,SfcJoinNetwork.Allow packet){
         Session s=member(p,packet.session(),packet.epoch());
         if(!host(p,s))return;
-        s.multiplayer=packet.enabled();if(!s.multiplayer)abortJoin(state(p.getServer()),s,"宿主已关闭手柄申请");
-        feedback(p,s.multiplayer?"已允许其他玩家申请空闲手柄，由你审批":"保持私有；关机再开可重新选择");
+        // Keep the old codec, but a delayed legacy dialog cannot override device policy.
+        feedback(p,"2P 许可由设备设置管理；关机后可调整，本局不再逐次审批");
+    }
+    private static boolean secondPortAllowed(Session s){
+        var c=(SfcHomeConsoleBlockEntity)s.connection.console();
+        return SfcHomeStartPolicy.secondPortAllowed(SfcCartridgeData.maxPlayers(c.insertedCartridge()),c.secondPortAllowed(),s.multiplayer);
     }
     private static boolean candidate(ServerPlayer p,Session s,boolean events){
         var console=(SfcHomeConsoleBlockEntity)s.connection.console();
@@ -517,14 +529,14 @@ if(st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size(
     private static boolean candidateController(ServerPlayer p,Session s){State st=state(p.getServer());Lease own=playerLease(st,p.getUUID());return own==null?freeHand(p)!=null&&st.leases.size()<8:own.console==s.connection.console()&&s.ports[own.port]==null&&validLease(p,own,false);}
     private static boolean joinValid(MinecraftServer server,Session s,boolean events){
         Joining j=s.join;if(j==null)return false;State st=state(server);var console=(SfcHomeConsoleBlockEntity)s.connection.console();
-        if(st.sessions.get(s.connection.consoleId())!=s||!j.gate.live(st.tick)||!s.multiplayer||s.ports[j.port]!=null
+        if(st.sessions.get(s.connection.consoleId())!=s||!j.gate.live(st.tick)||!secondPortAllowed(s)||s.ports[j.port]!=null
                 ||!s.host.id.equals(j.gate.hostLease)||!s.connection.consoleId().equals(j.gate.console)||!HomeSystems.isCurrent(s.connection)
                 ||!s.rom.equals(console.romSha())||!ItemStack.matches(j.card,console.insertedCartridge())||j.port>=SfcCartridgeData.maxPlayers(j.card))return false;
         ServerPlayer host=server.getPlayerList().getPlayer(s.host.player),other=server.getPlayerList().getPlayer(j.gate.applicant);
         if(!hostValid(host,s))return false;
         boolean eligible=j.second==null?candidate(other,s,events):other!=null&&st.leases.get(j.second.id)==j.second&&endpointFacts(other,j.second,s.connection)&&(!events||authorizedStart(other,j.second,s.connection));
         // Protection event callbacks can synchronously stop a session or edit/remove its hardware.
-        return eligible&&s.join==j&&st.sessions.get(s.connection.consoleId())==s&&j.gate.live(st.tick)&&s.multiplayer&&s.ports[j.port]==null
+        return eligible&&s.join==j&&st.sessions.get(s.connection.consoleId())==s&&j.gate.live(st.tick)&&secondPortAllowed(s)&&s.ports[j.port]==null
                 &&hostValid(host,s)&&ItemStack.matches(j.card,console.insertedCartridge());
     }
     private static void requestJoin(ServerPlayer p,Session s,int requestedPort){
@@ -533,23 +545,19 @@ if(st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size(
         if(s.repairs.active()!=null){feedback(p,"一个控制端正在同步，请稍后申请；主机仍在运行");return;}
         Lease reserved=playerLease(st,p.getUUID());if(reserved!=null&&(reserved.console!=s.connection.console()||reserved.port!=requestedPort)){feedback(p,"请点已借出手柄的原插口申请");return;}
         if(s.clock==null){feedback(p,"主机正在加载，请稍后申请");return;}
-        if(!s.multiplayer){feedback(p,"运行宿主尚未允许手柄申请");return;}
+        if(!secondPortAllowed(s)){feedback(p,"此设备未允许 2P，或卡带只支持单人");return;}
         if(requestedPort<0||requestedPort>=SfcCartridgeData.maxPlayers(((SfcHomeConsoleBlockEntity)s.connection.console()).insertedCartridge())||s.ports[requestedPort]!=null){feedback(p,"此手柄不可领取");return;}
         if(s.join!=null){feedback(p,s.join.gate.applicant.equals(p.getUUID())?"你的申请正在处理中":"运行宿主正在处理另一份申请");return;}
         if(st.sessions.values().stream().anyMatch(v->v.join!=null&&v.join.gate.applicant.equals(p.getUUID()))){feedback(p,"请先等当前加入申请结束");return;}
         if(!candidate(p,s,true)){feedback(p,"申请需要一只手空闲、有效距离以及主机和电视交互权限");return;}
         ServerPlayer host=p.getServer().getPlayerList().getPlayer(s.host.player);
-        if(!hostValid(host,s)||st.sessions.get(s.connection.consoleId())!=s||s.join!=null||!s.multiplayer||s.ports[requestedPort]!=null
+        if(!hostValid(host,s)||st.sessions.get(s.connection.consoleId())!=s||s.join!=null||!secondPortAllowed(s)||s.ports[requestedPort]!=null
                 ||requestedPort>=SfcCartridgeData.maxPlayers(((SfcHomeConsoleBlockEntity)s.connection.console()).insertedCartridge())
                 ||st.sessions.values().stream().anyMatch(v->v.join!=null&&v.join.gate.applicant.equals(p.getUUID())))return;
         s.join=new Joining(new SfcJoinGate(UUID.randomUUID(),host.getUUID(),p.getUUID(),s.host.id,s.connection.consoleId(),st.tick),((SfcHomeConsoleBlockEntity)s.connection.console()).insertedCartridge(),requestedPort);
-        // Disabling confirmation skips only the host dialog, never permissions,
-        // the current card/endpoint identity checks, or the snapshot handshake.
-        if(!s.connection.console().joinApprovalRequired()){
-            decideJoin(host,new SfcJoinNetwork.Decision(s.id,s.epoch,s.join.gate.token,true));
-            return;
-        }
-        SfcHomeNetwork.send(host,new SfcJoinNetwork.Approval(s.id,s.epoch,s.join.gate.token,p.getGameProfile().getName()+" → P"+(requestedPort+1)));feedback(p,"申请已发给运行宿主；批准后领取手柄并同步当前进度");
+        // Device permission replaces the dialog, not the exact identity, protection
+        // callbacks, capacity checks or prepare/ready snapshot handshake.
+        decideJoin(host,new SfcJoinNetwork.Decision(s.id,s.epoch,s.join.gate.token,true));
     }
     public static void decideJoin(ServerPlayer p,SfcJoinNetwork.Decision packet){
         Session s=member(p,packet.session(),packet.epoch());if(!host(p,s)||s.join==null)return;
@@ -563,7 +571,7 @@ if(st.sessions.containsKey(c.hardwareId())||st.sessions.size()+st.stopping.size(
         j.second=playerLease(st,other.getUUID());if(j.second==null)j.second=grant(other,(SfcHomeConsoleBlockEntity)s.connection.console(),j.port,st);
         if(j.second==null||j.second.console!=s.connection.console()||j.second.port!=j.port||!validLease(other,j.second,false)){abortJoin(st,s,"手柄无法领取，加入取消");return;}
         sendRuntime(other,s,j.second);
-        feedback(p,"已批准；申请者加载期间主机继续运行");feedback(other,s.playerMedia()?"运行宿主已批准；正在连接音画，无需下载 ROM 或启动本地核心":"运行宿主已批准；正在加载，随后同步当前进度");
+        feedback(p,"2P 正在加载，主机继续运行");feedback(other,s.playerMedia()?"正在连接音画，无需下载 ROM 或启动本地核心":"正在加载 2P，随后同步当前进度");
     }
     private static void joinReady(ServerPlayer p,Session s,SfcHomeNetwork.Ready ready){
         State st=state(p.getServer());Joining j=s.join;if(j==null||j.gate.phase()!=SfcJoinGate.Phase.LOADING)return;
@@ -847,7 +855,19 @@ for(Lease l:s.ports.clone())if(l!=null){ServerPlayer p=server.getPlayerList().ge
         ServerPlayer departed=server.getPlayerList().getPlayer(lease.player);if(departed!=null){SfcHomeNetwork.send(departed,new SfcHomeNetwork.Control(s.id,s.epoch,lease.id,lease.port,false));if(!s.host.player.equals(lease.player))SfcHomeNetwork.send(departed,new SfcHomeNetwork.Stopped(s.id,s.epoch,reason));}
         startClockIfReady(server,s);
     }
-    private static void release(MinecraftServer server,Lease l,String reason){State st=state(server);if(st.leases.get(l.id)!=l)return;Session current=st.sessions.get(l.console.hardwareId());if(current!=null&&current.connection.console()==l.console){if(current.join!=null&&current.join.second==l)abortJoin(st,current,reason);detach(st,current,l,reason);}st.leases.remove(l.id);l.console.setControllerLeased(l.port,false);ServerPlayer p=server.getPlayerList().getPlayer(l.player);if(p!=null){removeControllerCopies(p,l.id);feedback(p,reason);}l.stack.setCount(0);}
+    private static void release(MinecraftServer server,Lease l,String reason){
+        State st=state(server);if(st.leases.get(l.id)!=l)return;
+        Session current=st.sessions.get(l.console.hardwareId());
+        boolean active=current!=null&&current.connection.console()==l.console&&current.ports[l.port]==l;
+        // Capture the initiating cause before relay CLOSE and Stopped race on the client.
+        // One line per actual lease removal, not one line per rejected/late input packet.
+        var evidence=SfcControlExitDiagnostics.capture(reason,l.port,current!=null&&NETPLAY.containsKey(current),active,
+                active?current.health.sample(l.port,st.tick):null);
+        System.getLogger("PIQ-SFC-ControlExit").log(System.Logger.Level.INFO,evidence.text());
+        if(current!=null&&current.connection.console()==l.console){if(current.join!=null&&current.join.second==l)abortJoin(st,current,reason);detach(st,current,l,reason);}
+        st.leases.remove(l.id);l.console.setControllerLeased(l.port,false);
+        ServerPlayer p=server.getPlayerList().getPlayer(l.player);if(p!=null){removeControllerCopies(p,l.id);feedback(p,reason);}l.stack.setCount(0);
+    }
     private static void releaseConsole(MinecraftServer server,SfcHomeConsoleBlockEntity c,String reason){State st=state(server);Session current=st.sessions.get(c.hardwareId());if(current!=null&&current.connection.console()==c)stop(st,c.hardwareId(),reason);for(Lease l:List.copyOf(st.leases.values()))if(l.console==c)release(server,l,reason);}
     private static final class State{long nextSession,tick;UUID transfer;final SfcHomeStartPolicy.InteractionGate interactions=new SfcHomeStartPolicy.InteractionGate();final Map<UUID,Lease>leases=new HashMap<>();final Map<UUID,HomeLaunchServer.Key>launches=new HashMap<>();final Map<UUID,Session>sessions=new HashMap<>(),stopping=new HashMap<>();}
     private static final class Lease{final UUID id,player;final net.minecraft.network.Connection connection;final SfcHomeConsoleBlockEntity console;final int port;ItemStack stack;final SfcControllerAuthority authority;Lease(UUID id,ServerPlayer p,SfcHomeConsoleBlockEntity c,int port,ItemStack s){this.id=id;player=p.getUUID();connection=p.connection.getConnection();console=c;this.port=port;stack=s;authority=new SfcControllerAuthority(id,player,port);}}

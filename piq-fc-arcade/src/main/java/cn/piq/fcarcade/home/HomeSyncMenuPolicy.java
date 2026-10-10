@@ -23,7 +23,8 @@ public final class HomeSyncMenuPolicy {
                 : operation + " 当前所选模式不可用：" + unavailable;
     }
     public static boolean showMode(int mode, boolean external, boolean diagnosticsOnly, int mask) {
-        return mode >= 0 && mode < 5 && (mode != 4 || !external || diagnosticsOnly || supported(mask, mode));
+        // Stable positions across devices; unsupported lanes remain disabled with their real reason.
+        return mode >= 0 && mode < 5;
     }
     public static String buttonState(int mode, int selected, int mask, boolean editable, String unavailable) {
         if (!supported(mask, mode)) return unavailable;

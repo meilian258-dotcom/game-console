@@ -98,35 +98,37 @@ public final class HomeSyncSettings {
         var hit = new BlockHitResult(Vec3.atCenterOf(intent.clicked),Direction.UP,intent.clicked,false);
         if (!authorized(player,intent,hit)) { INTENTS.remove(player);feedback(player,"设置授权已过期或硬件/权限发生变化，请重新打开。");return; }
         var old=intent.lastSetting;var c=intent.console;
-        if(old!=null&&(old.mode()!=displayMode(c)||old.occupancy()!=c.occupancyVisible()||old.approval()!=c.joinApprovalRequired())){
+        if(old!=null&&(old.mode()!=displayMode(c)||old.occupancy()!=c.occupancyVisible()||old.approval()!=c.joinApprovalRequired()||old.secondPortAllowed()!=c.secondPortAllowed())){
             intent.revision++;reply(player,intent,false,"设置已被其他操作更新，请核对后再调整。");return;
         }
         if(request.revision()!=intent.revision){reply(player,intent,false,"状态已更新，请核对后再调整。");return;}
         String reason = "联机设置下次开机生效。";
-        if (request.mode() >= 0 || request.occupancy() >= 0 || request.approval() >= 0) {
+        if (request.mode() >= 0 || request.occupancy() >= 0 || request.approval() >= 0 || request.secondPort() >= 0) {
             boolean busy = busy(player,intent.console);
             if (!player.hasPermissions(2)) reason = "只有管理员可更改主机高级设置。";
             else if (diagnosticsOnly(c)) reason = "此设备仅提供诊断；没有可修改的公共联机设置。";
             else if (busy) reason = "请先关机并关闭加入、存档选择窗口；已借手柄无需归还。";
             else if (request.occupancy() >= 0 && !HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos())) reason="此机型不支持使用者标牌。";
+            else if (request.secondPort() >= 0 && !secondPortSupported(c)) reason="此机型尚未接入设备 2P 许可。";
             else if (request.mode() >= 0 && (supported(player,intent.console)&(1<<request.mode()))==0)
                 reason = "此机型或服务器不支持所选联机方式。";
             else {
                 // Re-run protection after all provider callbacks, then check the exact live instance again.
                 if (!authorized(player,intent,hit)) return;
                 int modes=supported(player,c);boolean stillBusy=busy(player,c);
-                if(!DeviceDebugPolicy.mayEdit(player.hasPermissions(2),stillBusy,HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos()),
-                        request.mode(),request.occupancy(),request.approval(),modes)||!basic(player,intent)||!player.hasPermissions(2)||!identity(player,intent))return;
+                if(!DeviceDebugPolicy.mayEdit(player.hasPermissions(2),stillBusy,HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos()),secondPortSupported(c),
+                        request.mode(),request.occupancy(),request.approval(),request.secondPort(),modes)||!basic(player,intent)||!player.hasPermissions(2)||!identity(player,intent))return;
                 if(request.mode()>=0){
                     if(c instanceof HomeConsoleBlockEntity fc){fc.netplayExperimental(request.mode()>=3);fc.netplayJniTrial(request.mode()==4);}
                     if(c instanceof ExternalHomeConsoleBlockEntity external){external.netplayExperimental(request.mode()==3);external.netplayJniTrial(request.mode()==4);}
                     c.synchronizationMode(request.mode()>=3?CabinetSyncMode.LOCAL_SYNC:CabinetSyncMode.checked(request.mode()));
                 }
                 else if(request.occupancy()>=0)c.occupancyVisible(request.occupancy()!=0);
+                else if(request.secondPort()>=0)c.secondPortAllowed(request.secondPort()!=0);
                 else c.joinApprovalRequired(request.approval()!=0);
                 intent.revision++;
                 reason = request.mode()>=0?HomeSyncSaveHints.modeSaved(system(c),request.mode())
-                        :request.occupancy()>=0?"使用者标牌设置已保存。":"加入确认已保存，下次开机生效；已加入玩家不受影响。";
+                        :request.occupancy()>=0?"使用者标牌设置已保存。":request.secondPort()>=0?"2P 许可已保存，下次开机生效；仍受游戏人数、私人模式和权限限制。":"加入确认已保存，下次开机生效；已加入玩家不受影响。";
             }
         }
         if (basic(player,intent)) reply(player,intent,false,reason);
@@ -151,7 +153,7 @@ public final class HomeSyncSettings {
         if(reason.length()>256)reason=reason.substring(0,255)+"…";
         var setting=new HomeSyncNetwork.Setting(intent.token,intent.revision,player.serverLevel().dimension().location(),
                 c.getBlockPos(),c.hardwareId(),system,displayMode(c),modes,
-                access.editable(),reason,open,c.occupancyVisible(),c.joinApprovalRequired(),HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos()),intent.tool!=null,modeReasons);
+                access.editable(),reason,open,c.occupancyVisible(),c.joinApprovalRequired(),HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos()),intent.tool!=null,modeReasons,c.secondPortAllowed(),secondPortSupported(c));
         if(!identity(player,intent))return;
         intent.lastSetting=setting;HomeSyncNetwork.send(player,setting);
     }
@@ -164,7 +166,13 @@ public final class HomeSyncSettings {
     private static void cachedReply(ServerPlayer player,Intent intent,String reason) {
         var s=intent.lastSetting;if(s==null)return;
         HomeSyncNetwork.send(player,new HomeSyncNetwork.Setting(s.token(),s.revision(),s.dimension(),s.console(),s.hardware(),s.system(),s.mode(),s.supported(),
-                s.editable(),reason,false,s.occupancy(),s.approval(),s.occupancySupported(),s.debugTool(),s.modeReasons()));
+                s.editable(),reason,false,s.occupancy(),s.approval(),s.occupancySupported(),s.debugTool(),s.modeReasons(),s.secondPortAllowed(),s.secondPortSupported()));
+    }
+    private static boolean secondPortSupported(HomeEndpointBlockEntity console) {
+        if(console instanceof HomeConsoleBlockEntity)return true;
+        if(console instanceof ExternalHomeConsoleBlockEntity external){var hooks=HomeSystems.applianceHooks(external.systemId());
+            try{return hooks!=null&&hooks.secondPortSettingsAvailable();}catch(RuntimeException|LinkageError failure){return false;}}
+        return false;
     }
     private static boolean diagnosticsOnly(HomeEndpointBlockEntity console) {
         return console instanceof ExternalHomeConsoleBlockEntity external&&HomeSystems.privateDeviceSettings(external.systemId());
@@ -192,8 +200,9 @@ public final class HomeSyncSettings {
     static CabinetSyncMode placementMode(net.minecraft.server.level.ServerLevel level, HomeEndpointBlockEntity console, CabinetSyncMode fallback) {
         int desired=cn.piq.fcarcade.config.GameConsoleAdminSettings.defaultMode(level.getServer());
         int modes=supported(level,console);
-        if(console instanceof HomeConsoleBlockEntity fc&&cn.piq.fcarcade.config.GameConsoleAdminPolicy.defaultFcJni(desired,modes)){
-            fc.netplayExperimental(true);fc.netplayJniTrial(true);
+        if(cn.piq.fcarcade.config.GameConsoleAdminPolicy.defaultHomeJni(desired,modes)){
+            if(console instanceof HomeConsoleBlockEntity fc){fc.netplayExperimental(true);fc.netplayJniTrial(true);}
+            else if(console instanceof ExternalHomeConsoleBlockEntity external){external.netplayExperimental(false);external.netplayJniTrial(true);}
             return CabinetSyncMode.LOCAL_SYNC;
         }
         return CabinetSyncMode.checked(cn.piq.fcarcade.config.GameConsoleAdminPolicy.selectNewMode(desired,modes,fallback.ordinal()));

@@ -18,4 +18,10 @@ public final class SfcInputHealth {
     }
     public boolean expiredPort(int port,long tick){if(port<0||port>1)throw new IllegalArgumentException("Invalid controller port");return tick-last[port]>100;}
     public boolean expired(long tick,boolean secondPort){return expiredPort(0,tick)||secondPort&&expiredPort(1,tick);}
+    /** Read-only evidence captured before a lease is detached; no watchdog mutation. */
+    public record Sample(long tick,long lastAcceptedTick,long ageTicks,int packetsThisTick) {}
+    public Sample sample(int port,long tick){
+        if(port<0||port>1)throw new IllegalArgumentException("Invalid controller port");
+        return new Sample(tick,last[port],tick-last[port],window[port]==tick?packets[port]:0);
+    }
 }

@@ -18,7 +18,12 @@ public final class DeviceNotices {
     private DeviceNotices() {}
 
     public static Entry record(String device, String detail) { return record(device, detail, null); }
-    public static synchronized Entry record(String device, String detail, Throwable failure) {
+    public static Entry record(String device, String detail, Throwable failure) {return record(device,detail,failure,null);}
+    public static Entry recordFailure(String device, NetplayFailureCode code, String detail, Throwable failure) {
+        java.util.Objects.requireNonNull(code);
+        return record(device,"["+code.name()+"] "+(detail==null?"":detail),failure,code.summary());
+    }
+    private static synchronized Entry record(String device, String detail, Throwable failure, String classifiedSummary) {
         String source = device == null || device.isBlank() ? "模拟器" : device;
         String context = detail == null || detail.isBlank() ? "操作未完成" : detail;
         StringWriter trace = new StringWriter();
@@ -32,8 +37,8 @@ public final class DeviceNotices {
         if (failure == null) LOGGER.log(System.Logger.Level.WARNING,"[" + source + "] " + context);
         else LOGGER.log(System.Logger.Level.WARNING,"[" + source + "] " + context,failure);
         // The actual failure has priority over incidental ROM/DLL names in a normal startup log.
-        String summary=failure==null?summarize(full):summarize(failure.toString());
-        if(summary.equals("操作未完成，请查看运行环境"))summary=summarize(full);
+        String summary=classifiedSummary!=null?classifiedSummary:failure==null?summarize(full):summarize(failure.toString());
+        if(classifiedSummary==null&&summary.equals("操作未完成，请查看运行环境"))summary=summarize(full);
         Entry entry = new Entry(++sequence, Instant.now(), source, summary,
                 full.length() <= 16_384 ? full : full.substring(0, 16_384) + "\n[显示已截断；完整记录见客户端日志]");
         ENTRIES.addFirst(entry);

@@ -24,9 +24,12 @@ public final class HomeSyncNetwork {
     public static void request(UUID token,int revision,int mode,int occupancy,int approval) {
         PacketDistributor.sendToServer(new Request(token,revision,mode,occupancy,approval));
     }
+    public static void request(UUID token,int revision,int mode,int occupancy,int approval,int secondPort) {
+        PacketDistributor.sendToServer(new Request(token,revision,mode,occupancy,approval,secondPort));
+    }
     static void send(ServerPlayer player,Setting setting) { PacketDistributor.sendToPlayer(player,setting); }
     @SubscribeEvent public static void register(RegisterPayloadHandlersEvent event) {
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"home-sync-5")
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"home-sync-6")
                 .playToServer(Request.TYPE,Request.CODEC,(packet,context) -> {
                     Connection source = context.connection();var entity = context.player();
                     context.enqueueWork(() -> {
@@ -42,18 +45,24 @@ public final class HomeSyncNetwork {
                 });
     }
     private static ResourceLocation id(String name) { return ResourceLocation.fromNamespaceAndPath("piq_fc_arcade","home_sync_"+name); }
-    public record Request(UUID token,int revision,int mode,int occupancy,int approval) implements CustomPacketPayload {
-        public Request { Objects.requireNonNull(token);if (!DeviceDebugPolicy.validRequest(revision,mode,occupancy,approval)) throw new IllegalArgumentException("Home settings request"); }
+    public record Request(UUID token,int revision,int mode,int occupancy,int approval,int secondPort) implements CustomPacketPayload {
+        public Request(UUID token,int revision,int mode,int occupancy,int approval){this(token,revision,mode,occupancy,approval,-1);}
+        public Request { Objects.requireNonNull(token);if (!DeviceDebugPolicy.validRequest(revision,mode,occupancy,approval,secondPort)) throw new IllegalArgumentException("Home settings request"); }
         public static final Type<Request> TYPE = new Type<>(id("request"));
         public static final StreamCodec<RegistryFriendlyByteBuf,Request> CODEC = StreamCodec.of((b,p) -> {
-            b.writeUUID(p.token);b.writeVarInt(p.revision);b.writeInt(p.mode);b.writeInt(p.occupancy);b.writeInt(p.approval);
-        },b -> new Request(b.readUUID(),b.readVarInt(),b.readInt(),b.readInt(),b.readInt()));
+            b.writeUUID(p.token);b.writeVarInt(p.revision);b.writeInt(p.mode);b.writeInt(p.occupancy);b.writeInt(p.approval);b.writeInt(p.secondPort);
+        },b -> new Request(b.readUUID(),b.readVarInt(),b.readInt(),b.readInt(),b.readInt(),b.readInt()));
         @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
     public record Setting(UUID token,int revision,ResourceLocation dimension,BlockPos console,UUID hardware,String system,
                           int mode,int supported,boolean editable,String reason,boolean open,
                           boolean occupancy,boolean approval,boolean occupancySupported,boolean debugTool,
-                          java.util.List<String> modeReasons) implements CustomPacketPayload {
+                          java.util.List<String> modeReasons,boolean secondPortAllowed,boolean secondPortSupported) implements CustomPacketPayload {
+        public Setting(UUID token,int revision,ResourceLocation dimension,BlockPos console,UUID hardware,String system,
+                       int mode,int supported,boolean editable,String reason,boolean open,
+                       boolean occupancy,boolean approval,boolean occupancySupported,boolean debugTool,java.util.List<String> modeReasons) {
+            this(token,revision,dimension,console,hardware,system,mode,supported,editable,reason,open,occupancy,approval,occupancySupported,debugTool,modeReasons,true,false);
+        }
         public Setting(UUID token,int revision,ResourceLocation dimension,BlockPos console,UUID hardware,String system,
                        int mode,int supported,boolean editable,String reason,boolean open,
                        boolean occupancy,boolean approval,boolean occupancySupported,boolean debugTool) {
@@ -72,8 +81,9 @@ public final class HomeSyncNetwork {
             b.writeVarInt(p.mode);b.writeVarInt(p.supported);b.writeBoolean(p.editable);b.writeUtf(p.reason,256);b.writeBoolean(p.open);
             b.writeBoolean(p.occupancy);b.writeBoolean(p.approval);b.writeBoolean(p.occupancySupported);b.writeBoolean(p.debugTool);
             for(String reason:p.modeReasons)b.writeUtf(reason,256);
+            b.writeBoolean(p.secondPortAllowed);b.writeBoolean(p.secondPortSupported);
         },b -> new Setting(b.readUUID(),b.readVarInt(),b.readResourceLocation(),b.readBlockPos(),b.readUUID(),b.readUtf(128),b.readVarInt(),b.readVarInt(),b.readBoolean(),b.readUtf(256),b.readBoolean(),b.readBoolean(),b.readBoolean(),b.readBoolean(),b.readBoolean(),
-                java.util.List.of(b.readUtf(256),b.readUtf(256),b.readUtf(256),b.readUtf(256),b.readUtf(256))));
+                java.util.List.of(b.readUtf(256),b.readUtf(256),b.readUtf(256),b.readUtf(256),b.readUtf(256)),b.readBoolean(),b.readBoolean()));
         @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 }

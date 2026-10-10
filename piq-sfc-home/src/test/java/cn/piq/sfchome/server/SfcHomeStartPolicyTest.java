@@ -3,6 +3,10 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 class SfcHomeStartPolicyTest {
+    @Test void deviceAndCardAndLaunchMustAllPermitSecondPort(){
+        for(int players:new int[]{0,1,2,3})for(boolean device:new boolean[]{false,true})for(boolean launch:new boolean[]{false,true})
+            assertEquals(players==2&&device&&launch,SfcHomeStartPolicy.secondPortAllowed(players,device,launch));
+    }
     @Test void legacyCardWithoutSecondLeaseStartsSingle(){assertEquals(SfcHomeStartPolicy.Plan.SINGLE,SfcHomeStartPolicy.plan(2,false,false));}
     @Test void legacyCardIncludesAnExistingSecondLease(){assertEquals(SfcHomeStartPolicy.Plan.DUAL,SfcHomeStartPolicy.plan(2,false,true));}
     @Test void explicitSingleNeverWaitsForOrIncludesP2(){assertEquals(SfcHomeStartPolicy.Plan.SINGLE,SfcHomeStartPolicy.plan(1,true,false));assertEquals(SfcHomeStartPolicy.Plan.SINGLE,SfcHomeStartPolicy.plan(1,true,true));}

@@ -2,6 +2,8 @@
 
 这份指南供开发者从当前源码构建主模组和附属。玩家安装成品请看[玩家指南](../piq-fc-arcade/docs/玩家指南.md)，不要把源码 ZIP 放进 `mods`。
 
+FC76.50／SFC52／MD16 为未发布开发候选，本批未验收。SFC52 的菜单、设备许可及错误提示和诊断改动不解决当前固定核心的回滚失配，不能作为 SFC 2P 修复版发行；构建或自动测试通过不改变这一边界。后续需选择未修改的上游替代核心并独立验证，或暂用现有玩家音画串流；本批未替换核心或迁移旧档，具体限制见 [SFC 当前状态](../piq-sfc-home/README.md#当前状态)。
+
 可选择两种构建方式：**普通开发构建使用固定核心**；**自动快照构建下载官方 nightly 普通核心，并为该批制品生成匹配的运行身份**。Git 不保存全部 DLL、WASM 和运行器；快照会自动取得明确列出的公开输入，不依赖维护电脑上的历史目录，也不会重编所有第三方原生核心。
 
 ## 自动快照
@@ -85,6 +87,25 @@ python source-control/setup.py
 
 子模块命令取得父仓库锁定的 PvZ 上游源码，不会自动升级到上游最新提交。只开发 FC 时不需要运行 PvZ 的构建脚本。
 
+## 开发构建工作目录
+
+FC76.50／SFC52／MD16 未发布开发候选的以下五个项目共用 [build-workspace.gradle](build-workspace.gradle)：`piq-fc-arcade`、`piq-retro-platform`、`piq-sfc-home`、`piq-sfc-arcade` 和 `piq-md-home`。它为开发 classpath 副本及测试临时文件选择独立目录，不改变玩家 JAR 的 `build/libs/` 输出位置，也不表示本批已验收。
+
+可以使用环境变量 `PIQ_BUILD_WORK_DIR` 为后续构建指定基础目录，或对单次 Gradle 调用传入 `-PpiqBuildWorkDir`；两者同时存在时，Gradle 参数优先。使用绝对、纯 ASCII、本地专用目录，建议位于非系统工作盘；不能指向盘根、用户主目录、源码根目录或经过符号链接／重解析点的路径。以下 `D:/game-console-build` 只是示例，请换成实际工作盘：
+
+```powershell
+$env:PIQ_BUILD_WORK_DIR = 'D:/game-console-build'
+.\piq-fc-arcade\gradlew.bat -p piq-fc-arcade printBuildWorkspace
+# 也可不设置环境变量，只为本次构建传入：
+.\piq-fc-arcade\gradlew.bat -p piq-fc-arcade -PpiqBuildWorkDir=D:/game-console-build --max-workers=2 check jar
+```
+
+未指定时，Windows 使用主 Git checkout 所在非系统盘根下的 `game-console-build`，而不是当前 worktree 的系统盘位置。例如主仓库位于 D 盘，则默认基础目录为 `D:/game-console-build`。主仓库在系统盘、网络路径或无法确定安全工作盘时停止并要求显式配置，不静默回退系统 Temp。非 Windows 默认使用 checkout 内的 `.build-work`。各 checkout 再按路径摘要、项目和任务隔离，避免不同工作树的 classpath 与测试目录互相覆盖。
+
+所有上述项目的 Gradle `Test` 任务，以及构建脚本中显式调用 `piqUseBuildWorkspace` 的 `JavaExec` 核心／打包探针，会在各自子 JVM 设置 `java.io.tmpdir`、`jna.tmpdir`、`wasmtime4j.native.tmpdir` 和该子进程的 `TEMP`／`TMP`。JNA、Wasmtime 的解包目录各有子目录。**ModDev 实际游戏任务（如 `runClient`、`runServer`）不应用这套测试设置**，游戏运行环境与数据目录保持原合同。
+
+这不是全局临时目录迁移：Gradle 本身、编译器、未接入项目及外部工具的所有临时文件不在统一保证范围内。脚本不会清理旧系统 Temp、旧批次目录或修改系统环境；classpath 的同步清理只限当前 checkout 的专用副本目录。排错时保留原失败日志，不通过删除系统缓存或玩家数据解决构建错误。
+
 ## 准备主模组的固定输入
 
 [build-inputs.json](build-inputs.json) 列出 FC 构建所需的文件、大小和 SHA-256。哈希用于确认构建用的是预期文件，不代表该文件已经通过所有游戏或联机测试。
@@ -151,7 +172,7 @@ BlastEm 已退出当前 MD 的正常构建和运行路线。保留的历史重�
 - **缺文件或 SHA 不符**：检查锁文件、输入来源和导入结果；不要重命名随机文件或放宽断言。
 - **找不到旧 FC JAR**：先构建当前主包，再传 `-PgameConsoleJar`。构建期路径和玩家运行依赖是两回事。
 - **子模块为空**：执行上面的子模块初始化命令；GitHub 源码 ZIP 不会包含子模块的完整代码。
-- **中文路径或缓存错误**：按目标组件的说明设置独立临时目录，保留首次失败日志；不要删除整个工作区或系统缓存来碰运气。
+- **中文路径或缓存错误**：上述五个项目先核对 `printBuildWorkspace`，按“开发构建工作目录”设置 `PIQ_BUILD_WORK_DIR` 或 `-PpiqBuildWorkDir`；其他组件按自己的说明处理。保留首次失败日志，不删除整个工作区或系统缓存来碰运气。
 - **测试通过但游戏异常**：自动测试不能替代 Minecraft 中的图形、输入、多人和保存恢复检查。
 
 ## 从开发产物到交付包

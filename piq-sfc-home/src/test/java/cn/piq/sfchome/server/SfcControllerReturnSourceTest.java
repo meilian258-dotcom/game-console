@@ -29,11 +29,11 @@ class SfcControllerReturnSourceTest {
         String explicit=section(s,"private static void returnController(","private static void tossedController(");
         assertTrue(explicit.contains("st.leases.get(lease.id)!=lease"));assertTrue(explicit.indexOf("HomeInteractionSounds.play")>explicit.indexOf("release(server,lease,"));
     }
-    @Test void approvalPreferenceSkipsOnlyDialogAndUsesTheFullExistingAdmissionPipeline()throws Exception{
+    @Test void devicePermissionSkipsOnlyDialogAndUsesTheFullExistingAdmissionPipeline()throws Exception{
         String s=source(),request=section(s,"private static void requestJoin(","public static void decideJoin(");
-        int automatic=request.indexOf("if(!s.connection.console().joinApprovalRequired())");
-        assertTrue(automatic>request.indexOf("if(!s.multiplayer)"));assertTrue(automatic>request.indexOf("if(!candidate(p,s,true))"));
-        assertTrue(automatic>request.indexOf("s.join=new Joining("));assertTrue(automatic<request.indexOf("new SfcJoinNetwork.Approval("));
+        int automatic=request.indexOf("decideJoin(host,new SfcJoinNetwork.Decision");
+        assertTrue(automatic>request.indexOf("if(!secondPortAllowed(s))"));assertTrue(automatic>request.indexOf("if(!candidate(p,s,true))"));
+        assertTrue(automatic>request.indexOf("s.join=new Joining("));assertFalse(request.contains("new SfcJoinNetwork.Approval("));
         assertTrue(request.contains("decideJoin(host,new SfcJoinNetwork.Decision(s.id,s.epoch,s.join.gate.token,true))"));
         String decision=section(s,"public static void decideJoin(","private static void joinReady(");
         assertTrue(decision.contains("!joinValid(p.getServer(),s,true)"));assertTrue(decision.contains("!candidate(other,s,false)"));assertTrue(decision.contains("sendRuntime(other,s,j.second)"));

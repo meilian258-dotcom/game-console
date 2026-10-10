@@ -11,6 +11,10 @@ public final class GameConsoleAdminPolicy {
     public static boolean validRange(int range) { return range >= MIN_RANGE && range <= MAX_RANGE; }
     /** Applied only to new FC placements; explicit global modes and old NBT are preserved. */
     public static boolean defaultFcJni(int preferred,int supported) {
+        return defaultHomeJni(preferred,supported);
+    }
+    /** New home placements only; explicit global modes and all loaded NBT are preserved. */
+    public static boolean defaultHomeJni(int preferred,int supported) {
         if(!validMode(preferred)||(supported&~KNOWN_CAPABILITIES)!=0)throw new IllegalArgumentException("Invalid console defaults");
         return preferred==-1&&(supported&16)!=0;
     }

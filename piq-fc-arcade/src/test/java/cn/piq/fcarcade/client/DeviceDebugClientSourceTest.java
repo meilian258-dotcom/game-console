@@ -12,7 +12,7 @@ class DeviceDebugClientSourceTest {
     }
     @Test void homeSettingsUseAcknowledgedRevisionsAndExposeRealSupport() throws Exception {
         String code=source("HomeSyncSettingsScreen");
-        assertTrue(code.contains("HomeSyncNetwork.request(setting.token(),setting.revision(),mode,occupancy,approval)"));
+        assertTrue(code.contains("HomeSyncNetwork.request(setting.token(),setting.revision(),mode,occupancy,approval,secondPort)"));
         assertTrue(code.contains("if(value.revision()<setting.revision())return"));
         assertTrue(code.contains("ready()&&setting.editable()&&setting.occupancySupported()"));
         assertTrue(code.contains("pending=false;timedOut=true"));

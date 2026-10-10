@@ -5,6 +5,19 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DeviceDebugPolicyTest {
+    @Test void secondPortIsOneBoundedFieldWithIndependentIdleAndCapabilityGates(){
+        for(int allowed=0;allowed<=1;allowed++){
+            assertTrue(DeviceDebugPolicy.validRequest(4,-1,-1,-1,allowed));
+            assertFalse(DeviceDebugPolicy.validRequest(4,4,-1,-1,allowed));
+            assertFalse(DeviceDebugPolicy.validRequest(4,-1,0,-1,allowed));
+            assertFalse(DeviceDebugPolicy.validRequest(4,-1,-1,0,allowed));
+            for(boolean admin:new boolean[]{false,true})for(boolean busy:new boolean[]{false,true})for(boolean supported:new boolean[]{false,true})
+                assertEquals(admin&&!busy&&supported,DeviceDebugPolicy.mayEdit(admin,busy,false,supported,-1,-1,-1,allowed,0));
+        }
+        assertFalse(DeviceDebugPolicy.validRequest(0,-1,-1,-1,-2));
+        assertFalse(DeviceDebugPolicy.validRequest(0,-1,-1,-1,2));
+        assertFalse(DeviceDebugPolicy.validRequest(-1,-1,-1,-1,1));
+    }
     @Test void refreshAndSingleFieldActionsAreValidButMixedWritesAreRejected() {
         assertTrue(DeviceDebugPolicy.validRequest(0,-1,-1,-1));
         for(int mode=0;mode<=4;mode++)assertTrue(DeviceDebugPolicy.validRequest(8,mode,-1,-1));

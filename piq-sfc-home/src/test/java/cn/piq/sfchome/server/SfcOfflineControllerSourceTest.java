@@ -31,9 +31,9 @@ class SfcOfflineControllerSourceTest {
         assertTrue(attach.lastIndexOf("st.sessions.get(s.connection.consoleId())!=s")>attach.indexOf("authorizedStart(p,lease,s.connection)"));
         assertTrue(attach.indexOf("new SfcHomeNetwork.Control")>attach.indexOf("s.ports[lease.port]=lease"));
     }
-    @Test void preborrowedRemoteStillRequiresHostApprovalAndExactOriginalPort()throws Exception{
+    @Test void preborrowedRemoteStillRequiresDevicePermissionAndExactOriginalPort()throws Exception{
         String s=source(),request=between(s,"private static void requestJoin(","public static void decideJoin(");
-        assertTrue(request.contains("reserved.port!=requestedPort"));assertTrue(request.contains("if(!s.multiplayer)"));assertTrue(request.contains("new SfcJoinNetwork.Approval"));
+        assertTrue(request.contains("reserved.port!=requestedPort"));assertTrue(request.contains("if(!secondPortAllowed(s))"));assertFalse(request.contains("new SfcJoinNetwork.Approval"));
         String approve=between(s,"public static void decideJoin(","private static void joinReady(");
         assertTrue(approve.indexOf("j.gate.approve")<approve.indexOf("j.second=playerLease(st,other.getUUID())"));
         assertTrue(approve.contains("j.second.port!=j.port||!validLease(other,j.second,false)"));assertFalse(approve.contains("s.ports[j.port]="));
