@@ -3,7 +3,7 @@ loaderVersion="[4,)"
 license="MIT"
 [[mods]]
 modId="piq_replay_compat"
-version="0.1.0-test.6"
+version="0.1.0-test.7"
 displayName="方块电玩：Replay 通用兼容补丁"
 authors="PIQ"
 description='''客户端可选音画录像兼容补丁。提供版本化世界屏幕与最终PCM接口、独立轨道及只读回放。音频仅正向1倍预览，不含有声视频导出。实验候选，兼容范围见说明。'''
@@ -43,7 +43,7 @@ reason="Replay 补丁尚未完成 Java ME 退出与 RMS 保存隔离验证，请
 [[dependencies.piq_replay_compat]]
 modId="piq_sfc_home"
 type="optional"
-versionRange="[0.1.0-alpha.53]"
+versionRange="[0.1.0-alpha.54]"
 side="CLIENT"
 [[dependencies.piq_replay_compat]]
 modId="piq_md_home"
@@ -53,7 +53,7 @@ side="CLIENT"
 [[dependencies.piq_replay_compat]]
 modId="piq_native_arcade"
 type="optional"
-versionRange="[0.1.5.8]"
+versionRange="[0.1.5.12]"
 side="CLIENT"
 [[dependencies.piq_replay_compat]]
 modId="piq_gba"
@@ -63,7 +63,7 @@ side="CLIENT"
 [[dependencies.piq_replay_compat]]
 modId="piq_computer"
 type="optional"
-versionRange="[0.1.0-prototype.12]"
+versionRange="[0.1.0-prototype.13]"
 side="CLIENT"
 [[dependencies.piq_replay_compat]]
 modId="piq_pvz"

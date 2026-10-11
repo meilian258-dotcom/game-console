@@ -47,6 +47,8 @@ class CabinetNetplayVariantTest {
         var selected=variant("retroarch-stock-v1",false);var room=UUID.randomUUID();var member=UUID.randomUUID();var token=UUID.randomUUID();
         var assignment=new CabinetRoomNetwork.Assignment(room,member,member,0,2,TARGET,BACKEND,TARGET,null,CabinetSyncMode.LOCAL_SYNC,false);
         roundTrip(CabinetRoomNetwork.NetplayStart.CODEC,new CabinetRoomNetwork.NetplayStart(assignment,(1L<<50)+999,token,selected.launch()));
+        roundTrip(CabinetRoomNetwork.NetplayStart.CODEC,new CabinetRoomNetwork.NetplayStart(assignment,(1L<<50)+999,token,selected.launch(),(1L<<50)+1000));
+        assertThrows(IllegalArgumentException.class,()->new CabinetRoomNetwork.NetplayStart(assignment,(1L<<50)+999,token,selected.launch(),(1L<<50)+999));
         assertThrows(IllegalArgumentException.class,()->new CabinetRoomNetwork.NetplayStart(assignment,999,token,selected.launch()));
         roundTrip(CabinetSyncNetwork.Mode.CODEC,new CabinetSyncNetwork.Mode(TARGET,BACKEND,-1,token,-1,-1,-1,-1,selected.id()));
         roundTrip(CabinetSyncNetwork.Setting.CODEC,new CabinetSyncNetwork.Setting(TARGET,BACKEND,3,true,true,"test",false,true,"",token,false,false,"",false,CabinetPowerSettings.DEFAULT_SECONDS,CabinetPowerSettings.DEFAULT_RENDER_DISTANCE,0,selected.id()));

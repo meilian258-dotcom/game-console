@@ -10,6 +10,7 @@ import java.util.Arrays;
 final class CabinetNetplayEmulator implements RetroEmulator {
     private final NetplayProcess process;private final Connection connection;private final long wire;private final int port;
     private final boolean processBased;
+    private final CabinetOperatingClient operating;
     private boolean closed;
     private NetplayProcess.Frame video;private int[] videoPixels;
     CabinetNetplayEmulator(CabinetRoomNetwork.NetplayStart grant,Connection connection,CabinetBackend.NetplayContent content){
@@ -22,7 +23,13 @@ final class CabinetNetplayEmulator implements RetroEmulator {
                 chunk->NetplayNetwork.upstream(connection,chunk),content.profile(),content::auxiliary,
                 grant.assignment().coinRequired()||cn.piq.fcarcade.cabinet.PgmServicePolicy.supportsBackend(grant.assignment().backend().toString()),grant.assignment().coinRequired());
         if(content.files()!=null)process.fileContent(content.files());
-        NetplayNetwork.bind(connection,process,grant.launch().persistenceSupported());process.start();
+        if(grant.operatingWire()!=0){
+            if(port!=0||processBased||!cn.piq.fcarcade.cabinet.CabinetOperatingFiles.supported(content.profile()))throw new IllegalArgumentException("街机运营配置适配不匹配，请更新配套主包和附属");
+            operating=new CabinetOperatingClient(cn.piq.fcarcade.client.NetplaySaveClient.open(connection,grant.operatingWire(),grant.ticket()),content.profile());
+            process.operatingFiles(operating);
+        }else operating=null;
+        try{NetplayNetwork.bind(connection,process,grant.launch().persistenceSupported());process.start();}
+        catch(RuntimeException failure){NetplayNetwork.unbind(connection,process);process.close();throw failure;}
     }
     @Override public boolean isReady(){return !closed&&process.ready();}
     /** Empty for JNI: its existing slot ownership and release contract remain authoritative. */
@@ -32,6 +39,7 @@ final class CabinetNetplayEmulator implements RetroEmulator {
     void localInput(int mask){process.inputRetroPad(mask);}
     void serverInput(int port,int mask){process.cabinetInput(port,mask);}
     void coin(int port,long sequence){process.cabinetCoin(port,sequence);}
+    void authorizeOperating(){if(operating!=null)operating.authorize();}
     @Override public boolean supportsCoinPreservingRelease(){return true;}
     @Override public void releaseGameplayPortKeepingCoin(int port){process.cabinetRelease(port);}
     @Override public void offerInputs(int p1,int p2,int p3,int p4){int[] masks={p1,p2,p3,p4};for(int p=0;p<4;p++)serverInput(p,masks[p]);}

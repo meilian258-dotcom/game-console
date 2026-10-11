@@ -158,6 +158,7 @@ public final class SfcHomeServer {
         }
     }
     public static void register(){if(registered)return;registered=true;
+        SfcSaveLibraryService.register();
         HomeSystems.register(SfcHomeConsoleBlockEntity.SYSTEM_ID,new HomeSystems.ServerHooks(){
             @Override public void onInteract(ServerPlayer p,InteractionHand hand,HomeSystems.Connection c,BlockHitResult hit){} // Legacy TV/body entry never powers on or grants a controller.
             @Override public boolean onPowerOn(ServerPlayer p,HomeSystems.Connection c){return powerOn(p,c);}

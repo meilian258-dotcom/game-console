@@ -33,7 +33,7 @@ public final class CabinetRoomNetwork {
     public static void send(CustomPacketPayload payload){PacketDistributor.sendToServer(payload);}
     public static void register(RegisterPayloadHandlersEvent event){
         CabinetSyncNetwork.register(event);
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"cabinet-room-11")
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"cabinet-room-12")
             .playToServer(Ready.TYPE,Ready.CODEC,(p,c)->c.enqueueWork(()->{if(c.player() instanceof ServerPlayer s)CabinetRooms.ready(s,p);}))
             .playToServer(Input.TYPE,Input.CODEC,(p,c)->c.enqueueWork(()->{if(c.player() instanceof ServerPlayer s)CabinetRooms.input(s,p);}))
             .playToServer(Reset.TYPE,Reset.CODEC,(p,c)->c.enqueueWork(()->{if(c.player() instanceof ServerPlayer s)CabinetRooms.reset(s,p);}))
@@ -70,11 +70,13 @@ public final class CabinetRoomNetwork {
         public static final StreamCodec<RegistryFriendlyByteBuf,Assignment> CODEC=StreamCodec.of((b,p)->{b.writeUUID(p.room);b.writeUUID(p.member);b.writeUUID(p.hostMember);b.writeVarInt(p.port);b.writeVarInt(p.capacity);CabinetNetwork.writeTarget(b,p.target);b.writeUtf(p.backend.toString(),128);CabinetNetwork.writeTarget(b,p.primary);b.writeBoolean(p.secondary!=null);if(p.secondary!=null)CabinetNetwork.writeTarget(b,p.secondary);b.writeVarInt(p.mode.ordinal());b.writeBoolean(p.coinRequired);},b->new Assignment(b.readUUID(),b.readUUID(),b.readUUID(),b.readVarInt(),b.readVarInt(),CabinetNetwork.readTarget(b),ResourceLocation.parse(b.readUtf(128)),CabinetNetwork.readTarget(b),b.readBoolean()?CabinetNetwork.readTarget(b):null,CabinetSyncMode.checked(b.readVarInt()),b.readBoolean()));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
-    public record NetplayStart(Assignment assignment,long wire,UUID ticket,NetplayLaunchSpec launch) implements CustomPacketPayload {
-        public NetplayStart(Assignment assignment,long wire,UUID ticket){this(assignment,wire,ticket,NetplayLaunchSpec.UNSPECIFIED);}
-        public NetplayStart{Objects.requireNonNull(assignment);Objects.requireNonNull(ticket);Objects.requireNonNull(launch);if(wire<(1L<<50)||assignment.mode()!=CabinetSyncMode.LOCAL_SYNC||assignment.capacity()>4)throw new IllegalArgumentException("Netplay assignment");}
+    public record NetplayStart(Assignment assignment,long wire,UUID ticket,NetplayLaunchSpec launch,long operatingWire) implements CustomPacketPayload {
+        public NetplayStart(Assignment assignment,long wire,UUID ticket){this(assignment,wire,ticket,NetplayLaunchSpec.UNSPECIFIED,0);}
+        public NetplayStart(Assignment assignment,long wire,UUID ticket,NetplayLaunchSpec launch){this(assignment,wire,ticket,launch,0);}
+        public NetplayStart{Objects.requireNonNull(assignment);Objects.requireNonNull(ticket);Objects.requireNonNull(launch);if(wire<(1L<<50)||assignment.mode()!=CabinetSyncMode.LOCAL_SYNC||assignment.capacity()>4
+                ||operatingWire!=0&&(operatingWire<(1L<<50)||operatingWire==wire||assignment.port()!=0))throw new IllegalArgumentException("Netplay assignment");}
         public static final Type<NetplayStart> TYPE=new Type<>(id("netplay_start"));
-        public static final StreamCodec<RegistryFriendlyByteBuf,NetplayStart> CODEC=StreamCodec.of((b,p)->{Assignment.CODEC.encode(b,p.assignment);b.writeLong(p.wire);b.writeUUID(p.ticket);NetplayLaunchCodec.CODEC.encode(b,p.launch);},b->new NetplayStart(Assignment.CODEC.decode(b),b.readLong(),b.readUUID(),NetplayLaunchCodec.CODEC.decode(b)));
+        public static final StreamCodec<RegistryFriendlyByteBuf,NetplayStart> CODEC=StreamCodec.of((b,p)->{Assignment.CODEC.encode(b,p.assignment);b.writeLong(p.wire);b.writeUUID(p.ticket);NetplayLaunchCodec.CODEC.encode(b,p.launch);b.writeLong(p.operatingWire);},b->new NetplayStart(Assignment.CODEC.decode(b),b.readLong(),b.readUUID(),NetplayLaunchCodec.CODEC.decode(b),b.readLong()));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     public record Control(UUID room,UUID member,boolean enabled) implements CustomPacketPayload {

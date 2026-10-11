@@ -8,6 +8,6 @@ public final class SfcUserModelTestRunner {
                 selectClass("cn.piq.sfchome.client.SfcCoverGeometryTest"),selectClass("cn.piq.sfchome.client.SfcAvCableGeometryTest")).build();
         var listener=new SummaryGeneratingListener();var launcher=LauncherFactory.create();launcher.registerTestExecutionListeners(listener);launcher.execute(request);
         listener.getSummary().printTo(new java.io.PrintWriter(System.out));listener.getSummary().printFailuresTo(new java.io.PrintWriter(System.out));
-        if(listener.getSummary().getTestsFoundCount()!=30||listener.getSummary().getTestsFailedCount()!=0||listener.getSummary().getTestsSkippedCount()!=0)throw new AssertionError("SFC user model tests");
+        if(listener.getSummary().getTestsFoundCount()!=31||listener.getSummary().getTestsFailedCount()!=0||listener.getSummary().getTestsSkippedCount()!=0)throw new AssertionError("SFC user model tests");
     }
 }

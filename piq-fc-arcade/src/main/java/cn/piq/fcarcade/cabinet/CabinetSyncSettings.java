@@ -25,7 +25,7 @@ public final class CabinetSyncSettings extends SavedData {
     static String netplayVariant(MinecraftServer s,CabinetTarget t,ResourceLocation b){return data(s).netplayVariants.getOrDefault(key(t,b),CabinetNetplay.defaultVariant(b));}
     static boolean supportsPersistence(ResourceLocation backend,String variant){var selected=CabinetNetplay.variant(backend,variant);return selected!=null?selected.persistenceSupported():CabinetNetplay.variants(backend).isEmpty()&&NetplayLaunchSpec.LEGACY.equals(variant);}
     static int effectiveSaveMode(ResourceLocation backend,String variant,int savedMode){return supportsPersistence(backend,variant)?savedMode:0;}
-    static boolean netplay(MinecraftServer s,CabinetTarget t,ResourceLocation b){return data(s).netplayModes.contains(key(t,b))&&get(s,t,b)==CabinetSyncMode.LOCAL_SYNC;}
+    static boolean netplay(MinecraftServer s,CabinetTarget t,ResourceLocation b){return get(s,t,b)==CabinetSyncMode.LOCAL_SYNC&&data(s).netplayModes.contains(key(t,b));}
     private static final Map<ServerPlayer,DebugIntent> DEBUG=new WeakHashMap<>();
     private static final ThreadLocal<Boolean> CHECKING=ThreadLocal.withInitial(()->false);
     private static final ThreadLocal<Boolean> COMMAND=ThreadLocal.withInitial(()->false);
@@ -82,20 +82,28 @@ public final class CabinetSyncSettings extends SavedData {
     static CabinetSyncMode get(MinecraftServer s,CabinetTarget t,ResourceLocation b){
         if(b.equals(CabinetBackends.NES))return CabinetSyncMode.LOCAL_SYNC; // Original physical FC cabinet has its own input-sync sessions.
         var saved=data(s).modes.get(key(t,b));if(saved!=null)return saved;
+        // A full settings table must neither crash an ordinary lookup nor claim an
+        // unsaved Netplay choice. Explicit existing entries above remain usable.
+        if(data(s).modes.size()>=4096)return CabinetSyncMode.MEDIA;
         var level=s.getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,t.dimension()));
         if(level!=null&&t.matches(level)&&level.getBlockEntity(t.anchor()) instanceof LegacyFcArcadeBlockEntity placed) {
             int desired=placed.placedDefaultMode();
+            String variantId=CabinetNetplay.defaultVariant(b);
+            var variant=CabinetNetplay.variant(b,variantId);
+            boolean defaultJni=CabinetPlacementDefaults.jni(placed.placedJniDefault(),desired,
+                    CabinetHostingConfig.localAllowed(),CabinetNetplay.supported(b),
+                    variant!=null&&variant.template().jni()!=null);
+            if(defaultJni) return data(s).rememberDefault(key(t,b),CabinetSyncMode.LOCAL_SYNC,true,variantId);
             var secondary=CabinetLinks.peer(s,t);
             boolean local=CabinetHostingConfig.localAllowed()&&CabinetBackends.supportsSync(b)
                     &&CabinetSeats.capacity(CabinetBackends.syncMaxPlayers(b),secondary!=null,t.dual(),secondary!=null&&secondary.dual())>0;
-            if(desired>=0) {
+            if(desired>=0||placed.placedJniDefault()) {
                 boolean hosted=CabinetHostedSessions.unavailable(s,t,b)==null;
                 int fallback=hosted?2:b.toString().equals("piq_sfc_home:sfc")&&local?1:0;
                 int supported=(CabinetHostingConfig.playerAllowed()?1:0)|(local?2:0)|(hosted?4:0);
                 var selected=CabinetSyncMode.checked(cn.piq.fcarcade.config.GameConsoleAdminPolicy.selectNewMode(desired,supported,fallback));
                 // Resolve once per backend. Later policy/runtime changes must not silently activate a formerly unavailable default.
-                var store=data(s);String identity=key(t,b);
-                if(store.modes.size()<4096||store.modes.containsKey(identity)){store.modes.put(identity,selected);store.setDirty();return selected;}
+                return data(s).rememberDefault(key(t,b),selected,false,null);
             }
         }
         // Never rewrite explicit preferences. Unconfigured public cabinets prefer server hosting
@@ -103,6 +111,16 @@ public final class CabinetSyncSettings extends SavedData {
         if(CabinetHostedSessions.unavailable(s,t,b)==null)return CabinetSyncMode.SERVER_MEDIA;
         if(b.toString().equals("piq_sfc_home:sfc")&&CabinetHostingConfig.localAllowed()&&CabinetBackends.supportsSync(b))return CabinetSyncMode.LOCAL_SYNC;
         return CabinetSyncMode.MEDIA;
+    }
+    /** One-time resolution also freezes an unavailable default, preventing later silent activation. */
+    CabinetSyncMode rememberDefault(String identity,CabinetSyncMode selected,boolean netplay,String variant) {
+        var existing=modes.get(identity);if(existing!=null)return existing;
+        if(modes.size()>=4096)throw new IllegalStateException("同步配置数量已达上限，未创建默认设置");
+        if(netplay&&(selected!=CabinetSyncMode.LOCAL_SYNC||variant==null))throw new IllegalArgumentException("Invalid Netplay placement");
+        if(variant!=null)NetplayLaunchSpec.checkVariant(variant);
+        modes.put(identity,selected);
+        if(netplay){netplayModes.add(identity);netplayVariants.put(identity,variant);}
+        setDirty();return selected;
     }
     static void request(ServerPlayer p,CabinetSyncNetwork.Mode packet){
         if(CHECKING.get())return;

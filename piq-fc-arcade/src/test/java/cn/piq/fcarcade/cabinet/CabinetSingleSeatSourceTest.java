@@ -30,7 +30,7 @@ class CabinetSingleSeatSourceTest {
         assertTrue(s.contains("room!=null&&room.capacity()>1&&(hosted()?moderator&&room.member().equals(hostMember):room.port()==0&&room.hostMember().equals(hostMember))"));assertTrue(s.contains("room.secondary()==null?room.capacity()"));assertTrue(s.contains("ready.maxPlayers()<room.capacity()"));
     }
     @Test void changedLegalCapacityRequiresNewMandatoryWireVersionAndKeepsExactIdentityChecks()throws Exception{
-        var s=source("cabinet/CabinetRoomNetwork");assertTrue(s.contains("TrafficPayloadRegistrar.create(event,\"cabinet-room-11\")"));assertFalse(s.contains("\"cabinet-room-9\""));
+        var s=source("cabinet/CabinetRoomNetwork");assertTrue(s.contains("TrafficPayloadRegistrar.create(event,\"cabinet-room-12\")"));assertFalse(s.contains("\"cabinet-room-9\""));
         assertTrue(s.contains("!CabinetSeats.validCapacity("));assertTrue(s.contains("port>=capacity"));assertTrue(s.contains("(port==0)!=member.equals(hostMember)"));assertTrue(s.contains("sink.acceptsConnection(source)"));
     }
 }

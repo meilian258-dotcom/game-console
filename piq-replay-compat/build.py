@@ -4,7 +4,7 @@ Python 3.11+, JDK 21. Never launches or modifies a game instance.
 from pathlib import Path
 import argparse, hashlib, json, os, subprocess, zipfile
 
-VERSION = '0.1.0-test.6'
+VERSION = '0.1.0-test.7'
 ROOT = Path(__file__).resolve().parent
 REPLAY_API_VERSION = 1
 PACKAGED_TEST = 'cn.piq.replaycompat.PackagedMetadataTest'

@@ -109,8 +109,12 @@ public final class NetplaySaveClient {
                         if(outgoing==null||operation==null||operation.isDone()||m.offset()!=offset)throw new IllegalStateException("存档上传确认顺序异常");
                         UUID tx=transaction;int expected=offset;
                         PACE.schedule(()->{synchronized(this){
-                            if(closed||outgoing==null||!transaction.equals(tx)||offset!=expected)return;
-                            for(int i=0;i<2&&offset<outgoing.length;i++){int start=offset;offset=Math.min(outgoing.length,offset+NetplaySaveTransfer.CHUNK);message(UPLOAD,0,start,Arrays.copyOfRange(outgoing,start,offset),"");}
+                            if(replayBlocked()||closed||outgoing==null||!transaction.equals(tx)||offset!=expected)return;
+                            // message() can revoke this channel and clear outgoing during a Replay transition.
+                            for(int i=0;i<2&&outgoing!=null&&offset<outgoing.length;i++){
+                                if(replayBlocked())return;
+                                int start=offset;offset=Math.min(outgoing.length,offset+NetplaySaveTransfer.CHUNK);message(UPLOAD,0,start,Arrays.copyOfRange(outgoing,start,offset),"");
+                            }
                         }},50,TimeUnit.MILLISECONDS);
                     }
                     case SAVED->{if(outgoing==null||offset!=outgoing.length||operation==null)throw new IllegalStateException("不完整的保存确认");outgoing=null;lastConfirmed=System.nanoTime();expires=Long.MAX_VALUE;operation.complete(null);}

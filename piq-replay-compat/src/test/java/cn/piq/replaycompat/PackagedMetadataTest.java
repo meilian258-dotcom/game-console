@@ -43,9 +43,9 @@ public final class PackagedMetadataTest {
             check(boundary.getLowerBound()!=null&&boundary.getUpperBound()==null,"public API gate replaces mod upper bound");
             var j2me=dependencies.stream().filter(c->"piq_j2me_arcade".equals(c.get("modId"))).toList();
             check(j2me.size()==1&&"incompatible".equals(j2me.getFirst().get("type")),"unverified Java ME must stay incompatible");
-            var pinned=java.util.Map.of("piq_sfc_home","0.1.0-alpha.53","piq_md_home","0.1.0-alpha.16",
-                    "piq_native_arcade","0.1.5.8","piq_gba","0.1.0-alpha.15",
-                    "piq_computer","0.1.0-prototype.12","piq_pvz","0.1.0-prototype.12");
+            var pinned=java.util.Map.of("piq_sfc_home","0.1.0-alpha.54","piq_md_home","0.1.0-alpha.16",
+                    "piq_native_arcade","0.1.5.12","piq_gba","0.1.0-alpha.15",
+                    "piq_computer","0.1.0-prototype.13","piq_pvz","0.1.0-prototype.12");
             for(var addon:pinned.entrySet()) {
                 var matches=dependencies.stream().filter(c->addon.getKey().equals(c.get("modId"))).toList();
                 check(matches.size()==1,"legacy adapter dependency missing: "+addon.getKey());

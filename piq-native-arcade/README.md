@@ -11,7 +11,9 @@
 - 所需固定核心和辅助运行库由对应成品提供，不要求玩家另装 RetroArch，也不要将运行库 JAR 当作模组放进 `mods`。
 - 从 [GitHub 整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)取得配套成品；安装步骤见[本套说明](../piq-fc-arcade/docs/整套测试版-20261007.md)。Code → Download ZIP 是源码，不是可安装成品；不随意替换 DLL。
 
-当前开发候选为街机 `0.1.5.11`，配套主包 `0.31.0-alpha.76.49`，不是上面的旧公开整套下载。新增原版 FBNeo 的 RetroArch Netplay 显式试验，不修改核心本体，不替换旧 FBNeo JNI 或 MAME，不迁移旧档。状态一致性验收尚未通过，不能据此宣称旧 JNI 闪退或全部联机问题已解决。客户端与服务器须一起更新，候选尚未作为正式默认下载发布。
+当前开发候选为街机 `0.1.5.12`，配套主包至少 `0.31.0-alpha.76.54`，不是上面的旧公开整套下载。本批修补固定 FBNeo JNI 路线的运营设置保存，新放置机柜按能力默认 JNI Netplay，旧设备已有选择保留。核心字节和旧进度不变，客户端与服务器须一起更新。验证与限制见[设备体验候选](../piq-fc-arcade/design/设备体验与PGM运营设置-20261012.md)，尚未作为正式默认下载发布。
+
+街机1.5.11 的原版 FBNeo RetroArch Netplay 显式试验仍保留；状态一致性验收尚未通过，不能据此宣称旧 JNI 闪退或全部联机问题已解决。
 
 ## RetroArch Netplay 试验
 
@@ -21,7 +23,7 @@
 
 ## 统一 RetroArch 后端首批（开发验证）
 
-默认仍使用 MAME JNI。仅在独立测试实例的 Java 启动参数显式添加 `-Dpiq.arcade.mediaBackend=retroarch`，才将**通用机柜客户端的玩家音画串流计算端**交给公共 RetroArch LOCAL 会话。删除此参数回到兼容默认；不支持的值会报错，不静默切换。参数不是聊天命令、机柜的联网模式或服务端发来的设置。
+选择玩家音画串流时，媒体运行器默认使用 MAME JNI。仅在独立测试实例的 Java 启动参数显式添加 `-Dpiq.arcade.mediaBackend=retroarch`，才将**通用机柜客户端的玩家音画串流计算端**交给公共 RetroArch LOCAL 会话。删除此参数回到兼容媒体运行器；不支持的值会报错，不静默切换。参数不是聊天命令、机柜的联网模式或服务端发来的设置。
 
 关机后在设备设置选择“玩家音画串流”（旧版按钮叫“玩家托管”），开机后进入“查看音画诊断”，应显示“MAME · RetroArch 独立进程”。不要选择 Netplay 来测试这条新路线。
 

@@ -141,6 +141,7 @@ public final class CabinetClientBackends implements CabinetNetwork.ClientSink, C
     @Override public void moderator(CabinetRoomNetwork.Moderator value){if(room!=null&&hosted()&&room.room().equals(value.room())&&room.member().equals(value.member())&&Minecraft.getInstance().getConnection()==sessionConnection)moderator=value.enabled();}
     @Override public void pgmService(CabinetRoomNetwork.PgmService value){
         if(!netplay()||room.port()!=0||!room.room().equals(value.room())||!room.member().equals(value.member())||!current()||!running())return;
+        if(emulator instanceof CabinetNetplayEmulator e)e.authorizeOperating();
         if(PGM_START.arm(System.nanoTime()))notice("准备发送维护组合键；先关闭聊天、松开所有按键。出现菜单后按游戏提示调整，菜单 EXIT 返回；未出现说明本游戏不支持此入口。");
     }
     @Override public void frames(CabinetSyncNetwork.Frames p){if(sync!=null)sync.frames(p);}

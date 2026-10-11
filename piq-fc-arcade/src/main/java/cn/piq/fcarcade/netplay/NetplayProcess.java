@@ -79,6 +79,7 @@ public final class NetplayProcess implements AutoCloseable {
         default void abort(){}
     }
     private volatile Persistence persistence;
+    public synchronized void operatingFiles(JniNetplaySession.OperatingFiles value){if(jni==null)throw new IllegalStateException("Operating files are not supported by this backend");jni.operatingFiles(value);}
     private NetplaySaveState.Identity saveIdentity;
     private byte[] initialSave;
     private volatile boolean closing;

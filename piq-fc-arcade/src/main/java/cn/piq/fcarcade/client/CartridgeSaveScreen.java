@@ -82,7 +82,8 @@ public final class CartridgeSaveScreen extends cn.piq.fcarcade.client.ui.DeviceS
             return;
         }
         var t=layout.toolbar();int controls=162;name=new EditBox(font,t.x(),t.y(),Math.max(30,t.width()-controls-8),20,Component.literal("存档名称"));
-        name.setMaxLength(32);name.setValue(draft);name.setHint(Component.literal("选择存档后修改名称"));name.setEditable(!busy&&selected()!=null&&selected().canEdit()&&!selected().active());addRenderableWidget(name);
+        name.setMaxLength(32);name.setValue(draft);name.setHint(Component.literal("选择存档查看；可管理项可改名"));name.setEditable(!busy&&selected()!=null&&selected().canEdit()&&!selected().active());
+        name.setTooltip(Tooltip.create(Component.literal(selected()!=null&&!selected().canEdit()?"此条目仅供查看，不能重命名或删除":"只修改可管理存档的名称，不改变游戏或核心身份")));addRenderableWidget(name);
         int x=name.getX()+name.getWidth()+4;
         button("重命名",new DeviceLayout.Rect(x,t.y(),58,20),()->{var e=selected();if(e!=null)request(CartridgeSaveNetwork.RENAME,e.id(),e.version(),name.getValue().strip(),null);},editable(),DeviceUi.Tone.NORMAL);
         button("删除…",new DeviceLayout.Rect(x+62,t.y(),48,20),()->{var e=selected();if(e!=null)request(CartridgeSaveNetwork.PREPARE_DELETE,e.id(),e.version(),"",null);},editable(),DeviceUi.Tone.DANGER);
@@ -106,7 +107,10 @@ public final class CartridgeSaveScreen extends cn.piq.fcarcade.client.ui.DeviceS
         if(focused&&name!=null&&editable()){setInitialFocus(name);name.moveCursorTo(cursor,false);}
     }
     private void button(String label,DeviceLayout.Rect r,Runnable action,boolean enabled,DeviceUi.Tone tone){
-        var b=DeviceUi.button(font,label,r.x(),r.y(),r.width(),r.height(),action,enabled,tone);b.setTooltip(Tooltip.create(Component.literal(label)));addRenderableWidget(b);
+        var b=DeviceUi.button(font,label,r.x(),r.y(),r.width(),r.height(),action,enabled,tone);
+        String hint=label;
+        if(!enabled&&(label.equals("重命名")||label.equals("删除…"))){var row=selected();hint=row==null?"请先选择存档；只读项目不能修改":!row.canEdit()?"此条目仅供查看，不能重命名或删除":row.active()?"存档正在使用，请正常关机并刷新后再修改":"请等待服务器确认";}
+        b.setTooltip(Tooltip.create(Component.literal(hint)));addRenderableWidget(b);
     }
     private void request(int operation,String id,String version,String name,UUID confirmation){
         if(!current()||!ready())return;busy=true;sentAt=System.nanoTime();nextActionAt=sentAt+1_050_000_000L;status="等待服务器确认…";
@@ -132,7 +136,7 @@ public final class CartridgeSaveScreen extends cn.piq.fcarcade.client.ui.DeviceS
         if(minecraft!=null&&minecraft.getConnection()!=null&&minecraft.getConnection().getConnection()==connection&&connection.isConnected())
             CartridgeSaveNetwork.send(new CartridgeSaveNetwork.Request(data.token(),CartridgeSaveNetwork.CLOSE,"","","",null));
     }
-    private static String details(CartridgeSaveNetwork.Entry e){return e.name()+"\n归属："+e.owner()+"\n来源："+e.source()+"\n更新时间："+DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(e.modified()))+"\n大小："+e.bytes()+" 字节"+(e.active()?"\n正在使用，不能修改":"");}
+    private static String details(CartridgeSaveNetwork.Entry e){return e.name()+"\n归属："+e.owner()+"\n来源："+e.source()+"\n更新时间："+DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(e.modified()))+"\n大小："+e.bytes()+" 字节"+(e.active()?"\n正在使用，不能修改":"")+(!e.canEdit()?"\n此条目只读，不能重命名或删除":"");}
     private static String systemLabel(String system){
         if(system.indexOf(':')<0)return system.toUpperCase(java.util.Locale.ROOT);
         var id=net.minecraft.resources.ResourceLocation.tryParse(system);var adapter=id==null?null:cn.piq.fcarcade.home.content.ContentCards.adapter(id);
@@ -157,5 +161,6 @@ public final class CartridgeSaveScreen extends cn.piq.fcarcade.client.ui.DeviceS
         }
         var s=layout.status();String message=nextActionAt!=0&&System.nanoTime()<nextActionAt?"请稍候 1 秒 · "+status:status;
         DeviceUi.status(g,font,message,s.x(),s.y(),s.width(),busy);super.render(g,mx,my,dt);
+        if(mx>=s.x()&&mx<s.right()&&my>=s.y()&&my<s.bottom())g.renderTooltip(font,Component.literal(status),mx,my);
     }
 }

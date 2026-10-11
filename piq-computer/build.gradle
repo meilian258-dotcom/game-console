@@ -1,7 +1,7 @@
 plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
 apply from: '../source-control/neoforge-compat.gradle'
 group = 'cn.piq.computer'
-version = '0.1.0-prototype.12'
+version = '0.1.0-prototype.13'
 base { archivesName = 'game_console_computer' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 neoForge {

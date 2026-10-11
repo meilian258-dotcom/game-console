@@ -42,7 +42,7 @@ class CabinetVariantRegistrationTest {
             var launch=new NetplayLaunchSpec("retroarch-stock-v1","ab".repeat(32),false);
             var origin=new WatchAnchor(target.anchor(),target.identity());
             var watch=new WatchNetwork.Start(1,UUID.randomUUID(),new WatchDescriptor(CabinetRooms.WATCH_PROVIDER,room,member,dimension,origin,null,List.of(origin)));
-            check(play,new CabinetRoomNetwork.NetplayStart(assignment,(1L<<50)+1,token,launch),PacketFlow.CLIENTBOUND,"cabinet-room-11");
+            check(play,new CabinetRoomNetwork.NetplayStart(assignment,(1L<<50)+1,token,launch,(1L<<50)+2),PacketFlow.CLIENTBOUND,"cabinet-room-12");
             check(play,new WatchNetwork.NetplayStart(watch,(1L<<50)+1,token,backend,"cd".repeat(32),launch),PacketFlow.CLIENTBOUND,"watch-5");
             check(play,new CabinetSyncNetwork.Mode(target,backend,-1,token,-1,-1,-1,-1,launch.variant()),PacketFlow.SERVERBOUND,"cabinet-sync-11");
             check(play,new CabinetSyncNetwork.Setting(target,backend,3,true,true,"试验",false,true,"",token,false,false,"",false,CabinetPowerSettings.DEFAULT_SECONDS,CabinetPowerSettings.DEFAULT_RENDER_DISTANCE,0,launch.variant()),PacketFlow.CLIENTBOUND,"cabinet-sync-11");

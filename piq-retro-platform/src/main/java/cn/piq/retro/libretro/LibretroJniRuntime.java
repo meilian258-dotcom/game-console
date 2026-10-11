@@ -42,6 +42,14 @@ public final class LibretroJniRuntime implements LibretroRuntime {
     private final int[] metadata = new int[11];
     private final double[] timing = new double[3];
     private ByteBuffer video, audio;
+    private LibretroOperatingFile operatingFile;
+    private Path operatingDirectory;
+
+    /** Trusted adapter only. Uses this session's fresh save directory, never a shared native path. */
+    public void operatingFile(LibretroOperatingFile file) {
+        check();if(token!=0||workspace!=null||operatingFile!=null)throw new IllegalStateException("Bind operating file before load");
+        operatingFile=Objects.requireNonNull(file);
+    }
 
     public LibretroJniRuntime(LibretroProfile profile, Class<?> resourceOwner) {
         this(profile, resourceOwner, profile.mesenGun() ? MESEN_GUN : 0);
@@ -173,6 +181,7 @@ public final class LibretroJniRuntime implements LibretroRuntime {
     }
     private LibretroProcess.Info open(Path content, Path system, Path saves, byte[] contentHash) throws IOException {
         Path save = saves == null ? Files.createDirectory(workspace.directory().resolve("save")) : saves.toAbsolutePath().normalize();
+        if(operatingFile!=null){if(saves!=null)throw new IOException("Operating file requires isolated session saves");operatingFile.prepare(save);operatingDirectory=save;}
         if (saves != null) {
             noLinks(save, true); Files.createDirectories(save); noLinks(save, true);
             saveChannel = FileChannel.open(save.resolve("piq-jni-session.lock"), StandardOpenOption.CREATE, StandardOpenOption.WRITE, LinkOption.NOFOLLOW_LINKS);
@@ -305,10 +314,15 @@ public final class LibretroJniRuntime implements LibretroRuntime {
         } catch (IOException | LinkageError e) { throw new IllegalStateException("JNI退出未确认，请保存世界后重启客户端", e); }
         closed = true;
         Exception failure = null;
+        if(operatingFile!=null&&operatingDirectory!=null&&info!=null)try{operatingFile.closed(operatingDirectory);}catch(Exception e){failure=e;}
         for (AutoCloseable resource : new AutoCloseable[]{saveLock, saveChannel, nativePin, workspace}) if (resource != null) {
             try { resource.close(); } catch (Exception e) { if (failure == null) failure = e; else failure.addSuppressed(e); }
         }
-        if (failure != null) throw new IllegalStateException("JNI已关闭，但试验工作区清理失败", failure);
+        if (failure != null) throw new PostCloseException(operatingFile!=null?"JNI已关闭，但运营配置保存或工作区清理失败；此前设置保留":"JNI已关闭，但试验工作区清理失败", failure);
+    }
+    /** Native close has succeeded; callers must not present this as an unclosed native core. */
+    public static final class PostCloseException extends IllegalStateException {
+        public PostCloseException(String message,Throwable cause){super(message,cause);}
     }
     private static ScheduledThreadPoolExecutor deadlines() {
         var executor = new ScheduledThreadPoolExecutor(1, r -> { var t = new Thread(r, "PIQ-JNI-deadlines"); t.setDaemon(true); return t; });

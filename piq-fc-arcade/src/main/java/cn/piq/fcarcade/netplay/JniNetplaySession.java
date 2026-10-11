@@ -50,6 +50,17 @@ public final class JniNetplaySession implements AutoCloseable {
     private final NetplayPeerRejections peerRejections=new NetplayPeerRejections();
     private volatile String failure,phase="准备 FC JNI Netplay",saveStatus="不保存进度";
     private volatile NetplayProcess.Persistence persistence;
+    /** Trusted host adapter for a native-owned NVRAM file, separate from gameplay checkpoints. */
+    public interface OperatingFiles {
+        LibretroOperatingFile prepare(NetplaySaveState.Identity game)throws Exception;
+        void normalClose(boolean normal);
+        void abort();
+    }
+    private OperatingFiles operatingFiles;
+    public synchronized void operatingFiles(OperatingFiles value){
+        if(started||closed||!grant.host()||generic==null||operatingFiles!=null)throw new IllegalStateException("Bind host operating files before start");
+        operatingFiles=Objects.requireNonNull(value);
+    }
     private CompletableFuture<byte[]> capture;
     private CompletableFuture<Void> commit=CompletableFuture.completedFuture(null);
     private volatile LibretroRuntime core;
@@ -202,7 +213,7 @@ public final class JniNetplaySession implements AutoCloseable {
         closing=true;input=0;gunInputs.close();
         if(!started){
             if(cabinet!=null)cabinet.close();
-            try{if(persistence!=null)persistence.abort();terminated.complete(null);}
+            try{if(persistence!=null)persistence.abort();if(operatingFiles!=null)operatingFiles.abort();terminated.complete(null);}
             catch(RuntimeException|LinkageError error){failure="JNI 存档准备撤销未确认";terminated.completeExceptionally(error);}
             finally{closed=true;}
         }
@@ -231,6 +242,10 @@ public final class JniNetplaySession implements AutoCloseable {
             if(fileContent==null&&persistence!=null){saved=persistence.load(identity);if(saved!=null)NetplaySaveState.decode(saved,identity);if(!persistence.enabled())persistence=null;}
             if(closing||!ReplayGuard.valid(replayEpoch)){discardSave=true;return;}
             core=factory.get();LibretroProcess.Info info;
+            if(operatingFiles!=null){
+                if(!(core instanceof LibretroJniRuntime runtime))throw new IOException("Operating files require JNI owner runtime");
+                runtime.operatingFile(operatingFiles.prepare(identity));
+            }
             if(!ReplayGuard.valid(replayEpoch)){discardSave=true;return;}
             if(fileContent!=null)info=core.loadFiles(fileContent,()->{if(closing)throw new IOException("JNI content preparation cancelled");});
             else if(generic!=null&&generic.jni().fullPath()){extras.put(generic.contentName(),rom);info=core.loadBundle(generic.contentName(),extras);}
@@ -294,8 +309,11 @@ public final class JniNetplaySession implements AutoCloseable {
             Throwable cleanupFailure=null;
             try{if(persistence!=null)persistence.abort();}
             catch(RuntimeException|LinkageError error){cleanupFailure=error;failure="JNI 存档通道撤销未确认；原进度保留";}
-            try{if(core!=null)core.close();}
-            catch(RuntimeException|LinkageError error){if(cleanupFailure!=null)error.addSuppressed(cleanupFailure);cleanupFailure=error;failure="JNI 核心关闭未确认；须正常重启客户端";}
+            try{if(operatingFiles!=null)operatingFiles.normalClose(!discardSave&&ReplayGuard.valid(replayEpoch)&&grant.host()&&activated&&failure==null&&timeline!=null);if(core!=null)core.close();}
+            catch(RuntimeException|LinkageError error){if(cleanupFailure!=null)error.addSuppressed(cleanupFailure);cleanupFailure=error;
+                failure=error instanceof cn.piq.retro.libretro.LibretroJniRuntime.PostCloseException?error.getMessage():"JNI 核心关闭未确认；须正常重启客户端";
+                if(operatingFiles!=null)operatingFiles.normalClose(false);}
+            finally{if(operatingFiles!=null)try{operatingFiles.abort();}catch(RuntimeException error){if(cleanupFailure==null)cleanupFailure=error;else cleanupFailure.addSuppressed(error);}}
             closed=true;
             if(cleanupFailure==null)terminated.complete(null);else terminated.completeExceptionally(cleanupFailure);
             pictures.clear();events.clear();
