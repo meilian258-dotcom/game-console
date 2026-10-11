@@ -118,11 +118,12 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
 
     def test_game_dependency_floors_match_required_public_api_generations(self):
         expected = {
-            # Shared launch protocol / legacy-save adapter require FC 76.41.
-            'piq-sfc-home': '[0.31.0-alpha.76.41,0.31.0-alpha.77)',
+            # Resume-only core variants use FC 76.52's home-launch-3 contract.
+            'piq-sfc-home': '[0.31.0-alpha.76.52,0.31.0-alpha.77)',
             # Unified content paths / file-backed JNI content require FC 76.40.
             'piq-sfc-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
-            'piq-md-home': '[0.31.0-alpha.76.36,0.31.0-alpha.77)',
+            # MD16 uses FC76.50's shared device-level second-port policy.
+            'piq-md-home': '[0.31.0-alpha.76.50,0.31.0-alpha.77)',
             # RetroArch Netplay variants require FC 76.49's shared launch contract.
             'piq-native-arcade': '[0.31.0-alpha.76.49,0.31.0-alpha.77)',
             'piq-gba': '[0.31.0-alpha.76.31,0.31.0-alpha.77)',

@@ -11,7 +11,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import static cn.piq.fcarcade.home.flow.HomeLaunchNetwork.*;
 
-/** One shared save page followed by an independent, explicit second-player confirmation. */
+/** Shared progress selection; device join policy is fixed by the server before activation. */
 public final class HomeLaunchScreen extends DeviceScreen {
     private static Connection seenConnection;
     private static final LinkedHashMap<UUID,Long> REVISIONS=new LinkedHashMap<>();
@@ -29,18 +29,18 @@ public final class HomeLaunchScreen extends DeviceScreen {
     private HomeLaunchScreen(Connection connection,View data){super(Component.literal(data.label()+" / 开局"));this.connection=connection;this.data=data;draft.receive(data);}
     private boolean connected(){var c=Minecraft.getInstance().getConnection();return c!=null&&c.getConnection()==connection&&connection.isConnected();}
     private void send(int operation,Choice choice){if(sent||!connected())return;sent=true;HomeLaunchNetwork.send(new Action(data.token(),data.revision(),operation,choice));rebuildWidgets();}
-    private void start(boolean resume){if(draft.available())send(SELECT,draft.choice(resume));}
+    private void start(boolean resume){if(draft.available()){var choice=draft.choice(resume);if(data.rows().get(draft.selected()).accepts(choice))send(SELECT,choice);}}
     private void button(String text,int x,int y,int w,Runnable run,boolean enabled){addRenderableWidget(DeviceUi.button(font,text,x,y,w,20,run,enabled&&!sent,DeviceUi.Tone.NORMAL));}
     @Override protected void init(){DeviceUi.prepare();layout=DeviceFormLayout.of(width,height,5);int x=layout.left(),w=layout.bodyWidth(),half=(w-6)/2;
         if(width<320||height<240){button("取消开局",x,layout.footerY(),w,this::onClose,true);return;}
         if(confirmFresh){button("确认从头开始",x,layout.rowY(3),half,()->start(false),true);button("返回选择",x+half+6,layout.rowY(3),w-half-6,()->{confirmFresh=false;rebuildWidgets();},true);}
         else if(data.stage()==Stage.SAVE_SELECTION&&draft.available()){int selected=draft.selected(),count=data.rows().size(),bw=(w-(count-1)*4)/Math.max(1,count);
-            for(int i=0;i<count;i++){int index=i;var row=data.rows().get(i);button((i==selected?"> ":"")+(data.mode()==1?"卡带进度":"槽位 "+row.slot())+(row.occupied()?" · 已有":" · 空"),x+i*(bw+4),layout.rowY(0),bw,()->{draft.select(index);rebuildWidgets();},true);}
+            for(int i=0;i<count;i++){int index=i;var row=data.rows().get(i);button((i==selected?"> ":"")+(row.metadataEditable()?(data.mode()==1?"卡带进度":"槽位 "+row.slot()):row.name())+(row.occupied()?" · 已有":" · 新"),x+i*(bw+4),layout.rowY(0),bw,()->{draft.select(index);rebuildWidgets();},true);}
             boolean metadataEditable=data.rows().get(selected).metadataEditable();
             var name=new EditBox(font,layout.fieldX(),layout.rowY(2),layout.fieldWidth(),20,Component.literal("存档名称"));name.setMaxLength(32);name.setValue(draft.name());name.setResponder(draft::name);name.setEditable(!sent&&metadataEditable);addRenderableWidget(name);
-            button(metadataEditable?(draft.players()==2?"存档标签：双人":"存档标签：单人"):"旧档不含人数标签；加入许可在下一步选择",x,layout.rowY(3),w,()->{draft.togglePlayers(data.maxPlayers());rebuildWidgets();},metadataEditable&&data.maxPlayers()>1);
-            var row=data.rows().get(selected);button(row.occupied()&&row.compatible()?"继续游戏":"开始游戏",x,layout.rowY(4),half,()->{if(row.occupied()&&!row.compatible()){confirmFresh=true;rebuildWidgets();}else start(row.occupied());},true);
-            button("从头开始…",x+half+6,layout.rowY(4),w-half-6,()->{confirmFresh=true;rebuildWidgets();},row.occupied());
+            button(metadataEditable?(draft.players()==2?"存档标签：双人":"存档标签：单人"):"进度信息只读；2P 许可按设备设置",x,layout.rowY(3),w,()->{draft.togglePlayers(data.maxPlayers());rebuildWidgets();},metadataEditable&&data.maxPlayers()>1);
+            var row=data.rows().get(selected);button(row.occupied()&&row.compatible()?"继续游戏":"开始游戏",x,layout.rowY(4),half,()->{if(row.occupied()&&!row.compatible()){confirmFresh=true;rebuildWidgets();}else start(row.occupied());},row.occupied()&&row.compatible()||row.startNewAllowed());
+            button(row.startNewAllowed()?"从头开始…":"旧进度仅可继续",x+half+6,layout.rowY(4),w-half-6,()->{confirmFresh=true;rebuildWidgets();},row.occupied()&&row.startNewAllowed());
         }else if(data.stage()==Stage.JOIN_CONFIRM){button("允许第二名玩家加入",x,layout.rowY(2),w,()->send(ALLOW,null),true);button("不允许，仅单人开始",x,layout.rowY(3),w,()->send(DENY,null),true);if(data.mode()!=0)button("返回存档选择",x,layout.rowY(4),w,()->send(BACK,null),true);}
         addRenderableWidget(DeviceUi.button(font,"取消开局",x,layout.footerY(),w,20,this::onClose,true,DeviceUi.Tone.NORMAL));
     }

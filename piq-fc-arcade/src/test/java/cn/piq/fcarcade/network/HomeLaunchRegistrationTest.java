@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ResourceLock("NeoForge-PAYLOAD_REGISTRATIONS")
 class HomeLaunchRegistrationTest {
-    @Test @SuppressWarnings("unchecked") void productionRegistersVersionTwoWithExactDirectionsAndCodecs() throws Exception {
+    @Test @SuppressWarnings("unchecked") void productionRegistersVersionThreeWithExactDirectionsAndCodecs() throws Exception {
         if(net.neoforged.fml.loading.LoadingModList.get()==null)
             net.neoforged.fml.loading.LoadingModList.of(List.of(),List.of(),List.of(),List.of(),Map.of());
         SharedConstants.tryDetectVersion();Bootstrap.bootStrap();
@@ -32,7 +32,7 @@ class HomeLaunchRegistrationTest {
         try {
             HomeLaunchNetwork.register(new RegisterPayloadHandlersEvent());
             assertEquals(size+2,play.size());
-            assertEquals("home-launch-2",play.get(a).version());assertEquals("home-launch-2",play.get(v).version());
+            assertEquals("home-launch-3",play.get(a).version());assertEquals("home-launch-3",play.get(v).version());
             assertFalse(play.get(a).optional());assertFalse(play.get(v).optional());
             assertEquals(PacketFlow.SERVERBOUND,play.get(a).flow().orElseThrow());
             assertEquals(PacketFlow.CLIENTBOUND,play.get(v).flow().orElseThrow());
@@ -40,7 +40,7 @@ class HomeLaunchRegistrationTest {
             // wire path, not object identity of the inner codec.
             var action=new HomeLaunchNetwork.Action(UUID.randomUUID(),2,HomeLaunchNetwork.CANCEL,null);
             var view=new HomeLaunchNetwork.View(UUID.randomUUID(),3,ResourceLocation.parse("piq_sfc_home:sfc"),"SFC","游戏",1,2,
-                cn.piq.retro.flow.DeviceSessionFlow.Stage.SAVE_SELECTION,List.of(new HomeLaunchNetwork.Row(1,"v1","原有进度","abc",1,0,true,false)),"选择存档");
+                cn.piq.retro.flow.DeviceSessionFlow.Stage.SAVE_SELECTION,List.of(new HomeLaunchNetwork.Row(1,"v1","原有进度","abc",1,0,true,false,false)),"选择存档");
             roundTrip((StreamCodec<RegistryFriendlyByteBuf,HomeLaunchNetwork.Action>)(Object)NetworkRegistry.getCodec(a,ConnectionProtocol.PLAY,PacketFlow.SERVERBOUND),action);
             roundTrip((StreamCodec<RegistryFriendlyByteBuf,HomeLaunchNetwork.View>)(Object)NetworkRegistry.getCodec(v,ConnectionProtocol.PLAY,PacketFlow.CLIENTBOUND),view);
             assertThrows(UnsupportedOperationException.class,()->HomeLaunchNetwork.register(new RegisterPayloadHandlersEvent()));

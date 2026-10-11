@@ -24,6 +24,7 @@ import zipfile
 
 from release_artifacts import inspect, sha256
 import snapshot_stock
+import sfc_stock
 
 ROOT = Path(__file__).resolve().parents[1]
 META = 'META-INF/neoforge.mods.toml'
@@ -148,6 +149,8 @@ def verify_resources(resource_root: Path, receipt_path: Path) -> None:
         raise ValueError('Incomplete snapshot resource tree')
     if bucket == 'arcade':
         verify_mame_lifecycle_resources(resource_root)
+    if bucket == 'sfc-home':
+        verify_file(resource_root / sfc_stock.LEGACY_RESOURCE, sfc_stock.LEGACY)
 
 
 def verify_inputs(input_root: Path) -> dict:
@@ -156,6 +159,7 @@ def verify_inputs(input_root: Path) -> dict:
     for name, record in records.items():
         verify_file(input_root / name, record)
     stock = snapshot_stock.verify_receipt(input_root, records)
+    sfc = sfc_stock.verify_receipt(input_root, records)
     pins = {}
     for entry in receipt.get('bootstrap', []):
         ident = entry.get('id')
@@ -169,13 +173,19 @@ def verify_inputs(input_root: Path) -> dict:
         raise ValueError('Exactly the six approved native input distributions are required')
     for bucket in RESOURCE_SCOPES:
         verify_resources(input_root / 'resources' / bucket, receipt_path)
-    return dict(receipt=receipt, bootstrap=pins, receipt_path=receipt_path, fbneo_stock=stock)
+    return dict(receipt=receipt, bootstrap=pins, receipt_path=receipt_path, fbneo_stock=stock, sfc_snes9x=sfc)
 
 
 def arcade_gradle_properties(fc: Path, inputs: dict) -> dict:
     stock = inputs['fbneo_stock']
     return dict(gameConsoleJar=str(fc), embeddedRuntimePython=sys.executable,
                 fbneoStockCore=str(stock['core']), fbneoStockSource=str(stock['source']))
+
+
+def sfc_gradle_properties(fc: Path, core: Path, inputs: dict) -> dict:
+    fixed = inputs['sfc_snes9x']
+    return dict(gameConsoleJar=str(fc), sfcCoreJar=str(core), sfcRuntimePython=sys.executable,
+                sfcSnes9xCore=str(fixed['core']), sfcSnes9xSource=str(fixed['source']))
 
 
 def archive_entries(path: Path) -> dict[str, bytes]:
@@ -430,7 +440,7 @@ def build(work: Path, output: Path) -> dict:
     common = dict(gameConsoleJar=str(fc))
     gradle('piq-sfc-arcade', ['clean', 'check', 'jar'], common, 'sfc-core')
     sfc_core = ROOT / 'piq-sfc-arcade/build/libs' / ('piq_sfc_arcade-' + version('piq-sfc-arcade') + '.jar')
-    gradle('piq-sfc-home', ['clean', 'check', 'jar'], dict(common, sfcCoreJar=str(sfc_core)), 'sfc-home')
+    gradle('piq-sfc-home', ['clean', 'check', 'jar'], sfc_gradle_properties(fc, sfc_core, inputs), 'sfc-home')
     sfc_home = ROOT / 'piq-sfc-home/build/libs' / ('piq_sfc_home-' + version('piq-sfc-home') + '.jar')
     sfc = merge_sfc(sfc_core, sfc_home, work / 'merged/sfc-complete.jar')
     gradle('piq-md-home', ['clean', 'check', 'jar'], common, 'md')

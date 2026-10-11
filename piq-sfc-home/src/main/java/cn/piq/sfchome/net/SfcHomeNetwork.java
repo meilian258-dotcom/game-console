@@ -35,7 +35,7 @@ public final class SfcHomeNetwork {
     public static void setCoverHandler(java.util.function.Consumer<CoverChunk> handler){coverClient=Objects.requireNonNull(handler);}
     public static void setClientHandler(ClientHandler handler) { client = Objects.requireNonNull(handler); }
     public static void register(RegisterPayloadHandlersEvent event) {
-        var r = cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"13");
+        var r = cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"14");
         SfcHostedNetwork.register(event);
         SfcJoinNetwork.register(event);
         r.playToServer(CoverRequest.TYPE,CoverRequest.CODEC,(p,c)->c.enqueueWork(()->{if(c.player() instanceof ServerPlayer s)cn.piq.sfchome.server.SfcCoverService.download(s,p);}));
@@ -79,10 +79,11 @@ public final class SfcHomeNetwork {
         public static final StreamCodec<RegistryFriendlyByteBuf,Session> CODEC=StreamCodec.of((b,v)->{b.writeVarLong(v.sessionId);b.writeVarInt(v.epoch);b.writeResourceLocation(v.dimension);b.writeBlockPos(v.consolePos);b.writeUUID(v.consoleId);b.writeBlockPos(v.tvPos);b.writeUUID(v.tvId);b.writeUUID(v.linkId);b.writeUtf(v.romSha,64);b.writeUtf(v.coreBuild,96);b.writeByte(v.port);b.writeUUID(v.controllerLease);b.writeBoolean(v.executionHost);b.writeByte(v.syncMode);b.writeUUID(v.mediaSource);b.writeUUID(v.mediaStream);},b->new Session(b.readVarLong(),b.readVarInt(),b.readResourceLocation(),b.readBlockPos(),b.readUUID(),b.readBlockPos(),b.readUUID(),b.readUUID(),b.readUtf(64),b.readUtf(96),b.readByte(),b.readUUID(),b.readBoolean(),b.readUnsignedByte(),b.readUUID(),b.readUUID()));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
-    public record NetplayStart(Session session,long wire,UUID ticket) implements CustomPacketPayload {
-        public NetplayStart{Objects.requireNonNull(session);Objects.requireNonNull(ticket);if(session.syncMode()!=3||wire<(1L<<50))throw new IllegalArgumentException("Netplay grant");}
+    public record NetplayStart(Session session,long wire,UUID ticket,cn.piq.fcarcade.netplay.NetplayLaunchSpec launch) implements CustomPacketPayload {
+        public NetplayStart(Session session,long wire,UUID ticket){this(session,wire,ticket,cn.piq.sfchome.core.SfcNetplayProfile.legacy().launch());}
+        public NetplayStart{Objects.requireNonNull(session);Objects.requireNonNull(ticket);Objects.requireNonNull(launch);if(session.syncMode()!=3||wire<(1L<<50))throw new IllegalArgumentException("Netplay grant");}
         public static final Type<NetplayStart> TYPE=id("netplay_start");
-        public static final StreamCodec<RegistryFriendlyByteBuf,NetplayStart> CODEC=StreamCodec.of((b,v)->{Session.CODEC.encode(b,v.session);b.writeLong(v.wire);b.writeUUID(v.ticket);},b->new NetplayStart(Session.CODEC.decode(b),b.readLong(),b.readUUID()));
+        public static final StreamCodec<RegistryFriendlyByteBuf,NetplayStart> CODEC=StreamCodec.of((b,v)->{Session.CODEC.encode(b,v.session);b.writeLong(v.wire);b.writeUUID(v.ticket);b.writeUtf(v.launch.variant(),48);b.writeUtf(v.launch.compatibilitySha(),64);b.writeBoolean(v.launch.persistenceSupported());},b->new NetplayStart(Session.CODEC.decode(b),b.readLong(),b.readUUID(),new cn.piq.fcarcade.netplay.NetplayLaunchSpec(b.readUtf(48),b.readUtf(64),b.readBoolean())));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     /** Sent only after the server commits launch and (when enabled) save authority. */

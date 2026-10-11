@@ -23,6 +23,10 @@ class StockInputTests(unittest.TestCase):
         self.pins = {role: dict(path=stock.INPUTS[role]['path'], bytes=len(raw),
                                sha256=hashlib.sha256(raw).hexdigest()) for role, raw in self.raw.items()}
         self.addCleanup(patch.stopall)
+        # SFC's separate fixed pair is exercised by test_sfc_stock, not these FBNeo fixtures.
+        patch.object(inputs.sfc_stock, 'inspect_pair', return_value={}).start()
+        patch.object(inputs.sfc_stock, 'import_pair').start()
+        patch.object(inputs.sfc_stock, 'verify_receipt', return_value={}).start()
         patch.dict(stock.INPUTS, self.pins, clear=True).start()
         self.origins = {}
         for role, raw in self.raw.items():

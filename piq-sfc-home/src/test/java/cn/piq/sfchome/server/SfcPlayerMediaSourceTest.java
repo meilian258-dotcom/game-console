@@ -22,10 +22,12 @@ class SfcPlayerMediaSourceTest {
             assertEquals(0,supported&8,"SFC does not claim a RetroArch mode");
         }
         assertTrue(s.contains("var mode=c.synchronizationMode();var checked=preflight(p,c,true)"));
-        assertTrue(s.contains("c.synchronizationMode()!=mode||!modeSupported(c)"));
+        assertTrue(s.contains("final boolean requestedNetplay=save.variant()!=null"));
+        assertTrue(s.contains("if(c.netplayJniTrial()!=requestedNetplay)return false"));
+        assertTrue(s.contains("c.synchronizationMode()!=mode||c.netplayJniTrial()!=requestedNetplay||!modeSupported(c)"));
         assertTrue(s.contains("st.tick,mode"));assertTrue(s.contains("st.tick,old.mode"));
         assertTrue(s.contains("host,run==null?s.mode.ordinal():3,s.watchSource,s.host.id"));
-        assertTrue(read("net/SfcHomeNetwork").contains("TrafficPayloadRegistrar.create(event,\"13\")"));
+        assertTrue(read("net/SfcHomeNetwork").contains("TrafficPayloadRegistrar.create(event,\"14\")"));
     }
     @Test void receiverBypassesRomAndCoreButHostKeepsOrderedInput()throws Exception{
         String c=read("client/SfcHomeClient"),worker=read("client/SfcPlayback"),s=read("server/SfcHomeServer");

@@ -78,6 +78,10 @@ class ArtifactTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory(prefix='snapshot-release-test-')
         self.addCleanup(self.tmp.cleanup)
         self.directory = Path(self.tmp.name)
+        legacy = b'fixed legacy Mesen-S fixture'
+        patcher = mock.patch.dict(release.sfc_stock.LEGACY, dict(bytes=len(legacy), sha256=hashlib.sha256(legacy).hexdigest()), clear=True)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.core_bytes = {ident: ('original fixture core ' + ident).encode() for ident in release.CORE_LOCATIONS}
         sources = []
         for ident, (_, _, platform, member) in release.CORE_LOCATIONS.items():
@@ -96,6 +100,8 @@ class ArtifactTests(unittest.TestCase):
                                      for mod_id in sorted(mod_set))
                 jar.writestr('META-INF/neoforge.mods.toml', metadata)
                 jar.writestr('example.txt', 'original fixture, not a runtime binary')
+                if 'piq_sfc_home' in mod_set:
+                    jar.writestr(release.sfc_stock.LEGACY_RESOURCE, legacy)
                 jar.writestr('META-INF/MANIFEST.MF', 'Manifest-Version: 1.0\n'
                              'Game-Console-Snapshot-Commit: ' + COMMIT + '\n\n')
                 jar.writestr(release.STAMP, json.dumps({key: self.manifest[key] for key in
@@ -131,6 +137,17 @@ class ArtifactTests(unittest.TestCase):
         files = release.validate(self.directory, COMMIT)
         self.assertEqual(9, len(files))
         self.assertEqual(7, sum(entry['name'].endswith('.jar') for entry in files))
+
+    def test_local_snes9x_candidate_cannot_be_relabelled_for_public_snapshot(self):
+        self.rewrite_jar(0, lambda entries: entries.update({release.sfc_stock.CORE_RESOURCE: b'candidate'}))
+        with self.assertRaisesRegex(ValueError, 'not approved for public snapshots'):
+            release.validate(self.directory, COMMIT)
+
+    def test_fixed_legacy_sfc_core_is_not_replaced_by_nightly(self):
+        index = next(i for i, e in enumerate(self.manifest['artifacts']) if 'piq_sfc_home' in e['modIds'])
+        self.rewrite_jar(index, lambda entries: entries.update({release.sfc_stock.LEGACY_RESOURCE: b'changed core'}))
+        with self.assertRaisesRegex(ValueError, 'retain its fixed identity'):
+            release.validate(self.directory, COMMIT)
 
     def test_extra_unlisted_file_is_rejected(self):
         (self.directory / 'private.txt').write_text('should never publish', encoding='utf8')

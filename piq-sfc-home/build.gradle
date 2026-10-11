@@ -16,7 +16,7 @@ neoForge {
     mods { piq_sfc_home { sourceSet(sourceSets.main) } }
 }
 repositories { mavenCentral() }
-def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.42.jar'),
+def localModJars = files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.52.jar'),
         providers.gradleProperty('sfcCoreJar').getOrElse('../piq-sfc-arcade/build/libs/piq_sfc_arcade-0.2.0-alpha.11.jar'))
 dependencies {
     implementation localModJars
@@ -26,6 +26,32 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+// Fixed, unmodified local candidate. No latest download or old-output fallback.
+def snes9xResources = layout.buildDirectory.dir('generated/sfcSnes9x')
+def snes9xCore = providers.gradleProperty('sfcSnes9xCore')
+def snes9xSource = providers.gradleProperty('sfcSnes9xSource')
+def snes9xCache = providers.gradleProperty('piqInputsDir').getOrElse('../.build-inputs')
+def prepareSnes9x = tasks.register('prepareSfcSnes9xRuntime', Exec) {
+    inputs.files('../source-control/sfc_stock.py', '../source-control/sfc-stock-inputs.json', '../source-control/build_inputs.py')
+    if (snes9xCore.isPresent()) inputs.file(file(snes9xCore.get()))
+    if (snes9xSource.isPresent()) inputs.file(file(snes9xSource.get()))
+    outputs.dir(snes9xResources)
+    // Revalidate even an up-to-date cache/output; hashes, not timestamps, decide.
+    outputs.upToDateWhen { false }
+    workingDir projectDir.parentFile
+    doFirst {
+        if (snes9xCore.isPresent() != snes9xSource.isPresent()) {
+            throw new GradleException('Provide both sfcSnes9xCore and sfcSnes9xSource, or import the fixed pair into .build-inputs')
+        }
+        def args = [providers.gradleProperty('sfcRuntimePython').getOrElse('python'),
+                    file('../source-control/sfc_stock.py').absolutePath, 'prepare',
+                    '--cache', file(snes9xCache).absolutePath, '--output', snes9xResources.get().asFile.absolutePath]
+        if (snes9xCore.isPresent()) args += ['--core', file(snes9xCore.get()).absolutePath, '--source', file(snes9xSource.get()).absolutePath]
+        commandLine args
+    }
+}
+sourceSets.main.resources.srcDir(snes9xResources)
+tasks.named('processResources') { dependsOn prepareSnes9x }
 def metadata = tasks.register('generateModMetadata', ProcessResources) {
     inputs.properties(version: project.version, neo_min_version: neo_min_version)
     expand(version: project.version, neo_min_version: neo_min_version)

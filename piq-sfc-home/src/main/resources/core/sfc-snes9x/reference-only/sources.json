@@ -1,0 +1,19 @@
+{
+  "purpose": "Historical license references only; different official source tree, not proof of DLL incorporation, corresponding source or applicable exception.",
+  "repository": "https://github.com/snes9xgit/snes9x",
+  "revision": "1bcc369e89f08243e0a462882fb1f3e42e51de3a",
+  "files": [
+    {
+      "file": "JMA-license.txt",
+      "url": "https://raw.githubusercontent.com/snes9xgit/snes9x/1bcc369e89f08243e0a462882fb1f3e42e51de3a/jma/license.txt",
+      "bytes": 270,
+      "sha256": "4b0a068c374a930c1bfa0ab30d21751c0cb616142cf947586c5062fbf3377065"
+    },
+    {
+      "file": "xBRZ-license.txt",
+      "url": "https://raw.githubusercontent.com/snes9xgit/snes9x/1bcc369e89f08243e0a462882fb1f3e42e51de3a/filter/xbrz-license.txt",
+      "bytes": 32472,
+      "sha256": "c61f12da7cdad526bdcbed47a4c0a603e60dbbfdaf8b66933cd088e9132c303f"
+    }
+  ]
+}

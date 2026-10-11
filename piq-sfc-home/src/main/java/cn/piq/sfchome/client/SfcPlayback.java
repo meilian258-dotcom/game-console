@@ -75,10 +75,13 @@ final class SfcPlayback implements AutoCloseable {
             };
         }
         public Netplay openNetplay(SfcHomeNetwork.NetplayStart grant,byte[] rom,boolean waitForActivation){
+            var variant=cn.piq.sfchome.core.SfcNetplayProfile.resolve(grant.launch());
+            if(!cn.piq.sfchome.core.SfcNetplayProfile.buildKey(variant).equals(grant.session().coreBuild()))
+                throw new IllegalArgumentException("SFC 联机授权与核心身份不一致");
             var authority=new cn.piq.fcarcade.netplay.NetplayProcess.Grant(grant.wire(),grant.ticket(),grant.session().executionHost(),true);
             var run=new cn.piq.fcarcade.netplay.NetplayProcess(authority,()->rom,
                     c->cn.piq.fcarcade.netplay.NetplayNetwork.upstream(connection,c),
-                    cn.piq.sfchome.core.SfcNetplayProfile.profile(),java.util.Map::of,false,false,waitForActivation);
+                    variant.template(),java.util.Map::of,false,false,waitForActivation);
             try{cn.piq.fcarcade.netplay.NetplayNetwork.bind(connection,run);}
             catch(RuntimeException|Error failure){run.close();throw failure;}
             return new Netplay(){
@@ -194,7 +197,7 @@ final class SfcPlayback implements AutoCloseable {
                 if(reason!=null)throw new cn.piq.fcarcade.client.ui.NetplayFailureCode.Failure(reason);
                 if(run.ready()&&netplayStart.prepared()){
                     startup.enter(SfcStartupProgress.Stage.READY);
-                    host.execute(()->{if(running&&host.isCurrent(this))host.ready(this,new SfcHomeNetwork.Ready(session.sessionId(),session.epoch(),session.romSha(),SfcHomeNetwork.CORE_BUILD,60,session.romSha()));});
+                    host.execute(()->{if(running&&host.isCurrent(this))host.ready(this,new SfcHomeNetwork.Ready(session.sessionId(),session.epoch(),session.romSha(),session.coreBuild(),60,session.romSha()));});
                 }
                 if(!netplayStart.active()){Thread.sleep(2);continue;}
                 if(audio==null)audio=host.openAudio();

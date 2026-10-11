@@ -2,9 +2,9 @@
 
 这份指南供开发者从当前源码构建主模组和附属。玩家安装成品请看[玩家指南](../piq-fc-arcade/docs/玩家指南.md)，不要把源码 ZIP 放进 `mods`。
 
-FC76.50／SFC52／MD16 为未发布开发候选，本批未验收；FC76.51 在其后继续验证公共联机流控。SFC52 的菜单、设备许可及错误提示和诊断改动不解决当前固定核心的回滚失配，不能作为 SFC 2P 修复版发行；构建或自动测试通过不改变这一边界。上游未修改 Snes9x 的隔离候选验证不等于生产替换，本批未迁移旧档，具体限制见 [SFC 当前状态](../piq-sfc-home/README.md#当前状态)。
+当前开发配套为 **FC76.52／完整 SFC53／MD16 本地候选**，未安装、未公开发布，也不因构建通过而成为稳定版。FC76.52 在 FC76.51 公共联机流控基础上增加旧进度仅恢复所需的公共字段，启动协议为 `home-launch-3`；SFC53 最低要求 FC76.52，测试时主包、服务端与客户端须使用同批协议配套，不与 FC76.50／51 混用。SFC53 的新 JNI 联机进度接入固定、未修改的 Snes9x；Mesen-S 核心、旧身份和旧进度恢复路线仍保留，不跨核迁移或覆盖旧档。原 Mesen-S 回滚失配并未被改核或屏蔽校验修复。最终包与 Minecraft 多人验收状态见 [SFC 当前状态](../piq-sfc-home/README.md#当前状态)。
 
-可选择两种构建方式：**普通开发构建使用固定核心**；**自动快照构建下载官方 nightly 普通核心，并为该批制品生成匹配的运行身份**。Git 不保存全部 DLL、WASM 和运行器；快照会自动取得明确列出的公开输入，不依赖维护电脑上的历史目录，也不会重编所有第三方原生核心。
+可选择两种构建方式：**普通开发构建使用固定核心**；**快照构建仅为明确列出的四个普通核心下载官方 nightly 并生成匹配身份，其余核心保留固定输入**。SFC 的 Snes9x 与 Mesen-S 均不参与 nightly 替换。Git 不保存全部 DLL、WASM 和运行器；固定输入需要按清单导入，不能假设快照会自动下载所有依赖，也不会重编所有第三方原生核心。
 
 ## 自动快照
 
@@ -32,11 +32,21 @@ bootstrap 身份；这里不预设尚未发布的 URL。普通本地开发可按
 下载最新核心或跳过 stock 资源。匹配的固定公开输入尚未发布，现有 JNI bootstrap
 下载前阻断仍保留；本分支自动 CI 尚未通过，不能据本地候选成功声称云端已就绪。
 
+SFC53 额外需要 [sfc-stock-inputs.json](sfc-stock-inputs.json) 固定的 Snes9x DLL 与参考源码 ZIP。
+快照准备支持成对传入 `--sfc-snes9x-core`／`--sfc-snes9x-source`，或从仓库根
+`.build-inputs/` 读取已导入的同一固定对；不会读取任意 vendor 目录或下载新的 `latest` 补位。
+两件输入写入 `fixed/sfc-snes9x-v1/` 并纳入 `receipt.json`；构建检查、临时源码复制后再次核验，
+再将回执中的绝对路径通过 `sfcSnes9xCore`／`sfcSnes9xSource` 显式交给 SFC Gradle。
+临时源码不需要依赖原 checkout 的忽略缓存。新核心仍为本地候选：即使其余 bootstrap 障碍解决、
+整套编译成功且源码干净，`snapshot_release.py --validate-only` 也会拒绝含
+`core/sfc-snes9x/` 的公开快照，并提示待完成的来源与许可审核。此门禁不阻止本地编译，
+也没有通过编辑成品清单、传命令行开关来跳过的路径。
+
 快照准备和 Gradle 前置检查都要求新 MAME DLL 与公开 NOTICE 同时存在，且与固定清单完全一致。
 即使修改输入回执，也不能跳过清单中的核心和补丁校验；两项资源缺失、替换或不配套都失败。
 尚未发布匹配 bootstrap 成品时，保持原下载前阻断，不使用旧公开包假装包含这次修复。
 
-[snapshot.yml](../.github/workflows/snapshot.yml) 在进入 `main` 的每次 push 后触发，也支持在 Actions 中手动选择 `main` 运行。只有七个成品全部编译、检查和打包成功，才会创建独立预发行；失败不会覆盖已有发行版。workflow 合入 `main` 后才启用，不在拉取请求中使用发布权限。
+[snapshot.yml](../.github/workflows/snapshot.yml) 在进入 `main` 的每次 push 后触发，也支持在 Actions 中手动选择 `main` 运行。只有七个成品全部编译、检查、打包且发布校验通过，才会创建独立预发行；失败不会覆盖已有发行版。当前上述 bootstrap 与 Snes9x 候选门禁均未解除，不能把此流程当作本批已可自动发布。workflow 合入 `main` 后才启用，不在拉取请求中使用发布权限。
 
 构建使用 GitHub 的 Windows 2022 runner、Java 21 和 Python 3.12，依次完成主模组、完整 SFC、MD、GBA、街机、电脑和 PvZ 七个玩家 JAR。SFC 由本次编译的两个内部组件合成一个完整玩家包；PvZ 仍是可选开发验证组件，不因自动打包变成稳定机型。
 
@@ -45,30 +55,33 @@ bootstrap 身份；这里不预设尚未发布的 URL。普通本地开发可按
 | 用途 | 快照来源 |
 | --- | --- |
 | FC Mesen | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/mesen_libretro.dll.zip)、[Linux x64](https://buildbot.libretro.com/nightly/linux/x86_64/latest/mesen_libretro.so.zip) |
-| SFC Mesen-S | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/mesen-s_libretro.dll.zip) |
 | MD 普通 Genesis Plus GX | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/genesis_plus_gx_libretro.dll.zip) |
 | GBA mGBA | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/mgba_libretro.dll.zip) |
 
-定制 FC 和 MD Netplay 核心、公共 JNI 桥、街机定制运行库、PvZ 原生组件及保留的 WASM 不用同名 nightly 文件替换。它们由 `snapshot_inputs.py` 从已公开的 `full-test-20261007-r1` 成品中按固定摘要提取；只取白名单内的原生资源，不把旧模组 Java 类当成本次构建结果。当前 GBA helper、街机 helper 和公共 worker 仍从源码编译。
+定制 FC 和 MD Netplay 核心、公共 JNI 桥、街机定制运行库、PvZ 原生组件、旧 SFC Mesen-S 及保留的 WASM 不用同名 nightly 文件替换。历史 bootstrap 提取路线由 `snapshot_inputs.py` 按固定摘要读取 `full-test-20261007-r1`，只取白名单内的原生资源，不把旧模组 Java 类当成本次构建结果；它仍不能提供本分支新增的 JNI 依赖，必须先解决前述公开输入阻碍。新 SFC Snes9x 与原版 FBNeo 使用各自独立的固定核心／源码对，不从该旧包冒领。当前 GBA helper、街机 helper 和公共 worker 仍从源码编译。
 
 这些定制或历史运行库仍受固定接口和摘要约束。修改街机 helper 等相关源码时，若新产物与运行器目录的身份不一致，构建会停止，需要同时审核并更新对应构建约束；不会仅因 `main` 有新提交就跳过兼容校验。旧离线运行库的校验表单独保留，不重新解释为 nightly 包。
 
-**快照不是固定核心版的原位升级。** 临时构建源码中的核心摘要、版本断言和保存身份与实际下载文件一起生成；正常源码的固定默认值、旧成品和旧存档保持不动。SFC 的 Netplay 使用普通 Mesen-S，也会跟随本次核心身份变化。升级前备份，在独立测试实例中使用同一快照的主包和附属；不要要求不同快照或固定核心版相互联机、读取旧即时档。下载 Linux Mesen 不代表整套附属或 JNI Netplay 已支持 Linux。
+**快照不是固定核心版的原位升级。** 只有上表四个普通核心的临时源码摘要、版本断言和保存身份随实际下载文件一起生成；正常源码的固定默认值、旧成品和旧存档保持不动。SFC 的旧 Mesen-S DLL、`mesen-s-piq1-8aca17e7` 身份及新 Snes9x 固定身份都不改写；旧 Mesen-S DLL 即使随回执被重新标注为另一个摘要也会校验失败。升级前备份，在独立测试实例中使用同一快照的主包和附属；不要要求不同快照或固定核心版相互联机、读取旧即时档。下载 Linux Mesen 不代表整套附属或 JNI Netplay 已支持 Linux。
 
 成功的发布标签是 `snapshot-<run_id>-<attempt>-<commit前12位>`，不会移动旧标签或替换稳定版。附件只有七个 JAR、`manifest.json` 和 `SHA256SUMS.txt`。JAR 内的 `META-INF/game-console/snapshot-cores.json` 记录源码提交及本批核心身份；内部 MOD 兼容版本沿用源码版本，以免破坏依赖范围，因此区分快照应查看发行标签、清单和哈希，不能只看文件名。
 
 构建任务只有只读权限；单独的发布任务使用短期 `GITHUB_TOKEN` 的 `contents: write` 权限，不需要配置个人令牌。发布先创建草稿，上传并核对所有附件后才公开。仓库或组织策略若禁止此权限，任务会失败，旧 Release 不变。参见 [GitHub workflow 权限说明](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions)。
 
-在 Windows 仓库根复现本地快照构建：
+在 Windows 仓库根复现本地快照的流程如下。`D:/approved/` 仅为已获准、摘要匹配输入的示例目录；不得用其他同名 DLL 凑数。**当前分支会首先因尚未发布的 JNI bootstrap 明确停止**；下面不是解除门禁的操作，也不表示云端已验证：
 
 ```powershell
 python -B -m unittest discover -s source-control -p "test_*.py"
-python source-control/snapshot_inputs.py --output .snapshot-build/inputs
+python source-control/snapshot_inputs.py --output .snapshot-build/inputs `
+  --fbneo-stock-core D:/approved/fbneo_libretro.dll `
+  --fbneo-stock-source D:/approved/FBNeo-a251c76229f1637e433b93e29845039752771b6d.zip `
+  --sfc-snes9x-core D:/approved/snes9x_libretro.dll `
+  --sfc-snes9x-source D:/approved/snes9x-fae2fea08f74180759ef540ee94259213f503480.zip
 python source-control/snapshot_build.py --work .snapshot-build --output snapshot-dist
 python source-control/snapshot_release.py --directory snapshot-dist --validate-only
 ```
 
-设置 `JAVA_HOME` 指向 Java 21。输入和临时源码保留在 `.snapshot-build/`，成品在 `snapshot-dist/`。本地未提交改动可用于构建排错，但候选会标记 `sourceDirty=true`，不能通过发布校验；正式快照要求干净的已提交源码。失败后保留日志；重新完整构建时为 `--work` 与 `--output` 选择新的空目录，不覆盖前一批。`--bootstrap-dir` 可复用六个摘要完全一致的公开 JAR，普通核心仍按本次 nightly 下载，不静默回退到旧核心。
+设置 `JAVA_HOME` 指向 Java 21，使用实际安装的 Python（先确认 `python --version` 有版本输出，不能使用空的系统商店占位程序）。输入和临时源码保留在 `.snapshot-build/`，成品在 `snapshot-dist/`。本地未提交改动可用于构建排错，但候选会标记 `sourceDirty=true`，不能通过发布校验；正式快照要求干净的已提交源码，干净也不自动解除 Snes9x 候选门禁。失败后保留日志；重新完整构建时为 `--work` 与 `--output` 选择新的空目录，不覆盖前一批。`--bootstrap-dir` 可复用六个摘要完全一致的公开 JAR，上表四个普通核心仍按本次 nightly 下载；两个固定 SFC 核心不走该下载路线。
 
 自动检查不替代 Minecraft 多人、画面、音频、存档及长时间运行验收。nightly 发生不兼容变更时，应修复适配或明确更新构建约束，不能删校验、跳过失败测试后继续发布。
 
@@ -89,7 +102,7 @@ python source-control/setup.py
 
 ## 开发构建工作目录
 
-FC76.50／SFC52／MD16 未发布开发候选的以下五个项目共用 [build-workspace.gradle](build-workspace.gradle)：`piq-fc-arcade`、`piq-retro-platform`、`piq-sfc-home`、`piq-sfc-arcade` 和 `piq-md-home`。它为开发 classpath 副本及测试临时文件选择独立目录，不改变玩家 JAR 的 `build/libs/` 输出位置，也不表示本批已验收。
+FC76.52／SFC53／MD16 未发布开发候选的以下五个项目共用 [build-workspace.gradle](build-workspace.gradle)：`piq-fc-arcade`、`piq-retro-platform`、`piq-sfc-home`、`piq-sfc-arcade` 和 `piq-md-home`。它为开发 classpath 副本及测试临时文件选择独立目录，不改变玩家 JAR 的 `build/libs/` 输出位置，也不表示本批已验收。
 
 可以使用环境变量 `PIQ_BUILD_WORK_DIR` 为后续构建指定基础目录，或对单次 Gradle 调用传入 `-PpiqBuildWorkDir`；两者同时存在时，Gradle 参数优先。使用绝对、纯 ASCII、本地专用目录，建议位于非系统工作盘；不能指向盘根、用户主目录、源码根目录或经过符号链接／重解析点的路径。以下 `D:/game-console-build` 只是示例，请换成实际工作盘：
 
@@ -146,6 +159,30 @@ $fcJar = (Resolve-Path ".\piq-fc-arcade\build\libs\piq_fc_arcade-$fcVersion.jar"
 
 先完成主包，再准备目标附属自己的核心和资源。部分附属构建脚本仍有历史 FC JAR 默认路径；使用 `-PgameConsoleJar` 显式传入本次主包，避免误用旧文件。
 
+### SFC53 的固定输入与许可配套
+
+SFC53 同时保留两套不同资源，不能将文件互相重命名、改写旧 SHA 或迁移旧即时档：
+
+- 旧 Mesen-S：`core/sfc-libretro/windows-x64/mesen-s_libretro.dll`，3896832 字节，SHA-256 `8aca17e76efbd7a70b0c247b42aaba04d0c1c90f693213bd1e76573986670b42`。继续按原组件固定资源准备方式保留；新工具不下载或重写它。
+- 新 Snes9x：`core/sfc-snes9x/windows-x64/snes9x_libretro.dll`，3840000 字节，SHA-256 `5ce01616184f255623405793e192f79aef5089fa796b29bc11ddc5e052060124`，实际版本报告为 `Snes9x 1.63 fae2fea`。参考源码 ZIP 为 `snes9x-fae2fea08f74180759ef540ee94259213f503480.zip`，760336 字节，SHA-256 `7f6dee7ab1a367da86bc86a87a204bf8fe0be389d62e7cfbd568dc2ccac32055`。
+
+固定来源、原归档摘要、取得时间及限制见 [输入清单](sfc-stock-inputs.json) 和 [NOTICE](../piq-sfc-home/src/main/resources/core/sfc-snes9x/NOTICE.txt)。原 DLL 来源是官方 Buildbot 的可变 `latest` 地址，不保证未来仍提供相同字节；若已变化，须自行提供匹配的既有输入，不能重新取最新 DLL 代替。参考源码是固定提交的官方源码 ZIP，短版本一致不等于已证明 Buildbot 的精确源码、编译选项或可复现二进制。工具只验证和复制，不下载、不重编、不执行核心。
+
+在仓库根导入 DLL 与源码包的固定对，然后检查缓存：
+
+```powershell
+python source-control/sfc_stock.py import `
+  --core D:/approved/snes9x_libretro.dll `
+  --source D:/approved/snes9x-fae2fea08f74180759ef540ee94259213f503480.zip
+python source-control/sfc_stock.py check
+```
+
+默认复用仓库根 `.build-inputs/<sha256>/<filename>`，与 FC 缓存共用目录但使用独立清单，不向 FC 锁表增加 SFC 依赖。可用 `--cache D:/approved/build-inputs` 导入／检查外部缓存，并在 SFC Gradle 传 `-PpiqInputsDir=D:/approved/build-inputs`；快照入口不接收该缓存参数，使用外部缓存时须将两条具体文件路径显式传给 `--sfc-snes9x-core`／`--sfc-snes9x-source`。
+
+`prepareSfcSnes9xRuntime` 在 `processResources` 前重新核验固定对并生成新 DLL、来源清单、原文顶层许可证、完整 LGPL 2.1 文本及带来源路径的版权／许可注释；资源也进入测试 classpath。源码 ZIP 不嵌入 JAR，保留为同批候选的独立配套文件，不能只交付 DLL 而丢掉源码资料。输出若存在不匹配或额外资源会失败，不静默覆盖；查明原因后使用新的干净构建输出，保留失败记录。
+
+原文许可证保留非商业使用／再分发条件；公共 GPL 前端／JNI 桥与独立核心分别声明，不意味着 GPL 能覆盖或取消核心限制。固定 libretro 参考树包含 NTSC、SPC DSP 的 LGPL 通知及 libretro-common 的 MIT 通知；顶层许可证还提及 JMA、xBRZ，但该树不含二者代码或许可证。`reference-only/` 的补充文本来自另一个明确固定的官方源码树，不证明实际编入 DLL或适用例外。公开前仍须核对实际构建组成、适用的对应源码／重新链接义务及非商业分发条件；这不是法律合规结论，当前公开快照门禁保留。
+
 例如，准备好 SFC 自身固定输入后，先编内部核心组件，再编家用组件：
 
 ```powershell
@@ -154,6 +191,18 @@ $sfcCoreVersion = ((Get-Content .\piq-sfc-arcade\gradle.properties | Select-Stri
 $sfcCoreJar = (Resolve-Path ".\piq-sfc-arcade\build\libs\piq_sfc_arcade-$sfcCoreVersion.jar").Path
 .\piq-sfc-home\gradlew.bat -p piq-sfc-home "-PgameConsoleJar=$fcJar" "-PsfcCoreJar=$sfcCoreJar" check jar
 ```
+
+如不使用缓存，可以给 SFC 家用构建显式传入固定对；`sfcRuntimePython` 指向实际 Python 可执行文件，以下均为示例路径：
+
+```powershell
+.\piq-sfc-home\gradlew.bat -p piq-sfc-home `
+  "-PgameConsoleJar=$fcJar" "-PsfcCoreJar=$sfcCoreJar" `
+  -PsfcSnes9xCore=D:/approved/snes9x_libretro.dll `
+  -PsfcSnes9xSource=D:/approved/snes9x-fae2fea08f74180759ef540ee94259213f503480.zip `
+  -PsfcRuntimePython=D:/tools/Python/python.exe check jar
+```
+
+`sfcSnes9xCore` 与 `sfcSnes9xSource` 必须同时提供或同时省略；错摘要、缺件不回退到旧核心或任意历史产物。
 
 上面的 SFC 家用产物仍是开发薄包，**不是玩家使用的完整 SFC 包**。上方快照构建入口会编译两个组件并核验合包；单独运行这些 Gradle 命令不会自动合包。仓库内锁定旧版本的历史合包脚本不用于当前产物。组件区别见 [SFC 说明](../piq-sfc-home/README.md)。
 

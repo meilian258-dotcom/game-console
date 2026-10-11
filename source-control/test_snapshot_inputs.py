@@ -40,7 +40,9 @@ class InputTests(unittest.TestCase):
 
     def test_official_directories_and_no_custom_core_download(self):
         self.assertEqual(set(subject.NIGHTLY_BASE), {'windows-x64', 'linux-x64'})
-        self.assertEqual(len(subject.NIGHTLY), 5)
+        self.assertEqual(len(subject.NIGHTLY), 4)
+        self.assertNotIn('mesen-s-windows', subject.NIGHTLY)
+        self.assertFalse(any('snes9x' in member for _, member in subject.NIGHTLY.values()))
         self.assertFalse(any('netplay' in member or 'blastem' in member for _, member in subject.NIGHTLY.values()))
         self.assertTrue(set(subject.JNI_BUNDLE_INPUTS).isdisjoint(subject.NIGHTLY))
         self.assertFalse(any('libc++' in member or 'libcxx' in member or 'libretro-jni' in member

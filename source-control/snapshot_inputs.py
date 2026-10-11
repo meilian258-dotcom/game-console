@@ -26,6 +26,7 @@ import zipfile
 from build_inputs import cache_path, load_lock, no_links, relative, verify
 from snapshot_build import MAME_LIFECYCLE_RESOURCES, verify_mame_lifecycle_resources
 import snapshot_stock
+import sfc_stock
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = 'https://github.com/meilian258-dotcom/game-console/releases/download/full-test-20261007-r1/'
@@ -53,7 +54,6 @@ NIGHTLY_BASE = {
 NIGHTLY = {
     'mesen-windows': ('windows-x64', 'mesen_libretro.dll'),
     'mesen-linux': ('linux-x64', 'mesen_libretro.so'),
-    'mesen-s-windows': ('windows-x64', 'mesen-s_libretro.dll'),
     'genesis-plus-gx-windows': ('windows-x64', 'genesis_plus_gx_libretro.dll'),
     'mgba-windows': ('windows-x64', 'mgba_libretro.dll'),
 }
@@ -268,7 +268,8 @@ def extract_bootstrap(pins: dict[str, Path], output: Path, source: Path) -> None
 
 
 def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = None,
-            fbneo_stock_core: Path | None = None, fbneo_stock_source: Path | None = None) -> dict:
+            fbneo_stock_core: Path | None = None, fbneo_stock_source: Path | None = None,
+            sfc_snes9x_core: Path | None = None, sfc_snes9x_source: Path | None = None) -> dict:
     output = no_links(output.absolute())
     # Nightly is resolved exactly once per run. Resume by invoking the build with
     # its verified receipt, not by accidentally mixing two downloads of latest.
@@ -278,8 +279,10 @@ def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = N
     # satisfy the new API from an old bridge or an unrelated nightly runtime.
     require_published_jni_bundle(load_lock(source / 'source-control/build-inputs.json'))
     stock_sources = snapshot_stock.inspect_pair(fbneo_stock_core, fbneo_stock_source)
+    sfc_sources = sfc_stock.inspect_pair(sfc_snes9x_core, sfc_snes9x_source, source / '.build-inputs')
     output.mkdir(parents=True, exist_ok=True)
     snapshot_stock.import_pair(output, stock_sources)
+    sfc_stock.import_pair(output, sfc_sources)
     pins, boot_records, sources = {}, [], []
     for ident, (filename, size, sha) in BOOTSTRAP.items():
         destination = output / 'bootstrap' / filename
@@ -313,6 +316,7 @@ def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = N
     receipt = dict(schema=1, resolvedAt=datetime.now(timezone.utc).isoformat(),
                    bootstrap=boot_records, files=files, nightly=nightly, sources=sources)
     snapshot_stock.verify_receipt(output, {entry['path']: entry for entry in files})
+    sfc_stock.verify_receipt(output, {entry['path']: entry for entry in files})
     put(output / 'receipt.json', (json.dumps(receipt, indent=2, ensure_ascii=True)+'\n').encode())
     return receipt
 
@@ -323,10 +327,13 @@ def main() -> int:
     parser.add_argument('--bootstrap-dir', type=Path, help='Optional offline copies of the six exact public release JARs')
     parser.add_argument('--fbneo-stock-core', type=Path, help='Explicit reviewed original FBNeo DLL; fixed SHA/size, no download')
     parser.add_argument('--fbneo-stock-source', type=Path, help='Matching fixed FBNeo source ZIP; required with --fbneo-stock-core')
+    parser.add_argument('--sfc-snes9x-core', type=Path, help='Fixed original Snes9x DLL; alternatively import both inputs into .build-inputs')
+    parser.add_argument('--sfc-snes9x-source', type=Path, help='Fixed Snes9x reference source ZIP; local candidate, not publication approval')
     args = parser.parse_args()
     try:
         receipt = prepare(args.output, bootstrap_dir=args.bootstrap_dir,
-                          fbneo_stock_core=args.fbneo_stock_core, fbneo_stock_source=args.fbneo_stock_source)
+                          fbneo_stock_core=args.fbneo_stock_core, fbneo_stock_source=args.fbneo_stock_source,
+                          sfc_snes9x_core=args.sfc_snes9x_core, sfc_snes9x_source=args.sfc_snes9x_source)
         print(json.dumps(dict(ok=True, bootstrap=len(receipt['bootstrap']), nightly=len(receipt['nightly']),
                               files=len(receipt['files'])), sort_keys=True))
         return 0
