@@ -1,8 +1,8 @@
 # AV 线像素物品草案（alpha.2）
 
 - 日期：2026-09-08
-- 制作者：client_worker（imagegen 技能）
-- 模式：内置 image_gen；全新生成；无参考图片；未使用 CLI/API 备用路径。
+- 制作方式：AI 图像生成（image_gen）。
+- 素材来源：全新生成，无参考图片。
 - 原始图稿：av-cable-generated-original.png
 - 尺寸 / 模式：1254 × 1254 / RGBA
 - 文件字节：440417
@@ -26,14 +26,6 @@
 - `models/item/av_cable.json` 只将 layer0 从原版 lead 改为 `piq_fc_arcade:item/av_cable`，parent 未变。
 - 目视检查：六枚黄白红插头与盘线仍可辨，无裁切、无附加背景；全透明 3201 像素、不透明 895 像素、部分透明 0；左/上/右/下留白分别 4/14/3/11 像素。
 
-## 最终提交提示词
+## 素材范围
 
-```text
-Use case: stylized-concept
-Asset type: Minecraft inventory item sprite, transparent PNG.
-Primary request: One black coiled analog AV/RCA cable, with exactly TWO ends. Each end splits into exactly THREE male RCA plugs: one yellow, one white, and one red. There must be exactly SIX visible plug heads total, in two clearly separated groups of yellow-white-red. This is one complete cable, not a leash, rope, adapter, pair of cables, or disconnected plugs.
-Scene/backdrop: Genuinely transparent background with real PNG alpha, including the open spaces inside the coil. Do not paint a checkerboard, solid backdrop, ground, or shadow.
-Style/medium: Authentic coarse Minecraft pixel-art item texture, designed on a strict 64 by 64 logical square-pixel grid. Very clear large blocky pixels and hard stepped pixel edges. Limited flat palette: black and a few charcoal shades for the insulated coil, bright yellow/red/off-white plug sleeves, simple flat gray metal tips. No smoothing, antialiasing, blur, gradients, photorealism, painterly strokes, microtexture, or glossy 3D render.
-Composition/framing: A compact readable loose black cable coil with the two triple-plug ends both visible outside the coil and easily countable. Entire cable and all six tips fit within the square canvas. Centered with generous transparent margin on every side; no cropping.
-Constraints: Only the single cable item. No text, letters, numbers, logos, watermark, border, UI, scene, checkerboard pattern, or decorative elements. Preserve genuine transparency. Request an actual 64x64 PNG if supported; otherwise retain the strict coarse 64x64 logical pixel-grid design in the generated square output without adding detail.
-```
+通用像素风 AV/RCA 线材：黑色盘线，两端各三个黄、白、红插头，共六头。透明背景，不包含文字、商标、角色或场景。原始生成图和确定性后处理记录保留，最终资源规格以上方接入记录为准。

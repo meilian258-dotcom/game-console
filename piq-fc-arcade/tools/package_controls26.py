@@ -1,6 +1,13 @@
-"""Package only frozen, final-JAR-tested unified controls files. Never install or launch a game."""
+"""Private historical evidence bundle, NOT a public release packager.
+
+Includes original local audit reports. Never upload its output as public assets.
+Keep frozen final-JAR checks. Never install or launch a game.
+"""
 import argparse,json
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'source-control'))
+from private_evidence import private_evidence
 import prepare_controls26 as stage
 from freeze_fc_core_alpha19 import digest,require,safe_path
 from package_fc_core_alpha19 import PackagePlan,snapshot,json_document,check_ownership
@@ -97,7 +104,7 @@ def plan(directory,reports,guide,counts):
     check_audit(parsed['audit'],jars);check_worker(parsed['worker'],jars);check_multiplayer(parsed['multiplayer'],jars)
     check_controls(parsed['controls'],jars);check_mixin(parsed['mixin'],jars);check_zapper(parsed['zapper'],jars);check_extra(parsed,jars,helper)
     inputs=[*raw_reports.values(),staged,*jars.values(),helper]
-    investigation=snapshot(ROOT/'piq-native-arcade/design/native-buttons26-qa-exit-investigation.json')
+    investigation=snapshot(private_evidence('piq-native-arcade/design/native-buttons26-qa-exit-investigation.json'))
     investigation_data=json_document(investigation.raw)
     require(investigation_data['native_jar_sha256']==jars['native'].sha256 and investigation_data['helper_sha256']==helper.sha256 and investigation_data['production_changed_during_investigation'] is False,'Native investigation artifact binding differs')
     inputs.append(investigation)

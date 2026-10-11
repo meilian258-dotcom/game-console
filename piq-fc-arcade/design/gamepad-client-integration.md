@@ -1,6 +1,6 @@
 # 实体手柄客户端输入（2026-09-10）
 
-本轮子任务：`sfc_cabinet_provider`。此功能随 FC 主模组唯一内置，附属复用同一 API；不新增独立 platform mod、驱动、SDL、JNI 或网络协议。
+此功能随 FC 主模组唯一内置，附属复用同一 API；不新增独立 platform mod、驱动、SDL、JNI 或网络协议。
 
 ## 宿主接口
 

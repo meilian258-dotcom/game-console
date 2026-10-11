@@ -1,11 +1,20 @@
-"""Fixed official FBNeo two-process, all-video/all-PCM snapshot research. No production integration."""
+"""Fixed official FBNeo snapshot research using an explicit private input report.
+
+Input/output reports may contain local paths and are not public release assets.
+No production integration.
+"""
 import argparse,concurrent.futures,hashlib,json,os,shutil,subprocess,sys,tempfile,time
 from pathlib import Path
 STUDY=Path(__file__).resolve().parents[1];ROOT=STUDY.parents[1]
 sys.path.insert(0,str(ROOT/'tools'));from check_native_determinism import sha,identity,compare,JDK,JNA
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--game',choices=['kof97','mslug2'],required=True);p.add_argument('--context',choices=['normal','netplay'],required=True);p.add_argument('--report',required=True,type=Path);a=p.parse_args();assert not a.report.exists()
-    old=json.loads((ROOT/'design/native-sync-study'/('kof97-v3.json'if a.game=='kof97'else'mslug2-v1.json')).read_text(encoding='utf-8'))
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--game',choices=['kof97','mslug2'],required=True);p.add_argument('--context',choices=['normal','netplay'],required=True);p.add_argument('--report',required=True,type=Path)
+    p.add_argument('--input-report',required=True,type=Path,help='Private existing determinism report with the exact ROM/BIOS inputs and SHA-256 values')
+    a=p.parse_args();assert not a.report.exists()
+    input_report=a.input_report.resolve(strict=True)
+    assert input_report.is_file() and input_report!=a.report.resolve(),'Separate existing input report required'
+    old=json.loads(input_report.read_text(encoding='utf-8'))
+    assert old.get('game')==a.game,'Input report game mismatch'
     sources=[Path(s)for s in old['inputs']];before={str(s):identity(s)for s in sources}
     for s in sources:assert before[str(s)]['sha256']==old['inputs'][str(s)]['sha256']
     meta=json.loads((STUDY/'official-artifacts.json').read_text(encoding='utf-8'));dll=STUDY/'vendor/fbneo_libretro.dll';assert sha(dll)==meta['dll']['sha256']

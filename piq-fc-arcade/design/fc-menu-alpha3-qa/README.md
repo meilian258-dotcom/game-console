@@ -1,6 +1,6 @@
 # FC alpha.3 菜单布局与状态回归 QA
 
-修改者：client_worker；日期：2026-09-08。仅本地界面、纯 Java 布局/helper 和定向测试，未运行或安装 Minecraft。
+日期：2026-09-08。仅本地界面、纯 Java 布局/helper 和定向测试，未运行或安装 Minecraft。
 
 ## 布局证据与边界
 

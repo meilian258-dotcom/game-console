@@ -44,7 +44,7 @@ SFC 家用仍是独立 SfcHomeServer Session/Host/physical Lease 系统；通用
 - 最终收尾后源码probe通过46断言：piq-sfc-home/build/home-hosted39-source-v3/report.json，同目录compile.log/run.log；报告记录精确源码SHA与借用前置编译目录。计数含接收到的媒体包codec检查，随实际收帧数略变；强制覆盖项不变。仍应重跑最终全模块编译测试。
 - 重跑：piq-sfc-home/tools/run_home_hosted39_probe.ps1 -CoreClasses <公共核心类目录或JAR> -EvidenceName <新唯一目录名>。使用本轮已编译家用基础类及冻结38/22依赖，不是final-JAR-only证据。
 - 未验证：Minecraft物理UI命中、保护模组回调、实际双客户端socket/断线、最终交付JAR类来源、声卡听感、真实游戏长期存档稳定性。probe不启动Minecraft、不开socket/声卡，不等同线上稳定性承诺。
-- 家用链路probe未验证SFC SRAM跨重启回读或旧客户端备份迁移；自制ROM不代表真实游戏的SRAM行为。存档容器/原子写测试由公共核心代理单独汇总。
+- 家用链路probe未验证SFC SRAM跨重启回读或旧客户端备份迁移；自制ROM不代表真实游戏的SRAM行为。存档容器/原子写属于公共核心独立测试范围。
 
 ## 未完成项
 

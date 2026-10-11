@@ -20,4 +20,4 @@
 
 ## 分发必须附对应源码
 
-`genesis-plus-gx-piqnp1-source.zip` 包含完整修改后上游源码、各组件原许可与本目录的补丁/生成器。分发新 DLL 时必须同时提供该包，并保留原版权声明；GX/Nuked 含非商业使用及完整对应源码要求，blip_buf 为 LGPL-2.1-or-later，不得将整个核心重新标成 MIT/GPL。原许可见源码包，来源信息见 `provenance.json`。
+`genesis-plus-gx-piqnp1-source.zip` 包含完整修改后上游源码、各组件原许可与本目录的补丁/生成器。分发新 DLL 时必须同时提供该包，并保留原版权声明；Genesis Plus GX 整体保留其非商业使用及完整对应源码条件，Nuked OPN2 与 blip_buf 分别保留 LGPL-2.1-or-later。Nuked OPN2 自身不是非商业许可证，但这不解除 GX 整体的非商业限制，也不得将整个核心重新标成 MIT/GPL。原许可见源码包及固定上游 [LICENSE.txt](https://github.com/libretro/Genesis-Plus-GX/blob/c2838c7dc4236fc2fe94e5dbd08b41486067918e/LICENSE.txt)，来源信息见 `provenance.json`。

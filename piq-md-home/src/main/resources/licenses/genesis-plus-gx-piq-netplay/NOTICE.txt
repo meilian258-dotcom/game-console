@@ -14,8 +14,10 @@ Corresponding source SHA256: adeb3901c851c941fbeb07080aac3c49f64f4c3be5faf4d315c
 Distribution MUST include that complete source archive alongside the JAR/DLL.
 The archive contains modified upstream source, original component notices,
 and piq-md-home/native-genesis-netplay patch files and build instructions.
-GX and Nuked components retain non-commercial/source distribution conditions;
-blip_buf retains LGPL-2.1-or-later. No blanket MIT/GPL relicensing is claimed.
+Genesis Plus GX retains its non-commercial/source distribution conditions.
+Nuked OPN2 and blip_buf each retain LGPL-2.1-or-later; Nuked OPN2 is not itself
+non-commercially licensed. This does not remove the overall GX restrictions.
+No blanket MIT/GPL relicensing is claimed.
 
 PIQ changes (2026-10-03): independent PIQGXNP schema 1 with CPU timing,
 two six-button controller handshakes, SRAM/EEPROM protocol state, FM/blip/filter

@@ -105,8 +105,8 @@ def apply():
     keep(DESIGN / "generic-cartridge-label-512x256.png", label_raw)
     keep(DESIGN / "generic-cartridge-skin-1024.png", skin_raw)
     report = {
-        "authorization": "User approved exact UV programmatic compositing on 2026-09-08",
-        "generation_mode": "built-in image_gen; original generation prompt in GENERATION.md",
+        "processing": "Programmatic compositing within the original label UV boundary.",
+        "generation_mode": "AI-generated source image; provenance and processing in GENERATION.md",
         "operation": "full-canvas NEAREST 512x256; paste only original label UV and 4px edge padding",
         "generated_size": source_size, "generated_sha256": sha(generated),
         "original_skin_sha256": sha(old), "label_sha256": sha(label_raw), "skin_sha256": sha(skin_raw),

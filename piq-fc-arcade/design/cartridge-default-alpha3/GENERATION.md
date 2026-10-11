@@ -1,21 +1,10 @@
-# 通用卡带封面 alpha.3：原始生成记录
+# 通用卡带封面 alpha.3：素材来源与处理
 
 2026-09-08，像素匠。默认卡带改用通用封面，不再显示公路赛车。
 
-模式：内置 image_gen；全新生成独立 2:1 标签，不让AI重画完整UV图。原图保留为 `generic-cartridge-label-generated.png`，用户原外壳/触点/背面与自定义封面不变。
+模式：AI 图像生成（image_gen）；全新生成独立 2:1 标签，不重画完整 UV 图。原图保留为 `generic-cartridge-label-generated.png`，原外壳/触点/背面与自定义封面不变。
 
-提示词如下（原文）：
-
-```text
-Use case: stylized-concept
-Asset type: production-ready flat default label texture for an FC game cartridge in a Minecraft mod, not a mockup.
-Primary request: design a clean generic all-games cartridge label, replacing a specific racing-game label.
-Canvas: wide 2:1 rectangle, opaque edge-to-edge artwork; intended final label is 512 by 256 pixels.
-Style: crisp retro 8-bit pixel graphic, restrained charcoal and warm ivory with muted gold accents to suit an existing yellow cartridge shell. Strong shapes readable at very small in-game size, subtle pixel texture, not photographic.
-Composition: one simple generic retro gamepad emblem and a very large clean pixel-letter "FC", with smaller "GAME CARTRIDGE" underneath. Generous 8 percent safe margin all around, modest thin rectangular printed border.
-Text (verbatim): "FC", "GAME CARTRIDGE". Render each once, no other text.
-Constraints: only the flat rectangular label fills the image. No cartridge shell, no 3D perspective, no scene, no product photograph, no background outside the label, no transparency. No racing car, no specific video game characters, no ROAD FIGHTER wording, no Nintendo or other company logo, no watermark. Do not imply any bundled game ROM. Keep details simple enough for nearest-neighbor downsampling.
-```
+素材范围：通用像素风卡带标签，采用深灰、暖白和暗金配色，包含通用手柄图案及 `FC`、`GAME CARTRIDGE` 字样。不包含特定游戏角色或公司标志，也不表示附带游戏 ROM。
 
 目视：横向通用FC、手柄图案与GAME CARTRIDGE字样，无赛车或游戏IP。
 

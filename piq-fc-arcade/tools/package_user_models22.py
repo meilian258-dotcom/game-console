@@ -1,6 +1,13 @@
-"""Deliver exact model22 audited artifacts, with no installation or existing-file overwrite."""
+"""Private historical evidence bundle, NOT a public release packager.
+
+Includes original local audit reports. Never upload its output as public assets.
+No installation or existing-file overwrite.
+"""
 import argparse,io,json,xml.etree.ElementTree as ET,zipfile
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'source-control'))
+from private_evidence import private_evidence
 from freeze_fc_core_alpha19 import safe_path,digest,require
 from package_fc_core_alpha19 import snapshot,json_document,PackagePlan,verify_archive,revalidate_inputs
 import prepare_user_models22 as stage
@@ -23,7 +30,7 @@ PREVIEWS={
  '预览/SFC到电视AV线.png':'piq-sfc-home/design/user-sfc-20260911/multi-out-av.png'}
 
 def plan():
-    reports={k:snapshot(ROOT/v,8*1024*1024) for k,v in REPORTS.items()}
+    reports={k:snapshot(private_evidence(v) if '/design/' in v else ROOT/v,8*1024*1024) for k,v in REPORTS.items()}
     parsed={k:json_document(v.raw) for k,v in reports.items()}
     for key,r in parsed.items():require(r.get('ok') is True,'Missing passing report: '+key)
     final=parsed['final-audit'];require(final['schema']=='piq-user-models22-independent-1' and final['production_compiled'] is False,'Wrong final audit')

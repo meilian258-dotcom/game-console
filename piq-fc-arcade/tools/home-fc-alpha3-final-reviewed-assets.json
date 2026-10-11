@@ -28,7 +28,7 @@
       53
     ],
     "default_cover": {
-      "authorization": "User approved programmatic normalization and original-UV embedding on 2026-09-08",
+      "processing": "Programmatic normalization and original-UV embedding.",
       "generated_original": "design/cartridge-default-alpha3/generic-cartridge-label-generated.png",
       "generated_sha256": "E0B67298F946D1F80830A48D77527B287C29C773E8838A675825847890D1D761",
       "normalized_label": "design/cartridge-default-alpha3/generic-cartridge-label-512x256.png",

@@ -3,7 +3,7 @@ import package_linked_cabinets21 as p
 
 class EvidenceTests(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):cls.reports={k:p.json_document(p.snapshot(p.ROOT/v).raw)for k,v in p.REPORTS.items()}
+    def setUpClass(cls):cls.reports={k:p.json_document(p.snapshot(p.private_evidence(v) if '/design/' in v else p.ROOT/v).raw)for k,v in p.REPORTS.items()}
     def test_current_evidence(self):p.check_evidence(self.reports)
     def rejected(self,section,key,value):
         r=copy.deepcopy(self.reports);r[section][key]=value

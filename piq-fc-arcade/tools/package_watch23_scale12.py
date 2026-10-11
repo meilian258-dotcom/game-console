@@ -1,4 +1,6 @@
-"""Package the audited FC23/SFC12/Native7 spectator delivery, never install it.
+"""Private historical evidence bundle, NOT a public release packager.
+
+Includes original local audit reports. Never upload its output as public assets.
 
 The original scope/wire reports retain their true FC23/SFC11 provenance. A
 separate visual-only audit and fresh SFC12 worker/multiplayer reports bridge
@@ -10,6 +12,9 @@ import copy
 import io
 import json
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'source-control'))
+from private_evidence import private_evidence
 import tomllib
 import xml.etree.ElementTree as ET
 import zipfile
@@ -203,7 +208,7 @@ def build_counts(project, inputs):
 
 
 def plan():
-    reports = {k: snapshot(ROOT / v, 8 * 1024 * 1024) for k, v in REPORTS.items()}
+    reports = {k: snapshot(private_evidence(v) if '/design/' in v else ROOT / v, 8 * 1024 * 1024) for k, v in REPORTS.items()}
     parsed = {k: json_document(v.raw) for k, v in reports.items()}
     require(reports['watch23-scope-baseline-sfc11'].sha256 == SCOPE_SHA, 'Reviewed scope v1 changed')
     jars = {k: snapshot(STAGE / name) for k, name in stage.NAMES.items()}

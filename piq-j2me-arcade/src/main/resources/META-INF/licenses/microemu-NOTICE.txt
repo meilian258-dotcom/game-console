@@ -1,9 +1,20 @@
 MicroEmulator 2.0.4
 Copyright (c) the MicroEmulator contributors.
 
-This mod distributes unmodified MicroEmulator Maven modules as separate nested
-JAR files. MicroEmulator is licensed under the GNU Lesser General Public
-License, version 2.1. Source and project information:
+The build expands and merges the MicroEmulator 2.0.4 microemu-cldc,
+microemu-midp, microemu-javase and microemu-javase-swing Maven archives into
+the mod JAR to avoid split packages. They are NOT separate nested JAR files.
+Original package names and applicable copyright/license notices remain owned
+by their respective contributors; merging does not relicense the components.
+
+The existing distribution identifies MicroEmulator as LGPL-2.1. Upstream's
+current COPYING also describes an Apache-2.0 option for most source files;
+that current-branch statement is not proof that every file in the four fixed
+2.0.4 artifacts offers the same choice. The exact 2.0.4 source/license inventory
+and the materials needed for replacement/relinking of this merged distribution
+still require verification. No blanket relicensing or completed review is claimed.
+
+Source and project information:
 https://github.com/barteo/microemu
 
 Java ME game JAR/JAD files are supplied by users and are not part of this mod.

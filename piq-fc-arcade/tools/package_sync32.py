@@ -1,4 +1,9 @@
-"""Package a frozen matching cohort and final-JAR evidence; no install or live-world writes."""
+"""Historical PRIVATE maintainer bundle, not approved for public distribution.
+
+Validate the frozen cohort against private final-JAR evidence without publishing
+raw reports by default. This is not the current public release packaging entry.
+No install or live-world writes are performed.
+"""
 import argparse,io,json,tomllib,zipfile
 from pathlib import Path
 from build_sync32 import ROOT,NAMES,inputs
@@ -16,8 +21,12 @@ def zip_bytes(files):
             info=zipfile.ZipInfo(name,(2026,9,12,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;z.writestr(info,raw)
     return buffer.getvalue()
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--stage',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--stage',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--evidence-dir',type=Path,required=True,help='Private directory containing kof97-v3.json and mslug2-v1.json; never load historical reports from tracked design/')
+    p.add_argument('--include-private-evidence',action='store_true',help='Embed raw reports only in a private maintainer handoff; never upload this bundle to a public release')
+    a=p.parse_args()
     stage=safe_path(a.stage);output=safe_path(a.output);verification=output.with_suffix('.verification.json')
+    evidence_dir=safe_path(a.evidence_dir);require(evidence_dir.is_dir(),'Private evidence directory required')
     require(stage.is_relative_to(ROOT/'piq-fc-arcade/build') and stage.is_dir(),'Frozen workspace stage required')
     require(output.parent==safe_path(ROOT/'制作Mod/03-街机模拟') and output.suffix=='.zip' and not output.exists() and not verification.exists(),'New delivery ZIP required')
     fence={};files={};mods={};hashes={}
@@ -36,7 +45,9 @@ def main():
         for name in entries:
             if name.endswith('.class'):require(name not in owners,'Duplicate class owner '+name);owners[name]=kind
     require(ids=={'piq_fc_arcade':'0.31.0-alpha.32','piq_sfc_arcade':'0.2.0-alpha.6','piq_sfc_home':'0.1.0-alpha.19','piq_native_arcade':'0.1.0-alpha.10','piq_gba':'0.1.0-alpha.2'},'Unexpected cohort')
-    evidence={}
+    evidence={};required_records={}
+    def keep_private_evidence(name,raw):
+        if a.include_private_evidence:files[name]=raw
     for name,kinds in REQUIRED.items():
         raw=take(stage/'checks'/name);record=json.loads(raw)
         passed=record.get('ok') is True
@@ -46,27 +57,27 @@ def main():
         bound={k:v['sha256'].upper() for k,v in record.get('jars',{}).items()}
         if name=='shared-game-final.json':bound['fc']=record['sha256'].upper()
         for kind in kinds:require(bound.get(kind)==hashes[kind],'Wrong final JAR in '+name+' '+kind)
-        files['checks/'+name]=raw;evidence[name]=digest(raw)
-    common=json.loads(files['checks/cohort-final.json'])['common']
+        keep_private_evidence('checks/'+name,raw);evidence[name]=digest(raw);required_records[name]=record
+    common=required_records['cohort-final.json']['common']
     require(common['actual_fml_reader'] and common['client_and_native_load_attempts']==0,'Missing actual FML/common-only validation')
-    files['checks/build-witness.json']=witness_raw
-    # Include any additional final evidence, but only when its declared candidates match this stage.
+    keep_private_evidence('checks/build-witness.json',witness_raw)
+    # Optional private handoffs may include extra evidence only for matching candidates.
     for path in (stage/'checks').glob('*.json'):
         if path.name in REQUIRED:continue
         raw=take(path);record=json.loads(raw)
         if record.get('ok') is True and record.get('mode')=='final-jar-only' and record.get('production_compiled') is False:
             bound={k:v['sha256'].upper() for k,v in record.get('jars',{}).items()}
-            if bound and all(hashes.get(k)==sha for k,sha in bound.items()):files['checks/'+path.name]=raw
+            if bound and all(hashes.get(k)==sha for k,sha in bound.items()):keep_private_evidence('checks/'+path.name,raw)
     guide=ROOT/'piq-fc-arcade/design/同步优化-alpha32-使用说明.md';files['先看这里.md']=take(guide)
     files['docs/实现约定.md']=take(ROOT/'piq-fc-arcade/design/sync32-contract.md')
     for path in [ROOT/'piq-fc-arcade/design/cabinet-sync32-handoff-20260912.md',ROOT/'piq-sfc-home/design/sync19-handoff.md',ROOT/'piq-fc-arcade/design/工作笔记-alpha32-20260912.md']:
         files['docs/'+path.name]=take(path)
     study=ROOT/'piq-native-arcade/design/native-sync-study'
-    for name in ('README-20260912.md','kof97-v3.json','mslug2-v1.json'):
-        raw=take(study/name)
-        if name.endswith('.json'):
-            r=json.loads(raw);require(r['ok'] and r['sync_qualified'] is False and r['production_modified'] is False and r['source_roms_unchanged'],'MAME study gate changed')
-        files['checks/mame-study/'+name]=raw
+    files['docs/mame-study-README-20260912.md']=take(study/'README-20260912.md')
+    for name in ('kof97-v3.json','mslug2-v1.json'):
+        raw=take(evidence_dir/name)
+        r=json.loads(raw);require(r['ok'] and r['sync_qualified'] is False and r['production_modified'] is False and r['source_roms_unchanged'],'MAME study gate changed')
+        keep_private_evidence('checks/mame-study/'+name,raw);evidence['mame-study/'+name]=digest(raw)
     source={}
     # Reproducible project source/assets, excluding user data, build caches, runtimes and test ROM binaries.
     for name,sha in w['inputs'].items():
@@ -92,7 +103,8 @@ def main():
       'protected_assets':{k:v['protected_unchanged'] for k,v in w['mods'].items()},'unique_classes':len(owners),
       'protocols':['cabinet-room-4','cabinet-game-1','cabinet-sync-1','sfc-repair-1'],'mame_local_sync_enabled':False,
       'installed':False,'uploaded':False,'published':False,'live_minecraft_multiplayer_tested':False,'rom_bios_saves_included':False,
-      'runtime_dlls_included':False,'legacy_companions_unchanged':True,'source_files':len(source)}
+      'runtime_dlls_included':False,'legacy_companions_unchanged':True,'source_files':len(source),
+      'public_distribution_approved':False,'private_evidence_included':a.include_private_evidence}
     files['checks/summary.json']=(json.dumps(summary,ensure_ascii=False,indent=2)+'\n').encode()
     files['SHA256.txt']=''.join(digest(raw)+'  '+name+'\n' for name,raw in sorted(files.items())).encode()
     require(inputs()==w['inputs'] and all(digest(path.read_bytes())==sha for path,sha in fence.items()),'Packaging input changed')

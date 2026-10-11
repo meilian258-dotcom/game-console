@@ -20,7 +20,7 @@
 
 新增：`home/HomeSaveIntent`、`ArcadeHomeSaveSlotsPayload`、`ArcadeHomeSaveActionPayload`、`ServerArcadeSessions$HomeSaveRequest`。
 
-`ZapperStandService.interact` 仅删两处开机门禁；该文件其它 cable/loanPlayer 变更归动态线代理。未编辑 WASM、模拟器核心、ROM、模型、贴图、原存档编码、旧 frame/history/input payload 格式。其他修改范围另列。
+`ZapperStandService.interact` 仅删两处开机门禁；该文件其它 cable/loanPlayer 变更属于动态线功能，另行记录。未编辑 WASM、模拟器核心、ROM、模型、贴图、原存档编码、旧 frame/history/input payload 格式。其他修改范围另列。
 
 ## 验证
 

@@ -1,6 +1,6 @@
 # 家用 FC alpha.10：本轮实现与验收边界
 
-记录日期：2026-09-09。本文按当前源码记录输入、手柄斜托和两种新增电视的设计，不是最终 JAR 发布清单。构建结果、文件散列、交付位置由根任务另行记录；本文不替代 Minecraft 实机或双人联机验收。
+记录日期：2026-09-09。本文按当前源码记录输入、手柄斜托和两种新增电视的设计，不是最终 JAR 发布清单。构建结果、文件散列、交付位置另行记录；本文不替代 Minecraft 实机或双人联机验收。
 
 ## 1. 兼容性与范围
 
@@ -86,8 +86,8 @@
 
 ## 6. 已做验证与未做验证
 
-输入子任务的 direct `javac` + JUnit 入口为 `tools/qa/ControllerInputTestRunner.java`，本轮最终运行 59 项，全部通过。覆盖 FIFO 短按/双按/组合键、重复事件、暂停恢复窗口、在途帧清理、GUI 表现抑制、P1/P2 分离、合法强制释放、序列/代次拒绝、过载保护、按帧历史压缩/裁剪，以及历史追帧不补播动画。
+输入测试的 direct `javac` + JUnit 入口为 `tools/qa/ControllerInputTestRunner.java`，本轮最终运行 59 项，全部通过。覆盖 FIFO 短按/双按/组合键、重复事件、暂停恢复窗口、在途帧清理、GUI 表现抑制、P1/P2 分离、合法强制释放、序列/代次拒绝、过载保护、按帧历史压缩/裁剪，以及历史追帧不补播动画。
 
 几何/表现离线工具包括 `tools/check_controller_slanted_pose.py`、`tools/check_large_lcd_presentation.py`、`tools/build_large_lcd_tv_model.py` 和 `tools/build_vintage_tv_model.py`。它们处理当前模型或布局数据；离线预览不是 Minecraft 游戏截图，也不是两台客户端的真实联机记录。
 
-本文子任务未运行 Gradle、未启动 Minecraft、未上传服务器、未执行双人实机联机。根任务的统一构建及最终 JAR 验包结果应另行报告，不能用本文的纯测试结果替代。
+本文记录的验证未运行 Gradle、未启动 Minecraft、未上传服务器、未执行双人实机联机。完整构建及最终 JAR 验包结果应另行报告，不能用本文的纯测试结果替代。

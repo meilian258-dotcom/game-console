@@ -13,17 +13,17 @@
 - 沿用领地保护、精确连接和硬件 UUID、距离、服务器线程/回调复验及迟到帧拒绝。重置和关机影响整局，权限仍由设备保护控制。
 - 旧世界 ID/卡带/AV 接线不迁移；新运行态默认停止，已有电视没有电源字段默认开启保持旧外观，音量使用默认。
 
-## 分工 / 接口
+## 实现范围 / 接口
 
 - HomeApplianceService、HomeHardware 路由、HomeSystems API、电视状态/显示/音量、实体按钮点击/提示、版本和合包。
 - FC Host 与 Controller 解耦、HomeConsoleRuntime、HomeZapperService、FC 服务端/客户端与网络。
 - SFC 同等状态分离、运行/控制协议、共享入口适配和测试。
-- 光枪支架 Block/BE/Item/绑定/模型/线/唯一物品、Mod 注册；直接与 FC 代理协调枪服务，不改共享语言文件。
+- 光枪支架 Block/BE/Item/绑定/模型/线/唯一物品、Mod 注册；通过 FC 枪服务接口接入，不改共享语言文件。
 
 HomeSystems.ServerHooks 新增 default：
 `boolean onPowerOn(ServerPlayer, Connection)`、`void onPowerOff(ServerLevel, ExternalHomeConsoleBlockEntity)`、`void onReset(ServerPlayer, Connection)`、`void onController(ServerPlayer, Connection, int)`、`boolean isRunning(ServerLevel, ExternalHomeConsoleBlockEntity)`。
 
-FC `HomeConsoleRuntime` 由 FC 代理提供：
+FC `HomeConsoleRuntime` 提供以下调用：
 `boolean powerOn(ServerPlayer, HomeConsoleBlockEntity)`、`void powerOff(ServerLevel, HomeConsoleBlockEntity)`、`void reset(ServerPlayer, HomeConsoleBlockEntity)`、`void takeController(ServerPlayer, HomeConsoleBlockEntity, int)`、`boolean running(ServerLevel, HomeConsoleBlockEntity)`。
 
 共享物理交互：`HomeApplianceService.interactConsole(ServerPlayer, BlockPos, BlockHitResult)`；外部主机点击区域使用 provider hook，参数本地逆朝向射线，具体 API 随同文档补充。

@@ -42,7 +42,7 @@
 
 ## 实际验证
 
-- 独立 Java21 / JUnit5：6 套、83 项全部成功，0 失败/错误/跳过；涵盖设置编解码、保存修订保护、旧格式迁移、自定义 N 游戏键不被改写、schema3 显式 Z 保留、三个输入档位 Z/X 路由和掩码、失焦/中立重新启用等。没有运行 Gradle，避免与其他代理并发编译。
+- 独立 Java21 / JUnit5：6 套、83 项全部成功，0 失败/错误/跳过；涵盖设置编解码、保存修订保护、旧格式迁移、自定义 N 游戏键不被改写、schema3 显式 Z 保留、三个输入档位 Z/X 路由和掩码、失焦/中立重新启用等。本项未运行 Gradle。
 - 10 份语言资源解析、重复键、全部翻译键与 `%s/%d/%%` 占位符对比 FC38 冻结配套基线通过；合计 910 键保持，59 个显示值改变，批准主机名称精确断言通过，显示值 PIQ 残留 0。
 - 报告：`piq-fc-arcade/build/controls-names39-source-v2/report.json`，含测试源 SHA 与语言 SHA/变更键名。v1 因 PowerShell 未引用 `-Dfile.encoding=UTF-8` 将点号参数拆分，Java runner 未启动；已仅修测试脚本参数引用，保留失败目录，没有改变生产代码或断言绕过失败。
 - `ControlSettingsScreen` 提示改动尚未实际 Minecraft API 编译；最终统一构建验证。未进行真实 OS 按键、Minecraft UI/世界、实体手柄、音频或多人联机测试，不能据纯测试宣称实机验收通过。
@@ -80,10 +80,10 @@
 
 `CabinetHostedSessions` / `HostedCabinetWorker` 的路径、媒体与核心契约审查发现两项修正点：
 
-1. `CabinetHostedSessions.context` 初版将每局网络 room UUID 传给 `ServerCoreContext.roomId`，而 saveDirectory 把该字段追加进持久存档路径；同设备同玩家下局因此新目录，不能恢复上局。应传稳定 `target.identity()`（核心代理也确认此契约），网络room仅用于通信/临时运行目录。
+1. `CabinetHostedSessions.context` 初版将每局网络 room UUID 传给 `ServerCoreContext.roomId`，而 saveDirectory 把该字段追加进持久存档路径；同设备同玩家下局因此新目录，不能恢复上局。应传稳定 `target.identity()`，网络room仅用于通信/临时运行目录。
 2. `HostedCabinetWorker` 初版 createDirectory(staging) 因既有目录而失败后，finally 仍尝试删该空目录。需记录本轮创建成功再允许删staging，保护既有碰撞目录；已有 created 文件清单仍保留。
 
-补充防御建议：外层finally调用可插拔core.close应防止异常越过关闭清理；必须真实isTerminated后才能删暂存或释放占额，不能用超时假报终止。核心代理确认其正常实现close非阻塞、内部保存/关闭异常有保护；不可强杀的WASM若永久卡住将继续占额，这个边界应明确，不能伪装已回收。
+补充防御建议：外层finally调用可插拔core.close应防止异常越过关闭清理；必须真实isTerminated后才能删暂存或释放占额，不能用超时假报终止。该核心正常实现close非阻塞、内部保存/关闭异常有保护；不可强杀的WASM若永久卡住将继续占额，这个边界应明确，不能伪装已回收。
 
 正向检查：manifest主文件/伴随BIOS白名单及文件名限制、按SHA读不可变对象、逐级无链接验证、CREATE_NEW/NOFOLLOW写临时副本与完整复制后再验、固定8个outbound batch和有界视频/PCM、只清理本轮created文件清单均存在。没有进行攻击性并发文件替换测试；父层后续修正、集成与测试统一验收。
 
@@ -127,7 +127,7 @@ SFC 整帧接线、完整构建和最终成套验证仍需单独完成。
 - 确认 SERVER_MEDIA 的固定 streamHostId/初始 owner 与动态管理者分离；P1/P2 都上送输入，P1 重占走接收器与管理者更新，旁观不绑定原主持 Connection。此为源码路径核查，不是断线/多人实机验收。
 - 发现：配置菜单仍用客户端 runtime 判断可用，可能阻断服务器有核心但客户端无 runtime 的首次配置；客户端音画接收器 15 秒无首帧退席，与服务器核心 60 秒启动期限不一致。该记录不预先宣称已修复或验收通过。
 - 发现 ServerCoreWorker 原全房间快照 FIFO 每模拟帧只取 1 项；2/4 人各40变化/秒会超过60项/秒总消费能力。改为4手柄与光枪各自最多128边沿，每帧并行消费各流下一边沿，跨玩家不再互相排队。同口短按先后保持；多口快照先全部检查容量再入队；满任一口拒整组。release 单口清队列/held/offered，P2 release 同时清光枪；reset/clear/close 清全部，保持原 owner 线程与媒体生命周期。
-- 保留 server_core39 同时新增的 offerFrameInput 入口并使用相同整组容量检查，没有改 Registry/Handle/factory。原第一次大块补丁因该新入口导致上下文不匹配而安全失败，没有覆盖其他代理的代码。
+- 保留既有 offerFrameInput 入口并使用相同整组容量检查，没有改 Registry/Handle/factory。
 - 新增 `src/test/java/cn/piq/fcarcade/server/hosted/ServerCoreInputPorts39Test.java` 9项：2/4人各40边沿/秒、60模拟秒无累计队列；每口128容量/短按；整组拒绝无前缀；精确松键、清空和真实 owner stub 同帧多口、P2光枪释放、reset不复活。
 - 独立 Java21 编译 Worker/当前Handle/新旧Worker测试，其他原20项生产依赖使用隔离classes与冻结FC38；JUnit 29/29，0失败/跳过。Worker 测试前后 SHA256 均 `BAA98C1A13C07926F025534015C3E688A2C2F68DC987A809C00725F55D677834`；新测试 SHA256 `FDE548BA0D4C5ACA32DF9D38AE2822A53215A534E9B69E17A4ABC6E6D7AFA3BB`。最终整包测试需加入新测试类；旧 ServerHosted39Tests 只列原4类。
 - 没有启动 Minecraft、服务器、用户ROM、WASM或native核心；stub owner 测试不等于实际模拟器性能测试。
@@ -140,7 +140,7 @@ SFC 整帧接线、完整构建和最终成套验证仍需单独完成。
 
 新增7项到 `KeyboardDefaults39Test`：原始Z/X别名安全迁移、N主键/别名、N附加功能阻止迁移、缺实际绑定、schema3显式Z/非默认快捷键、CUSTOM保留、只读迁移与显式保存。`build/controls-names39-source-v3/report.json`：6套90项JUnit通过，0失败/跳过，10语言910键校验通过。另用实际MC/NeoForge依赖独立编译 KeyboardConfig、KeyboardConfigStore、KeyboardInput 成功；这一编译不是客户端GUI/实体实际按键测试。
 
-模式只读核查时：普通机柜保存值优先，无配置才按服务器托管可用、SFC本地同步可用、玩家媒体顺序选择；进入房间再拒绝被禁用/缺核心的路线，不静默切换已选模式。家用默认LOCAL；当时SFC家用mask为LOCAL加可用SERVER，未虚启MEDIA。Native界面“仅kof97/mslug2、最多两席”说明应只针对LOCAL，且SFC家用是否应遵循allowLocalSync需明确配置作用域。FC服务端家用/旧机柜接线由另一代理继续，不得根据本审计声称所有机型三种模式已支持。
+模式只读核查时：普通机柜保存值优先，无配置才按服务器托管可用、SFC本地同步可用、玩家媒体顺序选择；进入房间再拒绝被禁用/缺核心的路线，不静默切换已选模式。家用默认LOCAL；当时SFC家用mask为LOCAL加可用SERVER，未虚启MEDIA。Native界面“仅kof97/mslug2、最多两席”说明应只针对LOCAL，且SFC家用是否应遵循allowLocalSync需明确配置作用域。FC服务端家用/旧机柜接线不在本项核查范围，不能据此声称所有机型三种模式已支持。
 
 ## 共享限额的失败启动收尾修复
 

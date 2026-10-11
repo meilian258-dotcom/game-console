@@ -28,6 +28,6 @@
 
 ## 边界
 
-- 新桥必须对同一 runtime token 内的实际 receipt/手序/枪柄切换调用 pause 和原 gamepad pause，不能只靠 presence 布尔。已单独告知桥代理，idle provider 已带精确 hand 身份。
+- 新桥必须对同一 runtime token 内的实际 receipt/手序/枪柄切换调用 pause 和原 gamepad pause，不能只靠 presence 布尔。idle provider 已带精确 hand 身份。
 - 这次 QA 不启动 Minecraft 单例/窗口/世界/网络 socket，不冒充真实按键或实体手柄验收。
 - HEAD 可拦标准 Minecraft/NeoForge KeyMapping 路径；不能阻止其它模组独立 GLFW 轮询或比本 Mixin 更早的自定义低层观察。位置锁不冻结服务器坐标、不免疫惯性/击退/重力。
