@@ -13,7 +13,8 @@
 - **游戏环境**：Minecraft 1.21.1、NeoForge 21.1.229 起、Java 21。当前原生游戏运行端以 Windows x64 为支持范围；其他平台不能照搬安装。
 - **多人服务器**：客户端和服务端安装配套版本的主模组及所用附属。
 - **游戏文件**：自行准备有权使用的 ROM；部分街机游戏还需要匹配的 BIOS。仓库不提供这些游戏内容。
-- **下载**：[整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)提供主模组和当前配套附属，可用于首次安装；版本、可选组件和更新步骤见[安装包说明](piq-fc-arcade/docs/整套测试版-20261007.md)。GitHub 的 Code → Download ZIP 是源码，不能放进 `mods`。
+- **下载**：先看[本次设备体验候选说明](piq-fc-arcade/docs/设备体验候选-20261012.md)。FC76.54 这一批按审核通过的组件分批测试发布，**不是完整套装**；只安装对应发行页明确列出的组合。SFC54 和包含它的整套 ZIP 暂不公开，不能用旧 SFC 包补位。
+- **历史完整套装**：[2026-10-07 整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)仍保留原批次 7 件成品，版本和步骤见[历史安装说明](piq-fc-arcade/docs/整套测试版-20261007.md)。它不包含后续修复，不要与新候选跨批混装。GitHub 的 Code → Download ZIP 是源码，不能放进 `mods`。
 
 NeoForge 最低版本不是对所有更新版本或整个整合包的兼容保证。具体范围见[兼容说明](piq-fc-arcade/design/NeoForge兼容范围-20261004.md)。
 
@@ -34,7 +35,7 @@ NeoForge 最低版本不是对所有更新版本或整个整合包的兼容保�
 
 ## 我想参与开发
 
-- [构建源码](source-control/BUILDING.md)：固定核心开发构建，以及 `main` 自动编译七个成品并发布 nightly 核心测试快照的流程。
+- [构建源码](source-control/BUILDING.md)：固定核心开发构建、配套版本，以及 `main` 自动快照流程的输入和发布门槛；当前分批候选不代表整套快照门槛已解除。
 - [开发协作](GIT_WORKFLOW.md)：克隆、分支、提交与审查。
 - [制作新设备](piq-fc-arcade/design/机器制作与交互标准.md)：玩家应该得到怎样的操作体验。
 - [公共接口与现状](piq-fc-arcade/design/全组件运行流程与复用接口总览.md)：哪些可以复用，哪些仍需适配。

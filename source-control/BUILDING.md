@@ -2,7 +2,9 @@
 
 这份指南供开发者从当前源码构建主模组和附属。玩家安装成品请看[玩家指南](../piq-fc-arcade/docs/玩家指南.md)，不要把源码 ZIP 放进 `mods`。
 
-当前开发配套为 **FC76.52／完整 SFC53／MD16 本地候选**，未安装、未公开发布，也不因构建通过而成为稳定版。FC76.52 在 FC76.51 公共联机流控基础上增加旧进度仅恢复所需的公共字段，启动协议为 `home-launch-3`；SFC53 最低要求 FC76.52，测试时主包、服务端与客户端须使用同批协议配套，不与 FC76.50／51 混用。SFC53 的新 JNI 联机进度接入固定、未修改的 Snes9x；Mesen-S 核心、旧身份和旧进度恢复路线仍保留，不跨核迁移或覆盖旧档。原 Mesen-S 回滚失配并未被改核或屏蔽校验修复。最终包与 Minecraft 多人验收状态见 [SFC 当前状态](../piq-sfc-home/README.md#当前状态)。
+当前源码的开发配套为 **FC76.54、完整 SFC54（内含 core11）、街机 0.1.5.12、电脑 prototype.13**，沿用 MD16／GBA15／PvZ12 作为本地回归组合，可选 Replay test.7。公开成品按审核通过的部分分批测试发布，附件范围见[候选说明](../piq-fc-arcade/docs/设备体验候选-20261012.md)；本地合装成功不代表这套组合已全部公开或成为稳定版。
+
+启动协议沿用 `home-launch-3`，机柜协议为 `cabinet-room-12`，SFC 协议为 `15`。SFC54 最低要求 FC76.54，参与测试的服务端和客户端须使用同批协议配套，不能用旧 SFC 成品补位。SFC 从 53 起的新 JNI 联机进度接入固定、未修改的 Snes9x；Mesen-S 核心、旧身份和旧进度恢复路线仍保留，不跨核迁移或覆盖旧档。原 Mesen-S 回滚失配并未被改核或屏蔽校验修复。SFC54 的公开来源与许可审核门槛仍保留，最终包与 Minecraft 多人验收状态见 [SFC 当前状态](../piq-sfc-home/README.md#当前状态)。
 
 可选择两种构建方式：**普通开发构建使用固定核心**；**快照构建仅为明确列出的四个普通核心下载官方 nightly 并生成匹配身份，其余核心保留固定输入**。SFC 的 Snes9x 与 Mesen-S 均不参与 nightly 替换。Git 不保存全部 DLL、WASM 和运行器；固定输入需要按清单导入，不能假设快照会自动下载所有依赖，也不会重编所有第三方原生核心。
 
@@ -11,28 +13,28 @@
 当前街机修复开发分支的主包已改用依赖 API 1 公共桥及固定 libc++。
 旧 `full-test-20261007-r1` 不包含这套输入，快照准备会在下载前明确拒绝，
 不能回退旧桥或用 nightly 覆盖它。此分支暂不能合入自动发布的 `main`。
-完成整核验证、准备并获准公开新固定成品后，需要一起审核更新
-`snapshot_inputs.py` 的已发布 JNI 输入表及它与 `snapshot_build.py` 的
-bootstrap 身份；这里不预设尚未发布的 URL。普通本地开发可按锁表导入
+FC76.54 与街机 0.1.5.12 固定候选及源码配套已按独立分批发行提供；
+但 `snapshot_inputs.py` 的旧 bootstrap 固定表及它与 `snapshot_build.py` 的
+身份尚未完成审核更新，仍在下载前拒绝；分批发行不解除自动快照门槛。普通本地开发可按锁表导入
 审核过的新桥和官方运行库后构建。街机修复还使用独立固定的 MAME 核心，不能用普通 nightly 补位。
 
-街机 `0.1.5.8` 的普通构建需显式传入 `-PmameLifecycleCore=<已核验 core.dll 的路径>`；
+街机从 `0.1.5.8` 起（当前 `0.1.5.12`）的普通构建需显式传入 `-PmameLifecycleCore=<已核验 core.dll 的路径>`；
 默认查找该组件的 `build/verified-mame-lifecycle/core.dll`，没有文件就停止，不自动下载。
 `native/mame-lifecycle/runtime.json` 固定源码、两份补丁、核心摘要及共享运行库身份；
 `prepareMameLifecycleRuntime` 只校验并打包既有 DLL，不重新编译 MAME。
 对应核心源码与构建说明应随候选保留。旧 MAME/FBNeo 资源仍使用原身份。
 
-街机 `0.1.5.11` 的原版 FBNeo 试验使用独立固定 DLL 和源码 ZIP，普通本地候选已完成
+街机从 `0.1.5.11` 起（当前 `0.1.5.12`）的原版 FBNeo 试验使用独立固定 DLL 和源码 ZIP，普通本地候选已完成
 `check jar`；这不表示自动快照或云端构建已可用。普通构建显式传入
 `-PfbneoStockCore=<已核验原版 DLL>`、`-PfbneoStockSource=<固定源码 ZIP>` 及
 `-PembeddedRuntimePython=<Python 路径>`。快照输入准备额外要求成对传入
 `--fbneo-stock-core <原版 DLL>`、`--fbneo-stock-source <固定源码 ZIP>`，按
 `snapshot_stock.py` 的固定大小与 SHA 导入同一回执；构建与临时源码复制后会复验，并将
 回执中的路径显式传给街机 Gradle。缺件或身份不符即停止，不读取私有 vendor 缓存、
-下载最新核心或跳过 stock 资源。匹配的固定公开输入尚未发布，现有 JNI bootstrap
+下载最新核心或跳过 stock 资源。固定候选单独公开不等于旧 bootstrap 固定表已更新，现有 JNI bootstrap
 下载前阻断仍保留；本分支自动 CI 尚未通过，不能据本地候选成功声称云端已就绪。
 
-SFC53 额外需要 [sfc-stock-inputs.json](sfc-stock-inputs.json) 固定的 Snes9x DLL 与参考源码 ZIP。
+SFC54 沿用 SFC53 的固定输入，额外需要 [sfc-stock-inputs.json](sfc-stock-inputs.json) 固定的 Snes9x DLL 与参考源码 ZIP。
 快照准备支持成对传入 `--sfc-snes9x-core`／`--sfc-snes9x-source`，或从仓库根
 `.build-inputs/` 读取已导入的同一固定对；不会读取任意 vendor 目录或下载新的 `latest` 补位。
 两件输入写入 `fixed/sfc-snes9x-v1/` 并纳入 `receipt.json`；构建检查、临时源码复制后再次核验，
@@ -44,7 +46,7 @@ SFC53 额外需要 [sfc-stock-inputs.json](sfc-stock-inputs.json) 固定的 Snes
 
 快照准备和 Gradle 前置检查都要求新 MAME DLL 与公开 NOTICE 同时存在，且与固定清单完全一致。
 即使修改输入回执，也不能跳过清单中的核心和补丁校验；两项资源缺失、替换或不配套都失败。
-尚未发布匹配 bootstrap 成品时，保持原下载前阻断，不使用旧公开包假装包含这次修复。
+尚未审核更新匹配 bootstrap 固定表时，保持原下载前阻断，不使用旧公开包假装包含这次修复。
 
 [snapshot.yml](../.github/workflows/snapshot.yml) 在进入 `main` 的每次 push 后触发，也支持在 Actions 中手动选择 `main` 运行。只有七个成品全部编译、检查、打包且发布校验通过，才会创建独立预发行；失败不会覆盖已有发行版。当前上述 bootstrap 与 Snes9x 候选门禁均未解除，不能把此流程当作本批已可自动发布。workflow 合入 `main` 后才启用，不在拉取请求中使用发布权限。
 
@@ -68,7 +70,7 @@ SFC53 额外需要 [sfc-stock-inputs.json](sfc-stock-inputs.json) 固定的 Snes
 
 构建任务只有只读权限；单独的发布任务使用短期 `GITHUB_TOKEN` 的 `contents: write` 权限，不需要配置个人令牌。发布先创建草稿，上传并核对所有附件后才公开。仓库或组织策略若禁止此权限，任务会失败，旧 Release 不变。参见 [GitHub workflow 权限说明](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions)。
 
-在 Windows 仓库根复现本地快照的流程如下。`D:/approved/` 仅为已获准、摘要匹配输入的示例目录；不得用其他同名 DLL 凑数。**当前分支会首先因尚未发布的 JNI bootstrap 明确停止**；下面不是解除门禁的操作，也不表示云端已验证：
+在 Windows 仓库根复现本地快照的流程如下。`D:/approved/` 仅为已获准、摘要匹配输入的示例目录；不得用其他同名 DLL 凑数。**当前分支会首先因尚未审核更新的 JNI bootstrap 固定表明确停止**；下面不是解除门禁的操作，也不表示云端已验证：
 
 ```powershell
 python -B -m unittest discover -s source-control -p "test_*.py"
@@ -102,7 +104,7 @@ python source-control/setup.py
 
 ## 开发构建工作目录
 
-FC76.52／SFC53／MD16 未发布开发候选的以下五个项目共用 [build-workspace.gradle](build-workspace.gradle)：`piq-fc-arcade`、`piq-retro-platform`、`piq-sfc-home`、`piq-sfc-arcade` 和 `piq-md-home`。它为开发 classpath 副本及测试临时文件选择独立目录，不改变玩家 JAR 的 `build/libs/` 输出位置，也不表示本批已验收。
+当前开发配套中的以下五个项目共用 [build-workspace.gradle](build-workspace.gradle)：`piq-fc-arcade`、`piq-retro-platform`、`piq-sfc-home`、`piq-sfc-arcade` 和 `piq-md-home`。这套目录规则从 FC76.52／SFC53／MD16 配套起使用，为开发 classpath 副本及测试临时文件选择独立目录，不改变玩家 JAR 的 `build/libs/` 输出位置，也不表示本批已完成游戏内验收。
 
 可以使用环境变量 `PIQ_BUILD_WORK_DIR` 为后续构建指定基础目录，或对单次 Gradle 调用传入 `-PpiqBuildWorkDir`；两者同时存在时，Gradle 参数优先。使用绝对、纯 ASCII、本地专用目录，建议位于非系统工作盘；不能指向盘根、用户主目录、源码根目录或经过符号链接／重解析点的路径。以下 `D:/game-console-build` 只是示例，请换成实际工作盘：
 
@@ -123,7 +125,7 @@ $env:PIQ_BUILD_WORK_DIR = 'D:/game-console-build'
 
 [build-inputs.json](build-inputs.json) 列出 FC 构建所需的文件、大小和 SHA-256。哈希用于确认构建用的是预期文件，不代表该文件已经通过所有游戏或联机测试。
 
-从[整套测试版](../piq-fc-arcade/docs/整套测试版-20261007.md)取得配套玩家 JAR。FC 锁定的二进制位于玩家主 JAR 内的 `core/` 子目录；按锁表的文件名与摘要提取、导入，不将整个 JAR 当成 DLL。项目源码见对应发行标签，其他原生组件按各自源码说明准备；不要用任意同名文件凑齐输入或关闭校验。附属仍需按自己的入口准备文件，不代表全部构建依赖已自动下载。
+从与当前锁表相匹配的发行附件或已审核固定材料准备输入。FC 锁定的二进制位于玩家主 JAR 内的 `core/` 子目录；按锁表的文件名与摘要提取、导入，不将整个 JAR 当成 DLL。[2026-10-07 整套测试版](../piq-fc-arcade/docs/整套测试版-20261007.md)只提供历史输入，不能满足当前新增的全部 JNI 依赖，也不能当作快照 bootstrap 门禁已解除。项目源码见对应发行标签，其他原生组件按各自源码说明准备；不要用任意同名文件凑齐输入或关闭校验。附属仍需按自己的入口准备文件，不代表全部构建依赖已自动下载。
 
 单项导入示例；把文件路径换成你实际取得的文件：
 
@@ -163,9 +165,9 @@ $fcJar = (Resolve-Path ".\piq-fc-arcade\build\libs\piq_fc_arcade-$fcVersion.jar"
 
 先完成主包，再准备目标附属自己的核心和资源。部分附属构建脚本仍有历史 FC JAR 默认路径；使用 `-PgameConsoleJar` 显式传入本次主包，避免误用旧文件。
 
-### SFC53 的固定输入与许可配套
+### SFC54 的固定输入与许可配套
 
-SFC53 同时保留两套不同资源，不能将文件互相重命名、改写旧 SHA 或迁移旧即时档：
+SFC54 沿用 SFC53 的两套不同资源，不能将文件互相重命名、改写旧 SHA 或迁移旧即时档：
 
 - 旧 Mesen-S：`core/sfc-libretro/windows-x64/mesen-s_libretro.dll`，3896832 字节，SHA-256 `8aca17e76efbd7a70b0c247b42aaba04d0c1c90f693213bd1e76573986670b42`。继续按原组件固定资源准备方式保留；新工具不下载或重写它。
 - 新 Snes9x：`core/sfc-snes9x/windows-x64/snes9x_libretro.dll`，3840000 字节，SHA-256 `5ce01616184f255623405793e192f79aef5089fa796b29bc11ddc5e052060124`，实际版本报告为 `Snes9x 1.63 fae2fea`。参考源码 ZIP 为 `snes9x-fae2fea08f74180759ef540ee94259213f503480.zip`，760336 字节，SHA-256 `7f6dee7ab1a367da86bc86a87a204bf8fe0be389d62e7cfbd568dc2ccac32055`。
