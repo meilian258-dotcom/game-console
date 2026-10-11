@@ -1,6 +1,13 @@
-"""Package exact audited linked-cabinet preview bytes. No installs or old-file overwrites."""
+"""Private historical evidence bundle, NOT a public release packager.
+
+Includes original local audit reports. Never upload its output as public assets.
+No installs or old-file overwrites.
+"""
 import argparse,io,json,xml.etree.ElementTree as ET,zipfile
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'source-control'))
+from private_evidence import private_evidence
 from freeze_fc_core_alpha19 import safe_path,digest,require
 from package_fc_core_alpha19 import snapshot,json_document,PackagePlan,verify_archive,revalidate_inputs
 import prepare_cabinet_multiplayer21 as stage
@@ -45,7 +52,7 @@ def check_evidence(r):
     require(r['stage']['ok']is True and r['stage']['installed']is False,'Stage failed')
 
 def plan():
-    reports={k:snapshot(ROOT/v,8*1024*1024) for k,v in REPORTS.items()};r={k:json_document(s.raw)for k,s in reports.items()};check_evidence(r)
+    reports={k:snapshot(private_evidence(v) if '/design/' in v else ROOT/v,8*1024*1024) for k,v in REPORTS.items()};r={k:json_document(s.raw)for k,s in reports.items()};check_evidence(r)
     jars={k:snapshot(STAGE/name)for k,name in stage.NAMES.items()}
     for key,s in jars.items():require(s.sha256==PINS[key],'Frozen JAR altered '+key)
     helper=snapshot(STAGE/'piq-native-arcade/runtime/piq-native-helper.jar');require(helper.sha256==stage.HELPER_SHA,'Frozen helper altered')

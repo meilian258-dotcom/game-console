@@ -1,6 +1,12 @@
-"""Freeze the SHA-verified SFC8-only update; never touches a Minecraft instance."""
+"""Private historical evidence bundle, NOT a public release packager.
+
+Includes original local audit reports. Never upload its output as public assets.
+Freeze the SHA-verified SFC8-only update; never touch a Minecraft instance.
+"""
 import hashlib,json,sys,zipfile,xml.etree.ElementTree as ET
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'source-control'))
+from private_evidence import private_evidence
 import merge_sfc_addon as safe
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -15,10 +21,10 @@ def main():
     candidate=PROJECT/'build/review-multiplayer8-v1/piq_sfc-0.1.0-alpha.8.jar'
     paths={
         'README-zh.md':DELIVERY/'SFC双人联机-alpha8-使用说明.md',
-        'playback-multiplayer.json':PROJECT/'design/playback-multiplayer8-v1.json',
+        'playback-multiplayer.json':private_evidence('piq-sfc-home/design/playback-multiplayer8-v1.json'),
         'final-independent-audit.json':PROJECT/'build/review-multiplayer8-v1/final-independent-audit.json',
-        'client-identity.json':PROJECT/'design/sfc-client-identity-20260910-v1.json',
-        'server-authority.json':PROJECT/'design/sfc8-server-authority-20260910.json',
+        'client-identity.json':private_evidence('piq-sfc-home/design/sfc-client-identity-20260910-v1.json'),
+        'server-authority.json':private_evidence('piq-sfc-home/design/sfc8-server-authority-20260910.json'),
     }
     for path in [candidate,FINAL,*paths.values()]:safe.safe_path(path,existing=True)
     safe.require(digest(candidate.read_bytes())==EXPECTED and digest(FINAL.read_bytes())==EXPECTED,'Final/candidate SHA mismatch')

@@ -22,6 +22,21 @@ class GuardTests(unittest.TestCase):
             self.assertTrue(path_issues('piq-gba/'+name),name)
         self.assertIn('private-key',content_issues('sample.txt',b'-----BEGIN '+b'PRIVATE KEY-----'))
         self.assertIn('possible-secret-literal',content_issues('sample.txt',b'password = '+b'"a123456789abcdef"'))
+    def test_private_paths_and_operations(self):
+        for value in (b'C:' + b'/Users/' + b'alice/work/file.txt',
+                      b'D:' + b'\\Users\\' + b'alice\\work\\file.txt'):
+            self.assertIn('personal-absolute-path', content_issues('script.py', value))
+        self.assertIn('private-operations-tool', path_issues('piq-fc-arcade/tools/shutdown_after_delivery.ps1'))
+        self.assertEqual([], content_issues('source.java', b'http://127.0.0.1:1234'))
+        self.assertEqual([], content_issues('fixture.txt', b'C:' + b'/Users/' + b'example/fixture'))
+        self.assertEqual([], content_issues('source.java', b'cn/piq/fcarcade/home/content/Example.java'))
+        self.assertEqual([], content_issues('LICENSE.txt', b'Copyright Example Author <author@example.org>'))
+        self.assertEqual([], path_issues('THIRD_PARTY_NOTICES.md'))
+    def test_reports_are_not_source_provenance_or_model_json(self):
+        self.assertIn('generated-test-report', content_issues('piq-gba/design/check.json', b'{"production_compiled":true}'))
+        for data in (b'{"sourceCommit":"abcdef","sourceBundleSha256":"123"}',
+                     b'{"elements":[],"textures":{}}'):
+            self.assertEqual([], content_issues('piq-gba/design/metadata.json', data))
     def test_no_false_positive_variable(self):
         self.assertEqual([],content_issues('sample.java',b'var password = prompt();'))
         self.assertEqual([],content_issues('sample.py',b'password = "test-placeholder"'))

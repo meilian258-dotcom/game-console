@@ -1,9 +1,13 @@
-"""Exact final-class comparison with tested source, then execute only final-JAR codec classes."""
+"""Compare final classes to tested source using private historical evidence.
+
+Requires PIQ_PRIVATE_EVIDENCE_ROOT; execute only final-JAR codec classes.
+"""
 
 import sys as _dev_sys
 from pathlib import Path as _DevPath
 _dev_sys.path.insert(0, str(_DevPath(__file__).resolve().parents[2] / "source-control"))
 from dev_tool_paths import gradle_home
+from private_evidence import private_evidence
 
 import argparse,hashlib,json,os,shutil,tempfile,zipfile
 from pathlib import Path
@@ -12,7 +16,7 @@ def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest().upper()
 def main():
     p=argparse.ArgumentParser();p.add_argument('--jar',type=Path,required=True);p.add_argument('--report',type=Path,required=True);a=p.parse_args()
     if a.report.exists():raise FileExistsError(a.report)
-    previous=json.loads((ROOT/'design/cabinet-media-fallback-20260911.json').read_text(encoding='utf-8'))
+    previous=json.loads(private_evidence('piq-fc-arcade/design/cabinet-media-fallback-20260911.json').read_text(encoding='utf-8'))
     source=[ROOT.parent/'piq-retro-platform/src/main/java/cn/piq/retro/api/RetroFrame.java',ROOT/'src/main/java/cn/piq/fcarcade/cabinet/CabinetMediaCodec.java']
     for path in source:
         if sha(path)!=previous['source_sha256'][str(path.relative_to(ROOT.parent))]:raise ValueError('Tested source changed')

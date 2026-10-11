@@ -32,6 +32,6 @@
 ## 验证
 
 - FC 定向 Gradle `test --tests cn.piq.fcarcade.client.ui.DeviceNoticesTest`：5/5 通过。第一次因原测试运行类路径未带 slf4j，改为无额外依赖的 JDK System.Logger 后通过；不需要修改构建依赖。
-- 测试含摘要分类、严格白名单不吞未知/邀请/传输、异常完整堆栈、32 条边界与不可变快照、只有电源/重置悬浮。根任务全量构建复验最终补充的连线/家具断言。
-- `tools/check_device_notices37.py --fc <冻结 jar> --report <新 JSON 路径>`：只编译独立 `DeviceNotices37Probe`，生产类必须来自给定 JAR；实际 Minecraft Component 与 NeoForge System 事件验证消费策略，无生产替身。最终报告由根任务给定冻结 JAR 后生成。
+- 测试含摘要分类、严格白名单不吞未知/邀请/传输、异常完整堆栈、32 条边界与不可变快照、只有电源/重置悬浮。完整构建时还需复验最终补充的连线/家具断言。
+- `tools/check_device_notices37.py --fc <冻结 jar> --report <新 JSON 路径>`：只编译独立 `DeviceNotices37Probe`，生产类必须来自给定 JAR；实际 Minecraft Component 与 NeoForge System 事件验证消费策略，无生产替身。最终报告须针对给定的冻结 JAR 生成。
 - 未启动 Minecraft、未实测 GPU Toast 绘制、实际瞄准判定、真实联机或 ROM。这里只声称代码/编译/定向事件验证，不声称已完成游戏内验收；未安装、未发布、未操作游戏实例或关机。

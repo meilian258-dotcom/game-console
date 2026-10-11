@@ -8,6 +8,7 @@ from unittest.mock import patch
 import zipfile
 
 import package_watch23_scale12 as target
+from private_evidence import private_evidence
 from package_fc_core_alpha19 import PackagePlan, json_document, snapshot, verify_archive
 
 
@@ -83,7 +84,7 @@ class PackageWatch23Scale12Test(unittest.TestCase):
             target.bind_jar({'path': str(other), 'sha256': item.sha256}, item, 'fixture')
 
     def test_scope_claim_cannot_skip_method_protection(self):
-        raw = (target.ROOT / target.REPORTS['watch23-scope-baseline-sfc11']).read_bytes()
+        raw = private_evidence(target.REPORTS['watch23-scope-baseline-sfc11']).read_bytes()
         original = json_document(raw)
         baselines = {k: snapshot(target.stage.BASE / name) for k, (name, _) in target.stage.PINNED.items()}
         target.check_scope(original, baselines)
@@ -96,21 +97,21 @@ class PackageWatch23Scale12Test(unittest.TestCase):
             with self.subTest(change=change), self.assertRaises(ValueError): target.check_scope(bad, baselines)
 
     def test_wire_claim_cannot_skip_real_write_completion(self):
-        original = json_document((target.ROOT / target.REPORTS['watch23-wire-fc23']).read_bytes())
+        original = json_document(private_evidence(target.REPORTS['watch23-wire-fc23']).read_bytes())
         artifact = snapshot(target.stage.BASE / target.stage.PINNED['fc'][0])
         target.check_wire(original, artifact)
         original['real_codec_and_shared_window']['actual_connection_write_completion'] = False
         with self.assertRaises(ValueError): target.check_wire(original, artifact)
 
     def test_old_sfc11_worker_report_cannot_stand_in_for_sfc12(self):
-        report = json_document((target.ROOT / 'piq-sfc-home/design/watch11-final-worker-v2.json').read_bytes())
+        report = json_document(private_evidence('piq-sfc-home/design/watch11-final-worker-v2.json').read_bytes())
         old = {k: snapshot(target.stage.BASE / target.stage.PINNED[k][0]) for k in ('fc', 'sfc')}
         target.check_worker(report, old)
         final = dict(old, sfc=snapshot(self.input))
         with self.assertRaises(ValueError): target.check_worker(report, final)
 
     def test_old_sfc11_multiplayer_report_cannot_stand_in_for_sfc12(self):
-        report = json_document((target.ROOT / 'piq-sfc-home/design/watch11-final-multiplayer-v1.json').read_bytes())
+        report = json_document(private_evidence('piq-sfc-home/design/watch11-final-multiplayer-v1.json').read_bytes())
         old = {k: snapshot(target.stage.BASE / target.stage.PINNED[k][0]) for k in ('fc', 'sfc')}
         target.check_multiplayer(report, old)
         final = dict(old, sfc=snapshot(self.input))

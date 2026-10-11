@@ -1,10 +1,13 @@
 """Independent FC22/SFC10 model-only delta audit against frozen FC21/SFC9.
 
+Private historical evidence is required via PIQ_PRIVATE_EVIDENCE_ROOT.
 No production compilation, mod entry points, emulator, sockets or installation.
 """
 from __future__ import annotations
 import argparse,importlib.util,json,os,re,sys,tempfile,tomllib
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'source-control'))
+from private_evidence import private_evidence
 import verify_retro_alpha19 as compat
 from verify_device_ui_alpha18 import disassemble,methods
 from check_fc_cartridge_workbench import instruction_positions
@@ -43,7 +46,7 @@ UI={
  'cn.piq.fcarcade.client.cabinet.CabinetMenuScreen':(' init(', ' openAppearance(', ' render('),
  'cn.piq.fcarcade.client.RomLibraryScreen':(' init(',),
  'cn.piq.fcarcade.client.SkinLibraryScreen':(' init(', ' render(', ' choose(', ' dedicatedAppearance(')}
-INCOMING_REPORT=ROOT/'piq-fc-arcade/design/user-models-20260911/independent-incoming-audit.json'
+INCOMING_REPORT='piq-fc-arcade/design/user-models-20260911/independent-incoming-audit.json'
 INCOMING_REPORT_SHA='48AFDE6840F19B0A23399318AB6E8C7EF4E188E7FAC1DC3233557B38B2E04D71'
 SFC_ASSET_SHA={'assets/piq_sfc_home/meshes/sfc_hardware.json':'4B944A5A98CF926A38092BCDF3B8FA5E8D1B07631B116E554E7DD551B4D80E64',
  'assets/piq_sfc_home/textures/block/user_sfc_20260911.png':'4BBBA0F53697D69A919F5FC12750E608AA50A4D71D8281F23D6428A5D02BD920',
@@ -51,8 +54,9 @@ SFC_ASSET_SHA={'assets/piq_sfc_home/meshes/sfc_hardware.json':'4B944A5A98CF926A3
  'assets/piq_sfc_home/models/item/console.json':'466510B9D2073126A07593BB9DB5A4083A0EBDDBF6CFBDC2D73579D37E00F33D'}
 
 def expected_assets():
-    require(compat.digest(INCOMING_REPORT.read_bytes())==INCOMING_REPORT_SHA,'Independent input audit changed')
-    original=json.loads(INCOMING_REPORT.read_text(encoding='utf-8'));source=INCOMING_REPORT.parent/'source'
+    incoming_report=private_evidence(INCOMING_REPORT)
+    require(compat.digest(incoming_report.read_bytes())==INCOMING_REPORT_SHA,'Independent input audit changed')
+    original=json.loads(incoming_report.read_text(encoding='utf-8'));source=incoming_report.parent/'source'
     require({p.relative_to(source).as_posix()for p in source.rglob('*')if p.is_file()}==set(original['file_sha256']),'Incoming inventory changed')
     require(all(compat.digest((source/n).read_bytes())==h for n,h in original['file_sha256'].items()),'Incoming original content changed')
     files,_=derive();fc={p.relative_to(ROOT/'piq-fc-arcade/src/main/resources').as_posix():b for p,b in files.items()}
@@ -161,7 +165,7 @@ def geometry_probes(paths,entries):
         require(footprint.get('ok')and footprint.get('assertions',0)>=250,'Footprint incomplete')
         visual=compat.parse_last_json(compat.run([JAVA/'java.exe','-cp',cp,'UserModel22VisualProbe',fc],tmp));require(visual.get('ok')and visual.get('assertions',0)>=70,'Visual projection incomplete')
         geometry=compat.parse_last_json(compat.run([JAVA/'java.exe','-cp',cp,'UserDualGeometryProbe'],tmp))
-        refpath=ROOT/'piq-fc-arcade/design/user-models-20260911/dual-integration-qa-v3/verification.json'
+        refpath=private_evidence('piq-fc-arcade/design/user-models-20260911/dual-integration-qa-v3/verification.json')
         require(compat.digest(refpath.read_bytes())=='F67B72218AD0BA1CC8B02F3DA1494887471A6E82E1D0B99D10814B7D7B3E47D4','Frozen source geometry report changed')
         reference=json.loads(refpath.read_text(encoding='utf-8'))
         # Reference key is explicit; no class is taken from its source build directory.

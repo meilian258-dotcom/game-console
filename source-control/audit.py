@@ -12,7 +12,7 @@ MODULES = (
     'piq-native-arcade', 'piq-gba', 'piq-j2me-arcade', 'piq-computer',
     'piq-flash-box', 'piq-pvz-addon', 'piq-md-home',
 )
-ROOT_FILES = {'.gitignore', '.gitattributes', '.gitmodules', 'GIT_WORKFLOW.md', 'README.md'}
+ROOT_FILES = {'.gitignore', '.gitattributes', '.gitmodules', 'GIT_WORKFLOW.md', 'README.md', 'THIRD_PARTY_NOTICES.md'}
 APPROVED_WORKFLOWS = {'.github/workflows/snapshot.yml'}
 APPROVED_SUBMODULES = {
     'piq-pvz-addon/vendor/PvZ-Portable': {
@@ -36,6 +36,15 @@ SECRET_RULES = {
 ASSIGNMENT = re.compile(rb'''(?i)\b(?:password|passwd|api_key|apiKey|access_token|secret_key)\s*["']?\s*[:=]\s*["']([^"'\r\n]{12,256})["']''')
 PLACEHOLDER = re.compile(rb'(?i)(example|placeholder|test|dummy|changeme|your[_ -]|<|\$|\{|\\|\.encode\(|not-a-real|redacted)')
 
+# Account-specific paths are not portable build inputs. Public upstream copyright
+# notices and ordinary localhost IPC are intentionally not treated as secrets.
+PERSONAL_PATH = re.compile(rb'(?i)[a-z]:[/\\]+Users[/\\]+([a-z0-9_\x80-\xff][^/\\\s"\x27]*)')
+PRIVATE_TOOL_NAMES = {'shutdown_after_delivery.ps1', 'sync_arcade44_manager.py',
+                      'sync_mapper43_manager.py', 'sync_tracking.py',
+                      'sync_tracking2.py', 'sync_tracking3.py'}
+RUN_REPORT_KEYS = {'production_compiled', 'minecraft_started', 'compile_log',
+                   'compile_output', 'source_roms_unchanged', 'network_socket_opened'}
+
 def git(*args: str) -> bytes:
     return subprocess.check_output(['git', '-C', str(ROOT), *args], stderr=subprocess.PIPE)
 
@@ -52,6 +61,8 @@ def path_issues(name: str) -> list[str]:
     if len(parts) > 2 and parts[0] in MODULES and parts[1].lower() == 'world':
         issues.append('runtime-world-directory')
     low = p.name.lower()
+    if low in PRIVATE_TOOL_NAMES:
+        issues.append('private-operations-tool')
     if (low.startswith('.env') or low in {'credentials.json', 'secrets.json', 'local.properties'}
             or '登录信息' in low or '服务器信息' in low):
         issues.append('credential-file')
@@ -70,6 +81,19 @@ def content_issues(name: str, data: bytes) -> list[str]:
         issues.append('over-10MiB-review-required')
     for key, pattern in SECRET_RULES.items():
         if pattern.search(data): issues.append(key)
+    if any(m.group(1).lower() not in {b'example', b'test-user', b'placeholder'}
+           for m in PERSONAL_PATH.finditer(data)):
+        issues.append('personal-absolute-path')
+    # Distinguish one-run results from source models, fixed source provenance,
+    # test fixtures and configuration schemas. Do not block every JSON file.
+    if '/design/' in name and name.endswith('.json'):
+        try:
+            value = json.loads(data)
+            if isinstance(value, dict) and (RUN_REPORT_KEYS.intersection(value)
+                    or ('ok' in value and ('tests' in value or 'checks' in value))):
+                issues.append('generated-test-report')
+        except (ValueError, UnicodeError):
+            pass
     for match in ASSIGNMENT.finditer(data):
         if not PLACEHOLDER.search(match.group(1)):
             issues.append('possible-secret-literal'); break

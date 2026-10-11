@@ -75,7 +75,7 @@ def build_artifacts(source: Path = SOURCE) -> tuple[bytes, bytes, dict]:
     native = png_bytes(sprite)
     preview = png_bytes(sprite.resize((512, 512), Image.Resampling.NEAREST))
     report = {
-        "authorization": "2026-09-08: 用户明确回复‘可以’，许可64x64最近邻缩放与透明边缘规范，并接入打包。",
+        "processing": "64x64 nearest-neighbor scaling and transparent-edge normalization.",
         "generation_mode": "Original: built-in image_gen; this step: deterministic Pillow only, no API/CLI generation.",
         "source": str(source.resolve()), "source_sha256": SOURCE_SHA256,
         "source_bytes": len(source_bytes), "source_size": [1254, 1254],

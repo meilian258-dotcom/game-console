@@ -56,7 +56,7 @@
 
 `FcNetwork.ZapperSink`：`acceptsConnection(Connection)`、`start(ZapperBinding)`、`stop(UUID lease)`，客户端通过 `setZapperSink` 注册；调用发生在游戏线程，捕获实际原连接。
 
-`FcNetwork.sendZapperInput(ArcadeZapperInputPayload)`：session/epoch/lease/sequence/x/y/offscreen/trigger/forceRelease。world ray 与扳机动画由模型代理实现；server 仍全部重新验证。
+`FcNetwork.sendZapperInput(ArcadeZapperInputPayload)`：session/epoch/lease/sequence/x/y/offscreen/trigger/forceRelease。world ray 与扳机动画属于模型表现层；server 仍全部重新验证。
 
 `ClientArcadeSession.join(...,reset,NesCoreVariant)`、`authorizedZapper(binding)`、`visualZapperTrigger(binding)` 由 ClientArcadeEvents facade 调用。授权包括 P1、当前 Connection、worker ready、当前主手枪、共享键盘模式 enabled/armed；远端动画仅取已完成权威帧，不向核心补视觉输入。
 

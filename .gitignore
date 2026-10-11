@@ -5,6 +5,7 @@
 !/.gitmodules
 !/GIT_WORKFLOW.md
 !/README.md
+!/THIRD_PARTY_NOTICES.md
 !/.github/
 /.github/*
 !/.github/workflows/
@@ -124,3 +125,17 @@ local.properties
 
 # 版本库校验结果在本机生成，不递归进入源码历史。
 /source-control/reports/
+
+# Private execution reports and one-off maintenance scripts are not public sources.
+**/private-reports/
+**/tools/shutdown_after_delivery.ps1
+**/tools/sync_arcade44_manager.py
+**/tools/sync_mapper43_manager.py
+**/tools/sync_tracking*.py
+**/design/**/report.json
+**/design/**/audit.json
+**/design/**/verification.json
+**/design/**/*-source-v*.json
+**/design/**/*-preflight-v*.json
+**/design/**/*-candidate-v*.json
+**/design/**/*-validation.json

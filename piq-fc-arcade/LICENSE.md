@@ -15,5 +15,7 @@ an individual file's notice expressly grants further rights. The GPL grant for
 program code is not a blanket grant for these assets. Existing third-party
 permissive grants remain in effect; this file does not revoke them.
 
-This local migration candidate is not a statement that the public-source release
-or all binary corresponding-source provenance checks have been completed.
+Public source availability does not certify every binary's corresponding-source
+provenance or the redistribution rights of all third-party components and assets.
+Version-specific source materials and remaining limitations are documented in
+the repository's THIRD_PARTY_NOTICES.md and the relevant release materials.

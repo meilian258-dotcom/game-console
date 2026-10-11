@@ -16,7 +16,7 @@
 - `client/zapper/ZapperClient`、`ZapperClient$1`、`$RemoteAnimation`。
 - `client/zapper/ZapperItemRenderer`、`ZapperItemRenderer$1`、`$2`、`$Cached`。
 
-`HomeZapperService` / `ZapperBinding` / `ZapperData` / network / worker 由会话代理负责，`ClientArcadeEvents` facade 和注册负责，不混入此清单。
+`HomeZapperService` / `ZapperBinding` / `ZapperData` / network / worker 属于会话层，`ClientArcadeEvents` facade 和注册也不在此清单范围。
 
 ## 资源与原模型保护
 
@@ -54,4 +54,4 @@
 
 执行器：`tools/check_zapper_visual26.py --fc <最终JAR> --output <新目录>`；只编 tests/probes，不编生产类，使用 SHA 一致的 ASCII 临时副本并前后复核原件。v1/source 报告仅留作历史，不代替此 v2 报告。
 
-验证边界：没有初始化 MC ArmPose、ModLauncher 游戏启动、OpenGL/真实玩家 renderer、真实鼠标/设备或实际世界运行。姿势矩阵、FML 变换、纯射线规则通过，不冒称已做实机体验验收。会话/实际 WASM/网络回归见独立会话代理报告。
+验证边界：没有初始化 MC ArmPose、ModLauncher 游戏启动、OpenGL/真实玩家 renderer、真实鼠标/设备或实际世界运行。姿势矩阵、FML 变换、纯射线规则通过，不代表已做实机体验验收。本项不包含会话、实际 WASM 与网络回归验证。

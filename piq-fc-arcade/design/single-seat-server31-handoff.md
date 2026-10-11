@@ -6,7 +6,7 @@
 
 FC30 原 `registerNetwork`、Ledger、Assignment 及未连房间拓扑均要求至少 2 席，因此不能仅把 GBA 的 localOnly 改为 false，也不能把真实单口核心假声明为 2 口。FC31 允许真实 `registerNetwork(id, 1)`，客户端和服务端需成套升级到必选 `cabinet-room-3`（没有新增字段，但合法容量范围改变；旧 room-2 解码器不接受 1）。
 
-GBA 由其负责代理注册 `register(BACKEND, description, false); registerNetwork(BACKEND, 1)`，实际核心仍为 1 口。单人或双人外形的未连机柜都只分配 P1。另一玩家右键得到“一个控制席位，可附近旁观”的提示，不产生申请/邀请 token、成员或 P2。任意两机柜串联容量至少 2，单口能力无法建立链接；既有持久链接失效时也不能把副柜降级为独立单席。旧 2–4 口附属未连仍为 2 席，原所有链接组合保持。
+GBA 通过 `register(BACKEND, description, false); registerNetwork(BACKEND, 1)` 注册，实际核心仍为 1 口。单人或双人外形的未连机柜都只分配 P1。另一玩家右键得到“一个控制席位，可附近旁观”的提示，不产生申请/邀请 token、成员或 P2。任意两机柜串联容量至少 2，单口能力无法建立链接；既有持久链接失效时也不能把副柜降级为独立单席。旧 2–4 口附属未连仍为 2 席，原所有链接组合保持。
 
 旁观完全复用既有 `WatchService`：host ready 后成为 source，独立观众 token 不占控制席，host 收到需求后发送原有有界视频/音频。旁观者不拿 ROM、不打开 GBA 进程，也不能调用控制输入。未改任何视频频率、音频、输入默认或流压缩。
 
@@ -37,7 +37,7 @@ GBA 由其负责代理注册 `register(BACKEND, description, false); registerNet
 - 这是街机房间，不是家用电源后台：host 是 P1，离机柜超过原 8 格、身份/权限/硬件失效、掉线或主动退出会结束整局和旁观；无 host 迁移或全离线继续运行。
 - 所有游戏和核心执行仍在 host 客户端，服务端只协调席位与有界音画；服务端没有读取 host 文件路径的权利，也不验证视频是否确由特定 ROM 生成。
 - ROM 由 host 明确配置，`CabinetGameSelection` 将本机路径绑定服务器地址/维度/设备 UUID/后端；加载前沿用逐级安全检查及 GBA 自身上限/摘要。观众无需 ROM 或 native runtime。
-- GBA 原预览存档是 host 本机按 ROM 摘要，不是服务器共享存档。新增 `CabinetBackend.prepareFactory` 捕获不可变开局上下文，GBA 代理据此隔离服务器/设备/玩家保存路径；这部分由二者负责，此记录未改存档代码。不得把“能在服务器运行”说明为“服务器托管存档/所有玩家共享进度”。
+- GBA 原预览存档是 host 本机按 ROM 摘要，不是服务器共享存档。新增 `CabinetBackend.prepareFactory` 捕获不可变开局上下文，GBA 据此隔离服务器/设备/玩家保存路径；此记录不包含存档代码改动。不得把“能在服务器运行”说明为“服务器托管存档/所有玩家共享进度”。
 - 既有视距、16 格入/20 格出、每源 8 观众、全局来源/网络预算保持。未进行真实 Minecraft、保护插件、远程 socket、实体手柄或商业 ROM 游戏验收。
 
 状态：此记录生产已冻结，48 项独立回归通过；等待完整构建与独立最终 JAR 验证。

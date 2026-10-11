@@ -1,5 +1,12 @@
-"""Build the local user package only after the exact frozen JAR audit passes."""
+"""Private historical evidence bundle, NOT a public release packager.
+
+Includes original local audit reports. Never upload its output as public assets.
+The exact frozen JAR audit must pass.
+"""
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'source-control'))
+from private_evidence import private_evidence
 from datetime import datetime,timezone
 import hashlib,json,shutil,zipfile,xml.etree.ElementTree as ET
 
@@ -39,8 +46,8 @@ def main():
     for entry in report['archives'].values():
         source=Path(entry['path']);copy(source,source.name)
     copy(AUDIT,'成品独立检查.json')
-    copy(ROOT/'piq-sfc-home/design/sfc-live-join-final-two-core-20260910.json','双模拟器当前进度同步检查.json')
-    copy(ROOT/'piq-sfc-home/design/sfc-hardware-alpha5-v1/pose/mesh-pose-audit.json','SFC模型与持握检查.json')
+    copy(private_evidence('piq-sfc-home/design/sfc-live-join-final-two-core-20260910.json'),'双模拟器当前进度同步检查.json')
+    copy(private_evidence('piq-sfc-home/design/sfc-hardware-alpha5-v1/pose/mesh-pose-audit.json'),'SFC模型与持握检查.json')
     copy(ROOT/'piq-fc-arcade/design/device-ui-preview/cartridge-512x278.png','界面离线预览.png')
     copy(ROOT/'piq-sfc-home/design/sfc-hardware-alpha5-v1/hardware-overview.png','SFC模型离线预览.png')
     with (PACKAGE/'构建测试汇总.json').open('x',encoding='utf-8')as f:json.dump(summary,f,ensure_ascii=False,indent=2)
