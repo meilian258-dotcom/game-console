@@ -33,6 +33,7 @@ public final class GenericLibretroCompatibilitySmoke {
 
     public static void main(String[] args) throws Exception {
         if (args.length > 1) throw new IllegalArgumentException("Optional argument: frozen FC63 JAR");
+        cn.piq.retro.storage.RuntimeWorkspaceTestSupport.configure();
         long started = System.nanoTime();
         try (Baseline baseline = new Baseline(args.length == 1 ? Path.of(args[0]) : null)) {
             verifyIdentityResources();

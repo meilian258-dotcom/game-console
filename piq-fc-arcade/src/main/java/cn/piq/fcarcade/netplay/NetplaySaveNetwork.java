@@ -39,6 +39,7 @@ public final class NetplaySaveNetwork {
             }));
     }
     public static void send(Connection c,Message message,boolean toClient){
+        if(!toClient&&cn.piq.retro.replay.ReplayGuard.playing())return;
         if(c==null||!c.isConnected())throw new IllegalStateException("存档连接已断开");
         if(c.channel()==null||!c.channel().isWritable())throw new IllegalStateException("连接拥塞，本次存档未确认，请稍后重试");
         if(toClient){

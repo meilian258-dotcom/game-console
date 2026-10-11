@@ -13,10 +13,13 @@ Retro Platform 是主模组与附属共用的 Java 源码库，负责核心运�
 | 路径与保存基础能力 | `ConsoleStorage`、`ServerContentPaths`、`LibretroMemoryStore` |
 | 开局和关闭的纯状态流程 | `DeviceSessionFlow` |
 | 输入与回滚基础结构 | 对应输入域及 `RollbackTimeline` |
+| 可选只读回放与最终 PCM | `ReplayGuard`、`ReplayAudio`，FC76.53 起的版本化 v1 合同 |
 
 这些类型提供基础合同，不代替 Minecraft 世界权限、联网协议或界面。主模组负责玩家和设备会话、公共菜单、内容授权及旁观服务；附属负责自身核心、格式、BIOS、端口和保存适配。
 
 本库不能反向依赖主模组或附属的实现类。内部类型可见不代表已经发布稳定 SDK；更改合同要检查已有调用方。
+
+FC76.53 的回放公共合同是明确版本化的局部接口，不把整个内部库升级成稳定 SDK。世界渲染部分留在主包客户端 `ReplayPresentation`，纯保护与音频入口留在本库；可选 Replay 补丁注册服务，设备无需引用补丁实现。迁移范围、调用顺序和破坏性变更规则见[回放公共接口](../piq-replay-compat/API.md)。
 
 ## 统一 RetroArch 后端与兼容边界
 

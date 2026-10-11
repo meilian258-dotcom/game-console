@@ -2,6 +2,7 @@
 package cn.piq.fcarcade.netplay;
 
 import cn.piq.retro.libretro.*;
+import cn.piq.retro.replay.ReplayGuard;
 import cn.piq.retro.netplay.RollbackTimeline;
 import cn.piq.retro.netplay.RollbackTimeline.Input;
 import java.io.IOException;
@@ -41,6 +42,8 @@ public final class JniNetplaySession implements AutoCloseable {
     private final Object intakeLock=new Object();
     private int intakeBytes;
     private volatile boolean started,closing,closed,ready;
+    private final long replayEpoch=ReplayGuard.epoch();
+    private volatile boolean discardSave;
     private volatile boolean activated;
     private volatile int input;
     private volatile long delivered,replayed,confirmedVisible,rejectedPeers;
@@ -104,7 +107,8 @@ public final class JniNetplaySession implements AutoCloseable {
     JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,boolean gun,Supplier<LibretroRuntime> factory,
                      NetplayProfile generic,Callable<Map<String,byte[]>> auxiliary,NetplayCabinetInputs cabinet,boolean waitForActivation) {
         this.grant=Objects.requireNonNull(grant);this.content=Objects.requireNonNull(content);
-        this.sender=Objects.requireNonNull(sender);this.factory=Objects.requireNonNull(factory);
+        Objects.requireNonNull(sender);
+        this.sender=chunk->{if(ReplayGuard.valid(replayEpoch)&&!discardSave)sender.accept(chunk);};this.factory=Objects.requireNonNull(factory);
         this.gunMode=gun;this.generic=generic;
         this.auxiliary=Objects.requireNonNull(auxiliary);this.cabinet=cabinet;
         ports=generic==null?2:generic.ports();activated=!waitForActivation;
@@ -134,6 +138,7 @@ public final class JniNetplaySession implements AutoCloseable {
         fileContent=files;
     }
     public synchronized void start() {
+        if(!ReplayGuard.valid(replayEpoch)){closeWithoutSave();return;}
         if(started||closed)return;started=true;
         var thread=new Thread(this::run,"PIQ-FC-JNI-Netplay-owner");thread.setDaemon(true);thread.start();
     }
@@ -165,20 +170,23 @@ public final class JniNetplaySession implements AutoCloseable {
         if(NetplayPeerRejections.shouldLog(evidence.count()))System.getLogger("PIQ-Netplay-Rejection").log(System.Logger.Level.WARNING,evidence.text());
     }
     public synchronized CompletableFuture<byte[]> checkpoint() {
+        if(!ReplayGuard.valid(replayEpoch)||discardSave)return CompletableFuture.failedFuture(new IllegalStateException("Replay retired this runtime"));
         if(!grant.host()||!active()||!ready())return CompletableFuture.failedFuture(new IllegalStateException("JNI 主持未就绪或尚未激活"));
         if(capture==null||capture.isDone())capture=new CompletableFuture<byte[]>().orTimeout(15,TimeUnit.SECONDS);
         return capture;
     }
     public synchronized CompletableFuture<Void> saveNow() {
+        if(!ReplayGuard.valid(replayEpoch)||discardSave)return CompletableFuture.failedFuture(new IllegalStateException("Replay retired this runtime"));
         if(persistence==null)return CompletableFuture.failedFuture(new IllegalStateException("本局未启用保存"));
         if(!commit.isDone())return commit;
         saveStatus="正在保存 JNI 试验进度…";
-        commit=checkpoint().thenCompose(persistence::save);
+        commit=checkpoint().thenCompose(bytes->ReplayGuard.valid(replayEpoch)&&!discardSave?persistence.save(bytes):CompletableFuture.failedFuture(new IllegalStateException("Replay retired this save")));
         commit.whenComplete((unused,error)->saveStatus=error==null?"JNI 试验进度已保存到服务器":"保存未确认，保留最近确认版本");
         return commit;
     }
     /** Network thread does bounded copying/enqueue only; no native work or server-side authority expansion. */
     public void receive(NetplayChunk chunk,int authorizedPort) {
+        if(!ReplayGuard.valid(replayEpoch))return;
         if(closed||closing||chunk.session()!=grant.session()||authorizedPort< -1||authorizedPort>=ports)return;
         if(!grant.host()&&!chunk.ticket().equals(grant.ticket()))return;
         synchronized(intakeLock) {
@@ -189,6 +197,7 @@ public final class JniNetplaySession implements AutoCloseable {
         }
     }
     @Override public synchronized void close() {
+        if(!ReplayGuard.valid(replayEpoch))discardSave=true;
         if(closing||closed)return;
         closing=true;input=0;gunInputs.close();
         if(!started){
@@ -198,8 +207,11 @@ public final class JniNetplaySession implements AutoCloseable {
             finally{closed=true;}
         }
     }
+    /** Does not take a final checkpoint; native release remains on the owner thread. */
+    public synchronized void closeWithoutSave(){discardSave=true;close();}
     private void run() {
         try {
+            if(!ReplayGuard.valid(replayEpoch)){discardSave=true;return;}
             byte[] rom=fileContent==null?content.call():null;
             if(fileContent==null&&(rom==null||rom.length<16||rom.length>(generic==null?NetplayProfile.fc():generic).maxRomBytes()))throw new IOException("ROM 大小异常");
             var extras=new TreeMap<String,byte[]>();var hashes=new TreeMap<String,String>();
@@ -217,11 +229,13 @@ public final class JniNetplaySession implements AutoCloseable {
             identity=generic==null?FcNetplaySaves.jniIdentity(gunMode,romHash):NetplaySaveState.identity(generic,romHash,hashes);
             byte[] saved=null;
             if(fileContent==null&&persistence!=null){saved=persistence.load(identity);if(saved!=null)NetplaySaveState.decode(saved,identity);if(!persistence.enabled())persistence=null;}
-            if(closing)return;
+            if(closing||!ReplayGuard.valid(replayEpoch)){discardSave=true;return;}
             core=factory.get();LibretroProcess.Info info;
+            if(!ReplayGuard.valid(replayEpoch)){discardSave=true;return;}
             if(fileContent!=null)info=core.loadFiles(fileContent,()->{if(closing)throw new IOException("JNI content preparation cancelled");});
             else if(generic!=null&&generic.jni().fullPath()){extras.put(generic.contentName(),rom);info=core.loadBundle(generic.contentName(),extras);}
             else info=core.load(rom);
+            if(!ReplayGuard.valid(replayEpoch)){discardSave=true;return;}
             // File selection and owner-thread staging may be separated in time. No save lease
             // is opened until the staged bytes have passed the captured SHA-256 checks.
             if(fileContent!=null&&persistence!=null){saved=persistence.load(identity);if(saved!=null)NetplaySaveState.decode(saved,identity);if(!persistence.enabled())persistence=null;}
@@ -243,6 +257,7 @@ public final class JniNetplaySession implements AutoCloseable {
             if(grant.host()){ready=true;phase=activated?runningLabel():"JNI 已准备就绪，等待开局授权";}
             else{remote=new Peer(grant.ticket(),grant.port());peers.put(remote.ticket,remote);control(remote,NetplayChunk.OPEN);phase="等待 JNI 主持与种子状态";}
             while(!closing) {
+                if(!ReplayGuard.valid(replayEpoch)){discardSave=true;break;}
                 if(!activated){LockSupport.parkNanos(500_000L);continue;}
                 drain();expire();
                 if(error()!=null)throw new IOException(error());
@@ -268,7 +283,7 @@ public final class JniNetplaySession implements AutoCloseable {
                 confirmedVisible=confirmed;replayed=timeline.replayedFrames();
                 LockSupport.parkNanos(500_000L);
             }
-            if(grant.host()&&activated&&failure==null&&ready&&persistence!=null)finishSave();
+            if(!discardSave&&ReplayGuard.valid(replayEpoch)&&grant.host()&&activated&&failure==null&&ready&&persistence!=null)finishSave();
         } catch(Exception|LinkageError error) {
             if(failure==null)failure=error.getMessage()==null?error.getClass().getSimpleName():error.getMessage();
         } finally {
@@ -550,6 +565,7 @@ public final class JniNetplaySession implements AutoCloseable {
         finally {core.restore(current);}
     }
     private synchronized void handleCapture() {
+        if(!ReplayGuard.valid(replayEpoch)||discardSave)return;
         if(capture==null||capture.isDone()||confirmed<=lastSaved)return;
         try {byte[] state=checkpointAt(confirmed);lastSaved=confirmed;capture.complete(state);}
         catch(RuntimeException error){capture.completeExceptionally(error);}
@@ -560,12 +576,17 @@ public final class JniNetplaySession implements AutoCloseable {
     }
     private void finishSave() {
         try {
+            if(!ReplayGuard.valid(replayEpoch)||discardSave)return;
             // Stop gameplay, then finish the same authorized host transaction off the MC thread.
             for(var p:List.copyOf(peers.values()))drop(p,false);
             try{commit.get(30,TimeUnit.SECONDS);}catch(ExecutionException ignored){}
+            if(!ReplayGuard.valid(replayEpoch)||discardSave)return;
             if(!reserveFrame())throw new IllegalStateException("Rollback history exhausted before final save");
             timeline.advance(new Input(timeline.next(),0,0,0,0,gunMode?65536:0,3));confirm();
-            byte[] state=checkpointAt(confirmed);persistence.save(state).get(30,TimeUnit.SECONDS);
+            byte[] state=checkpointAt(confirmed);
+            if(!ReplayGuard.valid(replayEpoch)||discardSave)return;
+            persistence.save(state).get(30,TimeUnit.SECONDS);
+            if(!ReplayGuard.valid(replayEpoch)||discardSave)return;
             persistence.finish().get(10,TimeUnit.SECONDS);saveStatus="最终 JNI 试验进度已保存";
         } catch(Exception error) {saveStatus="最终保存未确认，保留最近确认版本";}
     }

@@ -63,6 +63,6 @@ class NetplayProfileTest {
         var server=Files.readString(Path.of(root+"cabinet/CabinetNetplay.java"));
         for(String guard:List.of("CabinetRooms.authorized(p,a.room(),a.member())","run.server()!=p.getServer()","run.relay().renew(current)","NetplayNetwork.retire(run.relay())"))assertTrue(server.contains(guard));
         var client=Files.readString(Path.of(root+"client/cabinet/CabinetClientBackends.java"));
-        for(String guard:List.of("generation!=token||launch!=request||room!=assignment||netplayGrant!=grant||!current()","if(netplay()){startNetplay(chosen,remember);return;}","room=null;netplayGrant=null","if(netplay()){if(serverNetplayInput()&&current())CabinetRoomNetwork.send(new CabinetRoomNetwork.Reset(room.room(),room.member(),inputSequence++));else if(emulator!=null)emulator.clearInput();return;}"))assertTrue(client.contains(guard));
+        for(String guard:List.of("generation!=token||!ReplayGuard.valid(replayEpoch)||launch!=request||room!=assignment||netplayGrant!=grant||!current()","if(netplay()){startNetplay(chosen,remember);return;}","room=null;netplayGrant=null","if(netplay()){if(serverNetplayInput()&&current())CabinetRoomNetwork.send(new CabinetRoomNetwork.Reset(room.room(),room.member(),inputSequence++));else if(emulator!=null)emulator.clearInput();return;}"))assertTrue(client.contains(guard),guard);
     }
 }

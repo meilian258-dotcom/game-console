@@ -25,7 +25,7 @@ class CabinetSnapshotClientSourceTest {
         assertTrue(s.indexOf("CabinetSharedGames.resolve")>worker);assertTrue(s.indexOf("factory.open(path)")>s.indexOf("CabinetSharedGames.resolve"));
         assertTrue(s.contains("expectedCompatibility.equals(core.compatibilityId())"));
         assertTrue(s.contains("public void requestClose(){factory.requestClose();}"));
-        assertTrue(s.contains("token!=generation||!connection.isConnected()"));
+        assertTrue(s.contains("token!=generation||!ReplayGuard.valid(replayEpoch)||!connection.isConnected()"));
     }
     @Test void authoritativeModeSelectsAvailabilityAndSeatCapacity()throws Exception{
         String s=source("client/cabinet/CabinetClientBackends");

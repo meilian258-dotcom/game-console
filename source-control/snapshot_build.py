@@ -25,6 +25,7 @@ import zipfile
 from release_artifacts import inspect, sha256
 import snapshot_stock
 import sfc_stock
+import replay_api
 
 ROOT = Path(__file__).resolve().parents[1]
 META = 'META-INF/neoforge.mods.toml'
@@ -267,6 +268,7 @@ def version(module: str) -> str:
 def stage_outputs(paths: list[Path], output: Path, manifest: dict) -> dict:
     if len(paths) != 7 or output.exists():
         raise ValueError('Exactly seven new JARs and a new distribution directory are required')
+    replay_api.verify_suite(paths)
     metadata = [inspect(path) for path in paths]
     ids, classes = set(), set()
     for path, item in zip(paths, metadata):

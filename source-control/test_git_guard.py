@@ -64,5 +64,15 @@ class GitGuardIntegration(unittest.TestCase):
         # Retain this tiny fixture for inspection; no cleanup/deletion of user paths.
         print('Isolated hook fixture:', self.repo)
 
+    def test_replay_source_exception_does_not_admit_runtime_files(self):
+        shutil.copyfile(Path(__file__).resolve().parents[1]/'.gitignore', self.repo/'.gitignore')
+        for name in ('piq-replay-compat/README.md',
+                     'piq-fc-arcade/src/main/resources/META-INF/game-console/replay-api.properties'):
+            path=self.repo/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('source fixture',encoding='utf8')
+            self.assertEqual(self.git('check-ignore','--no-index',name).returncode,1,name)
+        for name in ('piq-replay-compat/build/a.jar','piq-replay-compat/game-console/state.json',
+                     'piq-fc-arcade/src/main/resources/META-INF/game-console/other.properties'):
+            self.assertEqual(self.git('check-ignore','--no-index',name).returncode,0,name)
+
 
 if __name__ == '__main__': unittest.main()

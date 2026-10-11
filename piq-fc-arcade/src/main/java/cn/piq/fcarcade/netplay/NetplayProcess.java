@@ -18,6 +18,9 @@ import cn.piq.retro.libretro.LibretroContentFiles;
  * Persistence is opt-in and host-only. The caller owns authorization and durable storage.
  */
 public final class NetplayProcess implements AutoCloseable {
+    private final long replayEpoch=cn.piq.retro.replay.ReplayGuard.epoch();
+    private volatile boolean discardSave;
+    private boolean replayValid(){return cn.piq.retro.replay.ReplayGuard.valid(replayEpoch)&&!discardSave;}
     /** Trusted frontend identity, shared with server-selected launch contracts. */
     public static final String RETROARCH_SHA="1335c34b04d8c3e55afe010a421ff373d938929ec196a6e93a9657972fe034e1";
     public static final String RETROARCH_PROTOCOL="PNP7";
@@ -101,6 +104,7 @@ public final class NetplayProcess implements AutoCloseable {
     public boolean forcedTermination(){return forcedTermination;}
     private boolean ownsPersistence(){return role==Role.LOCAL||grant.host();}
     public synchronized CompletableFuture<byte[]> checkpoint(){
+        if(!replayValid())return CompletableFuture.failedFuture(new IllegalStateException("Replay retired this runtime"));
         if(jni!=null)return jni.checkpoint();
         if(!ownsPersistence()||!ready||closed)return CompletableFuture.failedFuture(new IllegalStateException("保存会话尚未就绪"));
         if(capture!=null&&!capture.isDone())return capture;
@@ -111,11 +115,12 @@ public final class NetplayProcess implements AutoCloseable {
     }
     /** Safe menu action: host-only, serialized commits, no runtime load/rewind of a live room. */
     public synchronized CompletableFuture<Void> saveNow(){
+        if(!replayValid())return CompletableFuture.failedFuture(new IllegalStateException("Replay retired this runtime"));
         if(jni!=null)return jni.saveNow();
         if(persistence==null)return CompletableFuture.failedFuture(new IllegalStateException("本局没有启用保存"));
         if(!commit.isDone())return commit;
         saveStatus="正在保存…";
-        commit=checkpoint().thenCompose(bytes->persistence.save(bytes));
+        commit=checkpoint().thenCompose(bytes->replayValid()?persistence.save(bytes):CompletableFuture.failedFuture(new IllegalStateException("Replay retired this save")));
         commit.whenComplete((unused,failure)->saveStatus=failure==null?(role==Role.LOCAL?"本局存档已确认":"已保存到服务器"):"保存未确认；请保留已有存档备份");
         return commit;
     }
@@ -142,7 +147,7 @@ public final class NetplayProcess implements AutoCloseable {
     /** JNI hosts may prepare/restore first; the caller activates only after authoritative READY. */
     public NetplayProcess(Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,NetplayProfile profile,Callable<Map<String,byte[]>> auxiliary,boolean cabinetAuthority,boolean paid,boolean waitForActivation) {
         this.cabinetInputs=new NetplayCabinetInputs(paid);
-        this.grant=Objects.requireNonNull(grant);this.content=Objects.requireNonNull(content);this.sender=Objects.requireNonNull(sender);
+        this.grant=Objects.requireNonNull(grant);this.content=Objects.requireNonNull(content);Objects.requireNonNull(sender);this.sender=chunk->{if(replayValid())sender.accept(chunk);};
         this.role=grant.host()?Role.HOST:grant.player()?Role.PARTICIPANT:Role.SPECTATOR;
         this.localConfig=null;this.localFiles=null;
         this.profile=Objects.requireNonNull(profile);this.gunMode=profile.isFcZapper();this.auxiliary=Objects.requireNonNull(auxiliary);
@@ -185,7 +190,7 @@ public final class NetplayProcess implements AutoCloseable {
         Objects.requireNonNull(files);
         if(jni!=null)jni.fileContent(files);else verifiedFiles=files;
     }
-    public synchronized void start(){if(started||closed||localCloseRequested.get())return;started=true;if(jni!=null){jni.start();return;}daemon("PIQ-Netplay-owner",this::run);}
+    public synchronized void start(){if(!replayValid()){closeWithoutSave();return;}if(started||closed||localCloseRequested.get())return;started=true;if(jni!=null){jni.start();return;}daemon("PIQ-Netplay-owner",this::run);}
     public static String unavailableReason() {
         String os=System.getProperty("os.name","").toLowerCase(Locale.ROOT),arch=System.getProperty("os.arch","");
         return os.startsWith("windows")&&(arch.equals("amd64")||arch.equals("x86_64"))?null:"Netplay 实验仅支持 Windows x64 客户端";
@@ -251,6 +256,7 @@ public final class NetplayProcess implements AutoCloseable {
     }
     private void run() {
         try {
+            checkOpen();
             if(localCloseRequested.get())return;
             String unavailable=unavailableReason();if(unavailable!=null)throw new IOException(role==Role.LOCAL?"RetroArch 本机运行仅支持 Windows x64 客户端":unavailable);
             phase("准备游戏与核心");
@@ -347,15 +353,16 @@ public final class NetplayProcess implements AutoCloseable {
             builder.environment().remove("PIQ_SAVE_SEED");
             if(initialSave!=null)builder.environment().put("PIQ_SAVE_SEED","checkpoint.seed");
             builder.environment().put("TEMP",directory.toString());builder.environment().put("TMP",directory.toString());
-            if(closed||localCloseRequested.get())return;
+            if(!replayValid()||closed||localCloseRequested.get())return;
             // Process creation and workspace marker IO never hold the public session lock.
             // If close wins inside the OS, the owner still retires this late child in cleanup().
             child=workspace.start(builder);CHILDREN.add(child);
-            if(closed||localCloseRequested.get())return;
+            if(!replayValid()||closed||localCloseRequested.get())return;
             Process owned=child;
             daemon("PIQ-Netplay-log",()->processLog.read(owned.getInputStream()));
             long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(25);
             while(!closed&&ipc==null&&System.nanoTime()<deadline) {
+                checkOpen();
                 if(!owned.isAlive())throw new IOException(runtimeLabel()+" 原生端启动退出："+owned.exitValue());
                 try {
                     Socket candidate=sockets.own(ipcListener.accept());candidate.setTcpNoDelay(true);candidate.setSoTimeout(1000);
@@ -369,6 +376,7 @@ public final class NetplayProcess implements AutoCloseable {
             var in=new DataInputStream(new BufferedInputStream(ipc.getInputStream()));var out=new DataOutputStream(ipc.getOutputStream());
             nextSaveNanos=System.nanoTime()+TimeUnit.SECONDS.toNanos(30);
             while(!closed) {
+                if(!replayValid()){discardSave=true;break;}
                 int message=in.readInt();
                 if(message==0x504e5356){readCheckpoint(in);continue;}
                 if(message==0x504e5049){writeInputs(out);continue;}
@@ -406,7 +414,7 @@ public final class NetplayProcess implements AutoCloseable {
         if(failure instanceof EOFException)return runtimeLabel()+" 核心输出已结束，请查看诊断";
         return failure.getMessage()==null?failure.getClass().getSimpleName():failure.getMessage();
     }
-    private void checkOpen()throws IOException{if(closed||localCloseRequested.get()||Thread.currentThread().isInterrupted())throw new IOException("运行会话已取消");}
+    private void checkOpen()throws IOException{if(!replayValid()||closed||localCloseRequested.get()||Thread.currentThread().isInterrupted())throw new IOException("运行会话已取消");}
     static void validateFileContent(NetplayProfile profile,LibretroContentFiles files)throws IOException{
         if(!files.mainName().equals(profile.contentName())||files.main().size()<16
                 ||files.main().size()>profile.maxRomBytes()||files.size()>LibretroContentFiles.MAX_TOTAL)
@@ -569,6 +577,8 @@ public final class NetplayProcess implements AutoCloseable {
         }
     }
     @Override public void close() {
+        if(!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))discardSave=true;
+        if(jni!=null&&discardSave){jni.closeWithoutSave();return;}
         if(jni!=null){jni.close();return;}
         if(!localCloseRequested.compareAndSet(false,true))return;
         closing=true;input=0;
@@ -576,9 +586,10 @@ public final class NetplayProcess implements AutoCloseable {
         // Every RetroArch role closes off the caller thread, not just LOCAL.
         daemon("PIQ-RetroArch-close",this::closeInternal);
     }
+    public void closeWithoutSave(){discardSave=true;close();}
     private void closeInternal(){
         synchronized(this){if(closed)return;closing=true;input=0;gunInputs.close();cabinetInputs.close();}
-        if(persistence==null||!ready||error!=null){terminate();return;}
+        if(!replayValid()||persistence==null||!ready||error!=null){terminate();return;}
         // Gameplay routes may already have retired. Disconnect native peers so the final completed
         // frame cannot wait forever for input from a seat that the server has just revoked.
         for(Pipe pipe:List.copyOf(pipes.values()))pipe.close(false);
@@ -587,6 +598,7 @@ public final class NetplayProcess implements AutoCloseable {
             try{
                 try{commit.get(30,TimeUnit.SECONDS);}catch(ExecutionException ignored){}
                 saveNow().get(30,TimeUnit.SECONDS);
+                if(!replayValid())return;
                 persistence.finish().get(10,TimeUnit.SECONDS);
             }catch(Exception failure){saveStatus="最终保存未确认，保留最近已确认版本";fail(saveStatus);log("Final save not confirmed: "+failure.getClass().getSimpleName());}
             finally{terminate();}

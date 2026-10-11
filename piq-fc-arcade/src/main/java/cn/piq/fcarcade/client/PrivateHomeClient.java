@@ -9,6 +9,7 @@ import cn.piq.fcarcade.world.*;
 import cn.piq.retro.client.*;
 import cn.piq.retro.input.InputOwnership;
 import cn.piq.retro.libretro.LibretroRuntimes;
+import cn.piq.retro.replay.ReplayGuard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -58,6 +59,7 @@ public final class PrivateHomeClient {
     private static final Map<ResourceLocation,Provider> PROVIDERS = new LinkedHashMap<>();
     private static final Set<Runnable> BEFORE_START = new LinkedHashSet<>();
     private static Run current;
+    private static final ReplayGuard.Retirement REPLAY_RETIREMENT=new ReplayGuard.Retirement();
     private static LibretroRuntimes.Backend cartridgeBackend;
     private static boolean installed, opening, sampling, closing;
     private static java.util.concurrent.CompletableFuture<PrivateEngine.SaveResult> pendingSave;
@@ -79,6 +81,11 @@ public final class PrivateHomeClient {
     }
     static void install() {
         if(installed)return; installed=true;
+        ReplayGuard.registerEntryCheck("fc-private-home",()->{
+            var run=current;
+            if(run!=null&&!run.engine.supportsReplayRetirement())throw new IllegalStateException("请先正常结束此附属私人游戏并确认保存，再打开录像；该运行器不支持无保存退役");
+            if(closing)throw new IllegalStateException("请等待本机保存/运行器关闭完成，再打开录像");
+        });
         register(ResourceLocation.fromNamespaceAndPath("piq_fc_arcade","nes"),new Provider(){
             public String label(){return "FC / 小霸王";}
             public String storageKey(){return "fc";}
@@ -174,6 +181,7 @@ public final class PrivateHomeClient {
     }
     /** Called only after the shared cartridge client has verified an authorized download. */
     public static String startCartridge(ResourceLocation system,BlockPos pos,Path rom){
+        if(ReplayGuard.playing())return "录像回放期间不启动模拟器";
         var mc=Minecraft.getInstance();var provider=PROVIDERS.get(system);
         if(!connected()||provider==null||!provider.cartridgePower()||!mc.level.hasChunkAt(pos))return "卡带主机不可用";
         var console=mc.level.getBlockEntity(pos);
@@ -233,6 +241,7 @@ public final class PrivateHomeClient {
         return LibretroRuntimes.defaultBackend(target!=null&&target.provider.supportsJniTrial());
     }
     static String start(Target target,String filename,LibretroRuntimes.Backend backend) {
+        if(ReplayGuard.playing())return "录像回放期间不启动模拟器";
         Objects.requireNonNull(backend);
         if(current!=null||closing)return "请先结束上一局并等待本地保存完成。";
         if(!yieldObservers())return notice;
@@ -299,10 +308,12 @@ public final class PrivateHomeClient {
         return stack!=null&&t.provider.matches(mc.player,stack,t.console)&&HomeHardware.connected(mc.level,t.console,t.tv);
     }
     private static void tick(ClientTickEvent.Pre event){
+        if(REPLAY_RETIREMENT.block(PrivateHomeClient::retireForReplay))return;
         if(opening){opening=false;if(connected())open();}
         update();
     }
     private static void refreshKeyboard(){var r=current;if(r==null)return;
+        if(REPLAY_RETIREMENT.block(PrivateHomeClient::retireForReplay))return;
         if(!valid(r.target)||!InputOwnership.owns(r.owner)){stop("手柄或设备已失效，私人游戏已停止");return;}
         var held=held(r.target);int hand=held==null?-1:Minecraft.getInstance().player.getMainHandItem()==held?0:1;
         if(hand!=r.hand){r.hand=hand;KeyboardInput.pause(r.owner);releaseKeys(r);}
@@ -311,6 +322,7 @@ public final class PrivateHomeClient {
     }
     private static void releaseKeys(Run r){r.engine.clearInput();r.lastMask=-1;GamepadInput.pause(r.owner);}
     private static void sample(){
+        if(REPLAY_RETIREMENT.block(PrivateHomeClient::retireForReplay))return;
         if(sampling)return;sampling=true;
         try{var r=current;if(r==null)return;var mc=Minecraft.getInstance();
             boolean focused=valid(r.target)&&held(r.target)!=null&&mc.screen==null&&mc.isWindowActive()&&!mc.isPaused()&&r.engine.isReady();
@@ -325,6 +337,7 @@ public final class PrivateHomeClient {
     }
     static int canonicalNes(int nes){return (nes&0xfc)|((nes&1)<<8)|((nes&2)>>>1);}
     private static void update(){
+        if(REPLAY_RETIREMENT.block(PrivateHomeClient::retireForReplay))return;
         var r=current;if(r==null)return;
         try{
             if(!valid(r.target)){stop("已归还手柄、切换世界或设备状态改变");return;}
@@ -349,7 +362,9 @@ public final class PrivateHomeClient {
         r.texture.upload();r.aspect=frame.displayAspect();
     }
     public static void stop(String reason){
+        if(ReplayGuard.playing()){retireForReplay();return;}
         Run r=current;if(r==null)return;current=null;closing=true;
+        long replayEpoch=ReplayGuard.epoch();
         notice=reason+(r.engine.error()!=null?"；等待运行器安全退出，尚未确认保存。":"；正在保存到本机。");
         KeyboardInput.release(r.owner);GamepadInput.release(r.owner);r.engine.clearInput();
         CabinetClientOwner.release(r.owner);
@@ -359,7 +374,31 @@ public final class PrivateHomeClient {
         catch(RuntimeException error){pendingSave=java.util.concurrent.CompletableFuture.failedFuture(error);}
         pendingSave.whenComplete((saved,error)->Minecraft.getInstance().execute(()->{
             closing=false;notice=reason+"；"+(error!=null||saved==null?"本地保存失败，未确认保存成功。":saved.message());
-            var mc=Minecraft.getInstance();if(mc.player!=null&&mc.getConnection()==r.target.connection)mc.player.displayClientMessage(Component.literal(notice),false);
+            var mc=Minecraft.getInstance();if(ReplayGuard.valid(replayEpoch)&&mc.player!=null&&mc.getConnection()==r.target.connection)mc.player.displayClientMessage(Component.literal(notice),false);
+        }));
+    }
+    private static void retireForReplay(){
+        opening=false;
+        Run r=current;if(r==null)return;
+        // Unsupported providers are rejected by the entry check, never silently saved as cleanup.
+        if(!r.engine.supportsReplayRetirement())throw new IllegalStateException("Active private provider cannot retire for replay");
+        current=null;closing=true;
+        Throwable releaseFailure=null;
+        for(Runnable release:new Runnable[]{()->KeyboardInput.release(r.owner),()->GamepadInput.release(r.owner),
+                r.engine::clearInput,()->CabinetClientOwner.release(r.owner),()->{if(r.audio!=null)r.audio.close();},
+                ()->{if(r.textureId!=null)Minecraft.getInstance().getTextureManager().release(r.textureId);}}){
+            try{release.run();}catch(RuntimeException|LinkageError error){if(releaseFailure==null)releaseFailure=error;}
+        }
+        final Throwable presentationFailure=releaseFailure;
+        savingTarget=r.target;notice="录像回放已停止私人游戏，不写入存档";
+        try{pendingSave=r.engine.stopWithoutSave();}
+        catch(RuntimeException|LinkageError error){pendingSave=java.util.concurrent.CompletableFuture.failedFuture(error);}
+        var completion=pendingSave;
+        completion.whenComplete((saved,error)->Minecraft.getInstance().execute(()->{
+            if(pendingSave!=completion)return;
+            // A failed release is not evidence that the native slot is free.
+            closing=error!=null||presentationFailure!=null;
+            if(closing)notice="私人运行器关闭未确认，请正常重启客户端";
         }));
     }
     private static void interaction(InputEvent.InteractionKeyMappingTriggered event){
@@ -395,6 +434,10 @@ public final class PrivateHomeClient {
     static boolean ownsDisplay(HomeTvBlockEntity tv){return current!=null&&current.target.tv==tv&&valid(current.target);}
     static boolean ownsConsole(BlockEntity console){return current!=null&&current.target.console==console&&valid(current.target);}
     private static void render(RenderLevelStageEvent event){
+        try{renderOwned(event);}finally{cn.piq.fcarcade.api.replay.ReplayPresentation.clearAnchor();}
+    }
+    private static void renderOwned(RenderLevelStageEvent event){
+        if(REPLAY_RETIREMENT.block(PrivateHomeClient::retireForReplay))return;
         var r=current;
         if(r==null||r.textureId==null||event.getStage()!=RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES||!valid(r.target))return;
         var mc=Minecraft.getInstance();var tv=r.target.tv;var pos=tv.getBlockPos();var layout=ArcadeStructure.resolve(mc.level,pos);

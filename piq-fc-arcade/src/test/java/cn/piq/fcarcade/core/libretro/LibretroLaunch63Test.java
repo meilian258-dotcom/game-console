@@ -1,6 +1,7 @@
 package cn.piq.fcarcade.core.libretro;
 
 import org.junit.jupiter.api.Test;
+import cn.piq.retro.storage.RuntimeWorkspaceTestSupport;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -27,13 +27,9 @@ class LibretroLaunch63Test {
     @Test void ipv4OnlyStack() throws Exception { smoke("system", true); }
 
     private static void smoke(String preference, boolean ipv4Only) throws Exception {
-        boolean windows = System.getProperty("os.name").startsWith("Windows");
-        Path java = Path.of(System.getProperty("java.home"), "bin", windows ? "java.exe" : "java");
-        List<String> command = new ArrayList<>(List.of(java.toString(), "-Xmx128m",
-                "-Djava.net.preferIPv6Addresses=" + preference,
-                "-Djava.net.preferIPv4Stack=" + ipv4Only,
-                "-cp", smokeClasspath(), LibretroPackagedSmoke.class.getName()));
-        ProcessBuilder builder = new ProcessBuilder(command).redirectErrorStream(true);
+        ProcessBuilder builder = RuntimeWorkspaceTestSupport.child(128, smokeClasspath(), LibretroPackagedSmoke.class);
+        builder.command().addAll(1, List.of("-Djava.net.preferIPv6Addresses=" + preference,
+                "-Djava.net.preferIPv4Stack=" + ipv4Only));
         // Test the explicit parent settings, not a developer/launcher injection into both JVMs.
         for (String key : List.of("JDK_JAVA_OPTIONS", "JAVA_TOOL_OPTIONS", "_JAVA_OPTIONS", "CLASSPATH"))
             builder.environment().remove(key);

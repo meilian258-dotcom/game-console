@@ -214,6 +214,13 @@ def asciiTestOutput = new File(asciiClasspathRoot, 'test-output')
 def asciiMainOutput = new File(asciiClasspathRoot, 'main-output')
 def asciiRuntimeJar = new File(asciiClasspathRoot, "${mod_id}-runtime.jar")
 def asciiGameDependencies = new File(asciiClasspathRoot, 'game-dependencies')
+// Keep only test runtime instances short enough for the unmodified Win32 bridge.
+// The general task tmp/JNA/Wasmtime paths and actual ModDev game tasks are unchanged.
+def testRuntimeRoot = new File(piqBuildWorkspace, 'rt')
+def useTestRuntimeRoot = { task ->
+    task.systemProperty 'piq.test.runtimeRoot', testRuntimeRoot.absolutePath
+    task.doFirst { piqPrepareBuildDirectory(testRuntimeRoot) }
+}
 def prepareAsciiGameDependencies = tasks.register('prepareAsciiGameDependencies', Sync) {
     from sourceSets.main.compileClasspath
     into asciiGameDependencies
@@ -239,6 +246,7 @@ def prepareAsciiMainOutput = tasks.register('prepareAsciiMainOutput', Sync) {
 }
 
 tasks.named('test', Test).configure {
+    useTestRuntimeRoot(delegate)
     dependsOn prepareAsciiTestOutput, prepareAsciiMainOutput, prepareAsciiGameDependencies
     useJUnitPlatform()
     // JDK/Gradle worker argument files can corrupt non-ASCII paths on Windows.
@@ -264,6 +272,12 @@ neoForge.ideSyncTask generateModMetadata
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    // Unlike ordinary bundled-license collisions, shared Replay API collisions
+    // must never be silently hidden by the general shaded-JAR exclusion policy.
+    filesMatching(['cn/piq/retro/replay/**', 'cn/piq/fcarcade/api/replay/**',
+                   'META-INF/game-console/replay-api.properties']) {
+        duplicatesStrategy = DuplicatesStrategy.FAIL
+    }
     // Ship readable dependency attribution beside the verbatim license resources.
     from('THIRD_PARTY_NOTICES.md')
     from('LICENSE.md')
@@ -304,6 +318,7 @@ tasks.named('check') {
 
 tasks.register('packagedLibretroSmoke', JavaExec) {
     piqUseBuildWorkspace(delegate)
+    useTestRuntimeRoot(delegate)
     dependsOn tasks.named('packagedRuntimeSmoke')
     classpath = files(asciiTestOutput, asciiRuntimeJar)
     mainClass = 'cn.piq.fcarcade.core.libretro.LibretroPackagedSmoke'
@@ -312,6 +327,7 @@ tasks.named('check') { dependsOn tasks.named('packagedLibretroSmoke') }
 
 tasks.register('packagedGenericLibretroSmoke', JavaExec) {
     piqUseBuildWorkspace(delegate)
+    useTestRuntimeRoot(delegate)
     dependsOn tasks.named('packagedRuntimeSmoke')
     classpath = files(asciiTestOutput, asciiRuntimeJar)
     mainClass = 'cn.piq.fcarcade.core.libretro.GenericLibretroCompatibilitySmoke'
@@ -320,3 +336,28 @@ tasks.register('packagedGenericLibretroSmoke', JavaExec) {
     }
 }
 tasks.named('check') { dependsOn tasks.named('packagedGenericLibretroSmoke') }
+
+// Parse the actual player JAR without loading Minecraft or trusting a marker.
+// snapshot_build/release independently reuse the same data-only verifier.
+tasks.register('packagedReplayApiCheck', Exec) {
+    group = 'verification'
+    description = 'Verifies final Replay v1 signatures, explicit provider wiring and ownership.'
+    dependsOn tasks.named('jar')
+    def verifier = file('../source-control/replay_api.py')
+    def python = providers.gradleProperty('replayApiPython')
+            .orElse(providers.gradleProperty('snapshotPython'))
+            .orElse(providers.environmentVariable('PIQ_BUILD_PYTHON')).getOrElse('python')
+    inputs.file(verifier)
+    inputs.file(tasks.named('jar').flatMap { it.archiveFile })
+    environment 'PYTHONDONTWRITEBYTECODE', '1'
+    doFirst {
+        def temporary = new File(piqBuildWorkspace, 'packagedReplayApiCheck')
+        piqPrepareBuildDirectory(temporary)
+        environment 'TEMP', temporary.absolutePath
+        environment 'TMP', temporary.absolutePath
+        environment 'TMPDIR', temporary.absolutePath
+        commandLine python, '-B', verifier.absolutePath, '--require', '--jar',
+                tasks.named('jar').get().archiveFile.get().asFile.absolutePath
+    }
+}
+tasks.named('check') { dependsOn tasks.named('packagedReplayApiCheck') }

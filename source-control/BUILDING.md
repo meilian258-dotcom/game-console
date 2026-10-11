@@ -138,6 +138,10 @@ python source-control/build_inputs.py check
 
 ## 构建主模组
 
+FC76.53 起，`check` 包含最终 JAR 的 `packagedReplayApiCheck`，使用 Python 3.11+。不在 PATH 时传 `-PreplayApiPython="<Python可执行文件>"`，或设置本次构建进程的 `PIQ_BUILD_PYTHON`；快照沿用 `snapshotPython`。检查的是公共回放 v1 的真实类签名、调用点和唯一提供者，不仅是描述文件。新版本或无法识别的主包缺合同会拒绝 staging／release，旧 FC 的历史例外不适用于新快照。
+
+可独立检查：`python -B source-control/replay_api.py --require --jar "<主包JAR>"`。若要升级合同，先提供兼容层或新版补丁并补齐回归，不删除门禁、不伪造 `API_VERSION`。详见[公共回放演进规则](../piq-replay-compat/API.md)。
+
 在仓库根执行：
 
 ```powershell

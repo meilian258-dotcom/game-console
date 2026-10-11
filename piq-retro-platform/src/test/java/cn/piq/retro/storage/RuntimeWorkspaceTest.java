@@ -117,12 +117,9 @@ class RuntimeWorkspaceTest {
         assertFalse(Files.exists(workspace.directory()));
     }
     private static ProcessBuilder command(Class<?> type, String... args) throws Exception {
-        String javaCmd = Path.of(System.getProperty("java.home"), "bin", "java.exe").toString();
-        if (!Files.exists(Path.of(javaCmd))) javaCmd = Path.of(System.getProperty("java.home"), "bin", "java").toString();
         String cp = Path.of(type.getProtectionDomain().getCodeSource().getLocation().toURI()) + java.io.File.pathSeparator
                 + Path.of(RuntimeWorkspace.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-        var values = new ArrayList<>(List.of(javaCmd, "-cp", cp, type.getName())); values.addAll(List.of(args));
-        return new ProcessBuilder(values).redirectErrorStream(true);
+        return RuntimeWorkspaceTestSupport.child(64, cp, type, args);
     }
     public static class Sleeper { public static void main(String[] args) throws Exception { System.out.println("READY"); Thread.sleep(30000); } }
     public static class Crash {
@@ -136,7 +133,7 @@ class RuntimeWorkspaceTest {
         Process child = command(Crash.class, base.toString()).start();
         try {
             String path = child.inputReader().readLine();
-            assertTrue(child.waitFor(10, TimeUnit.SECONDS)); assertEquals(0, child.exitValue());
+            assertTrue(child.waitFor(10, TimeUnit.SECONDS)); assertEquals(0, child.exitValue(), path);
             assertNotNull(path); assertTrue(Files.exists(Path.of(path).resolve("core.dll")));
             assertEquals(1, RuntimeWorkspace.reap(base)); assertFalse(Files.exists(Path.of(path)));
         } finally { if (child.isAlive()) child.destroyForcibly(); }

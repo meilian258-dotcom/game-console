@@ -21,6 +21,16 @@ public final class HomeVideoDisplay {
                                  BlockPos consolePos, UUID consoleId, BlockPos televisionPos,
                                  UUID televisionId, UUID linkId, ResourceLocation texture,
                                  double pictureAspect) {
+        cn.piq.fcarcade.api.replay.ReplayPresentation.anchor(televisionPos);
+        try {
+            return renderOwned(event, systemId, consolePos, consoleId, televisionPos, televisionId, linkId, texture, pictureAspect);
+        } finally { cn.piq.fcarcade.api.replay.ReplayPresentation.clearAnchor(); }
+    }
+
+    private static boolean renderOwned(RenderLevelStageEvent event, ResourceLocation systemId,
+                                 BlockPos consolePos, UUID consoleId, BlockPos televisionPos,
+                                 UUID televisionId, UUID linkId, ResourceLocation texture,
+                                 double pictureAspect) {
         Minecraft mc = Minecraft.getInstance();
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES || mc.level == null
                 || texture == null || systemId == null || consolePos == null || consoleId == null

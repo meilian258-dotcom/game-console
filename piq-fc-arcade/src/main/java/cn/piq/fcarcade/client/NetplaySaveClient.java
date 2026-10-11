@@ -2,6 +2,7 @@
 package cn.piq.fcarcade.client;
 
 import cn.piq.fcarcade.netplay.*;
+import cn.piq.retro.replay.ReplayGuard;
 import java.util.*;
 import java.util.concurrent.*;
 import net.minecraft.network.Connection;
@@ -22,6 +23,7 @@ public final class NetplaySaveClient {
     /** Reuses the bounded checkpoint transport for an explicitly server-authorized non-Netplay host.
      * The server must register the same connection/session/ticket before sending its start grant. */
     public static NetplayProcess.Persistence open(Connection connection,long session,UUID ticket){
+        if(ReplayGuard.playing())throw new IllegalStateException("录像回放期间不打开保存通道");
         Objects.requireNonNull(connection);Objects.requireNonNull(ticket);
         if(session<0||!connection.isConnected())throw new IllegalArgumentException("保存连接或会话无效");
         var key=new Key(connection,session);var channel=new Channel(key,ticket);
@@ -36,6 +38,11 @@ public final class NetplaySaveClient {
         PACE.scheduleWithFixedDelay(()->{for(var c:CHANNELS.values())c.expire();},1,1,TimeUnit.SECONDS);
     });}
     private static final class Channel implements NetplayProcess.Persistence {
+        final long replayEpoch=ReplayGuard.epoch();
+        private boolean replayBlocked(){
+            if(ReplayGuard.valid(replayEpoch))return false;
+            fail("录像回放已退役保存通道；旧档保留",null);return true;
+        }
         final Key key;final UUID ticket;UUID transaction;
         CompletableFuture<byte[]> loaded=new CompletableFuture<>();CompletableFuture<Void> operation;
         NetplaySaveState.Identity identity;
@@ -48,12 +55,14 @@ public final class NetplaySaveClient {
         }
         @Override public synchronized boolean enabled(){return enabled;}
         @Override public synchronized CompletableFuture<Void> save(byte[] checkpoint){
+            if(replayBlocked())return CompletableFuture.failedFuture(new IllegalStateException("录像回放期间不保存"));
             if(closed||!enabled)return CompletableFuture.failedFuture(new IllegalStateException("保存会话不可用"));
             if(operation!=null&&!operation.isDone())return CompletableFuture.failedFuture(new IllegalStateException("上一份存档尚未确认"));
             operation=new CompletableFuture<>();var future=operation;transaction=UUID.randomUUID();UUID tx=transaction;
             expires=System.nanoTime()+TimeUnit.SECONDS.toNanos(45);
             try{IO.execute(()->{
                 try{
+                    synchronized(this){if(replayBlocked()||closed)return;}
                     NetplaySaveState.decode(checkpoint,identity);byte[] packed=NetplaySaveTransfer.pack(checkpoint);
                     synchronized(this){if(closed||operation!=future||!transaction.equals(tx))return;outgoing=packed;offset=0;
                         // A final save immediately after a periodic/manual commit must respect the server rate limit.
@@ -65,6 +74,7 @@ public final class NetplaySaveClient {
             return future;
         }
         @Override public synchronized CompletableFuture<Void> finish(){
+            if(replayBlocked())return CompletableFuture.failedFuture(new IllegalStateException("录像回放期间不确认保存"));
             if(closed)return CompletableFuture.failedFuture(new IllegalStateException("保存通道已结束，最终保存未确认"));
             if(operation!=null&&!operation.isDone())return CompletableFuture.failedFuture(new IllegalStateException("保存尚未确认"));
             operation=new CompletableFuture<>();transaction=UUID.randomUUID();expires=System.nanoTime()+TimeUnit.SECONDS.toNanos(10);
@@ -72,11 +82,13 @@ public final class NetplaySaveClient {
         }
         @Override public synchronized void abort(){if(closed)return;if(transaction!=null)message(CANCEL,0,0,new byte[0],"");fail("Netplay 运行器已结束；仅最近一次服务器确认的存档有效",null);}
         synchronized void message(int kind,int value,int at,byte[] bytes,String text){
+            if(replayBlocked())return;
             if(closed)return;
             try{send(key.connection,new Message(key.session,ticket,transaction,kind,value,at,bytes,text),false);}
             catch(RuntimeException failed){fail("服务器连接中断，保留最近已确认的存档",failed);}
         }
         synchronized void receive(Message m){
+            if(replayBlocked())return;
             if(closed||!ticket.equals(m.ticket())||!m.transaction().equals(transaction))return;
             try{
                 switch(m.kind()){
@@ -89,7 +101,7 @@ public final class NetplaySaveClient {
                         if(download.complete()){
                             byte[] packed=download.finish();int length=download.offset();download=null;
                             IO.execute(()->{try{byte[] bytes=NetplaySaveTransfer.unpack(packed);NetplaySaveState.decode(bytes,identity);
-                                synchronized(this){if(closed)return;message(NEXT,0,length,new byte[0],"");expires=Long.MAX_VALUE;loaded.complete(bytes);}
+                                synchronized(this){if(closed||replayBlocked())return;message(NEXT,0,length,new byte[0],"");expires=Long.MAX_VALUE;loaded.complete(bytes);}
                             }catch(Exception invalid){fail("服务器存档无法恢复，未开始新游戏",invalid);}});
                         }else if(download.offset()%(2*NetplaySaveTransfer.CHUNK)==0)message(NEXT,0,download.offset(),new byte[0],"");
                     }
@@ -109,10 +121,10 @@ public final class NetplaySaveClient {
         }
         synchronized void fail(String message,Throwable cause){
             if(closed)return;closed=true;CHANNELS.remove(key,this);download=null;outgoing=null;
-            if(transaction!=null)try{send(key.connection,new Message(key.session,ticket,transaction,CANCEL,0,0,new byte[0],""),false);}catch(RuntimeException ignored){}
+            if(transaction!=null&&ReplayGuard.valid(replayEpoch))try{send(key.connection,new Message(key.session,ticket,transaction,CANCEL,0,0,new byte[0],""),false);}catch(RuntimeException ignored){}
             var error=new IllegalStateException(message,cause);loaded.completeExceptionally(error);if(operation!=null)operation.completeExceptionally(error);
-            var mc=net.minecraft.client.Minecraft.getInstance();mc.execute(()->{if(mc.getConnection()!=null&&mc.getConnection().getConnection()==key.connection&&mc.player!=null)mc.player.displayClientMessage(net.minecraft.network.chat.Component.literal("Netplay 存档："+message),false);});
+            var mc=net.minecraft.client.Minecraft.getInstance();mc.execute(()->{if(ReplayGuard.valid(replayEpoch)&&mc.getConnection()!=null&&mc.getConnection().getConnection()==key.connection&&mc.player!=null)mc.player.displayClientMessage(net.minecraft.network.chat.Component.literal("Netplay 存档："+message),false);});
         }
-        synchronized void expire(){if(!key.connection.isConnected()||System.nanoTime()>expires)fail("Netplay 存档连接超时；仅最近确认版本有效",null);}
+        synchronized void expire(){if(replayBlocked())return;if(!key.connection.isConnected()||System.nanoTime()>expires)fail("Netplay 存档连接超时；仅最近确认版本有效",null);}
     }
 }

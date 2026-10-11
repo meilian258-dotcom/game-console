@@ -9,16 +9,16 @@ class CabinetClientSafetyTest {
         assertTrue(s.contains("catch(Exception|LinkageError failure)"));
         assertTrue(s.contains("catch(RejectedExecutionException failure){OPENING.set(false);stop("));
         assertTrue(s.contains("PENDING.compareAndSet(opened,null);CabinetCleanup.closeRetro(opened)"));
-        assertTrue(s.contains("if(token==generation)stop(\"模拟器启动失败：\""));
+        assertTrue(s.contains("if(token==generation&&ReplayGuard.valid(replayEpoch))stop(\"模拟器启动失败：\""));
         assertTrue(s.contains("finally{OPENING.set(false);}"));
         assertTrue(s.contains("AtomicReference<RetroEmulator> PENDING"));
         assertTrue(source("CabinetCleanup").contains("static void closeRetro(RetroEmulator emulator)"));
     }
     @Test void cancelledStartupStillClosesExactCoreAtBothHandoffs()throws Exception{
         var s=source("CabinetClientBackends");
-        assertTrue(s.contains("if(shuttingDown||token!=generation){CabinetCleanup.closeRetro(ready);return;}"));
-        assertTrue(s.contains("if(shuttingDown||token!=generation){PENDING.compareAndSet(ready,null);CabinetCleanup.closeRetro(ready);return;}"));
-        assertTrue(s.contains("if(token!=generation||!current()||!playing){CabinetCleanup.closeRetro(ready);return;}"));
+        assertTrue(s.contains("if(shuttingDown||token!=generation||!ReplayGuard.valid(replayEpoch)){CabinetCleanup.closeRetro(ready);return;}"));
+        assertTrue(s.contains("if(shuttingDown||token!=generation||!ReplayGuard.valid(replayEpoch)){PENDING.compareAndSet(ready,null);CabinetCleanup.closeRetro(ready);return;}"));
+        assertTrue(s.contains("if(token!=generation||!ReplayGuard.valid(replayEpoch)||!current()||!playing){CabinetCleanup.closeRetro(ready);return;}"));
         assertTrue(s.contains("var pending=PENDING.getAndSet(null)"));
         assertTrue(s.contains("generation++;var previous=launch;var previousRoom=room;var previousConnection=sessionConnection;launch=null;backend=null;room=null;netplayGrant=null;peers=null"));
         assertTrue(s.contains("mc.getConnection()==previousConnection"));

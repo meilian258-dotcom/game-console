@@ -110,11 +110,12 @@ class ImmersiveClientSafetyTest {
     @Test void staleFactoryCompletionsAreCheckedBeforeAndAfterClientHandoff() throws Exception {
         for(String s:new String[]{fc(),nativeClient()}) {
             String start=body(s,"private static void startGame(Path chosen,boolean remember)");
+            String replay=s.contains("class CabinetClientBackends")?"||!ReplayGuard.valid(replayEpoch)":"";
             assertTrue(start.contains("inttoken=++generation"));
-            assertTrue(start.contains("if(shuttingDown||token!=generation)"));
+            assertTrue(start.contains("if(shuttingDown||token!=generation"+replay+")"));
             assertTrue(start.contains("PENDING.set(ready)"));
             assertTrue(start.contains("PENDING.compareAndSet(ready,null)"));
-            assertTrue(start.contains("if(token!=generation||!current()||!playing)"));
+            assertTrue(start.contains("if(token!=generation"+replay+"||!current()||!playing)"));
             assertTrue(start.contains("catch(RejectedExecutionExceptionfailure)"));
         }
     }

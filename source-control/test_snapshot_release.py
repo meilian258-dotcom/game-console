@@ -93,10 +93,13 @@ class ArtifactTests(unittest.TestCase):
                              inputReceiptSha256='f' * 64, coreSources=sources)
         for mod_set in sorted(release.MOD_SETS, key=lambda value: sorted(value)):
             prefix, _, _ = PROFILES[mod_set]
-            name = prefix + '-1.0-test.jar'
+            # This fixture tests release provenance, not the new provider ABI.
+            # Use a real explicit legacy FC version instead of a future 1.0 marker.
+            version = '0.31.0-alpha.76.52' if 'piq_fc_arcade' in mod_set else '1.0-test'
+            name = prefix + '-' + version + '.jar'
             path = self.directory / name
             with zipfile.ZipFile(path, 'w') as jar:
-                metadata = '\n'.join('[[mods]]\nmodId="' + mod_id + '"\nversion="1.0-test"\n'
+                metadata = '\n'.join('[[mods]]\nmodId="' + mod_id + '"\nversion="' + version + '"\n'
                                      for mod_id in sorted(mod_set))
                 jar.writestr('META-INF/neoforge.mods.toml', metadata)
                 jar.writestr('example.txt', 'original fixture, not a runtime binary')

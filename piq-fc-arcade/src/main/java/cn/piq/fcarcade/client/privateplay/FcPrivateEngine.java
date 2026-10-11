@@ -9,6 +9,7 @@ import cn.piq.fcarcade.rom.RomRepository;
 import cn.piq.fcarcade.session.ControllerInputTransitions;
 import cn.piq.fcarcade.session.NesCoreVariant;
 import cn.piq.retro.libretro.LibretroRuntimes;
+import cn.piq.retro.replay.ReplayGuard;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
@@ -27,6 +28,8 @@ public final class FcPrivateEngine implements PrivateEngine {
     private final CompletableFuture<SaveResult> stopped = new CompletableFuture<>();
     private final Thread worker;
     private volatile boolean ready, stopping, paused;
+    private volatile boolean discardSave;
+    private final long replayEpoch = ReplayGuard.epoch();
     private volatile String failure;
     private volatile NesCore diagnosticCore;
     private long presentationGeneration;
@@ -118,6 +121,7 @@ public final class FcPrivateEngine implements PrivateEngine {
         synchronized (mailbox) { return stopping || paused ? null : frames.pollFirst(); }
     }
     @Override public CompletableFuture<SaveResult> stopAndSave() {
+        if (!ReplayGuard.valid(replayEpoch)) discardSave = true;
         synchronized (mailbox) {
             stopping = true; ready = false; presentationGeneration++;
             inputs[0].failClosed(); inputs[1].failClosed(); frames.clear();
@@ -126,22 +130,29 @@ public final class FcPrivateEngine implements PrivateEngine {
         return stopped;
     }
     @Override public void close() { stopAndSave(); }
+    @Override public boolean supportsReplayRetirement() { return true; }
+    @Override public CompletableFuture<SaveResult> stopWithoutSave() {
+        discardSave = true;
+        return stopAndSave();
+    }
 
     private void run(Path rom, PrivateSaveStore store, CoreFactory factory, String testModuleSha, String namespacePrefix) {
         NesCore core = null; SaveResult result = new SaveResult(false, "私人FC尚未加载，未写存档");
         try {
-            if (stopping) return;
+            if (stopping || !ReplayGuard.valid(replayEpoch)) return;
             byte[] bytes = readLocalRom(rom);
             NesCoreVariant variant = NesCoreVariant.forRom(INesHeader.parse(bytes), false);
             String sha = PrivateSaveStore.sha256(bytes);
             String module = testModuleSha == null ? moduleSha(variant) : testModuleSha;
             if (!module.matches("[0-9a-f]{64}")) throw new IOException("FC core fingerprint is invalid");
             PrivateSaveStore.Key key = new PrivateSaveStore.Key("fc", namespacePrefix + variant.stateNamespace() + "/" + module, sha);
-            if (stopping) return;
+            if (stopping || !ReplayGuard.valid(replayEpoch)) return;
             core = factory.create(variant);
             diagnosticCore=core;
+            if (!ReplayGuard.valid(replayEpoch)) return;
             if (!core.stateNamespace().equals(variant.stateNamespace())) throw new IOException("FC core namespace differs");
             core.loadRom(bytes);
+            if (!ReplayGuard.valid(replayEpoch)) return;
             Optional<PrivateSaveStore.Snapshot> saved = store.load(key);
             if (saved.isPresent()) {
                 byte[] state = saved.get().state();
@@ -154,6 +165,7 @@ public final class FcPrivateEngine implements PrivateEngine {
             byte[] rgba = new byte[NesCore.RGBA_BYTES]; float[] samples = new float[4096];
             Audio audio = new Audio(); long next = System.nanoTime();
             while (!stopping) {
+                if (!ReplayGuard.valid(replayEpoch)) { discardSave = true; break; }
                 // Consume a queued edge only when an emulated frame is actually due.
                 long wait = next - System.nanoTime();
                 if (!paused && wait > 0) { LockSupport.parkNanos(wait); continue; }
@@ -185,6 +197,10 @@ public final class FcPrivateEngine implements PrivateEngine {
                 next = Math.max(next + FRAME_NANOS, System.nanoTime() - FRAME_NANOS);
             }
             // No frame modulo/command queue: even a paused core freezes and snapshots immediately on its owner.
+            if (discardSave || !ReplayGuard.valid(replayEpoch)) {
+                result = new SaveResult(false, "录像回放已释放私人FC，未写存档");
+                return;
+            }
             core.setControllerState(0, 0); core.setControllerState(1, 0);
             byte[] state = core.savePersistentState();
             if (!variant.acceptsPersistentStateHeader(state, sha)) throw new IOException("FC核心返回了错误身份的存档");
@@ -194,18 +210,25 @@ public final class FcPrivateEngine implements PrivateEngine {
             failure = "私人FC启动/运行/保存失败，未报告保存成功：" + safeMessage(error);
             result = new SaveResult(false, failure);
         } finally {
+            Throwable closeFailure = null;
             performance.enabled(false);
             ready = false; stopping = true;
             synchronized (mailbox) { frames.clear(); inputs[0].clear(); inputs[1].clear(); }
             if (core != null) {
                 try { core.close(); }
                 catch (RuntimeException | LinkageError error) {
+                    closeFailure = error;
                     failure = "私人FC核心关闭异常：" + safeMessage(error);
                     result = new SaveResult(result.saved(), result.message() + "；" + failure);
                 }
             }
-            CAPACITY.release();
-            stopped.complete(result);
+            if (closeFailure != null && (discardSave || !ReplayGuard.valid(replayEpoch))) {
+                // A failed no-save release is not proof that the old owner/slot is free.
+                stopped.completeExceptionally(closeFailure);
+            } else {
+                CAPACITY.release();
+                stopped.complete(result);
+            }
         }
     }
     private static String safeMessage(Throwable error) {

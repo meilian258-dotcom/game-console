@@ -20,6 +20,7 @@ import zipfile
 
 from release_artifacts import inspect, sha256
 import sfc_stock
+import replay_api
 
 MOD_SETS = {
     frozenset({'piq_fc_arcade'}), frozenset({'piq_sfc_home', 'piq_sfc_arcade'}),
@@ -119,6 +120,9 @@ def validate(directory: Path, commit: str) -> list[dict]:
         checked.append(dict(name=name, bytes=actual['bytes'], sha256=actual['sha256']))
     if seen_mods != MOD_SETS or {p.name for p in paths} != seen_names | METADATA:
         raise ValueError('Unexpected release file set')
+    # Independently re-check actual API bytes/call sites and class ownership;
+    # neither a recomputed SHA manifest nor an editable capability marker suffices.
+    replay_api.verify_suite([directory / name for name in sorted(seen_names)])
     manifest_path = directory / 'manifest.json'
     checked.append(dict(name='manifest.json', bytes=manifest_path.stat().st_size,
                         sha256=sha256(manifest_path)))
