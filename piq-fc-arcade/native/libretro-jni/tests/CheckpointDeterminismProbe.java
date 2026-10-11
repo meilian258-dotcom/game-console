@@ -25,6 +25,14 @@ public final class CheckpointDeterminismProbe {
         if(first<0&&a.length!=b.length)first=Math.min(a.length,b.length);
         return new Diff(count==0,a.length,b.length,count,first,hash(a),hash(b));
     }
+    private static byte[] pcm(short[] samples) {
+        byte[] bytes=new byte[samples.length*2];
+        for(int i=0;i<samples.length;i++){bytes[i*2]=(byte)samples[i];bytes[i*2+1]=(byte)(samples[i]>>>8);}
+        return bytes;
+    }
+    private static String jsonString(String value) {
+        return "\""+value.replace("\\","\\\\").replace("\"","\\\"").replace("\n","\\n").replace("\r","\\r")+"\"";
+    }
     private static LibretroProcess.Controls input(int frame) {
         // Same two-port transitions as the generic Netplay diagnostic, independent of wall time.
         return new LibretroProcess.Controls(frame<125?new int[]{256,1}:new int[]{16,128},0);
@@ -62,12 +70,17 @@ public final class CheckpointDeterminismProbe {
         NetplayProfile profile=(NetplayProfile)Class.forName(args[3]).getMethod("profile").invoke(null);
         if(profile.jni()==null||profile.ports()!=2)throw new IllegalArgumentException("two-port JNI profile required");
         StringBuilder observations=new StringBuilder();
-        int compared=0,preState=-1,postState=-1,preVideo=-1,postVideo=-1;
+        int compared=0,preState=-1,postState=-1,preVideo=-1,postVideo=-1,preAudio=-1,postAudio=-1;
+        String leftVersion="",rightVersion="";
+        boolean avMetadataEqual=true;
         boolean immediate=true,seedExact=true,closed=false,unchanged=false;
         Throwable failure=null;
         try(var left=new LibretroJniRuntime(profile.jni(),profile.owner());
             var right=new LibretroJniRuntime(profile.jni(),profile.owner())) {
             warm(left,content);warm(right,content);
+            leftVersion=left.coreVersion();rightVersion=right.coreVersion();
+            System.out.println("CORE name="+profile.jni().name()+" leftVersion="+leftVersion+" rightVersion="+rightVersion
+                    +" leftInfo="+left.info()+" rightInfo="+right.info());
             // Equalize the startup seed and the number of restores before the A/B branch.
             byte[] initial=left.serialize();var memory=left.saveMemory();
             left.restoreSaveMemory(memory);left.restore(initial);
@@ -85,18 +98,21 @@ public final class CheckpointDeterminismProbe {
                 }
                 var controls=List.of(input(frame));
                 var a=left.run(controls,3);var b=right.run(controls,3);
-                var state=diff(left.serialize(),right.serialize());var video=diff(a.rgba(),b.rgba());compared++;
+                var state=diff(left.serialize(),right.serialize());var video=diff(a.rgba(),b.rgba());
+                var audio=diff(pcm(a.stereo()),pcm(b.stereo()));compared++;
+                avMetadataEqual&=a.info().equals(b.info())&&a.duplicate()==b.duplicate();
                 boolean pre=frame<checkpoint;
                 if(!state.equal){if(pre&&preState<0)preState=frame+1;else if(!pre&&postState<0)postState=frame+1;}
                 if(!video.equal){if(pre&&preVideo<0)preVideo=frame+1;else if(!pre&&postVideo<0)postVideo=frame+1;}
-                boolean first=frame+1==preState||frame+1==postState||frame+1==preVideo||frame+1==postVideo;
+                if(!audio.equal){if(pre&&preAudio<0)preAudio=frame+1;else if(!pre&&postAudio<0)postAudio=frame+1;}
+                boolean first=frame+1==preState||frame+1==postState||frame+1==preVideo||frame+1==postVideo||frame+1==preAudio||frame+1==postAudio;
                 int relative=frame+1-checkpoint;
                 if(first||frame+1==checkpoint||relative==1||relative==2||relative==60||relative==follow) {
                     observations.append("{\"kind\":\"frame\",\"frame\":").append(frame+1)
                             .append(",\"relative\":").append(relative).append(",\"state\":").append(state.json())
-                            .append(",\"video\":").append(video.json()).append("},\n");
+                            .append(",\"video\":").append(video.json()).append(",\"audioPcm16LE\":").append(audio.json()).append("},\n");
                     System.out.println("FRAME "+(frame+1)+" relative="+relative+" stateEqual="+state.equal+" stateChanged="+state.changed
-                            +" firstOffset="+state.first+" videoEqual="+video.equal);
+                            +" firstOffset="+state.first+" videoEqual="+video.equal+" audioEqual="+audio.equal);
                 }
             }
         }catch(Throwable ex){failure=ex;ex.printStackTrace();}
@@ -105,11 +121,14 @@ public final class CheckpointDeterminismProbe {
             unchanged=Files.size(contentFile)==contentSize&&Files.getLastModifiedTime(contentFile).equals(contentTime)
                     &&hash(Files.readAllBytes(contentFile)).equals(args[2]);
             if(observations.length()>0)observations.setLength(observations.length()-2);
-            boolean equal=failure==null&&preState<0&&postState<0&&preVideo<0&&postVideo<0&&immediate&&seedExact&&closed&&unchanged;
+            boolean equal=failure==null&&preState<0&&postState<0&&preVideo<0&&postVideo<0&&preAudio<0&&postAudio<0
+                    &&avMetadataEqual&&leftVersion.equals(rightVersion)&&immediate&&seedExact&&closed&&unchanged;
             String report="{\n\"scope\":\"Packaged JNI two-core deterministic input; no Minecraft, network or display GPU\",\n"
                     +"\"operation\":\""+operation+"\",\"checkpointFrame\":"+checkpoint+",\"followFrames\":"+follow+",\"comparedFrames\":"+compared
                     +",\n\"firstPreStateDifference\":"+preState+",\"firstPostStateDifference\":"+postState
                     +",\"firstPreVideoDifference\":"+preVideo+",\"firstPostVideoDifference\":"+postVideo
+                    +",\"firstPreAudioDifference\":"+preAudio+",\"firstPostAudioDifference\":"+postAudio+",\"avMetadataEqual\":"+avMetadataEqual
+                    +",\"leftCoreVersion\":"+jsonString(leftVersion)+",\"rightCoreVersion\":"+jsonString(rightVersion)
                     +",\n\"seedExact\":"+seedExact+",\"immediateStateEqual\":"+immediate+",\"slotsReleased\":"+closed+",\"inputUnchanged\":"+unchanged
                     +",\"completed\":"+(failure==null)+",\"equal\":"+equal+",\n\"observations\":[\n"+observations+"\n]}\n";
             Files.writeString(root.resolve("result.json"),report,StandardOpenOption.CREATE_NEW);

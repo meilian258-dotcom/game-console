@@ -395,6 +395,7 @@ public final class JniNetplaySession implements AutoCloseable {
         throw new IllegalArgumentException("JNI Netplay 接收阶段异常");
     }
     private void hostFrame() {
+        if(!reserveFrame())return;
         if(cabinet!=null) {
             int[] pads=cabinet.next(System.nanoTime());
             Arrays.fill(pads,ports,pads.length,0);
@@ -412,6 +413,7 @@ public final class JniNetplaySession implements AutoCloseable {
         publish(timeline.advance(lastP1,lastP2,known));confirm();broadcastCommands();pace();
     }
     private void peerFrame() {
+        if(!reserveFrame())return;
         long frame=timeline.next();Input canonical=canonicalFuture.get(frame);
         boolean remotePad=cabinet==null&&grant.port()==1;
         if(!remotePad&&canonical==null||remotePad&&frame>=lastHostNext+2)return;
@@ -487,6 +489,15 @@ public final class JniNetplaySession implements AutoCloseable {
         if(!grant.host()){failure="JNI Netplay 连接已结束，请重新加入";closing=true;}
     }
     private void trim() {long before=Math.max(timeline.oldest(),Math.min(confirmed,timeline.next())-RETAIN);timeline.discardBefore(before);}
+    /** Reserve history before consuming an input edge or sending its Pad. A catch-up
+     * batch may fill the window before the loop's usual trim; only confirmed history
+     * can make room. Check due CRCs before discarding their snapshots. */
+    private boolean reserveFrame() {
+        if(timeline.canAdvance())return true;
+        if(!grant.host())checkDigests();
+        trim();
+        return timeline.canAdvance();
+    }
     private void pace(){long now=System.nanoTime();long interval=(long)(1_000_000_000d/core.info().fps());nextPresent=Math.max(nextPresent+interval,now-interval);}
     private void publish(LibretroProcess.Output output) {
         int width=output.info().width(),height=output.info().height();
@@ -552,6 +563,7 @@ public final class JniNetplaySession implements AutoCloseable {
             // Stop gameplay, then finish the same authorized host transaction off the MC thread.
             for(var p:List.copyOf(peers.values()))drop(p,false);
             try{commit.get(30,TimeUnit.SECONDS);}catch(ExecutionException ignored){}
+            if(!reserveFrame())throw new IllegalStateException("Rollback history exhausted before final save");
             timeline.advance(new Input(timeline.next(),0,0,0,0,gunMode?65536:0,3));confirm();
             byte[] state=checkpointAt(confirmed);persistence.save(state).get(30,TimeUnit.SECONDS);
             persistence.finish().get(10,TimeUnit.SECONDS);saveStatus="最终 JNI 试验进度已保存";
