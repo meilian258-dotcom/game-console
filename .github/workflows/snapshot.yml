@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      validation_only:
+        description: Build and validate only; do not upload binaries or publish a Release
+        type: boolean
+        required: true
+        default: true
 
 # No PR event, personal token, self-hosted runner or persistent credential cache.
 permissions:
@@ -11,7 +17,11 @@ permissions:
 
 jobs:
   build:
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      github.ref == 'refs/heads/main' ||
+      (github.repository == 'meilian258-dotcom/game-console' &&
+       github.event_name == 'workflow_dispatch' &&
+       startsWith(github.ref, 'refs/heads/') && inputs.validation_only == true)
     runs-on: windows-2022
     timeout-minutes: 120
     concurrency:
@@ -43,7 +53,24 @@ jobs:
         run: python source-control/snapshot_build.py --work .snapshot-build --output snapshot-dist
       - name: Validate the exact release file set
         run: python source-control/snapshot_release.py --directory snapshot-dist --validate-only
+        env:
+          SNAPSHOT_VALIDATION_ONLY: ${{ inputs.validation_only }}
+      - name: Record validation-only scope
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.validation_only == true
+        shell: pwsh
+        run: |
+          @'
+          ## Validation only
+          This run checks the main/nightly snapshot build chain, not a fixed-core release candidate.
+          No player JARs, native runtimes or build directories are uploaded as Actions artifacts.
+          The Release publishing job is disabled for this run.
+          Build results do not grant distribution approval or imply Minecraft acceptance.
+          '@ | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
       - name: Transfer only the reviewed release assets
+        if: >-
+          github.ref == 'refs/heads/main' &&
+          (github.event_name == 'push' ||
+           (github.event_name == 'workflow_dispatch' && inputs.validation_only == false))
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: snapshot-${{ github.run_id }}-${{ github.run_attempt }}
@@ -58,7 +85,10 @@ jobs:
 
   publish:
     needs: build
-    if: github.ref == 'refs/heads/main' && needs.build.result == 'success'
+    if: >-
+      github.ref == 'refs/heads/main' && needs.build.result == 'success' &&
+      (github.event_name == 'push' ||
+       (github.event_name == 'workflow_dispatch' && inputs.validation_only == false))
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -88,4 +118,5 @@ jobs:
       - name: Verify assets and publish a new snapshot prerelease
         run: python source-control/snapshot_release.py --directory snapshot-dist
         env:
+          SNAPSHOT_VALIDATION_ONLY: ${{ inputs.validation_only }}
           GH_TOKEN: ${{ github.token }}

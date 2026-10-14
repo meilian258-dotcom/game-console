@@ -1,3 +1,4 @@
+import ast
 import copy
 import hashlib
 import json
@@ -17,6 +18,10 @@ COMMIT = 'a' * 40
 ENV = dict(GITHUB_REF='refs/heads/main', GITHUB_EVENT_NAME='push',
            GITHUB_REPOSITORY='example/game-console', GITHUB_SHA=COMMIT,
            GITHUB_RUN_ID='12345', GITHUB_RUN_ATTEMPT='2')
+VALIDATION_ENV = dict(ENV, GITHUB_ACTIONS='true', GITHUB_EVENT_NAME='workflow_dispatch',
+                      GITHUB_REPOSITORY='meilian258-dotcom/game-console',
+                      GITHUB_REF='refs/heads/codex/snapshot-validation',
+                      SNAPSHOT_VALIDATION_ONLY='true')
 
 
 class ContextTests(unittest.TestCase):
@@ -34,19 +39,48 @@ class ContextTests(unittest.TestCase):
             with self.subTest(key=key, value=value), self.assertRaises(ValueError):
                 release.context(dict(ENV, **{key: value}))
 
+    def test_branch_context_is_explicit_readonly_dispatch_only(self):
+        self.assertEqual(COMMIT, release.context(VALIDATION_ENV, validate_only=True)['commit'])
+        for key, value in [('GITHUB_EVENT_NAME', 'push'), ('GITHUB_EVENT_NAME', 'pull_request'),
+                           ('GITHUB_EVENT_NAME', 'pull_request_target'), ('GITHUB_EVENT_NAME', 'workflow_run'),
+                           ('GITHUB_REF', 'refs/tags/main'), ('GITHUB_REF', 'refs/heads/../main'),
+                           ('GITHUB_REF', 'refs/heads/'), ('GITHUB_REF', 'refs/heads/a//b'),
+                           ('GITHUB_REPOSITORY', 'fork/game-console'), ('GITHUB_SHA', 'main'),
+                           ('GITHUB_RUN_ID', '0'), ('GITHUB_RUN_ATTEMPT', '0'),
+                           ('SNAPSHOT_VALIDATION_ONLY', ''), ('SNAPSHOT_VALIDATION_ONLY', 'false'),
+                           ('SNAPSHOT_VALIDATION_ONLY', 'TRUE')]:
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                release.context(dict(VALIDATION_ENV, **{key: value}), validate_only=True)
+
+    def test_validation_mode_cannot_be_used_to_publish_even_on_main(self):
+        for ref in ('refs/heads/main', 'refs/heads/codex/snapshot-validation'):
+            with self.subTest(ref=ref), self.assertRaisesRegex(ValueError, 'cannot publish'):
+                release.context(dict(VALIDATION_ENV, GITHUB_REF=ref))
+        for invalid in ('TRUE', '1', 'yes'):
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, 'validation mode'):
+                release.context(dict(ENV, SNAPSHOT_VALIDATION_ONLY=invalid))
+        # Existing main push/manual publication context remains available.
+        for event in ('push', 'workflow_dispatch'):
+            release.context(dict(ENV, GITHUB_EVENT_NAME=event, SNAPSHOT_VALIDATION_ONLY='false'))
+        with self.assertRaisesRegex(ValueError, 'source repository'):
+            release.context(dict(VALIDATION_ENV, GITHUB_REF='refs/heads/main',
+                                 GITHUB_REPOSITORY='fork/game-console'), validate_only=True)
+
 
 class CommandLineTests(unittest.TestCase):
-    def invoke(self, env, validate_only=True):
+    def invoke(self, env, validate_only=True, head=COMMIT):
         argv = ['snapshot_release.py', '--directory', 'snapshot-dist']
         if validate_only:
             argv.append('--validate-only')
         with mock.patch.dict(release.os.environ, env, clear=True), \
                 mock.patch.object(release.sys, 'argv', argv), \
-                mock.patch.object(release.subprocess, 'check_output', return_value=COMMIT + '\n'), \
+                mock.patch.object(release.subprocess, 'check_output', return_value=head + '\n'), \
                 mock.patch.object(release, 'validate', return_value=[]) as validate, \
                 mock.patch.object(release, 'GitHub') as api:
-            release.main()
-            api.assert_not_called()
+            try:
+                release.main()
+            finally:
+                api.assert_not_called()
             validate.assert_called_once_with(Path('snapshot-dist'), COMMIT)
 
     def test_local_readonly_check_needs_no_github_environment_or_token(self):
@@ -56,6 +90,32 @@ class CommandLineTests(unittest.TestCase):
         self.invoke(dict(ENV, GITHUB_ACTIONS='true'))
         with self.assertRaisesRegex(ValueError, 'refs/heads/main'):
             self.invoke(dict(ENV, GITHUB_ACTIONS='true', GITHUB_REF='refs/heads/feature'))
+
+    def test_explicit_actions_branch_validation_never_constructs_publisher(self):
+        self.invoke(VALIDATION_ENV)
+        self.invoke(dict(VALIDATION_ENV, GITHUB_REF='refs/heads/main'))
+
+    def test_actions_validation_binds_checkout_to_triggering_commit(self):
+        for env in (VALIDATION_ENV, dict(ENV, GITHUB_ACTIONS='true')):
+            with self.subTest(ref=env['GITHUB_REF']), self.assertRaisesRegex(ValueError, 'triggering commit'):
+                self.invoke(env, head='b' * 40)
+
+    def test_branch_or_validation_mode_cannot_reach_publish_client(self):
+        for env in (VALIDATION_ENV, dict(VALIDATION_ENV, GITHUB_REF='refs/heads/main'),
+                    dict(VALIDATION_ENV, SNAPSHOT_VALIDATION_ONLY='false')):
+            with self.subTest(env=env), self.assertRaises(ValueError):
+                self.invoke(env, validate_only=False)
+
+    def test_branch_validation_does_not_bypass_artifact_guard(self):
+        with mock.patch.dict(release.os.environ, VALIDATION_ENV, clear=True), \
+                mock.patch.object(release.sys, 'argv', ['snapshot_release.py', '--directory', 'snapshot-dist', '--validate-only']), \
+                mock.patch.object(release.subprocess, 'check_output', return_value=COMMIT), \
+                mock.patch.object(release, 'validate', side_effect=ValueError('Dirty snapshot rejected')) as validate, \
+                mock.patch.object(release, 'GitHub') as api:
+            with self.assertRaisesRegex(ValueError, 'Dirty snapshot'):
+                release.main()
+            validate.assert_called_once_with(Path('snapshot-dist'), COMMIT)
+            api.assert_not_called()
 
     def test_local_publish_cannot_bypass_event_gate(self):
         with self.assertRaisesRegex(ValueError, 'refs/heads/main'):
@@ -321,12 +381,61 @@ class WorkflowTests(unittest.TestCase):
         self.root = Path(__file__).resolve().parents[1]
         self.text = (self.root / '.github/workflows/snapshot.yml').read_text(encoding='utf8')
 
-    def test_only_main_events_no_pr_or_workflow_run_token_escalation(self):
+    def test_main_push_and_explicit_manual_validation_no_token_escalation(self):
         self.assertIn('branches: [main]', self.text)
-        self.assertIn('workflow_dispatch:', self.text)
-        self.assertEqual(2, self.text.count("github.ref == 'refs/heads/main'"))
+        self.assertRegex(self.text, r'workflow_dispatch:\s+inputs:\s+validation_only:')
+        self.assertRegex(self.text, r'validation_only:\s+description: [^\n]+\s+type: boolean\s+required: true\s+default: true')
         self.assertNotRegex(self.text, r'(?m)^\s*(?:pull_request|pull_request_target|workflow_run):')
         self.assertNotRegex(self.text, r'(?m)^concurrency:')
+
+    @staticmethod
+    def condition(section, indent):
+        match = re.search(r'(?m)^' + ' ' * indent + r'if: >-\n((?:' + ' ' * (indent + 2) + r'.+\n)+)', section)
+        if match is None:
+            raise AssertionError('Missing explicit workflow condition')
+        return ' '.join(line.strip() for line in match[1].splitlines())
+
+    @staticmethod
+    def evaluate_condition(expression, ref, event, mode, repository, result):
+        # Evaluate only the small boolean predicate emitted by this workflow,
+        # never shell commands, arbitrary calls or any GitHub expression code.
+        expression = expression.replace("startsWith(github.ref, 'refs/heads/')", 'is_branch')
+        names = {'github.ref': 'ref', 'github.event_name': 'event',
+                 'inputs.validation_only': 'mode', 'github.repository': 'repository',
+                 'needs.build.result': 'result'}
+        for original, name in names.items():
+            expression = expression.replace(original, name)
+        expression = expression.replace('&&', ' and ').replace('||', ' or ')
+        tree = ast.parse(expression, mode='eval')
+        values = dict(ref=ref, event=event, mode=mode, repository=repository, result=result,
+                      is_branch=ref.startswith('refs/heads/'), true=True, false=False)
+        allowed = (ast.Expression, ast.BoolOp, ast.And, ast.Or, ast.Compare, ast.Eq,
+                   ast.Name, ast.Load, ast.Constant)
+        if any(not isinstance(node, allowed) or isinstance(node, ast.Name) and node.id not in values
+               for node in ast.walk(tree)):
+            raise AssertionError('Unreviewed workflow predicate syntax')
+        return eval(compile(tree, '<workflow-condition>', 'eval'), {'__builtins__': {}}, values)
+
+    def test_branch_validation_cannot_upload_or_publish_condition_matrix(self):
+        build, publish = self.text.split('  publish:', 1)
+        transfer = build.split('      - name: Transfer only the reviewed release assets', 1)[1]
+        conditions = [self.condition(build, 4), self.condition(transfer, 8), self.condition(publish, 4)]
+        for repository in ('meilian258-dotcom/game-console', 'fork/game-console'):
+            for ref in ('refs/heads/main', 'refs/heads/codex/check', 'refs/tags/main'):
+                for event in ('push', 'workflow_dispatch', 'pull_request', 'pull_request_target', 'workflow_run'):
+                    for mode in (None, False, True):
+                        for result in ('success', 'failure', 'cancelled'):
+                            with self.subTest(repository=repository, ref=ref, event=event, mode=mode, result=result):
+                                enabled = event == 'workflow_dispatch' or event == 'push' and ref == 'refs/heads/main'
+                                expected_build = enabled and (ref == 'refs/heads/main' or (
+                                    repository == 'meilian258-dotcom/game-console' and ref.startswith('refs/heads/')
+                                    and event == 'workflow_dispatch' and mode is True))
+                                expected_transfer = enabled and ref == 'refs/heads/main' and (
+                                    event == 'push' or event == 'workflow_dispatch' and mode is False)
+                                expected = [expected_build, expected_transfer, expected_transfer and result == 'success']
+                                actual = [enabled and self.evaluate_condition(condition, ref, event, mode, repository, result)
+                                          for condition in conditions]
+                                self.assertEqual(expected, actual)
 
     def test_pinned_actions_and_separated_write_permission(self):
         references = re.findall(r'uses:\s*(\S+)', self.text)
@@ -335,12 +444,17 @@ class WorkflowTests(unittest.TestCase):
         build, publish = self.text.split('  publish:', 1)
         self.assertNotIn('contents: write', build)
         self.assertNotIn('GH_TOKEN:', build)
+        self.assertNotIn('secrets.', self.text)
         self.assertIn('contents: write', publish)
         self.assertIn('needs: build', publish)
         self.assertIn('cancel-in-progress: false', publish)
         self.assertNotIn('cancel-in-progress: true', publish)
         self.assertEqual(2, self.text.count('persist-credentials: false'))
         self.assertNotIn('cache:', self.text)
+        self.assertEqual(2, self.text.count('SNAPSHOT_VALIDATION_ONLY: ${{ inputs.validation_only }}'))
+        self.assertIn('Record validation-only scope', build)
+        self.assertIn('GITHUB_STEP_SUMMARY', build)
+        self.assertIn('if: always() && github.event_name', build)
 
     def test_artifact_allowlist_does_not_upload_workspace(self):
         self.assertIn('snapshot-dist/*.jar', self.text)
@@ -349,6 +463,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn('include-hidden-files: false', self.text)
         self.assertIn('if-no-files-found: error', self.text)
         self.assertNotIn('snapshot-dist/**', self.text)
+        self.assertEqual(1, self.text.count('uses: actions/upload-artifact@'))
 
     def test_gitignore_opens_only_one_workflow(self):
         with tempfile.TemporaryDirectory(prefix='snapshot-ignore-test-') as name:

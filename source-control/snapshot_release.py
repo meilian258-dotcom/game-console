@@ -49,9 +49,24 @@ HEX40 = re.compile(r'[0-9a-f]{40}')
 HEX64 = re.compile(r'[0-9a-f]{64}')
 
 
-def context(env: dict) -> dict:
-    if env.get('GITHUB_REF') != 'refs/heads/main':
-        raise ValueError('Snapshots may only run from refs/heads/main')
+def context(env: dict, *, validate_only: bool = False) -> dict:
+    validation_mode = env.get('SNAPSHOT_VALIDATION_ONLY', '')
+    if validation_mode not in {'', 'false', 'true'}:
+        raise ValueError('Invalid snapshot validation mode')
+    if validation_mode == 'true':
+        if not validate_only:
+            raise ValueError('Validation-only runs cannot publish snapshots')
+        if env.get('GITHUB_EVENT_NAME') != 'workflow_dispatch':
+            raise ValueError('Validation-only mode requires workflow_dispatch')
+        if env.get('GITHUB_REPOSITORY') != 'meilian258-dotcom/game-console':
+            raise ValueError('Validation-only dispatch must belong to the source repository')
+    ref = env.get('GITHUB_REF', '')
+    if ref != 'refs/heads/main':
+        if not (validate_only and validation_mode == 'true'
+                and env.get('GITHUB_EVENT_NAME') == 'workflow_dispatch'
+                and re.fullmatch(r'refs/heads/[A-Za-z0-9][A-Za-z0-9._/-]*', ref)
+                and '..' not in ref and '//' not in ref and not ref.endswith(('/', '.'))):
+            raise ValueError('Snapshots may only publish from refs/heads/main; branch validation requires an explicit trusted dispatch')
     if env.get('GITHUB_EVENT_NAME') not in {'push', 'workflow_dispatch'}:
         raise ValueError('Unsupported snapshot event')
     repository = env.get('GITHUB_REPOSITORY', '')
@@ -321,12 +336,13 @@ def main() -> None:
         raise ValueError('Invalid local source commit')
     # A read-only local check needs no Actions identity or credentials. It still
     # verifies all provenance and rejects dirty-source artifacts inside validate.
-    # The publication path below always enforces the complete main/event context.
+    # Branch Actions checks require an explicit validation-only dispatch. The
+    # publication path still enforces main and refuses validation-only mode.
     if args.validate_only and os.environ.get('GITHUB_ACTIONS') != 'true':
         validate(args.directory, head)
         print(f'Validated seven JARs and two metadata files for local commit {head}', flush=True)
         return
-    ctx = context(os.environ)
+    ctx = context(os.environ, validate_only=args.validate_only)
     if head != ctx['commit']:
         raise ValueError('Publisher checkout must match the triggering commit')
     files = validate(args.directory, ctx['commit'])

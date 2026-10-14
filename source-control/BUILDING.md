@@ -8,7 +8,21 @@
 
 独立的 [快速回放兼容补丁](../piq-replay-quickmode-compat/README.md#构建)使用 Python 和 Java 21 构建；需自行提供指定版本的客户端编译依赖，并执行组件的静态、Mixin 转换和行为检查。它不属于下面的七件快照，不会因本目录入库自动上传 JAR。
 
-[snapshot.yml](../.github/workflows/snapshot.yml) 在进入 `main` 的每次 push 后触发，也支持在 Actions 中手动选择 `main` 运行。只有七个成品全部编译、检查和打包成功，才会创建独立预发行；失败不会覆盖已有发行版。workflow 合入 `main` 后才启用，不在拉取请求中使用发布权限。
+[snapshot.yml](../.github/workflows/snapshot.yml) 在进入 `main` 的每次 push 后触发，保留原有构建成功后自动创建独立预发行的行为；失败不会覆盖已有发行版。手动运行默认只验证，分支运行不发布，见下方说明。不在拉取请求中使用发布权限。
+
+### 分支上的非发布验证
+
+在本仓库 Actions 中选择 `Build and publish snapshot`、目标源码分支，并保持 `validation_only=true`（默认）。该模式运行原有输入准备、七组件构建和完整制品身份校验；只使用构建任务的只读权限，不执行 Release 发布任务，也不上传玩家 JAR、DLL/WASM、运行库或构建目录作为 Actions 附件。结果查看各步骤日志与任务摘要；临时制品随托管 runner 回收，不能作为玩家下载入口。
+
+分支验证仅接受本仓库的 `workflow_dispatch` 和 `refs/heads/*`，不接受标签、拉取请求或 fork 身份；检出的提交必须等于触发 SHA，源码必须干净。`snapshot_release.py --validate-only` 仍执行原有九文件白名单、全部 JAR 的内部提交/核心身份及 SHA 校验，不通过伪造本地运行环境绕过限制。真正发布仍仅限 `main`，且明确拒绝验证模式。`main` 上的手动运行若关闭 `validation_only`，以及 `main` 的 push，仍进入原发布路径；未完成发行许可核对时不要使用这些路径。
+
+这里验证的是当前源码的 **nightly 快照构建链**，不是 FC76.54/SFC54 固定核心候选的复现或升级。本链的 SFC 使用 Mesen-S nightly 和旧 WASM，不能把它的成功结果当作 SFC54/Snes9x 的构建、许可或实机验收。普通 nightly、定制 bootstrap 和最终合包身份均按下文规则处理，验证模式不放宽任何核心约束。
+
+当前快照脚本的身份与哈希检查**不是发行许可批准门禁**，也不会自动判断 SFC 完整组合及所有第三方组件是否已获准再分发。分支验证不会补授许可；恢复任何待批准成品的自动分发前，应另行完成精确输入、对应来源/源码、许可材料及组合批准清单，并在二进制附件上传和发布前失败关闭。不能用“来自官方 nightly”、旧包已公开或单个 `license` 字段代替该批准。本节仅提供无二进制分发的验证路径，不声称该许可清单已经实现。
+
+手动分支运行仍要求工作流已在默认分支登记，参见 [GitHub 手动运行说明](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow)。不需要为了执行已登记工作流的分支验证而先合并待验证源码。
+
+### 构建范围与核心来源
 
 构建使用 GitHub 的 Windows 2022 runner、Java 21 和 Python 3.12，依次完成主模组、完整 SFC、MD、GBA、街机、电脑和 PvZ 七个玩家 JAR。SFC 由本次编译的两个内部组件合成一个完整玩家包；PvZ 仍是可选开发验证组件，不因自动打包变成稳定机型。
 
