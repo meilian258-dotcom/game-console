@@ -17,7 +17,7 @@ public final class SfcHomeNetwork {
     public static final String CORE_BUILD = cn.piq.sfchome.core.LibretroSfcCore.BUILD+":jni-v1";
     public static final int MAX_ROM = 32 * 1024 * 1024 + 512, CHUNK = 65536;
     public static final int REFRESH=0, WRITE=1, UPLOAD_START=2, UPLOAD_CHUNK=3, UPLOAD_FINISH=4, CANCEL=5,
-            SAVE_NAME=6, COVER_START=7, CLEAR_COVER=8, RESTORE_COVER=9, SET_PLAYERS=10, USE_COVER=11, SET_SAVE_MODE=12;
+            SAVE_NAME=6, COVER_START=7, CLEAR_COVER=8, RESTORE_COVER=9, SET_PLAYERS=10, USE_COVER=11, SET_SAVE_MODE=12, SAVE_LIBRARY=13;
     public static final int MAX_COVER=2*1024*1024;
     private SfcHomeNetwork() {}
     public interface ClientHandler {
@@ -35,7 +35,7 @@ public final class SfcHomeNetwork {
     public static void setCoverHandler(java.util.function.Consumer<CoverChunk> handler){coverClient=Objects.requireNonNull(handler);}
     public static void setClientHandler(ClientHandler handler) { client = Objects.requireNonNull(handler); }
     public static void register(RegisterPayloadHandlersEvent event) {
-        var r = cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"13");
+        var r = cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"15");
         SfcHostedNetwork.register(event);
         SfcJoinNetwork.register(event);
         r.playToServer(CoverRequest.TYPE,CoverRequest.CODEC,(p,c)->c.enqueueWork(()->{if(c.player() instanceof ServerPlayer s)cn.piq.sfchome.server.SfcCoverService.download(s,p);}));
@@ -79,10 +79,11 @@ public final class SfcHomeNetwork {
         public static final StreamCodec<RegistryFriendlyByteBuf,Session> CODEC=StreamCodec.of((b,v)->{b.writeVarLong(v.sessionId);b.writeVarInt(v.epoch);b.writeResourceLocation(v.dimension);b.writeBlockPos(v.consolePos);b.writeUUID(v.consoleId);b.writeBlockPos(v.tvPos);b.writeUUID(v.tvId);b.writeUUID(v.linkId);b.writeUtf(v.romSha,64);b.writeUtf(v.coreBuild,96);b.writeByte(v.port);b.writeUUID(v.controllerLease);b.writeBoolean(v.executionHost);b.writeByte(v.syncMode);b.writeUUID(v.mediaSource);b.writeUUID(v.mediaStream);},b->new Session(b.readVarLong(),b.readVarInt(),b.readResourceLocation(),b.readBlockPos(),b.readUUID(),b.readBlockPos(),b.readUUID(),b.readUUID(),b.readUtf(64),b.readUtf(96),b.readByte(),b.readUUID(),b.readBoolean(),b.readUnsignedByte(),b.readUUID(),b.readUUID()));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
-    public record NetplayStart(Session session,long wire,UUID ticket) implements CustomPacketPayload {
-        public NetplayStart{Objects.requireNonNull(session);Objects.requireNonNull(ticket);if(session.syncMode()!=3||wire<(1L<<50))throw new IllegalArgumentException("Netplay grant");}
+    public record NetplayStart(Session session,long wire,UUID ticket,cn.piq.fcarcade.netplay.NetplayLaunchSpec launch) implements CustomPacketPayload {
+        public NetplayStart(Session session,long wire,UUID ticket){this(session,wire,ticket,cn.piq.sfchome.core.SfcNetplayProfile.legacy().launch());}
+        public NetplayStart{Objects.requireNonNull(session);Objects.requireNonNull(ticket);Objects.requireNonNull(launch);if(session.syncMode()!=3||wire<(1L<<50))throw new IllegalArgumentException("Netplay grant");}
         public static final Type<NetplayStart> TYPE=id("netplay_start");
-        public static final StreamCodec<RegistryFriendlyByteBuf,NetplayStart> CODEC=StreamCodec.of((b,v)->{Session.CODEC.encode(b,v.session);b.writeLong(v.wire);b.writeUUID(v.ticket);},b->new NetplayStart(Session.CODEC.decode(b),b.readLong(),b.readUUID()));
+        public static final StreamCodec<RegistryFriendlyByteBuf,NetplayStart> CODEC=StreamCodec.of((b,v)->{Session.CODEC.encode(b,v.session);b.writeLong(v.wire);b.writeUUID(v.ticket);b.writeUtf(v.launch.variant(),48);b.writeUtf(v.launch.compatibilitySha(),64);b.writeBoolean(v.launch.persistenceSupported());},b->new NetplayStart(Session.CODEC.decode(b),b.readLong(),b.readUUID(),new cn.piq.fcarcade.netplay.NetplayLaunchSpec(b.readUtf(48),b.readUtf(64),b.readBoolean())));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     /** Sent only after the server commits launch and (when enabled) save authority. */
@@ -151,7 +152,7 @@ public final class SfcHomeNetwork {
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     public record EditorAction(UUID token,int operation,String hash,String name,int total,int offset,byte[] data) implements CustomPacketPayload {
-        public EditorAction{Objects.requireNonNull(token);SfcHomeNetwork.hash(hash,true);text(name,128);if(operation<0||operation>SET_SAVE_MODE||total<0||total>MAX_ROM||offset<0||offset>MAX_ROM||data==null||data.length>CHUNK)throw new IllegalArgumentException("Invalid editor action");data=data.clone();}
+        public EditorAction{Objects.requireNonNull(token);SfcHomeNetwork.hash(hash,true);text(name,128);if(operation<0||operation>SAVE_LIBRARY||total<0||total>MAX_ROM||offset<0||offset>MAX_ROM||data==null||data.length>CHUNK)throw new IllegalArgumentException("Invalid editor action");if(operation==SAVE_LIBRARY&&(hash.isEmpty()||!name.isEmpty()||total!=0||offset!=0||data.length!=0))throw new IllegalArgumentException("Invalid save library action");data=data.clone();}
         @Override public byte[] data(){return data.clone();}public static final Type<EditorAction> TYPE=id("editor_action");
         public static final StreamCodec<RegistryFriendlyByteBuf,EditorAction> CODEC=StreamCodec.of((b,v)->{b.writeUUID(v.token);b.writeByte(v.operation);b.writeUtf(v.hash,64);b.writeUtf(v.name,128);b.writeVarInt(v.total);b.writeVarInt(v.offset);b.writeByteArray(v.data);},b->new EditorAction(b.readUUID(),b.readUnsignedByte(),b.readUtf(64),b.readUtf(128),b.readVarInt(),b.readVarInt(),b.readByteArray(CHUNK)));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}

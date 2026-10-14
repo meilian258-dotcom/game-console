@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -22,6 +23,9 @@ import tomllib
 import zipfile
 
 from release_artifacts import inspect, sha256
+import snapshot_stock
+import sfc_stock
+import replay_api
 
 ROOT = Path(__file__).resolve().parents[1]
 META = 'META-INF/neoforge.mods.toml'
@@ -37,12 +41,17 @@ BOOTSTRAP = {
     'arcade': '575f16d2123f1e91cadba12d8ace9dead63936770fcdec4476c260c13ce5d925',
     'pvz': 'e010b4185c8a9e51edcba3ef40718a81781068320681892cf869d68c3046f04a',
 }
+MAME_LIFECYCLE_RESOURCES = (
+    'core/mame-jni/windows-x64/mame_piq_lifecycle1.dll',
+    'META-INF/piq-native/mame-lifecycle/runtime.json',
+)
 RESOURCE_SCOPES = {
     'sfc-core': ('assets/piq_sfc_arcade/core/piq_sfc_wasm.wasm', 'META-INF/piq-sfc-wasm-privacy.json'),
     'sfc-home': ('core/sfc-libretro/',),
     'md': ('core/windows-x64/',),
     'pvz': ('core/pvz/', 'META-INF/pvz/licenses/'),
-    'arcade': ('native-runtime/', 'META-INF/piq-native/fbneo/', 'META-INF/licenses/native-runtime17/'),
+    'arcade': ('native-runtime/', 'META-INF/piq-native/fbneo/', 'META-INF/licenses/native-runtime17/',
+               *MAME_LIFECYCLE_RESOURCES),
 }
 EXPECTED_IDS = {'piq_fc_arcade', 'piq_sfc_arcade', 'piq_sfc_home', 'piq_md_home',
                 'piq_gba', 'piq_native_arcade', 'piq_computer', 'piq_pvz'}
@@ -92,6 +101,31 @@ def verify_file(path: Path, record: dict) -> None:
         raise ValueError('Snapshot input is absent or changed: ' + record.get('path', path.name))
 
 
+def verify_mame_lifecycle_resources(resource_root: Path, source_root: Path | None = None) -> None:
+    """Reuse the project's fixed identity checks; never prepare or execute a core."""
+    for name in MAME_LIFECYCLE_RESOURCES:
+        path = resource_root / name
+        no_links(path.absolute())
+        if not path.is_file():
+            raise ValueError('Missing fixed MAME lifecycle resource: ' + name)
+    project = (ROOT if source_root is None else source_root) / 'piq-native-arcade'
+    lock = project / 'native/mame-lifecycle/runtime.json'
+    tool_path = project / 'tools/prepare_mame_lifecycle_runtime.py'
+    no_links(lock.absolute())
+    no_links(tool_path.absolute())
+    if not lock.is_file():
+        raise ValueError('Reviewed MAME lifecycle manifest is required')
+    spec = importlib.util.spec_from_file_location('snapshot_mame_lifecycle_tool', tool_path)
+    tool = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(tool)
+    if (tool.RESOURCE, tool.NOTICE) != MAME_LIFECYCLE_RESOURCES:
+        raise ValueError('MAME lifecycle resource mapping changed; review snapshot scopes')
+    manifest = tool.load_manifest(lock, lock.parent / tool.PATCH.name, lock.parent / tool.SHARED_PATCH.name)
+    tool.verify_core(resource_root / tool.RESOURCE, manifest)
+    if (resource_root / tool.NOTICE).read_bytes() != tool.notice_bytes(manifest):
+        raise ValueError('MAME lifecycle notice differs from the reviewed manifest')
+
+
 def verify_resources(resource_root: Path, receipt_path: Path) -> None:
     """Called again by Gradle immediately before processResources."""
     input_root = receipt_path.absolute().parent
@@ -113,14 +147,19 @@ def verify_resources(resource_root: Path, receipt_path: Path) -> None:
         if not any(resource == prefix or (prefix.endswith('/') and resource.startswith(prefix))
                    for prefix in RESOURCE_SCOPES[bucket]):
             raise ValueError('Foreign snapshot resource: ' + resource)
-        if resource.endswith('.class') or resource == HELPER or resource.lower().endswith('blastem_libretro.dll'):
-            raise ValueError('Compiled MOD classes/current helper/retired core must not be bootstrapped')
+        if (resource.endswith('.class') or resource == HELPER or resource.lower().endswith('blastem_libretro.dll')
+                or snapshot_stock.generated_resource(resource)):
+            raise ValueError('Compiled MOD classes/current helper/stock resource/retired core must not be bootstrapped')
         if name not in expected:
             raise ValueError('Unreceipted resource: ' + resource)
         verify_file(path, expected[name])
         actual.add(name)
     if not actual or actual != set(expected):
         raise ValueError('Incomplete snapshot resource tree')
+    if bucket == 'arcade':
+        verify_mame_lifecycle_resources(resource_root)
+    if bucket == 'sfc-home':
+        verify_file(resource_root / sfc_stock.LEGACY_RESOURCE, sfc_stock.LEGACY)
 
 
 def verify_inputs(input_root: Path) -> dict:
@@ -128,6 +167,8 @@ def verify_inputs(input_root: Path) -> dict:
     receipt, records = load_receipt(receipt_path)
     for name, record in records.items():
         verify_file(input_root / name, record)
+    stock = snapshot_stock.verify_receipt(input_root, records)
+    sfc = sfc_stock.verify_receipt(input_root, records)
     pins = {}
     for entry in receipt.get('bootstrap', []):
         ident = entry.get('id')
@@ -141,7 +182,19 @@ def verify_inputs(input_root: Path) -> dict:
         raise ValueError('Exactly the six approved native input distributions are required')
     for bucket in RESOURCE_SCOPES:
         verify_resources(input_root / 'resources' / bucket, receipt_path)
-    return dict(receipt=receipt, bootstrap=pins, receipt_path=receipt_path)
+    return dict(receipt=receipt, bootstrap=pins, receipt_path=receipt_path, fbneo_stock=stock, sfc_snes9x=sfc)
+
+
+def arcade_gradle_properties(fc: Path, inputs: dict) -> dict:
+    stock = inputs['fbneo_stock']
+    return dict(gameConsoleJar=str(fc), embeddedRuntimePython=sys.executable,
+                fbneoStockCore=str(stock['core']), fbneoStockSource=str(stock['source']))
+
+
+def sfc_gradle_properties(fc: Path, core: Path, inputs: dict) -> dict:
+    fixed = inputs['sfc_snes9x']
+    return dict(gameConsoleJar=str(fc), sfcCoreJar=str(core), sfcRuntimePython=sys.executable,
+                sfcSnes9xCore=str(fixed['core']), sfcSnes9xSource=str(fixed['source']))
 
 
 def archive_entries(path: Path) -> dict[str, bytes]:
@@ -223,6 +276,7 @@ def version(module: str) -> str:
 def stage_outputs(paths: list[Path], output: Path, manifest: dict) -> dict:
     if len(paths) != 7 or output.exists():
         raise ValueError('Exactly seven new JARs and a new distribution directory are required')
+    replay_api.verify_suite(paths)
     metadata = [inspect(path) for path in paths]
     ids, classes = set(), set()
     for path, item in zip(paths, metadata):
@@ -424,12 +478,12 @@ def build(work: Path, output: Path) -> dict:
     common = dict(gameConsoleJar=str(fc))
     gradle('piq-sfc-arcade', ['clean', 'check', 'jar'], common, 'sfc-core')
     sfc_core = ROOT / 'piq-sfc-arcade/build/libs' / ('piq_sfc_arcade-' + version('piq-sfc-arcade') + '.jar')
-    gradle('piq-sfc-home', ['clean', 'check', 'jar'], dict(common, sfcCoreJar=str(sfc_core)), 'sfc-home')
+    gradle('piq-sfc-home', ['clean', 'check', 'jar'], sfc_gradle_properties(fc, sfc_core, inputs), 'sfc-home')
     sfc_home = ROOT / 'piq-sfc-home/build/libs' / ('piq_sfc_home-' + version('piq-sfc-home') + '.jar')
     sfc = merge_sfc(sfc_core, sfc_home, work / 'merged/sfc-complete.jar')
     gradle('piq-md-home', ['clean', 'check', 'jar'], common, 'md')
     md = ROOT / 'piq-md-home/build/libs' / ('game_console_md-' + version('piq-md-home') + '.jar')
-    gradle('piq-native-arcade', ['clean', 'check', 'jar'], dict(common, embeddedRuntimePython=sys.executable), 'arcade')
+    gradle('piq-native-arcade', ['clean', 'check', 'jar'], arcade_gradle_properties(fc, inputs), 'arcade')
     arcade = ROOT / 'piq-native-arcade/build/libs' / ('piq_native_arcade-' + version('piq-native-arcade') + '.jar')
     gradle('piq-pvz-addon', ['clean', 'check', 'jar'], common, 'pvz')
     pvz = ROOT / 'piq-pvz-addon/build/libs/game_console_pvz-0.1.0-prototype.12.jar'

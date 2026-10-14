@@ -1,0 +1,51 @@
+// Shared build/test workspace. Never applied to ModDev's actual game launch tasks.
+def workspaceType = new GroovyClassLoader(getClass().classLoader).parseClass(
+        file('../source-control/BuildWorkspace.groovy'))
+def checkout = file('..')
+def configuredWorkspace = providers.gradleProperty('piqBuildWorkDir')
+        .orElse(providers.environmentVariable('PIQ_BUILD_WORK_DIR')).orNull
+def workspaceBase = workspaceType.resolve(checkout, configuredWorkspace,
+        System.getProperty('os.name'), System.getenv('SystemDrive'))
+ext.piqBuildWorkspace = workspaceType.projectDirectory(workspaceBase, checkout, project.name)
+ext.piqAsciiClasspathRoot = new File(piqBuildWorkspace, 'classpath')
+ext.piqPrepareBuildDirectory = { directory -> workspaceType.prepare(directory) }
+
+// Explicit opt-in for JavaExec; runClient/runServer must retain game runtime ownership.
+ext.piqUseBuildWorkspace = { task ->
+    def temporary = workspaceType.taskDirectory(piqBuildWorkspace, task.name)
+    task.systemProperty 'java.io.tmpdir', temporary.absolutePath
+    task.systemProperty 'jna.tmpdir', new File(temporary, 'jna').absolutePath
+    task.systemProperty 'wasmtime4j.native.tmpdir', new File(temporary, 'wasmtime').absolutePath
+    task.environment 'TEMP', temporary.absolutePath
+    task.environment 'TMP', temporary.absolutePath
+    task.doFirst {
+        workspaceType.prepare(temporary)
+        workspaceType.prepare(new File(temporary, 'jna'))
+        workspaceType.prepare(new File(temporary, 'wasmtime'))
+    }
+}
+tasks.withType(Test).configureEach { piqUseBuildWorkspace(delegate) }
+
+// Sync may remove stale classpath copies, but only inside this checkout's scoped output.
+tasks.withType(AbstractCopyTask).configureEach {
+    doFirst {
+        if (delegate.hasProperty('destinationDir') && destinationDir != null &&
+                destinationDir.toPath().toAbsolutePath().normalize().startsWith(piqBuildWorkspace.toPath())) {
+            workspaceType.prepare(destinationDir)
+        }
+    }
+}
+tasks.register('printBuildWorkspace') {
+    group = 'help'
+    description = 'Prints the development classpath and test temporary workspace without creating it.'
+    doLast { logger.lifecycle('Development workspace: ' + piqBuildWorkspace) }
+}
+def verifyWorkspace = tasks.register('verifyBuildWorkspace') {
+    group = 'verification'
+    description = 'Runs the pure workspace policy checks with retained fixtures on the configured work drive.'
+    doLast {
+        new GroovyShell(getClass().classLoader).run(file('../source-control/test_build_workspace.groovy'),
+                [new File(piqBuildWorkspace, 'helper-tests').absolutePath] as String[])
+    }
+}
+tasks.named('check') { dependsOn verifyWorkspace }

@@ -16,7 +16,7 @@ class WatchNetplayTest {
         ResourceLocation.parse("piq_fc_arcade:cabinet"),id(2),id(3),ResourceLocation.parse("minecraft:overworld"),
         new WatchAnchor(BlockPos.ZERO,id(4)),null,List.of(new WatchAnchor(BlockPos.ZERO,id(4)))));}
     @Test void actualObserverCodecRoundTripsAndRejectsEveryTruncatedPayload(){
-        var grant=new WatchNetwork.NetplayStart(watch(),999,id(5),ResourceLocation.parse("piq_native_arcade:mame"),"ab".repeat(32));
+        var grant=new WatchNetwork.NetplayStart(watch(),999,id(5),ResourceLocation.parse("piq_native_arcade:mame"),"ab".repeat(32),new NetplayLaunchSpec("retroarch-stock-v1","cd".repeat(32),false));
         var b=new RegistryFriendlyByteBuf(Unpooled.buffer(),RegistryAccess.EMPTY);
         try{WatchNetwork.NetplayStart.CODEC.encode(b,grant);byte[] raw=new byte[b.readableBytes()];b.getBytes(0,raw);
             assertEquals(grant,WatchNetwork.NetplayStart.CODEC.decode(b));assertEquals(0,b.readableBytes());

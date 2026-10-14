@@ -5,6 +5,37 @@ import static org.junit.jupiter.api.Assertions.*;
 import static cn.piq.retro.flow.DeviceSessionFlow.Stage.*;
 
 class DeviceSessionFlowTest {
+    @Test void configuredSecondPortSkipsConfirmationForSaveAndNoSave(){
+        for(boolean saving:new boolean[]{false,true})for(boolean allowed:new boolean[]{false,true}){
+            var flow=new DeviceSessionFlow(2,saving,false,allowed);
+            assertThrows(IllegalStateException.class,flow::ready);flow.prepared();
+            if(saving){assertEquals(SAVE_SELECTION,flow.stage());flow.select(1);}
+            assertEquals(VALIDATING,flow.stage());assertFalse(flow.allowSecondPort());long revision=flow.revision();
+            flow.selected();assertEquals(LOADING,flow.stage());assertEquals(allowed,flow.allowSecondPort());
+            assertEquals(1,flow.savePlayers());assertFalse(flow.accepts(revision));
+            assertThrows(IllegalStateException.class,()->flow.join(!allowed));
+            flow.ready();assertEquals(READY,flow.stage());
+            flow.stopping();assertFalse(flow.allowSecondPort());flow.finished(true);assertEquals(CLOSED,flow.stage());
+        }
+    }
+    @Test void configuredAllowanceCannotOverrideContentOrPrivateScope(){
+        for(int max:new int[]{1,2})for(boolean privatePlay:new boolean[]{false,true}){
+            var flow=new DeviceSessionFlow(max,false,privatePlay,true);flow.prepared();flow.selected();
+            assertEquals(LOADING,flow.stage());assertEquals(max==2&&!privatePlay,flow.allowSecondPort());
+        }
+    }
+    @Test void configuredPolicySurvivesSaveRetryWithoutChangingSaveLabels(){
+        var flow=new DeviceSessionFlow(2,true,false,false);flow.prepared();flow.select(1);flow.invalidSelection();
+        flow.select(2);flow.selected();assertEquals(LOADING,flow.stage());assertEquals(2,flow.savePlayers());assertFalse(flow.allowSecondPort());
+    }
+    @Test void configuredPreparationCancellationAndFailureNeverGrantReady(){
+        for(boolean fail:new boolean[]{false,true})for(int step=0;step<4;step++){
+            var flow=new DeviceSessionFlow(2,true,false,true);
+            if(step>0)flow.prepared();if(step>1)flow.select(1);if(step>2)flow.selected();
+            long revision=flow.revision();if(fail)flow.fail();else flow.cancel();
+            assertTrue(flow.terminal());assertFalse(flow.allowSecondPort());assertFalse(flow.accepts(revision));assertThrows(IllegalStateException.class,flow::ready);
+        }
+    }
     @Test void noSaveStillRequiresIndependentSecondPlayerConsent(){var flow=new DeviceSessionFlow(2,false,false);flow.prepared();assertEquals(VALIDATING,flow.stage());flow.selected();assertEquals(JOIN_CONFIRM,flow.stage());assertThrows(IllegalStateException.class,flow::ready);flow.join(true);assertEquals(LOADING,flow.stage());assertEquals(1,flow.savePlayers());assertTrue(flow.allowSecondPort());flow.ready();assertEquals(READY,flow.stage());}
     @Test void saveLabelAndLiveJoinPermissionAreIndependent(){var flow=new DeviceSessionFlow(2,true,false);flow.prepared();flow.select(2);flow.selected();flow.join(false);assertEquals(2,flow.savePlayers());assertFalse(flow.allowSecondPort());flow.ready();flow.stopping();flow.finished(true);assertEquals(CLOSED,flow.stage());}
     @Test void soloSaveMayAllowTwoPlayersWithoutRelabelling(){var flow=new DeviceSessionFlow(2,true,false);flow.prepared();flow.select(1);flow.selected();flow.join(true);assertTrue(flow.allowSecondPort());assertEquals(1,flow.savePlayers());}

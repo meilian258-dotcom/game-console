@@ -14,6 +14,7 @@ class GuardTests(unittest.TestCase):
         self.assertIn('outside-source-scope',path_issues('piq-server-assistant/server.py'))
     def test_only_reviewed_workflow_is_allowed(self):
         self.assertEqual([], path_issues('.github/workflows/snapshot.yml'))
+        self.assertEqual([], path_issues('.github/workflows/mame-lifecycle-candidate.yml'))
         for name in ('.github/workflows/another.yml', '.github/actions/run/action.yml',
                      '.github/workflows/snapshot.yml/hidden.txt', '.github/secret.json'):
             self.assertIn('outside-source-scope', path_issues(name))
@@ -26,6 +27,13 @@ class GuardTests(unittest.TestCase):
         for name in ('install.py', 'recording.mcpr', 'recording.mcpr.cache/index',
                      'build/libs/test.jar', 'tools/verification.json', 'summary.json'):
             self.assertTrue(path_issues(prefix + name), name)
+    def test_replay_metadata_is_one_exact_source_exception(self):
+        self.assertEqual([],path_issues('piq-replay-compat/src/main/java/cn/piq/replaycompat/ReplayCompat.java'))
+        self.assertEqual([],path_issues('piq-fc-arcade/src/main/resources/META-INF/game-console/replay-api.properties'))
+        for name in ('piq-fc-arcade/src/main/resources/META-INF/game-console/other.properties',
+                     'piq-fc-arcade/game-console/replay-api.properties',
+                     'piq-replay-compat/game-console/replay-api.properties'):
+            self.assertIn('generated-or-private-directory',path_issues(name))
     def test_credentials(self):
         for name in ['.env','登录信息.txt','keys/server.pem','private/config.json']:
             self.assertTrue(path_issues('piq-gba/'+name),name)

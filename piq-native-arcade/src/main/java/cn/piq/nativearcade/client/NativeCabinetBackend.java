@@ -7,6 +7,8 @@ import cn.piq.fcarcade.client.cabinet.CabinetBackend;
 import cn.piq.fcarcade.client.rom.LocalRomLibrary;
 import cn.piq.nativearcade.bridge.NativeProcessSession;
 import cn.piq.nativearcade.bridge.NativeJniMediaSession;
+import cn.piq.nativearcade.bridge.NativeMediaBackend;
+import cn.piq.nativearcade.bridge.NativeRetroArchMediaSession;
 import cn.piq.nativearcade.NativeSnapshotProfile;
 import cn.piq.fcarcade.cabinet.CabinetRomBindings;
 import cn.piq.fcarcade.cabinet.CabinetSyncCore;
@@ -24,14 +26,18 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /** FC owns cabinet/GUI/leases. Media uses common JNI; legacy snapshot sync retains its verified worker. */
 public final class NativeCabinetBackend implements CabinetBackend {
-    @Override public String description(){return "JNI Netplay 使用可精确恢复的 FBNeo 游戏；普通音画使用 MAME JNI。旧本地同步仍为兼容后端";}
+    @Override public String description(){
+        try{return "Netplay 可选 JNI · FBNeo state-v3 或 RetroArch · 原版 FBNeo（实验、不存档）；普通音画使用 MAME · "+(NativeMediaBackend.selected()==NativeMediaBackend.RETROARCH?"RetroArch 独立进程（试验）":"JNI")+"。旧本地同步保持兼容";}
+        catch(IllegalArgumentException invalid){return invalid.getMessage();}
+    }
     @Override public String extensions(){return ".zip（如 dino.zip、kov.zip；独立完整 ROM 集，BIOS 放同目录）";}
     @Override public Path defaultRom(){return NativeArcadeClient.dataRoot().resolve("diagnostic/invaders.zip");}
     @Override public Path romDirectory(){return LocalRomLibrary.arcadeDirectory(Minecraft.getInstance().gameDirectory.toPath());}
     @Override public Set<String> romExtensions(){return Set.of(".zip");}
     @Override public Set<String> romExcludedNames(){return cn.piq.fcarcade.cabinet.CabinetGameManifest.BIOS;}
     @Override public String unavailableReason(){
-        return NativeJniMediaSession.unavailableReason();
+        try{return NativeMediaBackend.selected()==NativeMediaBackend.RETROARCH?NativeRetroArchMediaSession.unavailableReason():NativeJniMediaSession.unavailableReason();}
+        catch(IllegalArgumentException invalid){return invalid.getMessage();}
     }
     @Override public String syncUnavailableReason(){
         if(!System.getProperty("os.name","").startsWith("Windows")||!System.getProperty("os.arch","").matches("amd64|x86_64"))
@@ -51,6 +57,15 @@ public final class NativeCabinetBackend implements CabinetBackend {
     @Override public NetplayFactory prepareNetplayFactory(){
         return NativeNetplayContent::loadFiles;
     }
+    @Override public String netplayUnavailableReason(String variant){
+        try{cn.piq.nativearcade.NativeNetplayProfile.variant(variant);}
+        catch(IllegalArgumentException invalid){return invalid.getMessage();}
+        return netplayUnavailableReason();
+    }
+    @Override public NetplayFactory prepareNetplayFactory(String variant){
+        String trusted=cn.piq.nativearcade.NativeNetplayProfile.variant(variant).id();
+        return rom->NativeNetplayContent.loadFiles(rom,trusted);
+    }
     @Override public CabinetSyncCore openSync(Path rom)throws Exception{
         throw new java.io.IOException("本地同步必须使用主线程捕获的开局上下文");
     }
@@ -69,11 +84,13 @@ public final class NativeCabinetBackend implements CabinetBackend {
         @Override public void requestClose(){cancelled.set(true);Runnable closer=signal.get();if(closer!=null)closer.run();}
     }
     @Override public CabinetEmulator open(Path rom)throws Exception{
+        if(NativeMediaBackend.selected()==NativeMediaBackend.RETROARCH)return new NativeRetroArchMediaSession(rom);
         NativeJniMediaSession core=new NativeJniMediaSession(NativeArcadeClient.dataRoot().resolve("runtime"),rom);
         return new CabinetEmulator(){
             @Override public int maxPlayers(){return core.maxPlayers();}
             @Override public boolean isReady(){return core.isReady();}
             @Override public String error(){return core.error();}
+            @Override public List<String> diagnostics(){return core.diagnostics();}
             @Override public void offerInput(int p1,int p2){core.offerInput(p1,p2);}
             @Override public void offerInputs(int p1,int p2,int p3,int p4){core.offerInputs(p1,p2,p3,p4);}
             @Override public void releasePort(int port){core.releasePort(port);}

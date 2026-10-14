@@ -25,6 +25,7 @@ abstract class HomeEndpointBlockEntity extends BlockEntity {
     private boolean visualPowered;
     private boolean occupancyVisible = true;
     private Boolean joinApprovalRequired;
+    private boolean secondPortAllowed = true;
     private boolean adminDefaultsInitialized;
     private int observationRange;
     private cn.piq.fcarcade.cabinet.CabinetSyncMode synchronizationMode = cn.piq.fcarcade.cabinet.CabinetSyncMode.LOCAL_SYNC;
@@ -42,6 +43,12 @@ abstract class HomeEndpointBlockEntity extends BlockEntity {
         if (observationRange != range) { observationRange = range; changed(); }
     }
     public final boolean occupancyVisible() { return occupancyVisible; }
+    /** Device preference for the next public launch, independent of legacy per-join approval. */
+    public final boolean secondPortAllowed() { return secondPortAllowed; }
+    final void secondPortAllowed(boolean allowed) {
+        requireLiveConsole();
+        if (secondPortAllowed != allowed) { secondPortAllowed = allowed; changed(); }
+    }
     public final boolean joinApprovalRequired() {
         String system = this instanceof HomeConsoleBlockEntity ? "piq_fc_arcade:nes"
                 : this instanceof ExternalHomeConsoleBlockEntity external ? external.systemId().toString() : "";
@@ -54,6 +61,11 @@ abstract class HomeEndpointBlockEntity extends BlockEntity {
             return stored != null ? stored
                     : !("piq_fc_arcade:nes".equals(system) || "piq_sfc_home:sfc".equals(system));
         }
+        static boolean secondPort(CompoundTag tag) {
+            return !tag.contains("HomeSecondPortAllowed")
+                    || tag.contains("HomeSecondPortAllowed", net.minecraft.nbt.Tag.TAG_BYTE) && tag.getBoolean("HomeSecondPortAllowed");
+        }
+        static void secondPort(CompoundTag tag, boolean allowed) { tag.putBoolean("HomeSecondPortAllowed", allowed); }
     }
     final void occupancyVisible(boolean visible) {
         requireLiveConsole();
@@ -160,6 +172,8 @@ abstract class HomeEndpointBlockEntity extends BlockEntity {
         observationRange = cn.piq.fcarcade.config.GameConsoleAdminPolicy.persistedRange(tag.getInt("ConsoleWatchRange"), 0);
         visualPowered = tag.getBoolean("VisualPowered");
         occupancyVisible = !tag.contains("HomeOccupancyVisible") || tag.getBoolean("HomeOccupancyVisible");
+        // Missing is the new default; malformed present data must not grant a second port.
+        secondPortAllowed = Defaults.secondPort(tag);
         // Keep every stored boolean; a malformed present field fails closed.
         joinApprovalRequired = !tag.contains("HomeJoinApproval") ? null
                 : !tag.contains("HomeJoinApproval", net.minecraft.nbt.Tag.TAG_BYTE) || tag.getBoolean("HomeJoinApproval");
@@ -180,6 +194,7 @@ abstract class HomeEndpointBlockEntity extends BlockEntity {
             if (observationRange != 0) tag.putInt("ConsoleWatchRange", observationRange);
             tag.putBoolean("HomeOccupancyVisible", occupancyVisible);
             tag.putBoolean("HomeJoinApproval", joinApprovalRequired());
+            Defaults.secondPort(tag, secondPortAllowed);
         }
         tag.putUUID("HardwareId", hardwareId);
         if (kind() == HomeLinkLedger.Kind.CONSOLE) tag.putString("HomeSyncMode", synchronizationMode.name());

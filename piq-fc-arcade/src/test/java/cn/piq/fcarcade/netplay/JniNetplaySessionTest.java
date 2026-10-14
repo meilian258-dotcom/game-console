@@ -11,6 +11,36 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Exercises real relay/codec/session/rollback/storage callbacks; fake core only, not a JNI claim. */
 class JniNetplaySessionTest {
+    @Test void replayClosesOwnerWithoutFinalSnapshotPersistenceOrClosePacket()throws Exception{
+        var core=new Core();var saves=new AtomicInteger();var finishes=new AtomicInteger();var sends=new AtomicInteger();
+        var run=new JniNetplaySession(new NetplayProcess.Grant(701,UUID.randomUUID(),true,true),()->ROM,c->sends.incrementAndGet(),()->core);
+        run.persistence(new NetplayProcess.Persistence(){
+            public byte[] load(NetplaySaveState.Identity identity){return null;}
+            public CompletableFuture<Void> save(byte[] bytes){saves.incrementAndGet();return CompletableFuture.completedFuture(null);}
+            public CompletableFuture<Void> finish(){finishes.incrementAndGet();return CompletableFuture.completedFuture(null);}
+        });
+        try{
+            run.start();long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(3);
+            while(!run.ready()&&run.error()==null&&System.nanoTime()<end)Thread.sleep(2);
+            assertTrue(run.ready(),run.error());
+            cn.piq.retro.replay.ReplayGuard.enterReplay();run.closeWithoutSave();
+            run.terminated().get(5,TimeUnit.SECONDS);
+            assertTrue(core.closed);assertEquals(0,saves.get());assertEquals(0,finishes.get());assertEquals(0,sends.get());
+            cn.piq.retro.replay.ReplayGuard.exitReplay();
+            assertTrue(run.saveNow().isCompletedExceptionally());run.start();assertFalse(run.ready());
+        }finally{cn.piq.retro.replay.ReplayGuard.exitReplay();run.closeWithoutSave();run.terminated().get(5,TimeUnit.SECONDS);}
+    }
+    @Test void fullReplayIntervalDuringContentLoadDoesNotOpenLateCoreOrSend()throws Exception{
+        var entered=new CountDownLatch(1);var release=new CountDownLatch(1);var opens=new AtomicInteger();var sends=new AtomicInteger();
+        var run=new JniNetplaySession(new NetplayProcess.Grant(702,UUID.randomUUID(),true,true),()->{
+            entered.countDown();if(!release.await(4,TimeUnit.SECONDS))throw new IllegalStateException("test timeout");return ROM;
+        },c->sends.incrementAndGet(),()->{opens.incrementAndGet();return new Core();});
+        try{
+            run.start();assertTrue(entered.await(3,TimeUnit.SECONDS));
+            cn.piq.retro.replay.ReplayGuard.enterReplay();cn.piq.retro.replay.ReplayGuard.exitReplay();release.countDown();
+            run.terminated().get(5,TimeUnit.SECONDS);assertEquals(0,opens.get());assertEquals(0,sends.get());assertFalse(run.ready());
+        }finally{release.countDown();cn.piq.retro.replay.ReplayGuard.exitReplay();run.closeWithoutSave();run.terminated().get(5,TimeUnit.SECONDS);}
+    }
     static class Core implements LibretroRuntime {
         final InfoHolder av=new InfoHolder();long state=7;Thread owner;boolean closed,pendingReset;
         final boolean gun;
@@ -52,6 +82,7 @@ class JniNetplaySessionTest {
         final boolean gun;
         final Core hostCore;
         volatile int delay=0;
+        volatile java.util.function.UnaryOperator<NetplayChunk> peerPackets=java.util.function.UnaryOperator.identity();
         volatile JniNetplaySession bufferedTarget;
         final Queue<Runnable> buffered=new ConcurrentLinkedQueue<>();
         Room(boolean persist){
@@ -80,7 +111,7 @@ class JniNetplaySessionTest {
             synchronized(runs){
             Object key=new Object();var ticket=relay.grant(key,port);
             var run=new JniNetplaySession(new NetplayProcess.Grant(700,ticket.id(),false,port>=0,port),()->ROM,
-                    packet->wire.schedule(()->relay.receive(key,packet),delay,TimeUnit.MILLISECONDS),gun,()->new Core(gun));
+                    packet->wire.schedule(()->relay.receive(key,peerPackets.apply(packet)),delay,TimeUnit.MILLISECONDS),gun,()->new Core(gun));
             runs.put(key,run);run.start();return run;
             }
         }

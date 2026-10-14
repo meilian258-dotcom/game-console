@@ -1,5 +1,16 @@
 # Netplay 附属接入接口
 
+2026-10-09：后续统一方向改为 RetroArch 后端及其上游 Netplay，JNI 暂作兼容。下面带版本的接口与验收记录保持其历史语义；不因方向调整就移除 `withJni`、改保存身份或开放菜单。当前范围以[技术总览](全组件运行流程与复用接口总览.md)为准。RetroArch 本地自主会话不是 Netplay 房间，也不替代准备／激活及联机回归。
+
+## FC76.49：街机受信后端变体（试验接口）
+
+2026-10-10，配套 Native1.5.11。`CabinetNetplay.registerVariants(backend, defaultId, variants)` 在共同端注册固定 `NetplayVariant(id, label, template, persistenceSupported)`；默认仍为旧 JNI `legacy`。整组机柜仅允许管理员在原权限、通讯线身份、空闲与退出收尾门槛内明确选择变体；选择后端不自动启用 Netplay。原版 FBNeo 使用独立 `retroarch-stock-v1` 资源与身份，不替换 state-v3。
+
+- `NetplayStart` 与 `WatchNetplay.Offer/WatchNetwork.NetplayStart` 传递 `NetplayLaunchSpec`，仅含有界变体 ID、兼容指纹与保存能力。客户端调用 `CabinetBackend.netplayUnavailableReason(id)` / `prepareNetplayFactory(id)`，并由公共入口核对本地可信注册、固定核心 SHA、配置与前端身份；未知变体或指纹不符明确拒绝，不接受网络 DLL 路径、不静默回退。对应协议为 `cabinet-room-11`、`cabinet-sync-11`、`watch-5`，主包两端须同版。
+- 原版 RA 试验声明不支持保存，服务器与客户端均不创建本局保存绑定；旧 JNI 档案与策略保留，不迁移、不混读。`NetplayNetwork.bind(connection, process, false)` 仅绑定传输；旧二参数接口保留原有行为。`fileContent(LibretroContentFiles)` 允许启动前绑定已校验命名文件，仍经私有目录复制、原件只读和逐文件 SHA 复验，不扩展内容授权。
+- 公共柜体退出立即释放 UI／输入，RA 子进程异步回收。`CabinetNetplayEmulator.processRetirement()` 只为 RA 提供回收完成信号；公共柜体在释放会话前保留关闭尾巴，`CabinetClientBackends.netplayRetirementReason()` 返回只读拦截原因。只有 `terminated()` **正常成功完成**才允许替代本机计算会话；未完成、异常、取消或未知回收结果都不放行，切服／重连不能清除门槛。JNI 继续原槽位门槛，旁观继续原 closing 管理，不把退出界面视为回收证明。
+- `ready()` 仍只表示本机音画就绪，不是所有玩家完成同步；RA 不支持 JNI 的精确暂停后激活。现有服务器内容、席位授权和输入复核仍保留，但 RA 核心可在 MC 就绪确认前自主运行，没有精确准备／激活屏障。原版 FBNeo 的完整同步验收未通过（同 Netplay 模拟帧状态 CRC 仍有差异），回滚、弱网、长局与真实 MC 公共接入仍待验；界面明确标为试验，不能据双端画面一致宣称完整确定性通过。
+
 ## FC76.37 公共旁观管理
 
 2026-10-03；当前候选实现与验证见[旁观管理与 Iris 兼容](旁观管理与Iris兼容-20261003.md)。`watch-4` 在逐源租约上增加本连接、本局的暂停／恢复请求和精确确认，主包客户端／服务端必须同版；SFC44、MD12及既有街机沿用，不要求附属复制管理页。
@@ -27,7 +38,7 @@
 
 ## FC76.35：公共 JNI 准备、激活及授权内容下载（试验接口）
 
-2026-10-03。JNI Netplay 为适用模拟器机型的优先适配目标，见[通用制作规范 1.8](机器制作与交互标准.md)；不是把所有设备强制改为一种核心。以下是本轮公共接口，实际核心门禁与交付状态见 [MD 接入记录](../../piq-md-home/design/MD-JNI-Netplay-20261003.md)。不能把接口存在当作新机型已完成验收。旧 FC/SFC/街机调用未显式启用新选项时保持原有语义。
+2026-10-03 的历史接口批次，当时以 JNI Netplay 为优先适配目标；后续方向以本文顶部及[通用制作规范 1.8](机器制作与交互标准.md)为准，不是把所有设备强制改为一种核心。以下是该批公共接口，实际核心门禁与交付状态见 [MD 接入记录](../../piq-md-home/design/MD-JNI-Netplay-20261003.md)。不能把接口存在当作新机型已完成验收。旧 FC/SFC/街机调用未显式启用新选项时保持原有语义。
 
 ### 运行与权限
 

@@ -8,12 +8,16 @@
 | --- | --- |
 | 这是什么，需要装哪些 | [项目首页](../../README.md) |
 | 第一次安装和游玩 | [玩家指南](玩家指南.md) |
+| FC76.54 分批候选的配套、PGM 保存和界面变化 | [设备体验候选说明](设备体验候选-20261012.md) |
 | 想玩哪一种设备 | [主包](../README.md)、[SFC](../../piq-sfc-home/README.md)、[MD](../../piq-md-home/README.md)、[GBA](../../piq-gba/README.md)、[街机](../../piq-native-arcade/README.md)、[电脑](../../piq-computer/README.md) |
 | 服务端 ROM 和 BIOS 在哪里 | [玩家指南的目录部分](玩家指南.md#服主怎样找-rom-和-bios) |
 | 什么是串流、JNI Netplay 和旁观 | [模式区别](玩家指南.md#联机和观看有什么区别) |
+| 原版 FBNeo 的 RetroArch Netplay 试验怎么选、有哪些限制 | [街机试验入口与公共接口](../design/RetroArch-Netplay-街机试验接入.md) |
 | 闪退、光影、菜单或游戏不能运行 | [反馈清单](玩家指南.md#遇到问题时提供什么) |
 
-[GitHub 整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)提供主模组与当前配套附属共 7 个独立 JAR。首次安装与升级请看[本套版本、安装步骤及限制](整套测试版-20261007.md)；旧 MD15 补丁仅保留作历史下载。
+当前 FC76.54 候选按审核通过的组件分批测试发布，**不提供完整套装**。SFC54 和含它的整套 ZIP 暂不公开；下载以对应 [Release](https://github.com/meilian258-dotcom/game-console/releases) 的实际附件及[配套说明](设备体验候选-20261012.md)为准，不用旧 SFC 补位，也不把未列出的历史附属推定为兼容。
+
+[2026-10-07 整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)仍保留原批次 7 个独立 JAR，见[历史版本和安装步骤](整套测试版-20261007.md)。它不包含后续候选修复；旧 MD15 补丁也仅保留作历史下载。
 
 ## 我想编译或贡献代码
 

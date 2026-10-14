@@ -2,6 +2,7 @@
 package cn.piq.fcarcade.netplay;
 
 import cn.piq.retro.libretro.*;
+import cn.piq.retro.replay.ReplayGuard;
 import cn.piq.retro.netplay.RollbackTimeline;
 import cn.piq.retro.netplay.RollbackTimeline.Input;
 import java.io.IOException;
@@ -41,11 +42,25 @@ public final class JniNetplaySession implements AutoCloseable {
     private final Object intakeLock=new Object();
     private int intakeBytes;
     private volatile boolean started,closing,closed,ready;
+    private final long replayEpoch=ReplayGuard.epoch();
+    private volatile boolean discardSave;
     private volatile boolean activated;
     private volatile int input;
     private volatile long delivered,replayed,confirmedVisible,rejectedPeers;
+    private final NetplayPeerRejections peerRejections=new NetplayPeerRejections();
     private volatile String failure,phase="准备 FC JNI Netplay",saveStatus="不保存进度";
     private volatile NetplayProcess.Persistence persistence;
+    /** Trusted host adapter for a native-owned NVRAM file, separate from gameplay checkpoints. */
+    public interface OperatingFiles {
+        LibretroOperatingFile prepare(NetplaySaveState.Identity game)throws Exception;
+        void normalClose(boolean normal);
+        void abort();
+    }
+    private OperatingFiles operatingFiles;
+    public synchronized void operatingFiles(OperatingFiles value){
+        if(started||closed||!grant.host()||generic==null||operatingFiles!=null)throw new IllegalStateException("Bind host operating files before start");
+        operatingFiles=Objects.requireNonNull(value);
+    }
     private CompletableFuture<byte[]> capture;
     private CompletableFuture<Void> commit=CompletableFuture.completedFuture(null);
     private volatile LibretroRuntime core;
@@ -103,7 +118,8 @@ public final class JniNetplaySession implements AutoCloseable {
     JniNetplaySession(NetplayProcess.Grant grant,Callable<byte[]> content,Consumer<NetplayChunk> sender,boolean gun,Supplier<LibretroRuntime> factory,
                      NetplayProfile generic,Callable<Map<String,byte[]>> auxiliary,NetplayCabinetInputs cabinet,boolean waitForActivation) {
         this.grant=Objects.requireNonNull(grant);this.content=Objects.requireNonNull(content);
-        this.sender=Objects.requireNonNull(sender);this.factory=Objects.requireNonNull(factory);
+        Objects.requireNonNull(sender);
+        this.sender=chunk->{if(ReplayGuard.valid(replayEpoch)&&!discardSave)sender.accept(chunk);};this.factory=Objects.requireNonNull(factory);
         this.gunMode=gun;this.generic=generic;
         this.auxiliary=Objects.requireNonNull(auxiliary);this.cabinet=cabinet;
         ports=generic==null?2:generic.ports();activated=!waitForActivation;
@@ -133,6 +149,7 @@ public final class JniNetplaySession implements AutoCloseable {
         fileContent=files;
     }
     public synchronized void start() {
+        if(!ReplayGuard.valid(replayEpoch)){closeWithoutSave();return;}
         if(started||closed)return;started=true;
         var thread=new Thread(this::run,"PIQ-FC-JNI-Netplay-owner");thread.setDaemon(true);thread.start();
     }
@@ -157,22 +174,30 @@ public final class JniNetplaySession implements AutoCloseable {
     public CompletableFuture<Void> terminated(){return terminated;}
     /** No core invocation; includes a reserved, loading or still-closing native owner. */
     public boolean nativeSlotHeld(){var value=core;return value instanceof LibretroJniRuntime runtime&&runtime.nativeSlotHeld();}
-    public String diagnostic(){return status()+"\nJNI 试验；确认帧："+confirmedVisible+"；呈现帧："+delivered+"；重演帧："+replayed+"；拒绝异常连接："+rejectedPeers+"\n存档："+saveStatus;}
+    public String diagnostic(){return status()+"\nJNI 试验；确认帧："+confirmedVisible+"；呈现帧："+delivered+"；重演帧："+replayed+"；拒绝异常连接："+rejectedPeers+"\n"+peerRejections.snapshot().text()+"\n存档："+saveStatus;}
+    private void rejected(int port,NetplayPeerRejections.Code code){
+        rejectedPeers++;
+        var evidence=peerRejections.record(code,port,confirmed,timeline==null?-1:timeline.next());
+        if(NetplayPeerRejections.shouldLog(evidence.count()))System.getLogger("PIQ-Netplay-Rejection").log(System.Logger.Level.WARNING,evidence.text());
+    }
     public synchronized CompletableFuture<byte[]> checkpoint() {
+        if(!ReplayGuard.valid(replayEpoch)||discardSave)return CompletableFuture.failedFuture(new IllegalStateException("Replay retired this runtime"));
         if(!grant.host()||!active()||!ready())return CompletableFuture.failedFuture(new IllegalStateException("JNI 主持未就绪或尚未激活"));
         if(capture==null||capture.isDone())capture=new CompletableFuture<byte[]>().orTimeout(15,TimeUnit.SECONDS);
         return capture;
     }
     public synchronized CompletableFuture<Void> saveNow() {
+        if(!ReplayGuard.valid(replayEpoch)||discardSave)return CompletableFuture.failedFuture(new IllegalStateException("Replay retired this runtime"));
         if(persistence==null)return CompletableFuture.failedFuture(new IllegalStateException("本局未启用保存"));
         if(!commit.isDone())return commit;
         saveStatus="正在保存 JNI 试验进度…";
-        commit=checkpoint().thenCompose(persistence::save);
+        commit=checkpoint().thenCompose(bytes->ReplayGuard.valid(replayEpoch)&&!discardSave?persistence.save(bytes):CompletableFuture.failedFuture(new IllegalStateException("Replay retired this save")));
         commit.whenComplete((unused,error)->saveStatus=error==null?"JNI 试验进度已保存到服务器":"保存未确认，保留最近确认版本");
         return commit;
     }
     /** Network thread does bounded copying/enqueue only; no native work or server-side authority expansion. */
     public void receive(NetplayChunk chunk,int authorizedPort) {
+        if(!ReplayGuard.valid(replayEpoch))return;
         if(closed||closing||chunk.session()!=grant.session()||authorizedPort< -1||authorizedPort>=ports)return;
         if(!grant.host()&&!chunk.ticket().equals(grant.ticket()))return;
         synchronized(intakeLock) {
@@ -183,17 +208,21 @@ public final class JniNetplaySession implements AutoCloseable {
         }
     }
     @Override public synchronized void close() {
+        if(!ReplayGuard.valid(replayEpoch))discardSave=true;
         if(closing||closed)return;
         closing=true;input=0;gunInputs.close();
         if(!started){
             if(cabinet!=null)cabinet.close();
-            try{if(persistence!=null)persistence.abort();terminated.complete(null);}
+            try{if(persistence!=null)persistence.abort();if(operatingFiles!=null)operatingFiles.abort();terminated.complete(null);}
             catch(RuntimeException|LinkageError error){failure="JNI 存档准备撤销未确认";terminated.completeExceptionally(error);}
             finally{closed=true;}
         }
     }
+    /** Does not take a final checkpoint; native release remains on the owner thread. */
+    public synchronized void closeWithoutSave(){discardSave=true;close();}
     private void run() {
         try {
+            if(!ReplayGuard.valid(replayEpoch)){discardSave=true;return;}
             byte[] rom=fileContent==null?content.call():null;
             if(fileContent==null&&(rom==null||rom.length<16||rom.length>(generic==null?NetplayProfile.fc():generic).maxRomBytes()))throw new IOException("ROM 大小异常");
             var extras=new TreeMap<String,byte[]>();var hashes=new TreeMap<String,String>();
@@ -211,11 +240,17 @@ public final class JniNetplaySession implements AutoCloseable {
             identity=generic==null?FcNetplaySaves.jniIdentity(gunMode,romHash):NetplaySaveState.identity(generic,romHash,hashes);
             byte[] saved=null;
             if(fileContent==null&&persistence!=null){saved=persistence.load(identity);if(saved!=null)NetplaySaveState.decode(saved,identity);if(!persistence.enabled())persistence=null;}
-            if(closing)return;
+            if(closing||!ReplayGuard.valid(replayEpoch)){discardSave=true;return;}
             core=factory.get();LibretroProcess.Info info;
+            if(operatingFiles!=null){
+                if(!(core instanceof LibretroJniRuntime runtime))throw new IOException("Operating files require JNI owner runtime");
+                runtime.operatingFile(operatingFiles.prepare(identity));
+            }
+            if(!ReplayGuard.valid(replayEpoch)){discardSave=true;return;}
             if(fileContent!=null)info=core.loadFiles(fileContent,()->{if(closing)throw new IOException("JNI content preparation cancelled");});
             else if(generic!=null&&generic.jni().fullPath()){extras.put(generic.contentName(),rom);info=core.loadBundle(generic.contentName(),extras);}
             else info=core.load(rom);
+            if(!ReplayGuard.valid(replayEpoch)){discardSave=true;return;}
             // File selection and owner-thread staging may be separated in time. No save lease
             // is opened until the staged bytes have passed the captured SHA-256 checks.
             if(fileContent!=null&&persistence!=null){saved=persistence.load(identity);if(saved!=null)NetplaySaveState.decode(saved,identity);if(!persistence.enabled())persistence=null;}
@@ -237,6 +272,7 @@ public final class JniNetplaySession implements AutoCloseable {
             if(grant.host()){ready=true;phase=activated?runningLabel():"JNI 已准备就绪，等待开局授权";}
             else{remote=new Peer(grant.ticket(),grant.port());peers.put(remote.ticket,remote);control(remote,NetplayChunk.OPEN);phase="等待 JNI 主持与种子状态";}
             while(!closing) {
+                if(!ReplayGuard.valid(replayEpoch)){discardSave=true;break;}
                 if(!activated){LockSupport.parkNanos(500_000L);continue;}
                 drain();expire();
                 if(error()!=null)throw new IOException(error());
@@ -262,7 +298,7 @@ public final class JniNetplaySession implements AutoCloseable {
                 confirmedVisible=confirmed;replayed=timeline.replayedFrames();
                 LockSupport.parkNanos(500_000L);
             }
-            if(grant.host()&&activated&&failure==null&&ready&&persistence!=null)finishSave();
+            if(!discardSave&&ReplayGuard.valid(replayEpoch)&&grant.host()&&activated&&failure==null&&ready&&persistence!=null)finishSave();
         } catch(Exception|LinkageError error) {
             if(failure==null)failure=error.getMessage()==null?error.getClass().getSimpleName():error.getMessage();
         } finally {
@@ -273,8 +309,11 @@ public final class JniNetplaySession implements AutoCloseable {
             Throwable cleanupFailure=null;
             try{if(persistence!=null)persistence.abort();}
             catch(RuntimeException|LinkageError error){cleanupFailure=error;failure="JNI 存档通道撤销未确认；原进度保留";}
-            try{if(core!=null)core.close();}
-            catch(RuntimeException|LinkageError error){if(cleanupFailure!=null)error.addSuppressed(cleanupFailure);cleanupFailure=error;failure="JNI 核心关闭未确认；须正常重启客户端";}
+            try{if(operatingFiles!=null)operatingFiles.normalClose(!discardSave&&ReplayGuard.valid(replayEpoch)&&grant.host()&&activated&&failure==null&&timeline!=null);if(core!=null)core.close();}
+            catch(RuntimeException|LinkageError error){if(cleanupFailure!=null)error.addSuppressed(cleanupFailure);cleanupFailure=error;
+                failure=error instanceof cn.piq.retro.libretro.LibretroJniRuntime.PostCloseException?error.getMessage():"JNI 核心关闭未确认；须正常重启客户端";
+                if(operatingFiles!=null)operatingFiles.normalClose(false);}
+            finally{if(operatingFiles!=null)try{operatingFiles.abort();}catch(RuntimeException error){if(cleanupFailure==null)cleanupFailure=error;else cleanupFailure.addSuppressed(error);}}
             closed=true;
             if(cleanupFailure==null)terminated.complete(null);else terminated.completeExceptionally(cleanupFailure);
             pictures.clear();events.clear();
@@ -304,7 +343,7 @@ public final class JniNetplaySession implements AutoCloseable {
             var chunk=event.chunk();var peer=peers.get(chunk.ticket());
             if(chunk.kind()==NetplayChunk.CLOSE){if(peer!=null)drop(peer,false);continue;}
             if(grant.host()&&chunk.kind()==NetplayChunk.OPEN) {
-                if(gunMode&&event.port()!=-1){rejectedPeers++;continue;}
+                if(gunMode&&event.port()!=-1){rejected(event.port(),NetplayPeerRejections.Code.INPUT_DEVICE);continue;}
                 if(peer==null&&peers.size()<8&&event.port()!=0){peer=new Peer(chunk.ticket(),event.port());peers.put(peer.ticket,peer);control(peer,NetplayChunk.ACK);}continue;
             }
             if(peer==null)continue;
@@ -318,13 +357,13 @@ public final class JniNetplaySession implements AutoCloseable {
                 // A bad spectator/controller must not terminate the host or overwrite its good save.
                 // A client cannot continue without a valid authority, so its host failure still stops it.
                 if(!grant.host())throw invalidPeer;
-                rejectedPeers++;drop(peer,true);
+                rejected(peer.port,NetplayPeerRejections.classify(invalidPeer));drop(peer,true);
             }
         }
     }
     private void hostMessage(Peer peer,Message message) {
         if(message instanceof Hello hello&&!peer.hello) {
-            if(!identity.equals(hello.identity())){drop(peer,true);return;}
+            if(!identity.equals(hello.identity())){rejected(peer.port,NetplayPeerRejections.Code.IDENTITY);drop(peer,true);return;}
             peer.hello=true;return;
         }
         if(message instanceof Ready value&&joining==peer&&peer.seed!=null&&peer.seedOffset==peer.seed.length&&value.frame()==peer.seedFrame) {
@@ -389,6 +428,7 @@ public final class JniNetplaySession implements AutoCloseable {
         throw new IllegalArgumentException("JNI Netplay 接收阶段异常");
     }
     private void hostFrame() {
+        if(!reserveFrame())return;
         if(cabinet!=null) {
             int[] pads=cabinet.next(System.nanoTime());
             Arrays.fill(pads,ports,pads.length,0);
@@ -406,6 +446,7 @@ public final class JniNetplaySession implements AutoCloseable {
         publish(timeline.advance(lastP1,lastP2,known));confirm();broadcastCommands();pace();
     }
     private void peerFrame() {
+        if(!reserveFrame())return;
         long frame=timeline.next();Input canonical=canonicalFuture.get(frame);
         boolean remotePad=cabinet==null&&grant.port()==1;
         if(!remotePad&&canonical==null||remotePad&&frame>=lastHostNext+2)return;
@@ -466,9 +507,9 @@ public final class JniNetplaySession implements AutoCloseable {
     }
     private void expire() {
         long now=System.nanoTime();
-        for(var p:List.copyOf(peers.values()))if(now>p.deadline)drop(p,true);
+        for(var p:List.copyOf(peers.values()))if(now>p.deadline){if(grant.host())rejected(p.port,NetplayPeerRejections.Code.PREPARATION_TIMEOUT);drop(p,true);}
         if(!grant.host()&&now-lastTraffic>TIMEOUT)throw new IllegalStateException("JNI 主持超时，请重新加入");
-        if(grant.host()&&remote!=null&&now-remote.lastInput>TIMEOUT)drop(remote,true);
+        if(grant.host()&&remote!=null&&now-remote.lastInput>TIMEOUT){rejected(remote.port,NetplayPeerRejections.Code.INPUT_TIMEOUT);drop(remote,true);}
     }
     private void drop(Peer peer,boolean notify) {
         peers.remove(peer.ticket);if(joining==peer)joining=null;
@@ -481,6 +522,15 @@ public final class JniNetplaySession implements AutoCloseable {
         if(!grant.host()){failure="JNI Netplay 连接已结束，请重新加入";closing=true;}
     }
     private void trim() {long before=Math.max(timeline.oldest(),Math.min(confirmed,timeline.next())-RETAIN);timeline.discardBefore(before);}
+    /** Reserve history before consuming an input edge or sending its Pad. A catch-up
+     * batch may fill the window before the loop's usual trim; only confirmed history
+     * can make room. Check due CRCs before discarding their snapshots. */
+    private boolean reserveFrame() {
+        if(timeline.canAdvance())return true;
+        if(!grant.host())checkDigests();
+        trim();
+        return timeline.canAdvance();
+    }
     private void pace(){long now=System.nanoTime();long interval=(long)(1_000_000_000d/core.info().fps());nextPresent=Math.max(nextPresent+interval,now-interval);}
     private void publish(LibretroProcess.Output output) {
         int width=output.info().width(),height=output.info().height();
@@ -533,6 +583,7 @@ public final class JniNetplaySession implements AutoCloseable {
         finally {core.restore(current);}
     }
     private synchronized void handleCapture() {
+        if(!ReplayGuard.valid(replayEpoch)||discardSave)return;
         if(capture==null||capture.isDone()||confirmed<=lastSaved)return;
         try {byte[] state=checkpointAt(confirmed);lastSaved=confirmed;capture.complete(state);}
         catch(RuntimeException error){capture.completeExceptionally(error);}
@@ -543,11 +594,17 @@ public final class JniNetplaySession implements AutoCloseable {
     }
     private void finishSave() {
         try {
+            if(!ReplayGuard.valid(replayEpoch)||discardSave)return;
             // Stop gameplay, then finish the same authorized host transaction off the MC thread.
             for(var p:List.copyOf(peers.values()))drop(p,false);
             try{commit.get(30,TimeUnit.SECONDS);}catch(ExecutionException ignored){}
+            if(!ReplayGuard.valid(replayEpoch)||discardSave)return;
+            if(!reserveFrame())throw new IllegalStateException("Rollback history exhausted before final save");
             timeline.advance(new Input(timeline.next(),0,0,0,0,gunMode?65536:0,3));confirm();
-            byte[] state=checkpointAt(confirmed);persistence.save(state).get(30,TimeUnit.SECONDS);
+            byte[] state=checkpointAt(confirmed);
+            if(!ReplayGuard.valid(replayEpoch)||discardSave)return;
+            persistence.save(state).get(30,TimeUnit.SECONDS);
+            if(!ReplayGuard.valid(replayEpoch)||discardSave)return;
             persistence.finish().get(10,TimeUnit.SECONDS);saveStatus="最终 JNI 试验进度已保存";
         } catch(Exception error) {saveStatus="最终保存未确认，保留最近确认版本";}
     }

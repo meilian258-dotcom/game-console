@@ -110,11 +110,12 @@ class ImmersiveClientSafetyTest {
     @Test void staleFactoryCompletionsAreCheckedBeforeAndAfterClientHandoff() throws Exception {
         for(String s:new String[]{fc(),nativeClient()}) {
             String start=body(s,"private static void startGame(Path chosen,boolean remember)");
+            String replay=s.contains("class CabinetClientBackends")?"||!ReplayGuard.valid(replayEpoch)":"";
             assertTrue(start.contains("inttoken=++generation"));
-            assertTrue(start.contains("if(shuttingDown||token!=generation)"));
+            assertTrue(start.contains("if(shuttingDown||token!=generation"+replay+")"));
             assertTrue(start.contains("PENDING.set(ready)"));
             assertTrue(start.contains("PENDING.compareAndSet(ready,null)"));
-            assertTrue(start.contains("if(token!=generation||!current()||!playing)"));
+            assertTrue(start.contains("if(token!=generation"+replay+"||!current()||!playing)"));
             assertTrue(start.contains("catch(RejectedExecutionExceptionfailure)"));
         }
     }
@@ -122,7 +123,11 @@ class ImmersiveClientSafetyTest {
         for(String s:new String[]{fc(),nativeClient()}) {
             String stop=body(s,s.contains("static void stop(String reason,boolean notifyServer)")
                     ? "static void stop(String reason,boolean notifyServer)" : "static void stop(String reason)");
-            assertTrue(stop.startsWith("generation++;"));
+            if(s.contains("static void stop(String reason,boolean notifyServer)")){
+                assertTrue(stop.startsWith("retainRetirement(emulator);"));
+                assertTrue(stop.indexOf("generation++;")>stop.indexOf("retainRetirement(emulator);"));
+                assertTrue(stop.indexOf("generation++;")<stop.indexOf("launch=null"));
+            }else assertTrue(stop.startsWith("generation++;"));
             assertTrue(stop.contains("playing=false;announced=false;"));
             assertTrue(stop.indexOf("INPUT.reset();")>stop.indexOf("playing=false;"));
             assertTrue(stop.contains("CabinetClientOwner.release(INPUT_OWNER)"));

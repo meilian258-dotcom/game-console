@@ -1,0 +1,21 @@
+{
+  "schema": 2,
+  "upstreamCommit": "4fc9a9312baaf34963847f884961ad9793fbbc1d",
+  "resource": "core/mame-jni/windows-x64/mame_piq_lifecycle1.dll",
+  "platform": "windows-x64",
+  "savePolicy": "separate-identity-no-migration",
+  "profile": "clang64-shared",
+  "patches": {
+    "lifecycle-4fc9a931.patch": "1e8be3b68fb9b199360776e4ddf1f410c41787e9427eab9c5f64832dcb9b85a8",
+    "clang64-shared-4fc9a931.patch": "33396a5624f32c495280e114a1d91f57600fbff24fd7d6ce5f19edfbc003f357"
+  },
+  "runtime": {
+    "file": "libc++.dll",
+    "bytes": 1659392,
+    "sha256": "7344daed05388589e9bd691ed1d30c568c374da4b8b6a12e1502185948c03cd4"
+  },
+  "artifact": {
+    "bytes": 309413888,
+    "sha256": "00d1a8319378dc94f50cc6610a9947217bdf23f05f70d2fc4d5665357a50b603"
+  }
+}

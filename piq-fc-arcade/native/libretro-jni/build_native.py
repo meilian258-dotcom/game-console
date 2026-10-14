@@ -19,12 +19,12 @@ def main():
     command = [str(args.compiler.resolve()), '-std=c++20', '-O2', '-Wall', '-Wextra', '-static', '-shared',
                '-Wl,--no-insert-timestamp', '-I' + str(args.jdk.resolve() / 'include'),
                '-I' + str(args.jdk.resolve() / 'include/win32'), str(root / 'piq_libretro_jni.cpp'),
-               '-o', str(target), '-lopengl32', '-lgdi32', '-luser32']
+               '-o', str(target), '-lopengl32', '-lgdi32', '-luser32', '-lbcrypt']
     run = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     (output / 'build.log').write_text(run.stdout, encoding='utf-8')
     def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest().upper()
     receipt = dict(exitCode=run.returncode, command=command, sources={p.name:sha(p) for p in
-                   (root / 'piq_libretro_jni.cpp', root / 'libretro.h')})
+                   (root / 'piq_libretro_jni.cpp', root / 'libretro.h', root / 'runtime_dependencies.h')})
     if run.returncode == 0:
         receipt.update(dll=str(target), sha256=sha(target), bytes=target.stat().st_size)
     (output / 'receipt.json').write_text(json.dumps(receipt, indent=2), encoding='utf-8')

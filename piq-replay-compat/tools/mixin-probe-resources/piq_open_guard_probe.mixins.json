@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cn.piq.replaycompat.mixin",
+  "plugin": "cn.piq.replaycompat.mixin.CompatMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["ReplayOpenGuardMixin", "ReplayForceStopMixin"],
+  "injectors": {"defaultRequire": 1}
+}

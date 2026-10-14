@@ -32,6 +32,7 @@ def java():
         classes=Path(tmp)/'classes';classes.mkdir();empty=Path(tmp)/'empty';empty.mkdir();cp=os.pathsep.join(map(str,[classes,*deps]))
         names=('SfcHardwareMeshData','SfcControllerPoseLayout','SfcButtonAnimation','SfcCoverGeometry','SfcAvCableGeometry')
         prod=[ROOT/'src/main/java/cn/piq/sfchome/client'/(n+'.java') for n in names]
+        prod.append(ROOT/'src/main/java/cn/piq/sfchome/layout/SfcConsoleScale.java')
         tests=[ROOT/'src/test/java/cn/piq/sfchome/client'/(n+'.java') for n in ('SfcHardwareMeshDataTest','SfcButtonAnimationTest','SfcCoverGeometryTest','SfcAvCableGeometryTest')]
         probes=[ROOT/'tools/qa'/(n+'.java') for n in ('SfcHardwareMeshProbe','SfcUserModelProbe','SfcUserModelTestRunner')]
         run([JAVA/'javac.exe','-encoding','UTF-8','-proc:none','-sourcepath',empty,'-cp',cp,'-d',classes,*prod,*tests,*probes])
@@ -50,7 +51,7 @@ def main():
     doc,audit=build.build();actualraw=(build.ASSETS/'meshes/sfc_hardware.json').read_bytes()
     assert json.loads(actualraw)==doc,'asset does not match deterministic converter'
     assert (build.ASSETS/'models/item/console.json').read_bytes()==build.console_item_bytes(),'item GUI does not match pure wrapper'
-    pose,data,junit,hashes=java();audit.update({'junit_tests':30,'junit_output':junit,'actual_java_source_sha256':hashes,'mesh_sha256':build.sha(actualraw)})
+    pose,data,junit,hashes=java();audit.update({'junit_tests':31,'junit_output':junit,'actual_java_source_sha256':hashes,'mesh_sha256':build.sha(actualraw)})
     tex={resource:np.asarray(Image.open(path).convert('RGBA')) for resource,path in build.TEXTURES.values()}
     unit=rotation('x',90)@rotation('y',180)@scale([pose['controller_scale']/16]*3)@translation(-8,-8,-8)
     verts=np.concatenate([np.array(t['p']) for p in doc['groups']['controller']['parts'] for t in p['triangles']]);caps=[]
@@ -111,5 +112,5 @@ def main():
     icons.save(build.OUT/'item-gui.png')
     audit['av_quads']=len(data['av']['quads']);audit['limits']=['Pure production Java + actual mesh/UV, no Minecraft launched.','SFC input visual getter is read-only; no networking changes.','Hand volumes are diagnostic standard/slim models, not player screenshots.']
     (build.OUT/'java-pose-animation-audit.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2),encoding='utf-8')
-    print(json.dumps({'ok':True,'tests':30,'clear_key_rays':audit['unobstructed_center_rays'],'av_quads':audit['av_quads'],'report':str(build.OUT/'java-pose-animation-audit.json')}))
+    print(json.dumps({'ok':True,'tests':31,'clear_key_rays':audit['unobstructed_center_rays'],'av_quads':audit['av_quads'],'report':str(build.OUT/'java-pose-animation-audit.json')}))
 if __name__=='__main__':main()

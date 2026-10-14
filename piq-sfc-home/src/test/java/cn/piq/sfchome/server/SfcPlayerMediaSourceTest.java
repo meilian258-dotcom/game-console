@@ -10,12 +10,24 @@ class SfcPlayerMediaSourceTest {
     private String part(String source,String start,String end){return source.substring(source.indexOf(start),source.indexOf(end,source.indexOf(start)));}
     @Test void serverCapturesModeAndHonorsPlayerHostingConfiguration()throws Exception{
         String s=read("server/SfcHomeServer");
-        assertTrue(s.contains("CabinetHostingConfig.playerAllowed()?1:0"));
+        String modes=part(s,"@Override public int synchronizationSupportedModes(","@Override public String synchronizationUnavailableReason(");
+        assertTrue(modes.contains("SfcNetplaySettings.supportedModes(cn.piq.fcarcade.cabinet.CabinetHostingConfig.playerAllowed(),cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed(),hostedUnavailable(l,c)==null)"));
+        // The shared mode helper must still independently gate MEDIA by the server policy.
+        // Local/hosted permission cannot accidentally turn the MEDIA bit back on.
+        for(int flags=0;flags<8;flags++){
+            boolean media=(flags&1)!=0,local=(flags&2)!=0,hosted=(flags&4)!=0;
+            int supported=cn.piq.sfchome.world.SfcNetplaySettings.supportedModes(media,local,hosted);
+            assertEquals(media,(supported&1)!=0);assertEquals(local,(supported&2)!=0);
+            assertEquals(hosted,(supported&4)!=0);assertEquals(local,(supported&16)!=0);
+            assertEquals(0,supported&8,"SFC does not claim a RetroArch mode");
+        }
         assertTrue(s.contains("var mode=c.synchronizationMode();var checked=preflight(p,c,true)"));
-        assertTrue(s.contains("c.synchronizationMode()!=mode||!modeSupported(c)"));
+        assertTrue(s.contains("final boolean requestedNetplay=save.variant()!=null"));
+        assertTrue(s.contains("if(c.netplayJniTrial()!=requestedNetplay)return false"));
+        assertTrue(s.contains("c.synchronizationMode()!=mode||c.netplayJniTrial()!=requestedNetplay||!modeSupported(c)"));
         assertTrue(s.contains("st.tick,mode"));assertTrue(s.contains("st.tick,old.mode"));
         assertTrue(s.contains("host,run==null?s.mode.ordinal():3,s.watchSource,s.host.id"));
-        assertTrue(read("net/SfcHomeNetwork").contains("TrafficPayloadRegistrar.create(event,\"13\")"));
+        assertTrue(read("net/SfcHomeNetwork").contains("TrafficPayloadRegistrar.create(event,\"15\")"));
     }
     @Test void receiverBypassesRomAndCoreButHostKeepsOrderedInput()throws Exception{
         String c=read("client/SfcHomeClient"),worker=read("client/SfcPlayback"),s=read("server/SfcHomeServer");
@@ -101,6 +113,10 @@ class SfcPlayerMediaSourceTest {
         assertTrue(fail.contains("running=false;thread.interrupt()"));assertTrue(fail.contains("error="));
         assertTrue(publisher.contains("if(current.stream.error()!=null){failed(current);return;}"));
         assertTrue(publisher.contains("current.owner.playerMediaFailed()"));
-        assertTrue(read("client/SfcHomeClient").contains("if(playback.error()!=null){leave(playback.error());return;}"));
+        assertTrue(read("client/SfcHomeClient").contains("if(playback.error()!=null){leave(playback.errorForLeaveNotice());return;}"));
+        // Cleanup remains unconditional on failure. Only a notice already recorded by
+        // the Netplay worker is suppressed; required MEDIA failure keeps its reason.
+        assertTrue(worker.contains("String errorForLeaveNotice(){return errorNoticeRecorded?null:error;}"));
+        assertFalse(fail.contains("errorNoticeRecorded=true"));
     }
 }

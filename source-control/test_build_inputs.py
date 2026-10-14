@@ -65,10 +65,32 @@ class BuildInputsTests(unittest.TestCase):
         result=subprocess.run([sys.executable,str(script),'check','--cache',str(self.cache)],capture_output=True)
         self.assertEqual(result.returncode,1)
         report=json.loads(result.stdout)
-        self.assertFalse(report['ok']); self.assertEqual(len(report['errors']),9)
+        self.assertFalse(report['ok']); self.assertEqual(len(report['errors']),10)
         self.assertFalse(self.cache.exists())
         unknown=subprocess.run([sys.executable,str(script),'check','--id','unknown'],capture_output=True)
         self.assertEqual(unknown.returncode,1)
+
+    def test_reviewed_jni_bundle_pins_and_cache_safe_runtime_name(self):
+        lock = load_lock()
+        bridge = lock['libretro-jni-abi2']
+        runtime = lock['libcxx-windows']
+        self.assertEqual((bridge['bytes'], bridge['sha256']),
+                         (1320960, 'fc731f3b83b0b23f473b48bb9f399582ace264c0646eec45fbffafaf0fb36923'))
+        self.assertEqual((runtime['filename'], runtime['bytes'], runtime['sha256']),
+                         ('libcxx.dll', 1659392, '7344daed05388589e9bd691ed1d30c568c374da4b8b6a12e1502185948c03cd4'))
+        self.assertEqual(cache_path(self.cache, runtime).name, 'libcxx.dll')
+
+    def test_runtime_source_name_can_differ_without_relaxing_cache_name(self):
+        source = self.root / 'libc++.dll'
+        source.write_bytes(self.data)
+        entry = dict(self.entry, filename='libcxx.dll')
+        import_inputs({'runtime': entry}, {'runtime': source}, self.cache)
+        self.assertEqual(cache_path(self.cache, entry).read_bytes(), self.data)
+        manifest = self.root / 'unsafe-name.json'
+        manifest.write_text(json.dumps(dict(schemaVersion=1, inputs={
+            'runtime': dict(entry, filename='libc++.dll')})), encoding='utf8')
+        with self.assertRaisesRegex(ValueError, 'simple name'):
+            load_lock(manifest)
 
     def test_link_rejected(self):
         link=self.root/'link.dll'

@@ -18,6 +18,12 @@ final class HomeScreenRenderPose {
 
     /** Called only inside the caller's push/pop scope; never use for an already transformed BER. */
     static boolean apply(RenderLevelStageEvent event, Level level, BlockPos anchor) {
+        boolean applied = applyWorld(event, level, anchor);
+        cn.piq.fcarcade.api.replay.ReplayPresentation.anchor(applied ? anchor : null);
+        return applied;
+    }
+
+    private static boolean applyWorld(RenderLevelStageEvent event, Level level, BlockPos anchor) {
         var frame = HomeShipSpace.GROUND;
         if (level.getBlockEntity(anchor) instanceof HomeTvBlockEntity tv
                 && tv.consolePos() != null && level.hasChunkAt(tv.consolePos())

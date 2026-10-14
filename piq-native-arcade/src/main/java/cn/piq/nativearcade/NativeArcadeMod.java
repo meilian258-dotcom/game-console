@@ -28,8 +28,9 @@ public final class NativeArcadeMod {
         CabinetBackends.register(BACKEND_ID,"MAME 原生街机",false);
         CabinetBackends.registerNetwork(BACKEND_ID,4);
         CabinetBackends.registerSnapshotSync(BACKEND_ID,2,NativeSnapshotProfile.COMPATIBILITY_ID);
-        cn.piq.fcarcade.cabinet.CabinetNetplay.register(BACKEND_ID,4,NativeNetplayProfile::profile);
+        cn.piq.fcarcade.cabinet.CabinetNetplay.registerVariants(BACKEND_ID,NativeNetplayProfile.LEGACY,NativeNetplayProfile.variants());
         cn.piq.fcarcade.cabinet.PgmServicePolicy.registerDiagnosticBackend(BACKEND_ID);
+        cn.piq.fcarcade.cabinet.CabinetOperatingFiles.registerFbneoJni(NativeNetplayProfile.CORE_SHA.toLowerCase(java.util.Locale.ROOT));
         cn.piq.fcarcade.server.hosted.ServerCoreRegistry.register(BACKEND_ID,new cn.piq.nativearcade.server.NativeServerCoreFactory());
     }
 }

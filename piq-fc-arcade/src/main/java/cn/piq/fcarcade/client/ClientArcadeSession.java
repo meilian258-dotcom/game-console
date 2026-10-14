@@ -25,6 +25,11 @@ import java.util.ArrayList;
 
 /** Main-thread facade: never constructs or accesses a core on this thread. */
 final class ClientArcadeSession {
+    private final long replayEpoch=cn.piq.retro.replay.ReplayGuard.epoch();
+    private boolean replayBlocked(){
+        if(cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))return false;
+        closeResources();return true;
+    }
     private final Minecraft minecraft = Minecraft.getInstance();
     private final byte[] rgba = new byte[NesCore.RGBA_BYTES];
     private ResourceKey<Level> dimension;
@@ -120,6 +125,7 @@ final class ClientArcadeSession {
               long nextSessionId, int nextViewDistance, int nextAudioDistance,
               int nextAudioVolumePercent, int nextMemberCount, String nextPlayerNames,
               String expectedRomSha256, int nextEpoch, boolean reset,cn.piq.fcarcade.session.NesCoreVariant nextVariant) {
+        if(replayBlocked())return;
         viewDistance = nextViewDistance;
         audioDistance = nextAudioDistance;
         audioVolumePercent = nextAudioVolumePercent;
@@ -170,6 +176,7 @@ final class ClientArcadeSession {
         if (isActive()) stop(Component.translatable("message.piq_fc_arcade.session_left"));
     }
     void update() {
+        if(replayBlocked())return;
         if (!isActive()) return;
         try {
             if (!isWorldAndBlockValid()) {
@@ -359,6 +366,7 @@ final class ClientArcadeSession {
         return worker != null && mode == ArcadeMode.LOCKSTEP && id == sessionId && receivedEpoch == epoch;
     }
     private void startWorker(boolean needsSnapshot) {
+        if(replayBlocked())return;
         if(serverHosted())return;
         closeSimulation();
         if(netplayState!=null){
@@ -385,14 +393,20 @@ final class ClientArcadeSession {
         localFrame = 0;
         silentUntilFrame = 3;
         worker = new ClientNesWorker(() -> {
+            if(!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))throw new IllegalStateException("Replay retired this worker");
             RomDescriptor rom = ClientRomLibrary.loadBySha256(expectedSha);
             if (rom == null) throw new IllegalStateException("本地缺少会话指定的 ROM");
             if (!rom.sha256().equalsIgnoreCase(expectedSha)) throw new IllegalStateException("本地 ROM 在加入后发生变化，请重新右键街机");
             if(cn.piq.fcarcade.session.NesCoreVariant.forRom(rom.header(),expectedVariant.isZapper())!=expectedVariant)
                 throw new IllegalStateException("ROM 与会话核心不匹配，请客户端和服务器成套更新。");
+            if(!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))throw new IllegalStateException("Replay retired this worker");
             NesCore created = cn.piq.fcarcade.core.NesCores.create(expectedVariant);
             if(!created.stateNamespace().equals(expectedVariant.stateNamespace())){created.close();throw new IllegalStateException("Core state namespace mismatch");}
-            try { created.loadRom(rom.bytes()); return created; }
+            try {
+                if(!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))throw new IllegalStateException("Replay retired this worker");
+                created.loadRom(rom.bytes());
+                if(!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))throw new IllegalStateException("Replay retired this worker");
+                return created; }
             catch (Throwable error) { created.close(); throw error; }
         }, mode == ArcadeMode.LOCKSTEP, hasController(), expectedSha, awaitingSnapshot);
         if(mediaPublisher!=null)worker.mediaTap(mediaPublisher);
@@ -560,7 +574,7 @@ final class ClientArcadeSession {
         }
     }
     private void sendInput(ArcadeInputPayload input){if(netplay!=null&&!variant.isZapper()){netplay.input(input.buttonMask());return;}if(homeRuntime){if(controllerLease!=null)FcNetwork.sendHomeInput(new ArcadeHomeInputPayload(controllerLease,input));}else FcNetwork.sendInput(input);}
-    private boolean connected() { return minecraft.getConnection() != null&&minecraft.getConnection()==keyboardConnection&&minecraft.getConnection().getConnection().isConnected(); }
+    private boolean connected() { return cn.piq.retro.replay.ReplayGuard.valid(replayEpoch)&&minecraft.getConnection() != null&&minecraft.getConnection()==keyboardConnection&&minecraft.getConnection().getConnection().isConnected(); }
     boolean authorizedZapper(cn.piq.fcarcade.home.ZapperBinding binding){
         return binding!=null&&variant.isZapper()&&role.controllerIndex()>=0
                 &&(!homeRuntime||role==ArcadeRole.PLAYER_ONE||binding.lease().equals(controllerLease))
@@ -661,6 +675,7 @@ final class ClientArcadeSession {
         texture.upload();
     }
     private void restartLockstep(int nextEpoch) {
+        if(replayBlocked())return;
         releaseControls();
         if(mediaPublisher!=null){mediaPublisher.close();mediaPublisher=null;if(worker!=null)worker.mediaTap(null);}
         epoch = nextEpoch;

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "status": "local-candidate-only",
+  "runtimeVersion": "Snes9x 1.63 fae2fea",
+  "sourceRelationship": "Runtime short revision matches the reference source; exact Buildbot build inputs and reproducibility are not established.",
+  "inputs": {
+    "core": {
+      "filename": "snes9x_libretro.dll",
+      "bytes": 3840000,
+      "sha256": "5ce01616184f255623405793e192f79aef5089fa796b29bc11ddc5e052060124",
+      "legacyPath": "snes9x_libretro.dll",
+      "url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/snes9x_libretro.dll.zip",
+      "archiveBytes": 1316252,
+      "archiveSha256": "af334c14699af8784f751223d6ee63a0c22226eaa95d448dd95d3543452ff845",
+      "retrievedAt": "2026-10-11T03:00:49.708712+00:00",
+      "lastModified": "Sat, 10 Oct 2026 05:17:34 GMT"
+    },
+    "source": {
+      "filename": "snes9x-fae2fea08f74180759ef540ee94259213f503480.zip",
+      "bytes": 760336,
+      "sha256": "7f6dee7ab1a367da86bc86a87a204bf8fe0be389d62e7cfbd568dc2ccac32055",
+      "legacyPath": "snes9x-fae2fea08f74180759ef540ee94259213f503480.zip",
+      "url": "https://codeload.github.com/libretro/snes9x/zip/fae2fea08f74180759ef540ee94259213f503480",
+      "revision": "fae2fea08f74180759ef540ee94259213f503480"
+    }
+  }
+}

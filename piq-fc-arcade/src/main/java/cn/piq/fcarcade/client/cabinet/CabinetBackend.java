@@ -18,6 +18,9 @@ public interface CabinetBackend {
     /** Mode-specific runtime availability; legacy adapters preserve their existing check. */
     default String syncUnavailableReason(){return unavailableReason();}
     default String netplayUnavailableReason(){return "此附属尚未接入 Netplay";}
+    default String netplayUnavailableReason(String variant){
+        return cn.piq.fcarcade.netplay.NetplayLaunchSpec.LEGACY.equals(variant)?netplayUnavailableReason():"此附属未安装本局 Netplay 后端变体";
+    }
     record NetplayContent(cn.piq.fcarcade.netplay.NetplayProfile profile,byte[] rom,java.util.Map<String,byte[]> auxiliary,
                           cn.piq.retro.libretro.LibretroContentFiles files){
         public NetplayContent(cn.piq.fcarcade.netplay.NetplayProfile profile,byte[] rom,java.util.Map<String,byte[]> auxiliary){this(profile,rom,auxiliary,null);}
@@ -26,6 +29,11 @@ public interface CabinetBackend {
     @FunctionalInterface interface NetplayFactory {NetplayContent open(Path rom)throws Exception;}
     /** Main-thread capture, off-thread bounded content validation. No new input authority. */
     default NetplayFactory prepareNetplayFactory(){throw new UnsupportedOperationException("Netplay unsupported");}
+    /** The server selects one locally registered variant for the entire room, not a player preference. */
+    default NetplayFactory prepareNetplayFactory(String variant){
+        if(!cn.piq.fcarcade.netplay.NetplayLaunchSpec.LEGACY.equals(variant))throw new UnsupportedOperationException("Unknown Netplay variant");
+        return prepareNetplayFactory();
+    }
     default Path defaultRom(){return null;}
     /** Explicit directory and suffix metadata; never parse the human-readable extensions() label. */
     default Path romDirectory(){Path fallback=defaultRom();return fallback==null?cn.piq.retro.storage.ConsoleStorage.root(FMLPaths.GAMEDIR.get()).resolve("piq-cabinet/roms"):fallback.toAbsolutePath().getParent();}

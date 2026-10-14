@@ -10,10 +10,12 @@ ROOT = Path(__file__).resolve().parents[1]
 MODULES = (
     'piq-fc-arcade', 'piq-retro-platform', 'piq-sfc-home', 'piq-sfc-arcade',
     'piq-native-arcade', 'piq-gba', 'piq-j2me-arcade', 'piq-computer',
-    'piq-flash-box', 'piq-pvz-addon', 'piq-md-home', 'piq-replay-quickmode-compat',
+    'piq-flash-box', 'piq-pvz-addon', 'piq-md-home', 'piq-replay-compat',
+    'piq-replay-quickmode-compat',
 )
 ROOT_FILES = {'.gitignore', '.gitattributes', '.gitmodules', 'GIT_WORKFLOW.md', 'README.md', 'THIRD_PARTY_NOTICES.md'}
-APPROVED_WORKFLOWS = {'.github/workflows/snapshot.yml'}
+APPROVED_WORKFLOWS = {'.github/workflows/snapshot.yml',
+                      '.github/workflows/mame-lifecycle-candidate.yml'}
 APPROVED_SUBMODULES = {
     'piq-pvz-addon/vendor/PvZ-Portable': {
         'url': 'https://github.com/KLuoNuoYa/PvZ-Portable.git', 'branch': 'libretro',
@@ -56,7 +58,8 @@ def path_issues(name: str) -> list[str]:
         return ['unsafe-path']
     if name not in ROOT_FILES | APPROVED_WORKFLOWS and parts[0] not in (*MODULES, 'source-control'):
         issues.append('outside-source-scope')
-    if any(part.lower() in BLOCKED_DIRS or part.lower().startswith('publish') for part in parts[:-1]):
+    replay_descriptor = name == 'piq-fc-arcade/src/main/resources/META-INF/game-console/replay-api.properties'
+    if not replay_descriptor and any(part.lower() in BLOCKED_DIRS or part.lower().startswith('publish') for part in parts[:-1]):
         issues.append('generated-or-private-directory')
     if len(parts) > 2 and parts[0] in MODULES and parts[1].lower() == 'world':
         issues.append('runtime-world-directory')

@@ -2,7 +2,7 @@
 
 方块电玩使用多种模拟核心、运行器及适配库。**它们不采用统一许可证；公开源码也不代表所有组件、模型或游戏内容都可以任意再分发、商用。** 本文是导航和已核对的技术事实，不替代各组件的完整许可，也不是法律合规保证。
 
-更新日期：2026-10-15。组件总表沿用 `587fcb8` 基线，许可整理与快速回放补丁已进入 `6c535708`；独立 FC76.54 候选 `adb1e37` 中尚未合入该基线的组件单独列出。Release 的附件、对应源码与本分支可能不完全相同；再分发时以实际 JAR、运行库及其固定版本为单位核对，不能仅使用本表推断安装包内容。
+更新日期：2026-10-15。本发行准备分支整合 FC76.54 候选 `adb1e37` 与主线 `6c535708` 的许可、隐私清理和快速回放源码；整合源码不等于修改或重新验证既有玩家 JAR。Release 的附件、对应源码与本分支可能不完全相同；再分发时以实际 JAR、运行库及其固定版本为单位核对，不能仅使用本表推断安装包内容。
 
 ## 本项目代码与素材不是同一授权
 
@@ -12,7 +12,7 @@
 - 模型、贴图、声音、Logo 和宣传素材保留其权利人的声明；没有逐项许可时，不自动适用程序代码的 GPL。MD 模型已有随本仓库公开展示的授权说明，不等于通用素材的任意再分发或商用授权。电脑的黑白可组装主机、经典黑白键鼠两套原创素材已获作者允许随模组公开分发，范围见 [ASSETS.md](piq-computer/ASSETS.md)；不扩大为独立素材的任意复用或商用授权。
 - 本项目不提供商业游戏 ROM、BIOS、SWF 游戏、`main.pak`、操作系统镜像或玩家存档的使用授权。使用者必须有权使用自己的内容。
 
-## 主分支中的组件
+## 已纳入源码的组件
 
 “内置”表示相关构建/发行路线确实携带组件，不表示每个安装包均包含所有路线。旧运行方式仍有资源随包保留时，也需保留其许可。
 
@@ -24,7 +24,7 @@
 | FC 旧 WASM | nes-rust 0.1.2 及适配 | 普通 NES、光枪和 mapper19 等保留的 WASM 资源 | [MIT 原文](piq-fc-arcade/src/main/resources/META-INF/licenses/nes-rust-LICENSE.txt)；源码在 `piq-fc-arcade/native/nes-rust` 及相应适配目录，修改和打包资源须一一对应 |
 | 公共独立 worker / 部分附属 helper | JNA 5.14.0 | 独立 Java/native 调用库；主包 worker 不将它合并到 Minecraft classpath | 上游 LGPL / Apache 双许可，本发行选择 Apache-2.0；[原双许可说明](https://github.com/java-native-access/jna/blob/5.14.0/LICENSE)、[本包 Apache 全文](piq-fc-arcade/src/main/resources/META-INF/licenses/wasmtime4j-LICENSE.txt)。JNA 所含 libffi 仍须保留自己的 MIT 声明 |
 | FC WASM 运行器 | Wasmtime4j 46.0.1-1.2.0，`a377267cc70f891bb7c9618259251380ba26e57b` | 三份 Maven 库扁平合并进入主 JAR，不是 NeoForge Jar-in-Jar | [Apache-2.0 原文](piq-fc-arcade/src/main/resources/META-INF/licenses/wasmtime4j-LICENSE.txt)，[固定上游](https://github.com/tegmentum/wasmtime4j/blob/a377267cc70f891bb7c9618259251380ba26e57b/LICENSE) |
-| FC WASM 运行器 | Wasmtime 46.0.1，`823d1b8f251494a06288194d0df746191f535ff7` | Wasmtime4j 内部的 Windows/Linux 原生运行库 | [Apache-2.0 WITH LLVM-exception 原文](piq-fc-arcade/src/main/resources/META-INF/licenses/wasmtime-LICENSE.txt)，[固定上游](https://github.com/bytecodealliance/wasmtime/blob/823d1b8f251494a06288194d0df746191f535ff7/LICENSE)；全部原生传递依赖的来源清单仍未闭合 |
+| FC WASM 运行器 | Wasmtime 46.0.1，`823d1b8f251494a06288194d0df746191f535ff7` | Wasmtime4j 内部的 Windows/Linux 原生运行库 | [Apache-2.0 WITH LLVM-exception 原文](piq-fc-arcade/src/main/resources/META-INF/licenses/wasmtime-LICENSE.txt)，[固定上游](https://github.com/bytecodealliance/wasmtime/blob/823d1b8f251494a06288194d0df746191f535ff7/LICENSE)；新增 [121 个已确认 crate 版本及 Rust 标准库的原文通知](piq-fc-arcade/third-party/wasmtime4j-native/README.md)，不是完整 SBOM |
 | SFC 家用 | Mesen-S，`9e4fdeb9b336470bc96beb8765b2e79c86a2da1e` | SFC native 核心路线 | [本库原文/来源](piq-sfc-home/src/main/resources/core/sfc-libretro/)、[固定 GPLv3 原文](https://github.com/libretro/Mesen-S/blob/9e4fdeb9b336470bc96beb8765b2e79c86a2da1e/LICENSE) |
 | SFC 旧核心模块 | jgenesis，`25fc9e55ff065284c7b5f5855e2fc6d0f26e8270` | 内部 SFC 核心/WASM 路线，不另当成玩家必装主模组 | [固定 GPL 原文](https://github.com/jsgroth/jgenesis/blob/25fc9e55ff065284c7b5f5855e2fc6d0f26e8270/LICENSE)；源树中另行标为 MIT 的文件保留各自声明 |
 | MD | Genesis Plus GX 1.7.4，`c2838c7dc4236fc2fe94e5dbd08b41486067918e` | 普通核心及历史 PIQ Netplay `piqnp1` 独立修改版 | [本库原始许可](piq-md-home/src/main/resources/licenses/genesis-plus-gx/LICENSE.txt)、[修改版来源与源包](piq-md-home/src/main/resources/licenses/genesis-plus-gx-piq-netplay/NOTICE.txt)。GX 整体保留非商业和对应源码条件，不是 GPL/MIT 核心 |
@@ -51,7 +51,7 @@ PvZ 的实际静态依赖说明见 [THIRD_PARTY.md](piq-pvz-addon/THIRD_PARTY.md
 
 仓库中的 [快速回放兼容补丁 test.3](piq-replay-quickmode-compat/README.md)自有源码和测试工具采用 [MIT](piq-replay-quickmode-compat/LICENSE)。Minecraft、NeoForge、ReForgedPlay、Sable、Sponge Mixin 等由开发者或玩家另行提供，不打包进补丁，也不因适配代码采用 MIT 而改变各自许可。构建输出、测试中解出的依赖、私人录像和运行报告不纳入源码。
 
-以下事实来自候选源码 `adb1e37` 或对应发行件，不表示已合入上述 main 基线。可从[对应源码快照](https://github.com/meilian258-dotcom/game-console/tree/adb1e37ef5326bff7b8f5b22f1f074260b017e8c)核对；下载与完整材料见[项目 Releases](https://github.com/meilian258-dotcom/game-console/releases)。
+以下候选源码已纳入本发行准备分支；原发行件仍对应 `adb1e37`，新增通知未写入旧 JAR。可从[原对应源码快照](https://github.com/meilian258-dotcom/game-console/tree/adb1e37ef5326bff7b8f5b22f1f074260b017e8c)核对；下载与完整材料见[项目 Releases](https://github.com/meilian258-dotcom/game-console/releases)。
 
 | 范围 | 许可和边界 |
 | --- | --- |
@@ -82,8 +82,8 @@ Ruffle 的顶级 [MIT](piq-flash-box/runtime/vendor/LICENSE_MIT) / [Apache](piq-
 
 尚未闭合的事项不以本次文档补齐冒充完成：
 
-1. **SFC Snes9x**：官方取得记录、固定源提交、DLL 版本与摘要已绑定，完整源和 LGPL 原文已在材料中；待落实最终发行的运行库通知／源码附件，补核原 Buildbot 构建细节与实际组合的再分发条件。不是要求重新修改核心，也不是因非商业许可就一概禁止免费公开。完成前保持现有公开分发门禁。
-2. **Wasmtime/Wasmtime4j** 原生 Rust 传递依赖版本及版权／许可通知清单。顶层 Apache／LLVM 许可不要求 GPL 式对应源码交付；缺少原构建 Cargo.lock 或 SBOM 是完整组件清单的证据缺口，不直接等同于缺少必须交付的 GPL 源码。不能拿今天重新解析的依赖代替历史构建事实。
+1. **SFC Snes9x**：官方取得记录、固定源提交、DLL 版本与摘要已绑定，完整源和 LGPL 原文已在材料中。现用自有 GPL JNI 桥在同一进程加载并调用非商业许可的 Snes9x；当前未找到适用于该组合的链接例外。需明确相容的组合分发依据或由有权授权者提供适用的额外许可，不能仅凭独立 DLL、MIT API 或附上许可文本放行。最终发行还需包含运行库通知／源码附件；原 Buildbot 构建细节仍有精度限制，但不将字节一致重编当作一律必需。详见 [SFC 通知](piq-sfc-home/third-party/snes9x-runtime/NOTICE.md)。完成前保持现有公开分发门禁。
+2. **Wasmtime/Wasmtime4j**：已补 121 个可确证 crate/version 的 250 份原文和 Rust 1.96.1 标准库通知，来源及摘要见[独立材料目录](piq-fc-arcade/third-party/wasmtime4j-native/README.md)。旧 JAR 未重打包，分发时须携带相应补充材料。历史发布未提供锁/SBOM且原生日志已过期，剩余未显示在二进制版本字符串中的成员仍不能宣称全部核清；这不直接等于缺少必须交付的 GPL 源码，也不把完整 SBOM 本身当作普遍发行条件。未用今天重新解析的依赖冒充历史构建事实。
 3. **MicroEmulator 2.0.4** 四个固定 Maven 制品的完整源/许可清单及扁平合并后的替换/重链接材料；上游当前分支的双许可概述不自动适用于每个旧制品文件。
 4. **核心来源**：固定 SHA、版本字符串、官方取得记录、完整源树与构建脚本共同说明来源；若缺原构建记录，明确对应关系的证据范围。字节完全一致的可重复构建是另一个验证目标，不能仅因尚未做到它就断言不可分发，也不能用同名版本代替完整对应源码。
 5. **JNA、PvZ 与编译运行库**：逐发行包核对完整 Apache/libffi、public-r1 补充材料和静态链接库 notices；修改说明不能证明每个旧 JAR 都已携带它们。

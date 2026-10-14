@@ -118,12 +118,14 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
 
     def test_game_dependency_floors_match_required_public_api_generations(self):
         expected = {
-            # Shared launch protocol / legacy-save adapter require FC 76.41.
-            'piq-sfc-home': '[0.31.0-alpha.76.41,0.31.0-alpha.77)',
+            # SFC54 uses FC76.54's shared read-only save-library presentation.
+            'piq-sfc-home': '[0.31.0-alpha.76.54,0.31.0-alpha.77)',
             # Unified content paths / file-backed JNI content require FC 76.40.
             'piq-sfc-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
-            'piq-md-home': '[0.31.0-alpha.76.36,0.31.0-alpha.77)',
-            'piq-native-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
+            # MD16 uses FC76.50's shared device-level second-port policy.
+            'piq-md-home': '[0.31.0-alpha.76.50,0.31.0-alpha.77)',
+            # Native12 registers FC76.54's trusted operating-file adapter.
+            'piq-native-arcade': '[0.31.0-alpha.76.54,0.31.0-alpha.77)',
             'piq-gba': '[0.31.0-alpha.76.31,0.31.0-alpha.77)',
             'piq-computer': '[0.31.0-alpha.76.26,0.31.0-alpha.77)',
             'piq-pvz-addon': '[0.31.0-alpha.76.22,0.31.0-alpha.77)',

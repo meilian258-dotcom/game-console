@@ -39,7 +39,7 @@ class SnapshotProfilesTests(unittest.TestCase):
                                 archiveSha256=profiles.sha(archive.read_bytes())))
         return dict(schema=1, nightly=entries, files=files)
 
-    def test_exact_five_downloaded_identities(self):
+    def test_exact_four_downloaded_identities(self):
         receipt = self.cores()
         found = profiles.nightly_records(receipt, self.root)
         self.assertEqual(set(profiles.ARTIFACTS), set(found))
@@ -114,7 +114,10 @@ class SnapshotProfilesTests(unittest.TestCase):
         self.assertEqual(profiles.sha(profile.read_bytes()), identity['fcProfileSha256'])
         self.assertNotEqual(profiles.OLD_PROFILE, identity['fcProfileSha256'])
         self.assertIn(worker['sha256'], profile.read_text(encoding='utf-8'))
-        self.assertIn('snapshot-', identity['sfcBuild'])
+        self.assertEqual('mesen-s-piq1-8aca17e7', identity['sfcBuild'])
+        for name in ('LibretroSfcCore.java', 'SfcNetplayProfile.java'):
+            relative = 'piq-sfc-home/src/main/java/cn/piq/sfchome/core/' + name
+            self.assertEqual(before[relative], (self.root / relative).read_bytes(), 'both SFC identities must remain fixed')
         self.assertLessEqual(len(identity['sfcBuild'] + ':jni-v1'), 96, 'SFC network field bound')
         self.assertIn(cores['mgba-windows']['sha256'], identity['gbaProcessNamespace'])
         self.assertIn(cores['mgba-windows']['sha256'], identity['gbaJniNamespace'])

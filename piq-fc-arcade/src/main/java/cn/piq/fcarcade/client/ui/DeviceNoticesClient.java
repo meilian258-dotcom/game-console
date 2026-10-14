@@ -1,7 +1,7 @@
 package cn.piq.fcarcade.client.ui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.neoforged.api.distmarker.Dist;
@@ -9,12 +9,12 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientChatReceivedEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 
 /** Presentation boundary only. No network payloads, invitations or other mods' chat are intercepted. */
 @EventBusSubscriber(modid="piq_fc_arcade", value=Dist.CLIENT)
 public final class DeviceNoticesClient {
-    private static final SystemToast.SystemToastId ERROR_TOAST = new SystemToast.SystemToastId(6500);
-    private static long shown;
+    private static final DeviceNoticeChat CHAT = new DeviceNoticeChat();
     private DeviceNoticesClient() {}
     public static void message(String device, String text) {
         if (!DeviceNoticePolicy.routineText(text)) DeviceNotices.record(device, text);
@@ -46,17 +46,14 @@ public final class DeviceNoticesClient {
         }
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
-        var entry = DeviceNotices.last();
         var mc = Minecraft.getInstance();
-        if (entry == null || entry.id() <= shown || mc.player == null) return;
-        shown = entry.id();
-        // One dedicated vanilla toast, reused instead of queuing a wall of repeated failures.
-        String fullTitle = entry.device() + "：" + entry.summary();
-        String title = mc.font.plainSubstrByWidth(fullTitle, 192);
-        if (title.length() < fullTitle.length()) title = mc.font.plainSubstrByWidth(fullTitle, 184) + "…";
-        Component heading = Component.literal(title), guide = Component.literal("模组设置 → 运行环境");
-        var existing = mc.getToasts().getToast(SystemToast.class, ERROR_TOAST);
-        if (existing == null) mc.getToasts().addToast(SystemToast.multiline(mc, ERROR_TOAST, heading, guide));
-        else existing.reset(heading, guide);
+        if (mc.player == null) return;
+        var entry = CHAT.poll(DeviceNotices.snapshot(), System.nanoTime());
+        if (entry == null) return;
+        // Local chat only: do not send diagnostics, paths or stack traces to the server.
+        mc.gui.getChat().addMessage(Component.literal(DeviceNoticeChat.line(entry)).withStyle(ChatFormatting.YELLOW));
+    }
+    @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut event) {
+        CHAT.discardThrough(DeviceNotices.last());
     }
 }

@@ -35,11 +35,10 @@ class RuntimeWorkspaceJniPinTest {
         assertFalse(Files.exists(workspace.directory()));
     }
     @Test void actualJvmShutdownKeepsPinnedFilesForNextProcessRecovery()throws Exception{
-        String javaExecutable=Path.of(System.getProperty("java.home"),"bin",System.getProperty("os.name").startsWith("Windows")?"java.exe":"java").toString();
         String cp=Path.of(ShutdownFixture.class.getProtectionDomain().getCodeSource().getLocation().toURI())+java.io.File.pathSeparator
                 +Path.of(RuntimeWorkspace.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-        Process child=new ProcessBuilder(javaExecutable,"-cp",cp,ShutdownFixture.class.getName(),base.toString()).redirectErrorStream(true).start();
-        String line;try{assertTrue(child.waitFor(8,TimeUnit.SECONDS));line=child.inputReader().readLine();assertEquals(0,child.exitValue());}
+        Process child=RuntimeWorkspaceTestSupport.child(64,cp,ShutdownFixture.class,base.toString()).start();
+        String line;try{assertTrue(child.waitFor(8,TimeUnit.SECONDS));line=child.inputReader().readLine();assertEquals(0,child.exitValue(),line);}
         finally{if(child.isAlive()){child.destroyForcibly();child.waitFor(5,TimeUnit.SECONDS);}}
         assertNotNull(line);Path directory=Path.of(line);assertTrue(directory.startsWith(base));
         assertTrue(Files.exists(directory.resolve("core.dll")),"Shutdown must not delete pinned native files");

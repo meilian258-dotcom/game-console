@@ -6,13 +6,19 @@ public final class DeviceSessionFlow {
     public enum Stage { PREPARING, SAVE_SELECTION, VALIDATING, JOIN_CONFIRM, LOADING, READY, STOPPING, CLOSED, CANCELLED, FAILED }
     private final int maxPlayers;
     private final boolean saving,privatePlay;
+    private final Boolean configuredSecondPort;
     private Stage stage=Stage.PREPARING;
     private int savePlayers=1;
     private boolean allowSecondPort;
     private long revision=1;
     public DeviceSessionFlow(int maxPlayers,boolean saving,boolean privatePlay){
+        this(maxPlayers,saving,privatePlay,null);
+    }
+    /** Null retains the legacy confirmation flow for existing adapters. */
+    public DeviceSessionFlow(int maxPlayers,boolean saving,boolean privatePlay,Boolean configuredSecondPort){
         if(maxPlayers<1||maxPlayers>2)throw new IllegalArgumentException("Home port limit");
         this.maxPlayers=maxPlayers;this.saving=saving;this.privatePlay=privatePlay;
+        this.configuredSecondPort=configuredSecondPort;
     }
     public Stage stage(){return stage;}
     public long revision(){return revision;}
@@ -24,7 +30,12 @@ public final class DeviceSessionFlow {
     private void move(Stage next){stage=next;revision++;}
     public void prepared(){require(Stage.PREPARING);move(saving?Stage.SAVE_SELECTION:Stage.VALIDATING);}
     public void select(int players){require(Stage.SAVE_SELECTION);if(players<1||players>maxPlayers)throw new IllegalArgumentException("Save label exceeds content ports");savePlayers=players;move(Stage.VALIDATING);}
-    public void selected(){require(Stage.VALIDATING);allowSecondPort=false;move(!privatePlay&&maxPlayers>1?Stage.JOIN_CONFIRM:Stage.LOADING);}
+    public void selected(){
+        require(Stage.VALIDATING);
+        boolean eligible=!privatePlay&&maxPlayers>1;
+        allowSecondPort=eligible&&Boolean.TRUE.equals(configuredSecondPort);
+        move(eligible&&configuredSecondPort==null?Stage.JOIN_CONFIRM:Stage.LOADING);
+    }
     public void invalidSelection(){require(Stage.VALIDATING);if(!saving)throw new IllegalStateException("No save selection");move(Stage.SAVE_SELECTION);}
     public void join(boolean allowed){require(Stage.JOIN_CONFIRM);allowSecondPort=allowed;move(Stage.LOADING);}
     public void back(){require(Stage.JOIN_CONFIRM);if(!saving)throw new IllegalStateException("No previous save page");allowSecondPort=false;move(Stage.SAVE_SELECTION);}

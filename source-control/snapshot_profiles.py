@@ -17,6 +17,7 @@ import shutil
 import stat
 import subprocess
 import zipfile
+import sfc_stock
 
 OLD = {
     'mesen-windows': '2b3fbe286995c80ebbc85239fd28c8fa07b1011cc69c7f9021816429e3473885',
@@ -32,16 +33,20 @@ JNA = '34ed1e1f27fa896bca50dbc4e99cf3732967cec387a7a0d5e3486c09673fe8c6'
 ARTIFACTS = {
     'mesen-windows': ('windows-x64', 'mesen_libretro.dll'),
     'mesen-linux': ('linux-x64', 'mesen_libretro.so'),
-    'mesen-s-windows': ('windows-x64', 'mesen-s_libretro.dll'),
     'genesis-plus-gx-windows': ('windows-x64', 'genesis_plus_gx_libretro.dll'),
     'mgba-windows': ('windows-x64', 'mgba_libretro.dll'),
 }
 UNCOMMITTED_BUILD_FILES = (
     '.github/workflows/snapshot.yml', 'source-control/snapshot-resources.gradle',
     'source-control/snapshot_build.py', 'source-control/snapshot_inputs.py',
-    'source-control/snapshot_profiles.py', 'source-control/snapshot_release.py',
+    'source-control/snapshot_profiles.py', 'source-control/snapshot_release.py', 'source-control/snapshot_stock.py',
     'source-control/test_snapshot_build.py', 'source-control/test_snapshot_inputs.py',
-    'source-control/test_snapshot_profiles.py', 'source-control/test_snapshot_release.py',
+    'source-control/test_snapshot_profiles.py', 'source-control/test_snapshot_release.py', 'source-control/test_snapshot_stock.py',
+    'source-control/sfc_stock.py', 'source-control/sfc-stock-inputs.json', 'source-control/test_sfc_stock.py',
+    'piq-sfc-home/src/main/resources/core/sfc-snes9x/NOTICE.txt',
+    'piq-sfc-home/src/main/resources/core/sfc-snes9x/reference-only/JMA-license.txt',
+    'piq-sfc-home/src/main/resources/core/sfc-snes9x/reference-only/xBRZ-license.txt',
+    'piq-sfc-home/src/main/resources/core/sfc-snes9x/reference-only/sources.json',
 )
 FC = 'piq-fc-arcade/src/main/java/cn/piq/fcarcade/'
 GBA = 'piq-gba/src/main/java/cn/piq/gba/bridge/'
@@ -125,7 +130,7 @@ def nightly_records(receipt: dict, inputs: Path) -> dict:
                 raise ValueError('Nightly archive member identity mismatch')
         found[ident] = entry
     if set(found) != set(ARTIFACTS):
-        raise ValueError('Exactly five ordinary nightly cores are required')
+        raise ValueError('Exactly four ordinary nightly cores are required; both SFC core identities stay fixed')
     return found
 
 
@@ -164,11 +169,9 @@ def patch_profiles(root: Path, cores: dict, version: str, worker: dict, helper: 
     replace_exact(smoke, 'FC63 profile identity retained', 'generated snapshot profile identity pinned')
     replace_exact(smoke, 'private-play module resource stays FC63 profile', 'private-play module uses snapshot profile')
 
-    sfc_build = 'mesen-s-snapshot-' + h['mesen-s-windows']
-    sfc = root / 'piq-sfc-home/src/main/java/cn/piq/sfchome/core/LibretroSfcCore.java'
-    replace_exact(sfc, 'mesen-s-piq1-8aca17e7', sfc_build)
-    replace_exact(sfc, OLD['mesen-s-windows'], h['mesen-s-windows'])
-    replace_exact(root / 'piq-sfc-home/src/main/java/cn/piq/sfchome/core/SfcNetplayProfile.java', OLD['mesen-s-windows'], h['mesen-s-windows'])
+    # Legacy saves retain Mesen-S's original identity; JNI Snes9x is a separate
+    # pinned candidate. Neither may be silently rebranded as a current nightly.
+    sfc_build = 'mesen-s-piq1-8aca17e7'
     for file in ('piq-md-home/build.gradle', 'piq-md-home/src/main/java/cn/piq/mdhome/client/MdProfile.java',
                  'piq-md-home/src/test/java/cn/piq/mdhome/MdNetplayContractTest.java',
                  'piq-md-home/src/test/java/cn/piq/mdhome/client/MdPureTest.java'):
@@ -337,6 +340,24 @@ def write_json(path: Path, value: dict) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
 
+def copy_receipted_inputs(inputs: Path, dest: Path, receipt: dict) -> None:
+    all_records = {}
+    for entry in [*receipt['files'], *receipt['bootstrap'], *receipt['nightly']]:
+        name = safe_name(entry['path'])
+        if name in all_records and (all_records[name]['sha256'], all_records[name]['bytes']) != (entry['sha256'], entry['bytes']):
+            raise ValueError('Conflicting receipt record')
+        all_records[name] = entry
+    for name, entry in sorted(all_records.items()):
+        source = checked(inputs, entry)
+        target = dest / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+    # Fixed stock is copied only from the verified receipt, never ignored vendor files.
+    from snapshot_stock import verify_receipt as verify_stock_receipt
+    verify_stock_receipt(dest, all_records)
+    sfc_stock.verify_receipt(dest, all_records)
+
+
 def prepare(root: Path, inputs: Path, output: Path, jdk: Path) -> dict:
     root, inputs, output, jdk = [p.absolute() for p in (root, inputs, output, jdk)]
     for p in (root, inputs, output, jdk):
@@ -353,17 +374,7 @@ def prepare(root: Path, inputs: Path, output: Path, jdk: Path) -> dict:
     copy_checkout(root, output)
     dest = output / 'snapshot-inputs'
     dest.mkdir()
-    all_records = {}
-    for entry in [*receipt['files'], *receipt['bootstrap'], *receipt['nightly']]:
-        name = safe_name(entry['path'])
-        if name in all_records and (all_records[name]['sha256'], all_records[name]['bytes']) != (entry['sha256'], entry['bytes']):
-            raise ValueError('Conflicting receipt record')
-        all_records[name] = entry
-    for name, entry in sorted(all_records.items()):
-        source = checked(inputs, entry)
-        target = dest / name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
+    copy_receipted_inputs(inputs, dest, receipt)
     lockfile = output / 'source-control/build-inputs.json'
     lock = json.loads(lockfile.read_text(encoding='utf-8'))
     for ident in ('mesen-windows', 'mesen-linux'):
@@ -377,7 +388,6 @@ def prepare(root: Path, inputs: Path, output: Path, jdk: Path) -> dict:
             shutil.copy2(dest / cores[ident]['path'], target)
     write_json(lockfile, lock)
     for ident, name in (
-        ('mesen-s-windows', 'resources/sfc-home/core/sfc-libretro/windows-x64/mesen-s_libretro.dll'),
         ('genesis-plus-gx-windows', 'resources/md/core/windows-x64/genesis_plus_gx_libretro.dll'),
     ):
         target = dest / name
@@ -402,8 +412,6 @@ def prepare(root: Path, inputs: Path, output: Path, jdk: Path) -> dict:
     identities = patch_profiles(output, cores, native['version'], worker, helper)
 
     # These notices apply to the copied nightly artifact, not the original pinned release.
-    sfc_notice = output / 'piq-sfc-home/src/main/resources/core/sfc-libretro/NOTICE.txt'
-    replace_exact(sfc_notice, OLD['mesen-s-windows'], cores['mesen-s-windows']['sha256'])
     md_notice = output / 'piq-md-home/src/main/resources/licenses/genesis-plus-gx/NOTICE.txt'
     old_notice = md_notice.read_text(encoding='utf-8')
     copyright_start = old_notice.index('Copyright (c)')
@@ -418,8 +426,9 @@ def prepare(root: Path, inputs: Path, output: Path, jdk: Path) -> dict:
     manifest = dict(schema=1, channel='nightly-snapshot', inputRoot='snapshot-inputs',
                     runtimeBase='snapshot-gba/runtime-base.jar', nightly=list(cores.values()),
                     fcWorker=worker, gbaHelper=helper, gbaNativeInfo=native, identities=identities,
-                    customCorePolicy='FC r2, MD Netplay, Arcade and legacy WASM identities unchanged',
-                    validation='Build/test snapshot only; Minecraft and SFC nightly Netplay acceptance pending')
+                    customCorePolicy='FC r2, MD Netplay, Arcade, SFC Mesen-S, fixed SFC Snes9x and legacy WASM identities unchanged',
+                    sfcSnes9xPublication='blocked-local-candidate-only; see core/sfc-snes9x/NOTICE.txt',
+                    validation='Build/test snapshot only; new SFC core publication review and Minecraft acceptance pending')
     # The runner stamps this portable manifest only after all component builds.
     # Keeping one stamping owner avoids duplicate resources in the SFC merger.
     receipt['files'] = [record(p, dest) for p in sorted(dest.rglob('*')) if p.is_file()]

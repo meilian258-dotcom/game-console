@@ -160,6 +160,26 @@
         1.0826482542486753,
         1.0826482542486753
       ]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 1, 0],
+      "scale": [0.25, 0.25, 0.25]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 1, 0],
+      "scale": [0.25, 0.25, 0.25]
+    },
+    "thirdperson_righthand": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 1, 0],
+      "scale": [0.25, 0.25, 0.25]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 1, 0],
+      "scale": [0.25, 0.25, 0.25]
     }
   }
 }

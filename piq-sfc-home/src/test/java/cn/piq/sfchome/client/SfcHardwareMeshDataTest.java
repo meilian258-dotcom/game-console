@@ -33,7 +33,26 @@ class SfcHardwareMeshDataTest {
     @Test void armPoseDoesNotConsumeOtherItemOrSpecialMovement(){assertTrue(SfcControllerPoseLayout.eligible(true,true,true,false,false,false,false));assertFalse(SfcControllerPoseLayout.eligible(true,false,true,false,false,false,false));assertFalse(SfcControllerPoseLayout.eligible(false,true,true,false,false,false,false));for(int i=0;i<4;i++)assertFalse(SfcControllerPoseLayout.eligible(true,true,true,i==0,i==1,i==2,i==3));assertFalse(SfcControllerPoseLayout.eligible(true,true,false,false,false,false,false));}
     @Test void rigIsClampedAndSymmetric(){assertEquals(SfcControllerPoseLayout.rig(0,0),SfcControllerPoseLayout.rig(-2,-2));assertEquals(SfcControllerPoseLayout.rig(1,1),SfcControllerPoseLayout.rig(2,2));var l=SfcControllerPoseLayout.arm(false);var r=SfcControllerPoseLayout.arm(true);assertEquals(-l.x(),r.x(),1e-12);assertEquals(l.y(),r.y(),1e-12);assertEquals(l.z(),r.z(),1e-12);assertEquals(-l.roll(),r.roll(),1e-12);}
     @Test void userAtlasNamespacesStaySeparate()throws Exception{var groups=parsed();for(String g:new String[]{"cartridge","inserted"})for(var p:groups.get(g))assertEquals("piq_sfc_home:textures/block/user_sfc_cartridge_20260911.png",p.texture());for(String g:new String[]{"body","controller","p1_docked","p2_docked"})for(var p:groups.get(g))assertEquals("piq_sfc_home:textures/block/user_sfc_20260911.png",p.texture());}
-    @Test void exactUserMeshBudgetsAndNoDuplicateStaticCard()throws Exception{var groups=parsed();for(var e:java.util.Map.of("body",2402,"p1_docked",3628,"p2_docked",3628,"controller",3364,"cartridge",1012,"inserted",1012).entrySet())assertEquals(e.getValue().intValue(),groups.get(e.getKey()).stream().mapToInt(p->p.vertices().length/24).sum());assertFalse(groups.get("body").stream().anyMatch(p->p.name().contains("cartridge")));}
+    @Test void exactUserMeshBudgetsAndNoDuplicateStaticCard()throws Exception{var groups=parsed();for(var e:java.util.Map.of("body",2400,"p1_docked",3628,"p2_docked",3628,"controller",3364,"cartridge",1012,"inserted",1012).entrySet())assertEquals(e.getValue().intValue(),groups.get(e.getKey()).stream().mapToInt(p->p.vertices().length/24).sum());assertFalse(groups.get("body").stream().anyMatch(p->p.name().contains("cartridge")));}
+    @Test void frontBrandingDecalIsAbsentButOtherPrintRemains()throws Exception {
+        var parts=asset().getAsJsonObject("groups").getAsJsonObject("body").getAsJsonArray("parts");
+        boolean print=false;
+        for(var value:parts) {
+            var part=value.getAsJsonObject();
+            if(!part.get("name").getAsString().equals("console_print"))continue;
+            print=true;assertEquals(292,part.getAsJsonArray("triangles").size());
+            for(var entry:part.getAsJsonArray("triangles")) {
+                boolean branding=true;
+                for(var point:entry.getAsJsonObject().getAsJsonArray("uv")) {
+                    double u=point.getAsJsonArray().get(0).getAsDouble()*2048;
+                    double v=point.getAsJsonArray().get(1).getAsDouble()*2048;
+                    branding &= u>=566-1e-5&&u<=1072+1e-5&&v>=563-1e-5&&v<=611+1e-5;
+                }
+                assertFalse(branding,"An exported triangle still samples the front branding decal");
+            }
+        }
+        assertTrue(print);
+    }
     @Test void independentCardGeometryIsTranslatedNotScaled()throws Exception{
         var g=parsed();var a=g.get("cartridge");var b=g.get("inserted");assertEquals(a.size(),b.size());
         for(int i=0;i<a.size();i++){assertEquals(a.get(i).name(),b.get(i).name());float[] x=a.get(i).vertices(),y=b.get(i).vertices();assertEquals(x.length,y.length);for(int v=0;v<x.length;v+=8){assertEquals(x[v],y[v]);assertEquals((2.18-6.55)/16,y[v+1]-x[v+1],1e-7);assertEquals(3.711/16,y[v+2]-x[v+2],1e-7);for(int k=3;k<8;k++)assertEquals(x[v+k],y[v+k],1e-8);}}

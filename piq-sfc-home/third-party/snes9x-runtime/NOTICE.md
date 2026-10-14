@@ -39,3 +39,11 @@
 完整源树保留 NTSC/DSP 的可修改源、头文件与重新链接脚本。开发者构建的新核心仍须单独审核身份和适配，不指导玩家关闭生产哈希校验或覆盖旧存档。分发者须一并提供完整固定源、适用许可、运行库通知及修改说明，而不只给一个动态 nightly 链接。
 
 [Snes9x 原许可](https://github.com/libretro/snes9x/blob/fae2fea08f74180759ef540ee94259213f503480/LICENSE)规定非商业及署名等条件；免费公开分发不等于商业授权。LGPL 部件、MIT 代码及运行库例外保持各自范围，不由前端的 GPL 覆盖。实际组合的再分发条件和最终安装包材料仍须在公开前完成核对；本目录补齐原文，不自动解除 SFC54 的发布门禁。
+
+### 自有桥与核心的组合许可
+
+SFC54 的 JNI 路线由 `SfcNetplayProfile` 选择核心，经 `JniNetplaySession`、`LibretroJniRuntime` 和 `NativeLibretroBridge` 调用自有 C++ 桥；桥通过 `LoadLibraryExW`/`GetProcAddress` 在同一进程中加载核心并调用 `retro_run` 等接口。这不是仅交换游戏文件的独立程序，`NetplayProcess` 这个类名也不证明进程隔离。
+
+当前自有桥声明 GPL-3.0-or-later，未找到明确覆盖 Snes9x 组合的额外链接许可。Snes9x 的非商业条件不会因 DLL 独立、API 头文件是 MIT、附上源码或 GCC 运行库例外而解除。可参考 GNU 对[动态插件组合](https://www.gnu.org/licenses/gpl-faq.en.html#GPLPlugins)和[不相容库链接例外](https://www.gnu.org/licenses/gpl-faq.en.html#GPLIncompatibleLibs)的解释；这里指出需解决的许可条件，不作法院结论。
+
+如采用额外许可，必须由有权授权的人授予，并明确仅覆盖其有权授权的代码；不能替 RetroArch、其他贡献者或核心作者授予例外。当前本目录没有新增这类许可，也未更改 Snes9x、LGPL 部件、自有桥的现有条款。问题未解决前，保持 `sfc_stock.PUBLICATION_BLOCK`。

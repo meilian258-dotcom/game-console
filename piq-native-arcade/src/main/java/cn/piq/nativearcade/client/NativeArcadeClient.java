@@ -36,7 +36,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import net.neoforged.neoforge.event.GameShuttingDownEvent;
 
-/** The native library is NEVER loaded here: all core work is owned by a killable helper. */
+/** Legacy standalone cabinet; MAME JNI calls and teardown belong to the session's native owner thread. */
 @EventBusSubscriber(modid="piq_native_arcade",value=Dist.CLIENT)
 public final class NativeArcadeClient {
     private static final ExecutorService STARTER=Executors.newSingleThreadExecutor(r->{var t=new Thread(r,"PIQ-Native-Launch");t.setDaemon(true);return t;});

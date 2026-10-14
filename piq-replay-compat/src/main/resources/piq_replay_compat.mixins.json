@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cn.piq.replaycompat.mixin",
+  "plugin": "cn.piq.replaycompat.mixin.CompatMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ReplayPacketListenerMixin", "ReplayMarkerProcessorMixin", "ReplayVideoRendererMixin", "ReplayForceStopMixin", "ReplayOpenGuardMixin",
+    "CaptureBufferSource", "CaptureIrisBufferSource", "CaptureDynamicTexture",
+    "CaptureAudioSfc", "CaptureAudioGba",
+    "CaptureAudioNativeArcade", "CaptureAudioComputer", "CaptureAudioPvz", "CaptureAudioPvzJni",
+    "ReplayAudioTimelineMixin",
+    "CaptureJ2meMaterial", "CaptureComputerPixels", "CaptureComputerStreamPixels",
+    "GuardCustomPayload", "GuardSfc", "GuardSfcLocalWatch", "GuardMd", "GuardGba",
+    "GuardComputer", "GuardComputerInput", "GuardComputerStreams", "GuardJ2me"
+  ],
+  "injectors": {"defaultRequire": 1}
+}

@@ -14,18 +14,19 @@ class SfcPublicDefaultsSourceTest {
         assertTrue(write.contains("SfcCartridgeData.write(stack,hash,title);if(fresh)SfcCartridgeData.setPlayers(stack,2)"));
         assertFalse(write.contains("setPlayers(stack,1)"));
     }
-    @Test void newPublicRunUsesSharedExplicitConsentNotTheFormerOfferDialog()throws Exception{
+    @Test void newPublicRunUsesPersistentDevicePermissionWithoutTheFormerOfferDialog()throws Exception{
         String power=section(source("SfcHomeServer"),"private static boolean powerOn(","private static void sendRuntime(");
-        assertTrue(power.contains("s.multiplayer=allowSecond"));assertTrue(power.contains("HomeLaunchServer.start"));assertTrue(power.contains("launch.allowSecondPort()"));assertFalse(power.contains("new SfcJoinNetwork.Offer"));
+        assertTrue(power.contains("s.multiplayer=SfcHomeStartPolicy.secondPortAllowed"));assertTrue(power.contains("HomeLaunchServer.start"));assertTrue(power.contains("launch.allowSecondPort()"));assertFalse(power.contains("new SfcJoinNetwork.Offer"));
+        assertTrue(power.contains("final boolean secondPort=c.secondPortAllowed()"));assertTrue(power.contains("c.secondPortAllowed()==secondPort"));
         assertTrue(power.contains("preflight(p,c,true)"));assertTrue(power.contains("!ItemStack.matches(card,c.insertedCartridge())"));
     }
-    @Test void explicitCardLimitsAndStoredApprovalStillProtectAdmission()throws Exception{
+    @Test void explicitCardLimitsAndDevicePermissionStillProtectAdmission()throws Exception{
         String source=source("SfcHomeServer");
         String request=section(source,"private static void requestJoin(","public static void decideJoin(");
         assertTrue(request.contains("requestedPort>=SfcCartridgeData.maxPlayers("));assertTrue(request.contains("if(!candidate(p,s,true))"));
-        assertTrue(request.contains("if(!s.connection.console().joinApprovalRequired())"));
+        assertTrue(request.contains("if(!secondPortAllowed(s))"));assertFalse(request.contains("joinApprovalRequired()"));
         assertTrue(request.contains("decideJoin(host,new SfcJoinNetwork.Decision(s.id,s.epoch,s.join.gate.token,true))"));
-        assertTrue(request.contains("new SfcJoinNetwork.Approval"));
+        assertFalse(request.contains("new SfcJoinNetwork.Approval"));
         String reset=section(source,"private static void reset(","private static boolean hostValid(");
         assertTrue(reset.contains("next.multiplayer=old.multiplayer"));
     }

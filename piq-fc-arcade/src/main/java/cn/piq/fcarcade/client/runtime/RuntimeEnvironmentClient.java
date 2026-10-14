@@ -4,20 +4,16 @@ import cn.piq.fcarcade.FcArcadeMod;
 import cn.piq.fcarcade.runtime.RuntimeCatalog;
 import cn.piq.fcarcade.runtime.RuntimeStartupState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.TitleScreen;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.util.EnumSet;
 import java.util.Set;
 
 /** Client bootstrap only. Register no client extension on a dedicated server. */
 public final class RuntimeEnvironmentClient {
-    private static boolean attempted;
-    private static int titleTicks;
+    private static boolean failureReported;
     private RuntimeEnvironmentClient(){}
     public static void register(){
         IConfigScreenFactory factory=(container,parent)->new RuntimeEnvironmentScreen(parent);
@@ -35,15 +31,13 @@ public final class RuntimeEnvironmentClient {
     }
     private static void tick(ClientTickEvent.Post event){
         var mc=Minecraft.getInstance();
-        if(attempted||!(mc.screen instanceof TitleScreen)||mc.getOverlay()!=null)return;
-        if(++titleTicks<40)return;attempted=true;
-        var root=mc.gameDirectory.toPath();
-        var ids=required();
-        // Cheap existence only at the title screen; hash/ZIP work starts on a worker after opening the page.
-        boolean missing=RuntimeCatalog.standard().stream().filter(c->ids.contains(c.id())).flatMap(c->c.files().stream())
-                .anyMatch(file->!Files.isRegularFile(root.resolve(file.relativePath()),LinkOption.NOFOLLOW_LINKS));
-        // A conflicting/corrupt existing file can pass the cheap presence check.
-        // Startup already did the expensive work; only read its immutable result here.
-        if(missing||RuntimeStartupState.failure(root).isPresent())mc.setScreen(new RuntimeEnvironmentScreen(mc.screen));
+        // Diagnostics remain available on demand. Never replace the title/game screen automatically.
+        // Startup validation keeps its original checks; presentation reads only its immutable result.
+        if(failureReported||mc.player==null)return;
+        RuntimeStartupState.failure(mc.gameDirectory.toPath()).ifPresent(report->{
+            failureReported=true;
+            cn.piq.fcarcade.client.ui.DeviceNotices.record("运行环境",report.summary()+"\n"+String.join("\n",report.details())
+                    +"\n无来源的旧组件启动错误会保守保留至重启；各组件成功只清除其自身错误。");
+        });
     }
 }

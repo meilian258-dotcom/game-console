@@ -46,6 +46,38 @@ class FcPrivateEngineTest {
         assertFalse(finish(engine).saved()); assertEquals(0, opens.get());
         assertFalse(Files.exists(temporary.resolve("account-private"))); assertFalse(engine.isReady());
     }
+    @Test void replayRetiresBlockedFrameWithoutSnapshotSaveOrEarlyCapacityRelease() throws Exception {
+        FakeCore core=new FakeCore();core.blockFirst=true;var running=engine(core);
+        try{
+            assertTrue(core.entered.await(3,TimeUnit.SECONDS));
+            assertTrue(running.supportsReplayRetirement());
+            cn.piq.retro.replay.ReplayGuard.enterReplay();
+            var stopped=running.stopWithoutSave();assertFalse(stopped.isDone());assertFalse(core.closed);
+            cn.piq.retro.replay.ReplayGuard.exitReplay();
+            FakeCore rejected=new FakeCore();assertFalse(finish(engine(rejected)).saved());assertNull(rejected.owner);
+            core.release.countDown();assertFalse(stopped.get(5,TimeUnit.SECONDS).saved());
+            assertTrue(core.closed);assertEquals(0,core.snapshots.get());assertFalse(Files.exists(store().directory(key()).resolve("latest.zip")));
+            FakeCore next=new FakeCore();var normal=engine(next);
+            try{await(normal::isReady);}finally{assertTrue(finish(normal).saved());}
+        }finally{core.release.countDown();cn.piq.retro.replay.ReplayGuard.exitReplay();finish(running);}
+    }
+    @Test void slowFactoryCannotResumeAfterEntireReplayInterval() throws Exception {
+        var entered=new CountDownLatch(1);var release=new CountDownLatch(1);FakeCore core=new FakeCore();
+        var running=new FcPrivateEngine(rom(),store(),variant->{core.claimOwner();entered.countDown();
+            if(!release.await(4,TimeUnit.SECONDS))throw new IOException("test timeout");return core;},MODULE);
+        try{
+            assertTrue(entered.await(3,TimeUnit.SECONDS));
+            cn.piq.retro.replay.ReplayGuard.enterReplay();cn.piq.retro.replay.ReplayGuard.exitReplay();release.countDown();
+            assertFalse(finish(running).saved());assertTrue(core.closed);assertEquals(0,core.frames.get());assertEquals(0,core.snapshots.get());
+        }finally{release.countDown();cn.piq.retro.replay.ReplayGuard.exitReplay();finish(running);}
+    }
+    @Test void staleStoreCannotPublishAfterReplayEndsAndPreservesExistingArchive() throws Exception {
+        var old=store();var identity=key();old.save(identity,new byte[]{1,2,3},new byte[0]);
+        byte[] before=Files.readAllBytes(old.directory(identity).resolve("latest.zip"));
+        cn.piq.retro.replay.ReplayGuard.enterReplay();cn.piq.retro.replay.ReplayGuard.exitReplay();
+        assertThrows(IOException.class,()->old.save(identity,new byte[]{4,5,6},new byte[0]));
+        assertArrayEquals(before,Files.readAllBytes(old.directory(identity).resolve("latest.zip")));
+    }
     @Test void invalidRomIsRejectedBeforeCoreAndDoesNotTouchOriginalFile() throws Exception {
         Path invalid = temporary.resolve("bad.nes"); byte[] bytes = new byte[32]; Files.write(invalid, bytes);
         AtomicInteger opens = new AtomicInteger();

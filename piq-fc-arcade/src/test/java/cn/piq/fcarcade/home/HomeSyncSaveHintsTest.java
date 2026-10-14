@@ -51,7 +51,9 @@ class HomeSyncSaveHintsTest {
         assertTrue(HomeSyncSaveHints.footer("FC",4).contains("按个人/卡带归属另存"));
         assertTrue(HomeSyncSaveHints.footer("FC",4).contains("旁观自动跟随"));
         assertTrue(HomeSyncSaveHints.modeSaved("FC",4).contains("旧档保留"));
-        assertTrue(HomeSyncSaveHints.modeSaved("SFC",4).contains("对应机型说明"));
+        assertTrue(HomeSyncSaveHints.modeSaved("SFC",4).contains("JNI Netplay"));
+        assertTrue(HomeSyncSaveHints.modeSaved("SFC",4).contains("存档身份不变"));
+        assertTrue(HomeSyncSaveHints.footer("SFC",4).contains("2P按设备设置"));
     }
     @Test void serverAndClientUseSameAcknowledgedSystemAndModeWithVersionedBounds() throws Exception {
         String settings=source("home/HomeSyncSettings");
@@ -62,7 +64,7 @@ class HomeSyncSaveHintsTest {
         assertTrue(screen.contains("HomeSyncSaveHints.footer(setting.system(),setting.mode())"));
         assertFalse(screen.contains("存档仍在卡带菜单"));
         assertTrue(screen.contains("setting=value;pending=false"));
-        assertTrue(source("home/HomeSyncNetwork").contains("TrafficPayloadRegistrar.create(event,\"home-sync-5\")"));
+        assertTrue(source("home/HomeSyncNetwork").contains("TrafficPayloadRegistrar.create(event,\"home-sync-6\")"));
     }
     @Test void sharedTvRemoteDoesNotPromiseEveryMachineACartridgeMenu() throws Exception {
         String remote=source("home/TvRemoteService");

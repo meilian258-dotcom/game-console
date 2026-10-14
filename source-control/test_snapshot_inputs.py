@@ -40,8 +40,106 @@ class InputTests(unittest.TestCase):
 
     def test_official_directories_and_no_custom_core_download(self):
         self.assertEqual(set(subject.NIGHTLY_BASE), {'windows-x64', 'linux-x64'})
-        self.assertEqual(len(subject.NIGHTLY), 5)
+        self.assertEqual(len(subject.NIGHTLY), 4)
+        self.assertNotIn('mesen-s-windows', subject.NIGHTLY)
+        self.assertFalse(any('snes9x' in member for _, member in subject.NIGHTLY.values()))
         self.assertFalse(any('netplay' in member or 'blastem' in member for _, member in subject.NIGHTLY.values()))
+        self.assertTrue(set(subject.JNI_BUNDLE_INPUTS).isdisjoint(subject.NIGHTLY))
+        self.assertFalse(any('libc++' in member or 'libcxx' in member or 'libretro-jni' in member
+                             for _, member in subject.NIGHTLY.values()))
+        self.assertFalse(any('mame' in member for _, member in subject.NIGHTLY.values()))
+
+    def test_mame_scope_is_an_exact_pair_shared_with_build_validation(self):
+        import snapshot_build
+        expected = ('core/mame-jni/windows-x64/mame_piq_lifecycle1.dll',
+                    'META-INF/piq-native/mame-lifecycle/runtime.json')
+        self.assertEqual(expected, subject.MAME_LIFECYCLE_RESOURCES)
+        self.assertEqual(subject.BUCKETS['arcade'][2], snapshot_build.RESOURCE_SCOPES['arcade'])
+        self.assertEqual(expected, subject.BUCKETS['arcade'][2][-2:])
+
+    def extract_arcade_fixture(self, entries, validator):
+        fc = self.root / 'fc.jar'
+        with zipfile.ZipFile(fc, 'w'):
+            pass
+        arcade = self.make_zip(list(entries.items()))
+        with patch.object(subject, 'load_lock', return_value={}), \
+                patch.object(subject, 'require_published_jni_bundle'), \
+                patch.dict(subject.FC_RESOURCES, {}, clear=True), \
+                patch.dict(subject.BUCKETS, {'arcade': subject.BUCKETS['arcade']}, clear=True), \
+                patch.object(subject, 'verify_mame_lifecycle_resources', validator):
+            subject.extract_bootstrap({'fc': fc, 'arcade': arcade}, self.root / 'out', self.root / 'source')
+
+    def test_mame_extraction_keeps_both_files_and_invokes_fixed_validator(self):
+        from unittest.mock import Mock
+        entries = dict(zip(subject.MAME_LIFECYCLE_RESOURCES, (b'core fixture', b'notice fixture')))
+        validator = Mock()
+        self.extract_arcade_fixture(entries, validator)
+        for name, data in entries.items():
+            self.assertEqual(data, (self.root / 'out/resources/arcade' / name).read_bytes())
+        validator.assert_called_once_with(self.root / 'out/resources/arcade', self.root / 'source')
+
+    def test_bootstrap_stock_is_excluded_so_current_task_is_single_packaging_owner(self):
+        from unittest.mock import Mock
+        entries = dict(zip(subject.MAME_LIFECYCLE_RESOURCES, (b'core fixture', b'notice fixture')))
+        stock = {prefix + 'old-stock-input': b'must not be bootstrapped'
+                 for prefix in subject.snapshot_stock.GENERATED_PREFIXES}
+        self.extract_arcade_fixture({**entries, **stock}, Mock())
+        for name in stock:
+            self.assertFalse((self.root / 'out/resources/arcade' / name).exists())
+        for name, data in entries.items():
+            self.assertEqual(data, (self.root / 'out/resources/arcade' / name).read_bytes())
+
+    def test_mame_extraction_rejects_missing_pair_even_with_legacy_payload(self):
+        from unittest.mock import Mock
+        for omitted in ((subject.MAME_LIFECYCLE_RESOURCES[0],),
+                        (subject.MAME_LIFECYCLE_RESOURCES[1],), subject.MAME_LIFECYCLE_RESOURCES):
+            entries = {name: b'fixture' for name in subject.MAME_LIFECYCLE_RESOURCES if name not in omitted}
+            entries['native-runtime/legacy.bin'] = b'legacy is not the new core'
+            validator = Mock()
+            with self.subTest(omitted=omitted), self.assertRaisesRegex(ValueError, 'core/notice pair'):
+                self.extract_arcade_fixture(entries, validator)
+            validator.assert_not_called()
+
+    def test_mame_extraction_cannot_ignore_fixed_identity_failure(self):
+        from unittest.mock import Mock
+        validator = Mock(side_effect=ValueError('fixed identity mismatch'))
+        entries = dict.fromkeys(subject.MAME_LIFECYCLE_RESOURCES, b'fixture')
+        with self.assertRaisesRegex(ValueError, 'fixed identity mismatch'):
+            self.extract_arcade_fixture(entries, validator)
+
+    def test_fc_mapping_includes_cache_to_packaged_runtime_rename(self):
+        lock = subject.load_lock()
+        self.assertEqual(set(lock), set(subject.FC_RESOURCES))
+        self.assertEqual(lock['libcxx-windows']['filename'], 'libcxx.dll')
+        self.assertEqual(subject.FC_RESOURCES['libcxx-windows'],
+                         'core/libretro-jni/windows-x64/libc++.dll')
+
+    def test_unpublished_bundle_fails_before_network_and_offline_copy(self):
+        for offline in (None, self.root / 'missing-offline-bootstrap'):
+            output = self.root / 'unprepared'
+            with self.subTest(offline=offline), patch.object(subject, 'fetch') as fetch, \
+                    patch.object(subject, 'verify') as verify:
+                with self.assertRaisesRegex(ValueError, '^JNI dependency bundle requires a matching published bootstrap$'):
+                    subject.prepare(output, bootstrap_dir=offline)
+                fetch.assert_not_called()
+                verify.assert_not_called()
+                self.assertFalse(output.exists())
+
+    def test_bundle_guard_requires_exact_published_hash_and_size(self):
+        lock = subject.load_lock()
+        published = {ident: (lock[ident]['bytes'], lock[ident]['sha256'])
+                     for ident in subject.JNI_BUNDLE_INPUTS}
+        with patch.dict(subject.PUBLISHED_JNI_BUNDLES, {subject.BOOTSTRAP['fc'][2]: published}, clear=True):
+            subject.require_published_jni_bundle(lock)
+            for ident in subject.JNI_BUNDLE_INPUTS:
+                for change in ({'bytes': lock[ident]['bytes'] + 1}, {'sha256': '0' * 64}):
+                    with self.subTest(ident=ident, change=change), self.assertRaisesRegex(ValueError, 'matching published bootstrap'):
+                        subject.require_published_jni_bundle({**lock, ident: {**lock[ident], **change}})
+            with self.assertRaisesRegex(ValueError, 'matching published bootstrap'):
+                subject.require_published_jni_bundle({k: v for k, v in lock.items() if k != 'libcxx-windows'})
+        with patch.dict(subject.PUBLISHED_JNI_BUNDLES, {}, clear=True), \
+                self.assertRaisesRegex(ValueError, 'matching published bootstrap'):
+            subject.require_published_jni_bundle(lock)
 
     def test_redirect_rejects_foreign_insecure_credentials(self):
         for url in ('http://buildbot.libretro.com/core.zip', 'https://evil.test/file',

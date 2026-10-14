@@ -20,31 +20,48 @@ public final class NativeLibretroBridge {
     public static synchronized void load() throws IOException {
         if (loaded) return;
         if (loadFailure != null) throw new IOException(loadFailure);
-        Properties manifest = new Properties();
-        try (var in = resource("/core/libretro-jni/runtime.properties")) { manifest.load(in); }
-        if (!Integer.toString(ABI).equals(manifest.getProperty("abi"))) throw new IOException("Bundled generic JNI ABI mismatch");
-        String sha = manifest.getProperty("windows-x64.sha256", "");
-        if (!sha.matches("[A-Fa-f0-9]{64}")) throw new IOException("Missing pinned generic JNI manifest");
-        RuntimeWorkspace workspace = RuntimeWorkspace.create("libretro", 16L * 1024 * 1024);
+        RuntimeDependencyManifest.Bundle manifest;
+        try (var in = resource("/core/libretro-jni/runtime.properties")) { manifest = RuntimeDependencyManifest.read(in); }
+        RuntimeWorkspace workspace = RuntimeWorkspace.create("libretro", RuntimeDependencyManifest.WORKSPACE_BYTES);
         AutoCloseable pin = null;
-        boolean nativeLoaded = false;
+        boolean loadAttempted = false;
         try {
             Path dll = workspace.directory().resolve("piq-libretro-jni.dll");
-            extract(LibretroProcess.class, "/core/libretro-jni/windows-x64/piq-libretro-jni.dll", sha, dll, 16L * 1024 * 1024);
-            pin = workspace.pinNative();
-            System.load(dll.toString()); nativeLoaded = true;
-            libraryWorkspace = workspace; libraryPin = pin;
-            try {
-                if (abiVersion() != ABI) throw new IOException("Generic JNI ABI mismatch");
-            } catch (IOException | LinkageError e) {
-                loadFailure = "Generic JNI bridge failed after load; restart required: " + e.getMessage();
-                throw e;
+            extract(LibretroProcess.class, "/core/libretro-jni/windows-x64/piq-libretro-jni.dll",
+                    manifest.bridgeSha256(), dll, RuntimeDependencyManifest.MAX_ARTIFACT_BYTES);
+            String[] paths = new String[manifest.dependencies().size()];
+            String[] hashes = new String[paths.length];
+            for (int i = 0; i < paths.length; i++) {
+                var dependency = manifest.dependencies().get(i);
+                Path target = workspace.directory().resolve(dependency.name());
+                extract(LibretroProcess.class, "/core/libretro-jni/windows-x64/" + dependency.name(),
+                        dependency.sha256(), target, dependency.bytes());
+                if (Files.size(target) != dependency.bytes()) throw new IOException("Bundled runtime length mismatch");
+                paths[i] = target.toString(); hashes[i] = dependency.sha256();
             }
+            // All bytes are staged and checked before any native entry point can execute.
+            pin = workspace.pinNative();
+            libraryWorkspace = workspace; libraryPin = pin;
+            // A failed/hung OS load can have side effects. Keep its files until process exit.
+            loadAttempted = true;
+            System.load(dll.toString());
+            if (abiVersion() != ABI) throw new IOException("Generic JNI ABI mismatch");
+            if (runtimeDependencyApiVersion() != RuntimeDependencyManifest.API)
+                throw new IOException("Generic JNI runtime dependency API mismatch");
+            retainRuntimeDependencies(paths, hashes);
             loaded = true;
+        } catch (IOException | LinkageError | RuntimeException e) {
+            if (loadAttempted) {
+                loadFailure = "Generic JNI runtime initialization failed; restart required: " + e.getMessage();
+                throw new IOException(loadFailure, e);
+            }
+            throw e;
         } finally {
-            if (!nativeLoaded) {
+            if (!loadAttempted) {
                 if (pin != null) try { pin.close(); } catch (Exception ignored) { }
                 workspace.close();
+            } else if (!loaded && loadFailure == null) {
+                loadFailure = "Generic JNI runtime initialization did not finish; restart required";
             }
         }
     }
@@ -69,6 +86,10 @@ public final class NativeLibretroBridge {
         if (!HexFormat.of().formatHex(sha.digest()).equalsIgnoreCase(expected)) throw new IOException("Native artifact checksum mismatch");
     }
     public static native int abiVersion();
+    /** Additional capability handshake; existing session ABI stays at 2. */
+    public static native int runtimeDependencyApiVersion();
+    /** Fixed, verified runtime dependencies only. Held by the bridge until process exit, not core sessions. */
+    public static native void retainRuntimeDependencies(String[] absolutePaths, String[] expectedSha256) throws IOException;
     /** Does not load native code during discovery, or wait for a potentially stuck core owner. */
     public static boolean atCapacity() { return freeSlotsIfLoaded() == 0; }
     /** Advisory discovery budget. Never loads a DLL or takes a core owner's lock; reserve() remains authoritative. */

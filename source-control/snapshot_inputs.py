@@ -3,6 +3,8 @@
 Only ordinary supported libretro cores come from the two official nightly
 directories. Project-specific Netplay/bridge libraries and legacy runtimes are
 extracted from a SHA-pinned public release, never from a developer's machine.
+The fixed FBNeo stock core/source pair is an explicit, verified local input;
+it has no implicit vendor cache or download fallback.
 No downloaded native library is executed by this preparation command.
 """
 from __future__ import annotations
@@ -22,6 +24,9 @@ import urllib.request
 import zipfile
 
 from build_inputs import cache_path, load_lock, no_links, relative, verify
+from snapshot_build import MAME_LIFECYCLE_RESOURCES, verify_mame_lifecycle_resources
+import snapshot_stock
+import sfc_stock
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = 'https://github.com/meilian258-dotcom/game-console/releases/download/full-test-20261007-r1/'
@@ -33,6 +38,15 @@ BOOTSTRAP = {
     'arcade': ('game-console-arcade-0.1.5.7.jar', 141792262, '575f16d2123f1e91cadba12d8ace9dead63936770fcdec4476c260c13ce5d925'),
     'pvz': ('game-console-pvz-0.1.0-prototype.12.jar', 5004879, 'e010b4185c8a9e51edcba3ef40718a81781068320681892cf869d68c3046f04a'),
 }
+# This repair branch is not merge/release-ready. FC76.44 has no dependency
+# bundle. Review a published replacement, both snapshot bootstrap pins, and this
+# inventory only after full MAME validation and explicit publication approval.
+JNI_BUNDLE_INPUTS = ('libretro-jni-abi2', 'libcxx-windows')
+PUBLISHED_JNI_BUNDLES = {
+    '7d4db04cc8bafb3f7dc426e3e8412459ba1308dac9d33c434f99c1fcf5eac716': {
+        'libretro-jni-abi2': (1375744, 'aec72d00384d89de94c214e12fe32a19c1c54c93ea80c9bc82727895be509a36'),
+    },
+}
 NIGHTLY_BASE = {
     'windows-x64': 'https://buildbot.libretro.com/nightly/windows/x86_64/latest/',
     'linux-x64': 'https://buildbot.libretro.com/nightly/linux/x86_64/latest/',
@@ -40,7 +54,6 @@ NIGHTLY_BASE = {
 NIGHTLY = {
     'mesen-windows': ('windows-x64', 'mesen_libretro.dll'),
     'mesen-linux': ('linux-x64', 'mesen_libretro.so'),
-    'mesen-s-windows': ('windows-x64', 'mesen-s_libretro.dll'),
     'genesis-plus-gx-windows': ('windows-x64', 'genesis_plus_gx_libretro.dll'),
     'mgba-windows': ('windows-x64', 'mgba_libretro.dll'),
 }
@@ -49,6 +62,7 @@ FC_RESOURCES = {
     'mesen-windows': 'core/libretro/windows-x64/mesen_libretro.dll',
     'mesen-linux': 'core/libretro/linux-x64/mesen_libretro.so',
     'libretro-jni-abi2': 'core/libretro-jni/windows-x64/piq-libretro-jni.dll',
+    'libcxx-windows': 'core/libretro-jni/windows-x64/libc++.dll',
     'retroarch-netplay': 'core/netplay/piq-retroarch.exe',
     'mesen-jni-netplay-r2': 'core/libretro-jni-netplay/windows-x64/mesen_piq_jni_netplay_r2.dll',
     'nes-zapper-wasm': 'core/nes_zapper_v1.wasm',
@@ -60,7 +74,8 @@ BUCKETS = {
     'sfc-home': ('sfc', 'piq-sfc-home', ('core/sfc-libretro/',)),
     'md': ('md', 'piq-md-home', ('core/windows-x64/',)),
     'pvz': ('pvz', 'piq-pvz-addon', ('core/pvz/', 'META-INF/pvz/licenses/')),
-    'arcade': ('arcade', 'piq-native-arcade', ('native-runtime/', 'META-INF/piq-native/fbneo/', 'META-INF/licenses/native-runtime17/')),
+    'arcade': ('arcade', 'piq-native-arcade', ('native-runtime/', 'META-INF/piq-native/fbneo/',
+                                           'META-INF/licenses/native-runtime17/', *MAME_LIFECYCLE_RESOURCES)),
 }
 CURRENT_HELPER = 'native-runtime/win-x64-v1/piq-native-arcade/runtime/piq-native-helper-v4.jar'
 MAX_CORE = 32 * 1024 * 1024
@@ -203,8 +218,17 @@ def unpack_core(archive_path: Path, destination: Path, member: str, platform: st
     put(destination, data)
 
 
+def require_published_jni_bundle(lock: dict) -> None:
+    published = PUBLISHED_JNI_BUNDLES.get(BOOTSTRAP['fc'][2], {})
+    requested = {ident: (lock[ident]['bytes'], lock[ident]['sha256'])
+                 for ident in JNI_BUNDLE_INPUTS if ident in lock}
+    if set(requested) != set(JNI_BUNDLE_INPUTS) or requested != published:
+        raise ValueError('JNI dependency bundle requires a matching published bootstrap')
+
+
 def extract_bootstrap(pins: dict[str, Path], output: Path, source: Path) -> None:
     lock = load_lock(source / 'source-control/build-inputs.json')
+    require_published_jni_bundle(lock)
     if set(lock) != set(FC_RESOURCES):
         raise ValueError('FC build-input inventory changed; review snapshot resource mapping')
     with zipfile.ZipFile(pins['fc']) as jar:
@@ -219,11 +243,13 @@ def extract_bootstrap(pins: dict[str, Path], output: Path, source: Path) -> None
         count = 0
         with zipfile.ZipFile(pins[ident]) as jar:
             index = members(jar)
+            if bucket == 'arcade' and not set(MAME_LIFECYCLE_RESOURCES).issubset(index):
+                raise ValueError('Bootstrap is missing the fixed MAME lifecycle core/notice pair')
             for name in index:
                 if not any(name == prefix or (prefix.endswith('/') and name.startswith(prefix)) for prefix in prefixes):
                     continue
-                if name == CURRENT_HELPER:
-                    continue  # the current native worker is compiled from source
+                if name == CURRENT_HELPER or snapshot_stock.generated_resource(name):
+                    continue  # Current helper/stock resources have their own preparation tasks.
                 if name.endswith('.class') or 'blastem' in name.lower():
                     raise ValueError('Foreign class or retired core in native resources')
                 data = jar.read(index[name])
@@ -237,15 +263,26 @@ def extract_bootstrap(pins: dict[str, Path], output: Path, source: Path) -> None
                 count += 1
         if count == 0:
             raise ValueError('No binary resources selected for ' + bucket)
+        if bucket == 'arcade':
+            verify_mame_lifecycle_resources(output / 'resources' / bucket, source)
 
 
-def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = None) -> dict:
+def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = None,
+            fbneo_stock_core: Path | None = None, fbneo_stock_source: Path | None = None,
+            sfc_snes9x_core: Path | None = None, sfc_snes9x_source: Path | None = None) -> dict:
     output = no_links(output.absolute())
     # Nightly is resolved exactly once per run. Resume by invoking the build with
     # its verified receipt, not by accidentally mixing two downloads of latest.
     if (output / 'receipt.json').exists() or (output / 'nightly').exists():
         raise ValueError('Input directory already resolved; build it or choose a new directory')
+    # Fail before network or even offline bootstrap copying; never silently
+    # satisfy the new API from an old bridge or an unrelated nightly runtime.
+    require_published_jni_bundle(load_lock(source / 'source-control/build-inputs.json'))
+    stock_sources = snapshot_stock.inspect_pair(fbneo_stock_core, fbneo_stock_source)
+    sfc_sources = sfc_stock.inspect_pair(sfc_snes9x_core, sfc_snes9x_source, source / '.build-inputs')
     output.mkdir(parents=True, exist_ok=True)
+    snapshot_stock.import_pair(output, stock_sources)
+    sfc_stock.import_pair(output, sfc_sources)
     pins, boot_records, sources = {}, [], []
     for ident, (filename, size, sha) in BOOTSTRAP.items():
         destination = output / 'bootstrap' / filename
@@ -278,6 +315,8 @@ def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = N
             files.append(record(path, output))
     receipt = dict(schema=1, resolvedAt=datetime.now(timezone.utc).isoformat(),
                    bootstrap=boot_records, files=files, nightly=nightly, sources=sources)
+    snapshot_stock.verify_receipt(output, {entry['path']: entry for entry in files})
+    sfc_stock.verify_receipt(output, {entry['path']: entry for entry in files})
     put(output / 'receipt.json', (json.dumps(receipt, indent=2, ensure_ascii=True)+'\n').encode())
     return receipt
 
@@ -286,9 +325,15 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('.snapshot-build/inputs'))
     parser.add_argument('--bootstrap-dir', type=Path, help='Optional offline copies of the six exact public release JARs')
+    parser.add_argument('--fbneo-stock-core', type=Path, help='Explicit reviewed original FBNeo DLL; fixed SHA/size, no download')
+    parser.add_argument('--fbneo-stock-source', type=Path, help='Matching fixed FBNeo source ZIP; required with --fbneo-stock-core')
+    parser.add_argument('--sfc-snes9x-core', type=Path, help='Fixed original Snes9x DLL; alternatively import both inputs into .build-inputs')
+    parser.add_argument('--sfc-snes9x-source', type=Path, help='Fixed Snes9x reference source ZIP; local candidate, not publication approval')
     args = parser.parse_args()
     try:
-        receipt = prepare(args.output, bootstrap_dir=args.bootstrap_dir)
+        receipt = prepare(args.output, bootstrap_dir=args.bootstrap_dir,
+                          fbneo_stock_core=args.fbneo_stock_core, fbneo_stock_source=args.fbneo_stock_source,
+                          sfc_snes9x_core=args.sfc_snes9x_core, sfc_snes9x_source=args.sfc_snes9x_source)
         print(json.dumps(dict(ok=True, bootstrap=len(receipt['bootstrap']), nightly=len(receipt['nightly']),
                               files=len(receipt['files'])), sort_keys=True))
         return 0

@@ -4,7 +4,8 @@ import java.util.Arrays;
 
 /** Only the final mod JAR and this class: no external JNA/core directories on the classpath. */
 public final class LibretroPackagedSmoke {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        cn.piq.retro.storage.RuntimeWorkspaceTestSupport.configure();
         byte[] rom = new byte[16+16384+8192];
         rom[0]='N';rom[1]='E';rom[2]='S';rom[3]=0x1a;rom[4]=1;rom[5]=1;
         rom[16]=0x4c;rom[17]=0;rom[18]=(byte)0x80;

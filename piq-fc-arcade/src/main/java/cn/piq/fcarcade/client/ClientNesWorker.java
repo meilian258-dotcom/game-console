@@ -15,6 +15,7 @@ import java.util.concurrent.locks.LockSupport;
 
 /** No Minecraft, network, sound-line or GL calls are permitted in this class. */
 final class ClientNesWorker implements AutoCloseable {
+    private final long replayEpoch=cn.piq.retro.replay.ReplayGuard.epoch();
     static final int MAX_SESSIONS = 16;
     static final int MAX_INPUTS = 4096;
     static final int MAX_COMMANDS = 32;
@@ -234,7 +235,7 @@ final class ClientNesWorker implements AutoCloseable {
     }
     boolean calibrationFinish(Path gameDirectory) {
         return offer(() -> {
-            if (calibration == null) return;
+            if (calibration == null || !cn.piq.retro.replay.ReplayGuard.valid(replayEpoch)) return;
             try {
                 Path reports = cn.piq.fcarcade.storage.FcStoragePaths.prepare(gameDirectory,
                         cn.piq.fcarcade.storage.FcStoragePaths.Area.CALIBRATION);
@@ -290,6 +291,7 @@ final class ClientNesWorker implements AutoCloseable {
     }
 
     private synchronized boolean offer(Command command) {
+        if (!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch)) { close(); return false; }
         if (closed || failed || commands.size() >= MAX_COMMANDS) return false;
         commands.addLast(new TaggedCommand(generation, command));
         SCHEDULER.wake();
@@ -326,6 +328,7 @@ final class ClientNesWorker implements AutoCloseable {
 
     /** Returns whether this session did work. It never runs on a caller thread. */
     private boolean slice() {
+        if (!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch)) close();
         if (closed) { closeCore(); return false; }
         if (failed) { closeCore(); return false; }
         try {
@@ -346,6 +349,7 @@ final class ClientNesWorker implements AutoCloseable {
                     closeCore();
                     return false;
                 }
+                if (!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch)) close();
                 if (closed) { closeCore(); return false; }
                 emit(new Event("ready", 0, 0, "", null));
                 publishPicture();
@@ -354,7 +358,7 @@ final class ClientNesWorker implements AutoCloseable {
             TaggedCommand command;
             synchronized (this) { command = commands.pollFirst(); }
             if (command != null) {
-                if (command.generation == generation) {
+                if (command.generation == generation && cn.piq.retro.replay.ReplayGuard.valid(replayEpoch)) {
                     ownerGeneration = command.generation;
                     command.command.run();
                 }
@@ -376,7 +380,7 @@ final class ClientNesWorker implements AutoCloseable {
             long deadline = now + SLICE_NANOS;
             int advanced = 0;
             while (advanced < 3 && System.nanoTime() < deadline && !closed
-                    && ownerGeneration == generation && !paused) {
+                    && ownerGeneration == generation && !paused && cn.piq.retro.replay.ReplayGuard.valid(replayEpoch)) {
                 if (snapshotRequested && frame % 3 == 0) break;
                 int frameOne,frameTwo,gun=cn.piq.fcarcade.session.ZapperInput.NEUTRAL;
                 long presentationRevision;
@@ -419,7 +423,7 @@ final class ClientNesWorker implements AutoCloseable {
                             core.copyFrameRgba(pixels);
                             // Host-local mute/distance must not mute remote players.
                             // No compression or socket writes on this core thread.
-                            tap.frame(pixels, samples, count);
+                            if(cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))tap.frame(pixels, samples, count);
                         }
                     } catch(RuntimeException|LinkageError failure) {
                         if(mediaTap==tap)mediaTap=null;

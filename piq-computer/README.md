@@ -44,6 +44,8 @@
 
 ## 开发与排错
 
+`0.1.0-prototype.13` 本地候选缩小了外设连接器（无线接收器）的第一／第三人称左右手显示，放置后的几何和 GUI 图标不变。其余电脑程序、共享与保存行为不变；实际持物视觉待验，不因模型检查通过而认定游戏验收完成。
+
 公共程序边界是 `ProgramBackend`；`ComputerPrograms` 管选择与启停，`ComputerStreamServer` 管共享会话和控制权。新程序应接这些入口，不再复制一台电脑。构建前读[统一构建说明](../source-control/BUILDING.md)，显式指定配套主包及需要的 PvZ 编译输入。
 
 启动失败先看屏幕／聊天原因和 `game-console/piq-pvz/logs/` 或 `game-console/piq-flash-box/logs/`，不要靠覆盖任意 DLL 或重复启动解决。报告问题时附完整模组版本、操作步骤和日志，勿公开游戏或存档文件。

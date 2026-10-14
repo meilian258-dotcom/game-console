@@ -4,6 +4,8 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
+#include <bcrypt.h>
+#include <psapi.h>
 #include <GL/gl.h>
 #include <jni.h>
 #include <algorithm>
@@ -230,6 +232,7 @@ std::filesystem::path checkedPath(JNIEnv *env, jstring value, bool directory) {
     }
     return p;
 }
+#include "runtime_dependencies.h"
 void dimensions(unsigned w, unsigned h) {
     if (!w || !h || w > MAX_DIM || h > MAX_DIM)
         throw std::runtime_error("Video geometry exceeds 2048x2048");
@@ -831,6 +834,12 @@ size_t memoryLimit(int id) {
 } // namespace
 #define JNI(name) Java_cn_piq_retro_libretro_jni_NativeLibretroBridge_##name
 extern "C" JNIEXPORT jint JNICALL JNI(abiVersion)(JNIEnv *, jclass) { return ABI; }
+extern "C" JNIEXPORT jint JNICALL JNI(runtimeDependencyApiVersion)(JNIEnv *, jclass) { return 1; }
+extern "C" JNIEXPORT void JNICALL JNI(retainRuntimeDependencies)(JNIEnv *env,jclass,jobjectArray paths,jobjectArray hashes) {
+    try { RuntimeDependencies::retain(env,paths,hashes); }
+    catch(const std::exception &ex) { io(env,ex.what()); }
+    catch(...) { io(env,"Runtime dependency initialization failed; restart required"); }
+}
 // Queries never acquire an owner's mutex or enter a core. A failed open retains its known token.
 extern "C" JNIEXPORT jint JNICALL JNI(availableSlots)(JNIEnv *, jclass) {
     int free = 0;
@@ -945,6 +954,9 @@ extern "C" JNIEXPORT jlong JNICALL JNI(openReserved)(JNIEnv *env, jclass, jlong 
                 throw std::runtime_error("Content changed while reading");
         }
         s->audio.reserve(MAX_AUDIO);
+        // Recheck retained runtime identities for every new core, not only the
+        // first Java bridge load. No module/global lock spans LoadLibrary.
+        RuntimeDependencies::checkBeforeCoreOpen();
         s->core =
             LoadLibraryExW(core.c_str(), nullptr, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
         if (!s->core)
