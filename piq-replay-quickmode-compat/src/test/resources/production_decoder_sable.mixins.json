@@ -1,0 +1,1 @@
+{"required":true,"minVersion":"0.8","package":"dev.ryanhcode.sable.mixin.entity.entities_stick_sublevels.packet_mixin","compatibilityLevel":"JAVA_21","client":["ClientboundTeleportEntityPacketMixin"],"injectors":{"defaultRequire":1}}

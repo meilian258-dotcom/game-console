@@ -1,0 +1,6 @@
+# Workstation installers, recordings and generated receipts are not source.
+/install.py
+*.mcpr*
+verification.json
+summary.json
+build-result.json

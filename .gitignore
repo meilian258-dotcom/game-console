@@ -23,6 +23,7 @@
 !/piq-flash-box/
 !/piq-pvz-addon/
 !/piq-md-home/
+!/piq-replay-quickmode-compat/
 
 # 构建输出、IDE、本机运行数据；只忽略，绝不删除原文件。
 **/.git/

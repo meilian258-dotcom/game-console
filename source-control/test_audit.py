@@ -17,6 +17,15 @@ class GuardTests(unittest.TestCase):
         for name in ('.github/workflows/another.yml', '.github/actions/run/action.yml',
                      '.github/workflows/snapshot.yml/hidden.txt', '.github/secret.json'):
             self.assertIn('outside-source-scope', path_issues(name))
+    def test_quickmode_source_scope_and_private_inputs(self):
+        prefix = 'piq-replay-quickmode-compat/'
+        for name in ('.gitignore', 'LICENSE', 'README.md', 'build.py', 'verify.py',
+                     'src/main/java/cn/piq/replayquick/QuickSableState.java',
+                     'src/test/java/RecordedReplayIndexTest.java', 'tools/run-tests.py'):
+            self.assertEqual([], path_issues(prefix + name), name)
+        for name in ('install.py', 'recording.mcpr', 'recording.mcpr.cache/index',
+                     'build/libs/test.jar', 'tools/verification.json', 'summary.json'):
+            self.assertTrue(path_issues(prefix + name), name)
     def test_credentials(self):
         for name in ['.env','登录信息.txt','keys/server.pem','private/config.json']:
             self.assertTrue(path_issues('piq-gba/'+name),name)
