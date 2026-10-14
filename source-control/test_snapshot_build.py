@@ -1,9 +1,13 @@
 """Fast fixture tests; no network, Gradle, native library or Minecraft required."""
 import hashlib
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import tomllib
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 import zipfile
@@ -148,12 +152,127 @@ class SnapshotBuildTests(unittest.TestCase):
         staging = self.root / 'ascii-staging'
         staging.mkdir()
         receipt = self.root / 'probe-inputs.json'
-        with patch.object(build.tempfile, 'mkdtemp', return_value=str(staging)):
-            copied, client = build.prepare_gba_probe_classpath(deps, minecraft, receipt)
+        temporary, _ = build.prepare_build_environment(self.root)
+        with patch.object(build.tempfile, 'mkdtemp', return_value=str(staging)) as create:
+            copied, client = build.prepare_gba_probe_classpath(deps, minecraft, receipt, temporary)
+        create.assert_called_once_with(prefix='gc-snapshot-gba-deps-', dir=temporary)
         self.assertEqual(b'library bytes', (copied / 'dependency-000.jar').read_bytes())
         self.assertEqual(b'resource bytes', client.read_bytes())
         self.assertTrue(str(client).isascii())
         self.assertEqual(2, len(json.loads(receipt.read_text())['files']))
+
+    def test_build_temp_is_canonical_owned_and_does_not_mutate_parent_environment(self):
+        inherited = dict(os.environ)
+        temporary, environment = build.prepare_build_environment(self.root)
+        self.assertEqual(self.root.resolve() / 'temp', temporary)
+        self.assertEqual(temporary.resolve(), temporary)
+        self.assertTrue(temporary.is_dir())
+        for key in ('TEMP', 'TMP', 'TMPDIR'):
+            self.assertEqual(str(temporary), environment[key])
+        self.assertEqual(inherited, dict(os.environ))
+        for key, value in inherited.items():
+            if key not in ('TEMP', 'TMP', 'TMPDIR'):
+                self.assertEqual(value, environment[key])
+
+    def test_build_temp_never_reuses_existing_directory_or_file(self):
+        temporary, _ = build.prepare_build_environment(self.root)
+        marker = temporary / 'prior-failure.txt'
+        marker.write_bytes(b'preserve failed build evidence')
+        with self.assertRaises(FileExistsError):
+            build.prepare_build_environment(self.root)
+        self.assertEqual(b'preserve failed build evidence', marker.read_bytes())
+        other = self.root / 'other'
+        other.mkdir()
+        (other / 'temp').write_bytes(b'not a directory')
+        with self.assertRaises(FileExistsError):
+            build.prepare_build_environment(other)
+        self.assertEqual(b'not a directory', (other / 'temp').read_bytes())
+
+    def test_build_temp_requires_ascii_without_creating_hidden_fallback(self):
+        work = self.root / '构建'
+        work.mkdir()
+        with self.assertRaisesRegex(ValueError, 'ASCII work directory'):
+            build.prepare_build_environment(work)
+        self.assertFalse((work / 'temp').exists())
+
+    def test_build_temp_rejects_link_before_resolving_it(self):
+        target, link = self.root / 'target', self.root / 'link'
+        target.mkdir()
+        if os.name == 'nt':
+            environment = dict(os.environ, GC_TEST_LINK=str(link), GC_TEST_TARGET=str(target))
+            subprocess.run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command',
+                            'New-Item -ItemType Junction -Path $env:GC_TEST_LINK '
+                            '-Target $env:GC_TEST_TARGET -ErrorAction Stop | Out-Null'],
+                           env=environment, capture_output=True, check=True)
+            self.addCleanup(link.rmdir)
+        else:
+            link.symlink_to(target, target_is_directory=True)
+            self.addCleanup(link.unlink)
+        with self.assertRaisesRegex(ValueError, 'Linked input/output path'):
+            build.prepare_build_environment(link)
+        with self.assertRaisesRegex(ValueError, 'Linked input/output path'):
+            build.prepare_build_environment(link / 'child')
+        self.assertFalse((target / 'temp').exists())
+        self.assertFalse((target / 'child').exists())
+
+    def test_no_links_rejects_windows_reparse_without_python312_helper(self):
+        class Python311Path(type(self.root)):
+            def __getattribute__(self, name):
+                if name == 'is_junction':
+                    raise AttributeError(name)
+                return super().__getattribute__(name)
+
+        path = Python311Path(self.root)
+        self.assertFalse(hasattr(path, 'is_junction'))
+        attributes = SimpleNamespace(st_mode=build.stat.S_IFDIR | 0o700,
+                                     st_file_attributes=build.stat.FILE_ATTRIBUTE_REPARSE_POINT)
+        with patch.object(build.os, 'lstat', return_value=attributes):
+            with self.assertRaisesRegex(ValueError, 'Linked input/output path'):
+                build.no_links(path)
+
+    def test_build_step_passes_temp_to_real_child_and_grandchild(self):
+        temporary, environment = build.prepare_build_environment(self.root)
+        logs = self.root / 'logs'
+        logs.mkdir()
+        probe = ('import json, os, tempfile; '
+                 'print(json.dumps([tempfile.gettempdir(), '
+                 '[os.environ[key] for key in ("TEMP", "TMP", "TMPDIR")]]))')
+        child = ('import subprocess, sys; '
+                 'subprocess.run([sys.executable, "-c", ' + repr(probe) + '], check=True)')
+        build.run_build_step('temp-probe', [sys.executable, '-c', child], self.root, logs, environment)
+        result = json.loads((logs / 'temp-probe.log').read_text())
+        self.assertEqual(temporary, Path(result[0]))
+        self.assertEqual([str(temporary)] * 3, result[1])
+
+    def test_failed_build_step_keeps_log_and_blocks_continuation(self):
+        temporary, environment = build.prepare_build_environment(self.root)
+        evidence = temporary / 'before-failure.txt'
+        evidence.write_bytes(b'keep temporary evidence')
+        logs = self.root / 'logs'
+        logs.mkdir()
+        command = [sys.executable, '-c', 'import sys; print("failure evidence"); sys.exit(7)']
+        with self.assertRaisesRegex(RuntimeError, 'failed; no snapshot may be published'):
+            build.run_build_step('failure', command, self.root, logs, environment)
+        self.assertIn('failure evidence', (logs / 'failure.log').read_text())
+        self.assertTrue(temporary.is_dir())
+        self.assertEqual(b'keep temporary evidence', evidence.read_bytes())
+        with self.assertRaises(FileExistsError):
+            build.run_build_step('failure', command, self.root, logs, environment)
+
+    def test_gba_probe_uses_owned_temp_even_when_python_cached_another_root(self):
+        deps = self.root / 'dependencies'
+        deps.mkdir()
+        (deps / 'library.jar').write_bytes(b'library bytes')
+        minecraft = self.root / 'minecraft.jar'
+        minecraft.write_bytes(b'resource bytes')
+        temporary, _ = build.prepare_build_environment(self.root)
+        receipt = self.root / 'probe-inputs.json'
+        with patch.object(build.tempfile, 'tempdir', str(self.root / 'unavailable-temp')):
+            copied, client = build.prepare_gba_probe_classpath(deps, minecraft, receipt, temporary)
+        self.assertEqual(temporary, copied.parent.parent)
+        self.assertEqual(temporary, client.parent.parent)
+        self.assertEqual(b'library bytes', (copied / 'dependency-000.jar').read_bytes())
+        self.assertEqual(b'resource bytes', client.read_bytes())
 
     def test_seven_artifacts_with_exact_ids_and_checksum_manifest(self):
         groups = [('piq_fc_arcade',), ('piq_sfc_arcade', 'piq_sfc_home'), ('piq_md_home',),

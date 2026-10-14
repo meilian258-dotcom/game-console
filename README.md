@@ -13,7 +13,7 @@
 - **游戏环境**：Minecraft 1.21.1、NeoForge 21.1.229 起、Java 21。当前原生游戏运行端以 Windows x64 为支持范围；其他平台不能照搬安装。
 - **多人服务器**：客户端和服务端安装配套版本的主模组及所用附属。
 - **游戏文件**：自行准备有权使用的 ROM；部分街机游戏还需要匹配的 BIOS。仓库不提供这些游戏内容。
-- **下载**：[整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)提供主模组和当前配套附属，可用于首次安装；版本、可选组件和更新步骤见[安装包说明](piq-fc-arcade/docs/整套测试版-20261007.md)。GitHub 的 Code → Download ZIP 是源码，不能放进 `mods`。
+- **下载**：[FC76.54 设备体验候选](https://github.com/meilian258-dotcom/game-console/releases/tag/device-polish-fc7654-20261012-r1)已公开主包、街机、电脑和可选 Replay 补丁四件，**不是完整套装**；按发行页的精确版本表选配。较早的[整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)及其[安装说明](piq-fc-arcade/docs/整套测试版-20261007.md)仅对应那一批旧版本，不拿其中的旧 SFC 混入 FC76.54。完整 SFC54 套装仍待分发材料补齐。GitHub 的 Code → Download ZIP 是源码，不能放进 `mods`。
 
 NeoForge 最低版本不是对所有更新版本或整个整合包的兼容保证。具体范围见[兼容说明](piq-fc-arcade/design/NeoForge兼容范围-20261004.md)。
 

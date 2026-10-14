@@ -60,6 +60,14 @@ def no_links(path: Path) -> None:
     for part in (path, *path.parents):
         if part.is_symlink() or (hasattr(part, 'is_junction') and part.is_junction()):
             raise ValueError('Linked input/output path is not accepted')
+        try:
+            attributes = os.lstat(part)
+        except FileNotFoundError:
+            continue
+        # Path.is_junction() is only available from Python 3.12. Reject Windows
+        # reparse points on the supported Python 3.11 path as well, before resolve.
+        if getattr(attributes, 'st_file_attributes', 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT:
+            raise ValueError('Linked input/output path is not accepted')
 
 
 def load_receipt(receipt_path: Path) -> tuple[dict, dict[str, dict]]:
@@ -290,14 +298,47 @@ def verify_arcade_helper(arcade: Path, fresh_helper: Path, catalog: Path) -> Non
         raise ValueError('Fresh arcade helper does not match the FC runtime catalog')
 
 
-def prepare_gba_probe_classpath(dependencies: Path, minecraft: Path, receipt: Path) -> tuple[Path, Path]:
+def prepare_build_environment(work: Path) -> tuple[Path, dict[str, str]]:
+    """Keep every nested compiler/test temp path canonical and privately owned.
+
+    Windows TEMP can contain an 8.3 alias. JUnit preserves that spelling while
+    the production storage guards compare it to toRealPath(), so normal test
+    files can be rejected. Select a fresh real path, never relax those guards.
+    """
+    no_links(work.absolute())
+    temporary = work.resolve(strict=True) / 'temp'
+    no_links(temporary)
+    if not str(temporary).isascii():
+        raise ValueError('Snapshot builds require an ASCII work directory for Windows Java argfiles')
+    temporary.mkdir(exist_ok=False)
+    environment = os.environ.copy()
+    for key in ('TEMP', 'TMP', 'TMPDIR'):
+        environment[key] = str(temporary)
+    return temporary, environment
+
+
+def run_build_step(label: str, command: list[str], root: Path, logs: Path,
+                   environment: dict[str, str]) -> None:
+    print('Building/verifying ' + label, flush=True)
+    with (logs / (label + '.log')).open('xb') as log:
+        result = subprocess.run(command, cwd=root, env=environment,
+                                stdout=log, stderr=subprocess.STDOUT, timeout=2700)
+    if result.returncode:
+        # Keep the complete local log; this is not a release asset.
+        print((logs / (label + '.log')).read_text(encoding='utf-8', errors='replace')[-12000:])
+        raise RuntimeError(label + ' failed; no snapshot may be published')
+
+
+def prepare_gba_probe_classpath(dependencies: Path, minecraft: Path, receipt: Path,
+                               temporary: Path) -> tuple[Path, Path]:
     """The Windows java launcher decodes @argfiles using its native code page.
 
     GBA's checker already stages its two MOD JARs, but its other classpath
     entries need the same treatment when the checkout path contains Unicode.
     Keep the owned copies and hashes as private diagnostics, not release assets.
     """
-    root = Path(tempfile.mkdtemp(prefix='gc-snapshot-gba-deps-'))
+    no_links(temporary.absolute())
+    root = Path(tempfile.mkdtemp(prefix='gc-snapshot-gba-deps-', dir=temporary.resolve(strict=True)))
     if not str(root).isascii():
         raise ValueError('GBA probe requires an ASCII TEMP directory for Windows Java argfiles')
     deps = root / 'dependencies'
@@ -341,19 +382,14 @@ def build(work: Path, output: Path) -> dict:
         raise ValueError('This seven-MOD build currently requires Windows and JAVA_HOME pointing to JDK 21')
     work.mkdir(parents=True, exist_ok=True)
     (work / 'build-started.json').write_text(json.dumps({'commit': commit}), encoding='utf-8')
+    temporary, environment = prepare_build_environment(work)
     logs = work / 'logs'
     logs.mkdir()
     commands = []
 
     def run(label: str, command: list[str]) -> None:
-        print('Building/verifying ' + label, flush=True)
         commands.append(label)
-        with (logs / (label + '.log')).open('xb') as log:
-            result = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, timeout=2700)
-        if result.returncode:
-            # The complete log remains private to the CI artifact, never in the release.
-            print((logs / (label + '.log')).read_text(encoding='utf-8', errors='replace')[-12000:])
-            raise RuntimeError(label + ' failed; no snapshot may be published')
+        run_build_step(label, command, ROOT, logs, environment)
 
     def gradle(module: str, tasks: list[str], properties: dict | None = None, resources: str | None = None) -> None:
         props = dict(properties or {})
@@ -408,7 +444,8 @@ def build(work: Path, output: Path) -> dict:
     minecraft_resources = list((ROOT / 'piq-fc-arcade/build/moddev/artifacts').glob('*-client-extra-aka-minecraft-resources.jar'))
     if len(minecraft_resources) != 1:
         raise ValueError('FC build did not provide a unique Minecraft resource artifact for GBA verification')
-    probe_deps, probe_minecraft = prepare_gba_probe_classpath(deps, minecraft_resources[0], work / 'gba-probe-inputs.json')
+    probe_deps, probe_minecraft = prepare_gba_probe_classpath(
+        deps, minecraft_resources[0], work / 'gba-probe-inputs.json', temporary)
     run('piq-gba-probes', [sys.executable, str(ROOT / 'piq-gba/tools/check_current.py'), '--fc', str(fc),
                          '--gba', str(gba_outputs[0]), '--dependencies', str(probe_deps),
                          '--minecraft-client', str(probe_minecraft), '--jdk', str(jdk),
