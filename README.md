@@ -34,6 +34,8 @@ NeoForge 最低版本不是对所有更新版本或整个整合包的兼容保�
 
 ## 我想参与开发
 
+可选客户端工具：[快速回放兼容补丁](piq-replay-quickmode-compat/README.md)提供 ReForgedPlay 的握手和 Sable 玩家位置适配源码。它不是方块电玩设备运行的前置，也不是屏幕/声音录制补丁；具体依赖、构建与待验范围见组件说明。
+
 - [构建源码](source-control/BUILDING.md)：固定核心开发构建，以及 `main` 自动编译七个成品并发布 nightly 核心测试快照的流程。
 - [开发协作](GIT_WORKFLOW.md)：克隆、分支、提交与审查。
 - [制作新设备](piq-fc-arcade/design/机器制作与交互标准.md)：玩家应该得到怎样的操作体验。

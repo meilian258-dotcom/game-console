@@ -49,6 +49,8 @@ PvZ 的实际静态依赖说明见 [THIRD_PARTY.md](piq-pvz-addon/THIRD_PARTY.md
 
 ## 独立候选与历史资源
 
+仓库中的 [快速回放兼容补丁 test.3](piq-replay-quickmode-compat/README.md)自有源码和测试工具采用 [MIT](piq-replay-quickmode-compat/LICENSE)。Minecraft、NeoForge、ReForgedPlay、Sable、Sponge Mixin 等由开发者或玩家另行提供，不打包进补丁，也不因适配代码采用 MIT 而改变各自许可。构建输出、测试中解出的依赖、私人录像和运行报告不纳入源码。
+
 以下事实来自候选源码 `adb1e37` 或对应发行件，不表示已合入上述 main 基线。可从[对应源码快照](https://github.com/meilian258-dotcom/game-console/tree/adb1e37ef5326bff7b8f5b22f1f074260b017e8c)核对；下载与完整材料见[项目 Releases](https://github.com/meilian258-dotcom/game-console/releases)。
 
 | 范围 | 许可和边界 |

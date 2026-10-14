@@ -1,0 +1,31 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="piq_replay_quickmode_compat"
+version="0.1.0-test.3"
+displayName="PIQ 快速回放兼容补丁"
+authors="PIQ / Codex"
+description='''保留快速回放握手，补齐玩家位置标记，核验普通世界位置以避免缺标记录误退快速模式。仅客户端测试候选；载具子世界完整回放不在本版范围内。'''
+
+[[dependencies.piq_replay_quickmode_compat]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.21.2)"
+side="CLIENT"
+
+[[dependencies.piq_replay_quickmode_compat]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.250,21.2)"
+side="CLIENT"
+
+[[dependencies.piq_replay_quickmode_compat]]
+modId="reforgedplaymod"
+type="required"
+versionRange="[0.3]"
+side="CLIENT"
+
+[[mixins]]
+config="piq_replay_quickmode_compat.mixins.json"

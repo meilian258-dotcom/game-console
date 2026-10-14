@@ -34,6 +34,19 @@ class GitGuardIntegration(unittest.TestCase):
         self.assertEqual(self.git('check-ignore','--no-index','piq-fc-arcade/world/playerdata.json').returncode,0)
         self.assertEqual(self.git('check-ignore','--no-index','piq-fc-arcade/run/world/level.dat').returncode,0)
 
+    def test_quickmode_git_scope_excludes_workstation_files(self):
+        origin = Path(__file__).resolve().parents[1]
+        shutil.copyfile(origin / '.gitignore', self.repo / '.gitignore')
+        module = self.repo / 'piq-replay-quickmode-compat'
+        module.mkdir(exist_ok=True)
+        shutil.copyfile(origin / 'piq-replay-quickmode-compat/.gitignore', module / '.gitignore')
+        prefix = 'piq-replay-quickmode-compat/'
+        for name in ('build.py', 'src/main/java/Example.java', 'tools/run-tests.py'):
+            self.assertEqual(1, self.git('check-ignore', '--no-index', prefix + name).returncode, name)
+        for name in ('install.py', 'recording.mcpr', 'recording.mcpr.cache/index',
+                     'build/libs/test.jar', 'tools/verification.json', 'summary.json'):
+            self.assertEqual(0, self.git('check-ignore', '--no-index', prefix + name).returncode, name)
+
     def test_real_hook_and_index(self):
         self.assertEqual(self.git('add', 'source-control').returncode, 0)
         # Force staging credential-looking data: the real hook must reject it.

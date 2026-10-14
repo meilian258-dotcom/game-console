@@ -6,6 +6,8 @@
 
 ## 自动快照
 
+独立的 [快速回放兼容补丁](../piq-replay-quickmode-compat/README.md#构建)使用 Python 和 Java 21 构建；需自行提供指定版本的客户端编译依赖，并执行组件的静态、Mixin 转换和行为检查。它不属于下面的七件快照，不会因本目录入库自动上传 JAR。
+
 [snapshot.yml](../.github/workflows/snapshot.yml) 在进入 `main` 的每次 push 后触发，也支持在 Actions 中手动选择 `main` 运行。只有七个成品全部编译、检查和打包成功，才会创建独立预发行；失败不会覆盖已有发行版。workflow 合入 `main` 后才启用，不在拉取请求中使用发布权限。
 
 构建使用 GitHub 的 Windows 2022 runner、Java 21 和 Python 3.12，依次完成主模组、完整 SFC、MD、GBA、街机、电脑和 PvZ 七个玩家 JAR。SFC 由本次编译的两个内部组件合成一个完整玩家包；PvZ 仍是可选开发验证组件，不因自动打包变成稳定机型。

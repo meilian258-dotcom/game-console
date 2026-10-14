@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MODULES = (
     'piq-fc-arcade', 'piq-retro-platform', 'piq-sfc-home', 'piq-sfc-arcade',
     'piq-native-arcade', 'piq-gba', 'piq-j2me-arcade', 'piq-computer',
-    'piq-flash-box', 'piq-pvz-addon', 'piq-md-home',
+    'piq-flash-box', 'piq-pvz-addon', 'piq-md-home', 'piq-replay-quickmode-compat',
 )
 ROOT_FILES = {'.gitignore', '.gitattributes', '.gitmodules', 'GIT_WORKFLOW.md', 'README.md', 'THIRD_PARTY_NOTICES.md'}
 APPROVED_WORKFLOWS = {'.github/workflows/snapshot.yml'}
@@ -61,6 +61,11 @@ def path_issues(name: str) -> list[str]:
     if len(parts) > 2 and parts[0] in MODULES and parts[1].lower() == 'world':
         issues.append('runtime-world-directory')
     low = p.name.lower()
+    if parts[0] == 'piq-replay-quickmode-compat':
+        if low == 'install.py':
+            issues.append('private-operations-tool')
+        if any('.mcpr' in part.lower() for part in parts) or low in {'verification.json', 'summary.json', 'build-result.json'}:
+            issues.append('private-replay-or-run-report')
     if low in PRIVATE_TOOL_NAMES:
         issues.append('private-operations-tool')
     if (low.startswith('.env') or low in {'credentials.json', 'secrets.json', 'local.properties'}
