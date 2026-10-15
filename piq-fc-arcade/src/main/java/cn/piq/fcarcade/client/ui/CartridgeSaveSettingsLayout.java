@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client.ui;
 
 /** Full-width choices keep the active save mode visible at every supported GUI scale. */

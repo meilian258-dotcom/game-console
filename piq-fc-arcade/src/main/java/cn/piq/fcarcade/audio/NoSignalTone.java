@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.audio;
 
 /** Continuous, quiet 1 kHz test tone; original generated PCM, no external sound assets. */

@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.session;
 
 /** Compact authoritative sensor input; the ROM, not the server, decides hits. */

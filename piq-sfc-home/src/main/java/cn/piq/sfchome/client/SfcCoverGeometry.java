@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.client;
 
 /** Fits the FC 2:1 cover inside the user's 3.85 x 1.735 label without stretching it. */

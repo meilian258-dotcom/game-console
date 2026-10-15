@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.cabinet;
 
 /** Configuration is captured at room creation, never changed in a running room. */

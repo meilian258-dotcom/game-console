@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.world;
 import cn.piq.fcarcade.home.ExternalHomeConsoleBlockEntity;
 import cn.piq.sfchome.data.SfcCartridgeData;

@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.retro.client;
 
 /** All twelve actual keys remain visible even at the smallest usable GUI size. */

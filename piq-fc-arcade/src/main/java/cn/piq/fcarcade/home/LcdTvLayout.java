@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.home;
 
 /** Thin one-cell LCD with its desktop stand; bounds in 16-units-per-block coordinates. */

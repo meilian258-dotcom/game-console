@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.server;
 /** Per-port packet budget and a watchdog independent from a player's TCP connection. */
 public final class SfcInputHealth {

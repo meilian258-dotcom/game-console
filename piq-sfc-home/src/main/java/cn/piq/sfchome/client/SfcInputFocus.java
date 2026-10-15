@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.client;
 
 /** Matches FC: do not replay a keyboard/gamepad key held through a GUI or loss of focus. */

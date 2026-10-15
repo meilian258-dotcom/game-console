@@ -4,6 +4,8 @@
 
 第一次安装先看[玩家指南](../piq-fc-arcade/docs/玩家指南.md)。本页只说明 SFC 的区别和限制。
 
+自有适配代码保留 GPL，并在[有限链接许可](../piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt)列明的范围内允许与固定 Snes9x 组合。Snes9x 的非商业条件及其他组件许可不变；[源码与运行库通知](third-party/snes9x-runtime/NOTICE.md)说明所需发行材料和当前边界。
+
 ## 需要安装什么
 
 - Minecraft 1.21.1、NeoForge 21.1.229 或以上兼容的 21.1 版本、Java 21。当前原生游戏运行端为 Windows x64。

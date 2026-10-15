@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.skin;
 
 public record SkinDescriptor(String name, String sha256, int size, SkinLayout layout) {

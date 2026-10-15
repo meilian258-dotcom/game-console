@@ -7,6 +7,7 @@
 ## 本项目代码与素材不是同一授权
 
 - 主模组自有程序源码及公共 JNI 桥采用 [GPL-3.0-or-later](piq-fc-arcade/LICENSE.md)，完整文本见 [GPLv3](piq-fc-arcade/src/main/resources/META-INF/licenses/GPL-3.0.txt)。内部公共库随主包提供，不是要求玩家额外安装的模拟核心。
+- 所列自有前端、公共层、SFC 集成和 JNI 实现另有 [Snes9x 有限链接许可](piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt)，仅覆盖固定 Snes9x 与有权授权的自有代码；GPL 保留，Snes9x 非商业条件保留，不替第三方授予例外。
 - SFC、MD、街机、GBA、电脑、Flash、PvZ 的自有适配代码按各组件声明处理，不能把其自有代码许可套到第三方模拟核心。
 - Java ME 原型的自身 metadata 当前声明 `All Rights Reserved`，不能由主模组 GPL 推导它已经改用 GPL。独立 Replay 兼容补丁的自有代码采用 MIT，见下文候选范围。
 - 模型、贴图、声音、Logo 和宣传素材保留其权利人的声明；没有逐项许可时，不自动适用程序代码的 GPL。MD 模型已有随本仓库公开展示的授权说明，不等于通用素材的任意再分发或商用授权。电脑的黑白可组装主机、经典黑白键鼠两套原创素材已获作者允许随模组公开分发，范围见 [ASSETS.md](piq-computer/ASSETS.md)；不扩大为独立素材的任意复用或商用授权。
@@ -82,7 +83,7 @@ Ruffle 的顶级 [MIT](piq-flash-box/runtime/vendor/LICENSE_MIT) / [Apache](piq-
 
 尚未闭合的事项不以本次文档补齐冒充完成：
 
-1. **SFC Snes9x**：官方取得记录、固定源提交、DLL 版本与摘要已绑定，完整源和 LGPL 原文已在材料中。现用自有 GPL JNI 桥在同一进程加载并调用非商业许可的 Snes9x；当前未找到适用于该组合的链接例外。需明确相容的组合分发依据或由有权授权者提供适用的额外许可，不能仅凭独立 DLL、MIT API 或附上许可文本放行。最终发行还需包含运行库通知／源码附件；原 Buildbot 构建细节仍有精度限制，但不将字节一致重编当作一律必需。详见 [SFC 通知](piq-sfc-home/third-party/snes9x-runtime/NOTICE.md)。完成前保持现有公开分发门禁。
+1. **SFC Snes9x**：官方取得记录、固定源提交、DLL 版本与摘要已绑定，完整源和 LGPL 原文已在材料中。自有代码与固定 Snes9x 的组合授权现由上述有限链接许可明确，不能据此给 RetroArch 或其他第三方 GPL 代码授予例外。最终发行仍需实际携带例外、GPL、完整对应源码、适用 LGPL 重链接材料和运行库通知；旧 JAR 未重打包。原 Buildbot 构建细节仍有精度限制，但不将字节一致重编当作一律必需。详见 [SFC 通知](piq-sfc-home/third-party/snes9x-runtime/NOTICE.md)。最终材料核验完成前保持现有公开分发门禁。
 2. **Wasmtime/Wasmtime4j**：已补 121 个可确证 crate/version 的 250 份原文和 Rust 1.96.1 标准库通知，来源及摘要见[独立材料目录](piq-fc-arcade/third-party/wasmtime4j-native/README.md)。旧 JAR 未重打包，分发时须携带相应补充材料。历史发布未提供锁/SBOM且原生日志已过期，剩余未显示在二进制版本字符串中的成员仍不能宣称全部核清；这不直接等于缺少必须交付的 GPL 源码，也不把完整 SBOM 本身当作普遍发行条件。未用今天重新解析的依赖冒充历史构建事实。
 3. **MicroEmulator 2.0.4** 四个固定 Maven 制品的完整源/许可清单及扁平合并后的替换/重链接材料；上游当前分支的双许可概述不自动适用于每个旧制品文件。
 4. **核心来源**：固定 SHA、版本字符串、官方取得记录、完整源树与构建脚本共同说明来源；若缺原构建记录，明确对应关系的证据范围。字节完全一致的可重复构建是另一个验证目标，不能仅因尚未做到它就断言不可分发，也不能用同名版本代替完整对应源码。

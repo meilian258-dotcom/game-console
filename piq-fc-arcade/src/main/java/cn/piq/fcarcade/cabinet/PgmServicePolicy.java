@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.cabinet;
 
 /** Trusted addon capability. A diagnostic request is not a promise that every ROM has a menu. */

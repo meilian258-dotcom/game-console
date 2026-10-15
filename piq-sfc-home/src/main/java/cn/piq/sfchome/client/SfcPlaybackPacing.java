@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.client;
 
 /** Worker-local policy: catch up by executing every frame, never by skipping input. */

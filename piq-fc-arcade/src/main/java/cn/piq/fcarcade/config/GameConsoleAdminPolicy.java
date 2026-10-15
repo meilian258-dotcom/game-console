@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.config;
 
 /** Pure bounds and placement-only resolution; -1 means preserve the model's automatic default. */

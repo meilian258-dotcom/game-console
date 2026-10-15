@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.retro.input;
 
 import static cn.piq.retro.input.RetroButtons.*;

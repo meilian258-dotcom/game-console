@@ -44,6 +44,16 @@
 
 SFC54 的 JNI 路线由 `SfcNetplayProfile` 选择核心，经 `JniNetplaySession`、`LibretroJniRuntime` 和 `NativeLibretroBridge` 调用自有 C++ 桥；桥通过 `LoadLibraryExW`/`GetProcAddress` 在同一进程中加载核心并调用 `retro_run` 等接口。这不是仅交换游戏文件的独立程序，`NetplayProcess` 这个类名也不证明进程隔离。
 
-当前自有桥声明 GPL-3.0-or-later，未找到明确覆盖 Snes9x 组合的额外链接许可。Snes9x 的非商业条件不会因 DLL 独立、API 头文件是 MIT、附上源码或 GCC 运行库例外而解除。可参考 GNU 对[动态插件组合](https://www.gnu.org/licenses/gpl-faq.en.html#GPLPlugins)和[不相容库链接例外](https://www.gnu.org/licenses/gpl-faq.en.html#GPLIncompatibleLibs)的解释；这里指出需解决的许可条件，不作法院结论。
+自有程序代码保留 GPL-3.0-or-later；自 2026-10-15 起，[Snes9x 有限链接许可](../../../piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt)为其中列明的 PIQ 自有前端、公共 Java 层、SFC 集成和 JNI 实现提供 GPLv3 第 7 条附加许可，允许与固定 `fae2fea` Snes9x 组合分发。它不授权其他核心或后续 Snes9x 修订，不替 RetroArch、jgenesis 等第三方版权人授权，也不把自有 GPL 代码整体改为非商业许可。Snes9x 原有非商业条件、其他组件许可和适用源码义务保留。参见 GNU 对[不相容库链接例外](https://www.gnu.org/licenses/gpl-faq.en.html#GPLIncompatibleLibs)的说明。
 
-如采用额外许可，必须由有权授权的人授予，并明确仅覆盖其有权授权的代码；不能替 RetroArch、其他贡献者或核心作者授予例外。当前本目录没有新增这类许可，也未更改 Snes9x、LGPL 部件、自有桥的现有条款。问题未解决前，保持 `sfc_stock.PUBLICATION_BLOCK`。
+这项许可从生效日起同样覆盖指定基线中既有的自有代码副本，包括 FC76.54／完整 SFC54 的自有部分；不是追溯宣告历史分发全部合规。冻结 JAR 不重打包，发行时需把例外文本、GPL、完整对应源码和本目录通知一并作为配套提供。未来主包、SFC 两个内部组件和公共库构建均从同一原文打包，避免声明漂移。
+
+冻结副本的对应关系如下；哈希只用于定位，例外不为这些文件中的第三方内容授予权利。
+
+| 副本 | SHA-256 |
+| --- | --- |
+| `game-console-0.31.0-alpha.76.54.jar` | `3632de31cc6658f32f9e7c498c916c1680218fe58ae160f58e9fa0f0551d0549` |
+| 完整 SFC54，含 home54 与 core11 | `35e7d740863be3e0e5e696defa03bfb4eea3186895210a379152374a541180c5` |
+| 主包中的自有 `piq-libretro-jni.dll` | `fc731f3b83b0b23f473b48bb9f399582ace264c0646eec45fbffafaf0fb36923` |
+
+这解决的是上述自有代码的组合授权，不能替代最终发行材料核验。公开 SFC 包仍需核对完整源码交付、LGPL 部件可重链接材料及运行库通知是否实际配齐；在该步骤完成前，`sfc_stock.PUBLICATION_BLOCK` 保持拒绝发布，不因存在例外文本而自动放行。

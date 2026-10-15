@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.netplay;
 
 /** Per-direction TCP reader backpressure. Both directions stay below the server's 2 MiB/s cap. */

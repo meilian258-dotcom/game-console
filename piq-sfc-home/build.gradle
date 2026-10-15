@@ -81,6 +81,7 @@ tasks.named('test', Test) {
 }
 jar {
     from('LICENSE') { into 'META-INF' }
+    from('../piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
     // Internal thin build. Package with the reviewed core11 using the explicit
     // merge procedure in the current delivery guide; preserve both legacy mod IDs.
     // FC owns the public platform and runtime: do not embed duplicate copies.

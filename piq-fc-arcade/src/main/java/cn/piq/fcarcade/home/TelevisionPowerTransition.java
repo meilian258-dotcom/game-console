@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.home;
 
 /** Client presentation in fixed 50 ms units, independent of world/TPS clocks. Never controls the emulator. */

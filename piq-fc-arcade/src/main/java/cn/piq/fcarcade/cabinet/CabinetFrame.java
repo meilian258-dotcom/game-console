@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.cabinet;
 
 /** Owned immutable-by-contract pixels (ABGR) and stereo PCM48k; raw, unrotated display aspect. */

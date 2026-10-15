@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.furniture;
 
 /** Exact Minecraft 1.21.1 wood families. Recipes deliberately do not use #planks. */

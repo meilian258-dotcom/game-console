@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.cabinet;
 
 /** Pure four-command transfer ledger. IO completion does not release a request permit. */

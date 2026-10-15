@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client;
 
 /** Per-tab catalog state. Scans and their durable diagnostics do not own mutation state. */

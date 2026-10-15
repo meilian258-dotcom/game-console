@@ -26,8 +26,9 @@ SOURCE_ROOT = 'snes9x-fae2fea08f74180759ef540ee94259213f503480/'
 LEGACY_RESOURCE = 'core/sfc-libretro/windows-x64/mesen-s_libretro.dll'
 LEGACY = dict(bytes=3896832, sha256='8aca17e76efbd7a70b0c247b42aaba04d0c1c90f693213bd1e76573986670b42')
 PUBLICATION_BLOCK = ('Snes9x is a local candidate, not approved for public snapshots: '
-                     'resolve GPL frontend/bridge and non-commercial core combination permissions; '
-                     'supply fixed source, applicable LGPL/relinking materials and runtime notices. '
+                     'verify the final bundle carries the limited PIQ Snes9x linking permission, '
+                     'GPL, fixed corresponding source, applicable LGPL/relinking materials and runtime notices; '
+                     'third-party code is not covered by the PIQ permission. '
                      'See piq-sfc-home/third-party/snes9x-runtime/NOTICE.md and '
                      'core/sfc-snes9x/NOTICE.txt; adding notices alone does not grant approval')
 

@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client.cabinet;
 
 /** A held power press suppresses more physical presses, never its own server reply. */

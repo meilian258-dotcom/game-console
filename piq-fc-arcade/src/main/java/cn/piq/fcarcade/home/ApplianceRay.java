@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.home;
 
 /** Pure bounded ray/box picking; coordinates are already in model units or blocks. */

@@ -5,6 +5,12 @@ and not a separate Minecraft mod. The main mod packages the approved DLL once;
 addons supply fixed, SHA-verified core resources, content rules and capabilities.
 Execution defaults belong to the caller's supported mode, not to this bridge.
 
+The PIQ-authored bridge remains GPL-3.0-or-later with the limited additional
+permission in [SNES9X-LINKING-EXCEPTION.txt](../../SNES9X-LINKING-EXCEPTION.txt).
+New main-mod builds carry that text beside the bridge licenses and in
+`META-INF/licenses/`. It does not authorize other parties' GPL code or change
+Snes9x's original non-commercial license.
+
 ## Fixed shared runtime dependencies
 
 The development bundle adds dependency API 1 without changing the session ABI 2.

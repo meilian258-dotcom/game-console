@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.retro.client;
 
 /** Human labels follow native input bit order, not physical button-array order. */

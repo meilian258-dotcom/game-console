@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client.cabinet;
 
 /** One optional audio device per spectator source; the presentation policy selects one audible source. */

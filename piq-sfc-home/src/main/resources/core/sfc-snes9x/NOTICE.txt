@@ -25,6 +25,13 @@ does not grant commercial rights. The original text, not this summary, governs.
 The frontend/public JNI bridge's GPL license does not relicense this separate
 core, erase these restrictions, or establish permission for a combined product.
 
+PIQ-authored integration code has the separate limited permission in
+META-INF/licenses/SNES9X-LINKING-EXCEPTION.txt in new builds. Frozen SFC54
+copies require that notice as a companion; their JAR bytes are unchanged.
+It covers only the stated PIQ copyrights and this pinned Snes9x revision,
+not RetroArch or other third-party code, and does not authorize commercial
+use of Snes9x. GPL/source obligations for covered code remain applicable.
+
 The pinned reference Makefile.common directly includes filter/snes_ntsc.c and
 the APU DSP implementation. snes_ntsc and SPC_DSP.cpp state LGPL 2.1-or-later;
 licenses/LICENSE-LGPL-2.1.txt preserves the complete original license from this
@@ -40,9 +47,14 @@ are NOT evidence of incorporation, corresponding source, or an exception for
 the distributed DLL. In particular the JMA text limits its stated GPL exception
 to Snes9x, not derivatives. See reference-only/sources.json for exact provenance.
 
-Before public distribution: establish the DLL's actual build/source composition,
-resolve any applicable LGPL corresponding-source/relinking requirements and
-JMA/xBRZ applicability, and review non-commercial bundle/use conditions. The
+The fixed tree/build list has no JMA/xBRZ compilation units; the fixed DLL
+also identifies JMA as disabled. Reference-only texts do not establish their
+incorporation. Runtime notices and source/build scope are described in
+piq-sfc-home/third-party/snes9x-runtime/NOTICE.md in the source distribution.
+
+Before public distribution: verify delivery of the limited linking permission,
+GPL, fixed complete source, applicable LGPL relinking materials and runtime
+notices, together with compliance with non-commercial bundle/use terms. The
 snapshot publication validator explicitly rejects this candidate until that
 review is completed in a separate approved change; no download/build switch
 bypasses that gate. Local compilation and isolated tests are still permitted.

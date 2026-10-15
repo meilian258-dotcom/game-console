@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client.runtime;
 
 /** Native GUI pixels; never scales or blurs rendered text. */

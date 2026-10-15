@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.cabinet;
 
 /** Exactly-one-frame core. Construction, stepping, state and close all belong to ONE worker. */

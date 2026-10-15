@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.skin;
 
 /** Layout identity is explicit on the wire; equal file names are not compatibility evidence. */

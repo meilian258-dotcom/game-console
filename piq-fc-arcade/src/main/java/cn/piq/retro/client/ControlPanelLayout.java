@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.retro.client;
 
 /** Bounded GUI coordinates, never scaled text or a full-screen settings panel. */

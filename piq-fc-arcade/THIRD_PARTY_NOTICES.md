@@ -22,6 +22,13 @@ original licenses. It does not relicense FBNeo, Mesen, Mesen-S or PvZ. The relea
 provides matching bridge source and API header, without claiming a complete
 byte-reproducible third-party SDK. No ROM, BIOS or game data is included.
 
+For the PIQ-authored code identified in `SNES9X-LINKING-EXCEPTION.txt`, a
+limited GPLv3 section 7 permission covers the specified unmodified Snes9x
+revision. The same text is packaged as
+`META-INF/licenses/SNES9X-LINKING-EXCEPTION.txt` in new builds. It does not
+apply to the RetroArch frontend or relicense any core; original Snes9x
+non-commercial terms and all applicable source obligations still apply.
+
 FC76.22's RetroArch 1.22.2 PNP7 frontend additionally gates input polling and save
 capture to outer core runs (not recursive rollback replay). The matching modified
 frontend source and minimal patch accompany this candidate; CRC/protocol checks

@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client.cabinet;
 
 /** Bounded, focus-safe reserved diagnostic combo. No claim to detect a game's menu. */

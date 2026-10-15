@@ -146,6 +146,7 @@ neoForge.ideSyncTask generateModMetadata
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from('../piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
     exclude 'META-INF/MANIFEST.MF',
             'META-INF/*.SF',
             'META-INF/*.RSA',

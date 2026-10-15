@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client;
 
 /** Main-thread lifecycle gate. Resuming cannot re-play a key held through a GUI/reset. */

@@ -4,6 +4,8 @@ Retro Platform 是主模组与附属共用的 Java 源码库，负责核心运�
 
 **它不是玩家单独安装的模组。** 公共代码随主模组打包一次，附属编译时依赖主包；不要把 `piq_retro_internal` JAR 放进 `mods`，也不要在每个附属里再复制一套桥。
 
+本库自有 GPL 程序代码的 Snes9x 组合权限见[有限链接许可](../piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt)。它只覆盖所列自有代码和固定 Snes9x，不替第三方授权；其他 GPL 条款保留。
+
 ## 哪些职责放在这里
 
 | 职责 | 当前入口 |

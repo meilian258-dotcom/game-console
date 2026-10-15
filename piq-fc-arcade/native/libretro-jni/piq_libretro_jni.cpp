@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in ../../SNES9X-LINKING-EXCEPTION.txt.
 // ABI 2, bounded multi-instance Windows x64 frontend. No MC/JVM/render-thread work.
 // The Java resource owner verifies core provenance and SHA before calling this bridge.
 #define WIN32_LEAN_AND_MEAN

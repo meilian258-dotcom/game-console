@@ -4,6 +4,8 @@
 
 想玩 SFC 家用机，请从 [SFC 附属说明](../piq-sfc-home/README.md)开始；想用通用机柜的 SFC 选项，也安装完整 SFC 附属，不需要单独找这个核心包。
 
+本组件参与 SFC 集成的自有 Java 代码适用[有限 Snes9x 链接许可](../piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt)；jgenesis、WASM、Mesen-S 等第三方实现不在例外授权范围内，其原许可保留。
+
 ## 安装边界
 
 - 完整玩家包名形如 `game-console-sfc-版本.jar`，包含 `piq_sfc_home` 和本组件 `piq_sfc_arcade` 两个注册 ID。

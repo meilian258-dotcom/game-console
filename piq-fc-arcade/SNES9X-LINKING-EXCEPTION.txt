@@ -1,0 +1,76 @@
+Game Console Snes9x Linking Permission, version 1
+Additional permission under GNU GPL version 3 section 7
+Effective date: 2026-10-15
+
+Grantor: the copyright owner of PIQ-authored Game Console program code.
+
+1. Covered code
+
+This permission applies only to the Grantor's copyright interests in the
+PIQ-authored GPL-3.0-or-later program code in these repository locations:
+
+  piq-fc-arcade/src/main/java/
+  piq-retro-platform/src/main/java/
+  piq-sfc-home/src/main/java/
+  piq-sfc-arcade/src/main/java/
+  piq-fc-arcade/native/libretro-jni/piq_libretro_jni.cpp
+  piq-fc-arcade/native/libretro-jni/runtime_dependencies.h
+
+The source baseline is Game Console commit
+925e6e09ae814e07735689e7bcb395b75bbaeaf8. This grant also applies, from the
+effective date, to existing copies of that covered code and its compiled
+forms, including the PIQ-authored parts of FC76.54 and SFC54. It does not
+relicense an entire JAR, alter an upstream license, or grant rights in code
+owned by anyone else. Modified versions may retain this permission for the
+Grantor's covered material; other contributors must separately authorize
+any extension to their own copyright interests.
+
+2. Specified library and additional permission
+
+The specified library is the unmodified libretro Snes9x source at
+https://github.com/libretro/snes9x/tree/fae2fea08f74180759ef540ee94259213f503480
+and object code built from that source. Its reported version is
+Snes9x 1.63 fae2fea. The specified library also expressly includes the
+unmodified Windows x64 DLL used in SFC54: snes9x_libretro.dll, 3,840,000
+bytes, SHA-256
+5ce01616184f255623405793e192f79aef5089fa796b29bc11ddc5e052060124.
+This identifies the permitted binary; it is not a claim of bit-for-bit
+reproduction from the reference source. This permission does not extend to other emulator
+cores, later Snes9x revisions, or modifications of that library.
+
+As an additional permission under GNU GPL version 3 section 7, the Grantor
+permits you to link or combine the covered code with the specified library
+through the libretro interface and to convey the resulting combination,
+provided that you comply with the GNU GPL for the covered code and with
+the licenses applicable to the specified library and all other components.
+The specified library need not be relicensed under the GNU GPL solely
+because of this combination with the Grantor's covered code.
+
+When conveying the resulting combination in object-code form under this
+permission, provide the complete corresponding source for the covered
+code and the specified library, including applicable build/link scripts,
+modifications, copyright notices and license texts, using the source
+delivery requirements of GNU GPL version 3 section 6. Applicable LGPL
+source and relinking requirements remain in force.
+
+3. Limits and retained terms
+
+The covered code remains GPL-3.0-or-later. This permission does not impose
+a non-commercial restriction on that code by itself. Snes9x's own
+non-commercial and other conditions remain in effect; this permission
+does not grant commercial rights to Snes9x or waive any of its terms.
+
+No permission is granted on behalf of RetroArch, Mesen, Mesen-S, jgenesis,
+FBNeo, Genesis Plus GX, Snes9x, or any other third-party rights holder.
+Third-party code, bundled libraries, libretro headers, artwork, models,
+textures, audio, trademarks, ROMs, BIOS files and game data are excluded
+from the covered code, wherever they are stored or packaged.
+
+Apart from this limited additional permission, the GNU GPL and its
+disclaimer of warranty remain unchanged. You may remove this additional
+permission as allowed by GNU GPL version 3 section 7; a copy without it
+must not be represented as granting this permission.
+
+Include this notice with copies that rely on this permission. This grant
+is not a certification that a particular binary distribution satisfies
+every third-party obligation.
