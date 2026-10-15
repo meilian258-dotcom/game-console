@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.retro.input;
 
 /** Radial Schmitt deadzone plus angular hysteresis for stable eight-way digital directions. */

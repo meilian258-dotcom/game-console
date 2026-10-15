@@ -15,6 +15,16 @@ import java.util.function.BooleanSupplier;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClientNesWorkerTest {
+    @Test void replayIntervalRetiresWorkerAndCannotRestartFromQueuedInput()throws Exception{
+        FakeCore core=new FakeCore();
+        var worker=new ClientNesWorker(()->{core.claimOwner();return core;},true,true,"",false);
+        try{
+            await(worker::isReady);cn.piq.retro.replay.ReplayGuard.enterReplay();cn.piq.retro.replay.ReplayGuard.exitReplay();
+            await(()->core.closed);int before=core.frames.get();
+            worker.enqueue(new ClientNesWorker.Input(3,1,2));
+            assertFalse(worker.isReady());assertEquals(before,core.frames.get());
+        }finally{cn.piq.retro.replay.ReplayGuard.exitReplay();worker.close();}await(()->core.closed);
+    }
     @Test void performanceReadsDoNotConsumeOutputOrAdvanceSimulation() throws Exception {
         FakeCore core=new FakeCore();
         var worker=new ClientNesWorker(()->{core.claimOwner();return core;},true,true,"",false);

@@ -1,0 +1,4683 @@
+{
+  "schema": "binary-observed-crate-notices-v1",
+  "completeSbom": false,
+  "scope": "Original licenses/notices from immutable registry packages for versions directly observed in the selected Wasmtime4j native binaries; not a complete inventory of linked code or a legal certification.",
+  "mavenCoordinate": "ai.tegmentum:wasmtime4j-jni:46.0.1-1.2.0",
+  "mavenJarSha256": "c4e55d01c334c2f9c5700e4d75077d79cc8d6172825ff1fa02e03694034f5530",
+  "binaries": [
+    {
+      "member": "natives/windows-x86_64/wasmtime4j.dll",
+      "sha256": "ab44831073d409ed84fee85746b81226feb28dfe5b29ef179fac6eac4ecb65eb"
+    },
+    {
+      "member": "natives/linux-x86_64/libwasmtime4j.so",
+      "sha256": "81242001c26dad865c5cfff5f497b6710deb36d62a42e8adebcf6c4213eca95f"
+    }
+  ],
+  "crates": [
+    {
+      "crate": "addr2line",
+      "version": "0.26.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/addr2line/addr2line-0.26.1.crate",
+      "registryIndexUrl": "https://index.crates.io/ad/dr/addr2line",
+      "sourceSha256": "59317f77929f0e679d39364702289274de2f0f0b22cbf50b2b8cff2169a0b27a",
+      "sourceBytes": 43193,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/gimli-rs/addr2line",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/addr2line-0.26.1/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/addr2line-0.26.1/LICENSE-MIT",
+          "sha256": "e99d88d232bf57d70f0fb87f6b496d44b6653f99f8a63d250a54c61ea4bcde40",
+          "bytes": 1069
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "ea55016a653014a0be6fc9f085ead564ede47fff"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "a12ccbb6deddfa3b37b34ff12ee5c042c958867df6b2e824d5a46e112f258e3e"
+    },
+    {
+      "crate": "aho-corasick",
+      "version": "1.1.4",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/aho-corasick/aho-corasick-1.1.4.crate",
+      "registryIndexUrl": "https://index.crates.io/ah/o-/aho-corasick",
+      "sourceSha256": "ddd31a130427c27518df266943a5308ed92d4b226cc639f5a8f1002816174301",
+      "sourceBytes": 184015,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Unlicense OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/BurntSushi/aho-corasick",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/aho-corasick-1.1.4/COPYING",
+          "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+          "bytes": 126
+        },
+        {
+          "path": "crate-notices/aho-corasick-1.1.4/LICENSE-MIT",
+          "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+          "bytes": 1081
+        },
+        {
+          "path": "crate-notices/aho-corasick-1.1.4/UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c",
+          "bytes": 1211
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "17f8b32e3b7c845ef3c5429b823804f552f14ec9"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "9384d7c725c5c2ebc8adc602081e7cbce8b214693e9e27edef1c40f33e925810"
+    },
+    {
+      "crate": "allocator-api2",
+      "version": "0.2.21",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/allocator-api2/allocator-api2-0.2.21.crate",
+      "registryIndexUrl": "https://index.crates.io/al/lo/allocator-api2",
+      "sourceSha256": "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923",
+      "sourceBytes": 63622,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/zakarumych/allocator-api2",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/allocator-api2-0.2.21/LICENSE-APACHE",
+          "sha256": "20fe7b00e904ed690e3b9fd6073784d3fc428141dbd10b81c01fd143d0797f58",
+          "bytes": 9899
+        },
+        {
+          "path": "crate-notices/allocator-api2-0.2.21/LICENSE-MIT",
+          "sha256": "36516aefdc84c5d5a1e7485425913a22dbda69eb1930c5e84d6ae4972b5194b9",
+          "bytes": 1046
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "63cd7fcc2f8854b5821c7054d026e8a4647acde1"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "ddaa434cc54a30a33bbe0096e72479d71ba5deffa2ad9bee39419d4e50b75275"
+    },
+    {
+      "crate": "anstream",
+      "version": "1.0.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/anstream/anstream-1.0.0.crate",
+      "registryIndexUrl": "https://index.crates.io/an/st/anstream",
+      "sourceSha256": "824a212faf96e9acacdbd09febd34438f8f711fb84e09a8916013cd7815ca28d",
+      "sourceBytes": 28916,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-cli/anstyle.git",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/anstream-1.0.0/LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "bytes": 11358
+        },
+        {
+          "path": "crate-notices/anstream-1.0.0/LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6",
+          "bytes": 1062
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "3048fe7820055a6c995170d822e725c62b3d63e1"
+        },
+        "path_in_vcs": "crates/anstream"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "43f306d58209afac8fd535b305716d668fa334e2c27195c1dc6e46eab88bccfc"
+    },
+    {
+      "crate": "anstyle",
+      "version": "1.0.14",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/anstyle/anstyle-1.0.14.crate",
+      "registryIndexUrl": "https://index.crates.io/an/st/anstyle",
+      "sourceSha256": "940b3a0ca603d1eade50a4846a2afffd5ef57a9feac2c0e2ec2e14f9ead76000",
+      "sourceBytes": 17787,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-cli/anstyle.git",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/anstyle-1.0.14/LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "bytes": 11358
+        },
+        {
+          "path": "crate-notices/anstyle-1.0.14/LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6",
+          "bytes": 1062
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "0fe6f0ff6d52e9f91d4071199bd0b24bd46f3d35"
+        },
+        "path_in_vcs": "crates/anstyle"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "1464191f3d9cdcddee83a73a16c7cee7e48dba818248b3fd4273757fbed4407e"
+    },
+    {
+      "crate": "anstyle-parse",
+      "version": "1.0.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/anstyle-parse/anstyle-parse-1.0.0.crate",
+      "registryIndexUrl": "https://index.crates.io/an/st/anstyle-parse",
+      "sourceSha256": "52ce7f38b242319f7cabaa6813055467063ecdc9d355bbb4ce0c68908cd8130e",
+      "sourceBytes": 22042,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-cli/anstyle.git",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/anstyle-parse-1.0.0/LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "bytes": 11358
+        },
+        {
+          "path": "crate-notices/anstyle-parse-1.0.0/LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6",
+          "bytes": 1062
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "3048fe7820055a6c995170d822e725c62b3d63e1"
+        },
+        "path_in_vcs": "crates/anstyle-parse"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "fb68a322c2a6df11ca66e0f0fb79b9595e9d2f551eb9e062f44bb47de4c74367"
+    },
+    {
+      "crate": "anyhow",
+      "version": "1.0.103",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/anyhow/anyhow-1.0.103.crate",
+      "registryIndexUrl": "https://index.crates.io/an/yh/anyhow",
+      "sourceSha256": "2a4385e2e34eb35d6b3efe798b9eb88096925d87726c0798709bf56d9ed84af3",
+      "sourceBytes": 48746,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/dtolnay/anyhow",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/anyhow-1.0.103/LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "bytes": 9723
+        },
+        {
+          "path": "crate-notices/anyhow-1.0.103/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "5bdb0e24db3994be119d42f18fe2d655e1f68f4a"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "dc1557f23ac90829bc4cb26366aa1702934c8c2cdcc50ee95b6ea690d4cf786b"
+    },
+    {
+      "crate": "atomic-waker",
+      "version": "1.1.2",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/atomic-waker/atomic-waker-1.1.2.crate",
+      "registryIndexUrl": "https://index.crates.io/at/om/atomic-waker",
+      "sourceSha256": "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0",
+      "sourceBytes": 12422,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/smol-rs/atomic-waker",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/atomic-waker-1.1.2/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/atomic-waker-1.1.2/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        },
+        {
+          "path": "crate-notices/atomic-waker-1.1.2/LICENSE-THIRD-PARTY",
+          "sha256": "6226d0632e2e1a80c23597e964da9812ae193c535fe058154afb034e94167aa5",
+          "bytes": 1849
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "9969a29ccd1fe298e2df7346849c0095ba303a64"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "0bcc14ea808935bf632dfaa6746dce30e4fdfc0902e1320df8ab36763dc76250"
+    },
+    {
+      "crate": "base64",
+      "version": "0.22.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/base64/base64-0.22.1.crate",
+      "registryIndexUrl": "https://index.crates.io/ba/se/base64",
+      "sourceSha256": "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6",
+      "sourceBytes": 81597,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/marshallpierce/rust-base64",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/base64-0.22.1/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/base64-0.22.1/LICENSE-MIT",
+          "sha256": "0dd882e53de11566d50f8e8e2d5a651bcf3fabee4987d70f306233cf39094ba7",
+          "bytes": 1076
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "e14400697453bcc85997119b874bc03d9601d0af"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "52bee6a418e14918d37058fd15fccfd0f417a06fe4f9668b6f97866bf7f991e3"
+    },
+    {
+      "crate": "bumpalo",
+      "version": "3.20.3",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/bumpalo/bumpalo-3.20.3.crate",
+      "registryIndexUrl": "https://index.crates.io/bu/mp/bumpalo",
+      "sourceSha256": "72f5acc6cb2ba439de613abc23857ec3d78374d8ed5ac84e9d11336e87da8649",
+      "sourceBytes": 98671,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/fitzgen/bumpalo",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/bumpalo-3.20.3/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/bumpalo-3.20.3/LICENSE-MIT",
+          "sha256": "65f94e99ddaf4f5d1782a6dae23f35d4293a9a01444a13135a6887017d353cee",
+          "bytes": 1059
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "84654ace6be4444da3ff102a0a0af3b38c4df4fb"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "a6d2d81f09f1c739f738032bbcb5ecf4d3ce56d2f75e2e8bae9c753b09a6db4c"
+    },
+    {
+      "crate": "bytes",
+      "version": "1.12.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/bytes/bytes-1.12.0.crate",
+      "registryIndexUrl": "https://index.crates.io/by/te/bytes",
+      "sourceSha256": "8ae3f5d315924270530207e2a68396c3cc547f6dca3fbdca317cfb1a51edb593",
+      "sourceBytes": 75441,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/tokio-rs/bytes",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/bytes-1.12.0/LICENSE",
+          "sha256": "45f522cacecb1023856e46df79ca625dfc550c94910078bd8aec6e02880b3d42",
+          "bytes": 1055
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "91402cee605b21bf530ac07ede463599182b5d32"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "6a4d6e139590858e3c2b76cabce61b6169e1e4a95a988b3bdb56b44ebd20fd02"
+    },
+    {
+      "crate": "cap-fs-ext",
+      "version": "3.4.5",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cap-fs-ext/cap-fs-ext-3.4.5.crate",
+      "registryIndexUrl": "https://index.crates.io/ca/p-/cap-fs-ext",
+      "sourceSha256": "d5528f85b1e134ae811704e41ef80930f56e795923f866813255bc342cc20654",
+      "sourceBytes": 22135,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/cap-std",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cap-fs-ext-3.4.5/COPYRIGHT",
+          "sha256": "5b3d8a674979e158328c57f5c4cc12150df79d0bdf12c86eafc2e9c6006a2d4e",
+          "bytes": 869
+        },
+        {
+          "path": "crate-notices/cap-fs-ext-3.4.5/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/cap-fs-ext-3.4.5/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/cap-fs-ext-3.4.5/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "e8cbd4b80788bc851c10c792c3f42c22fb89fb92"
+        },
+        "path_in_vcs": "cap-fs-ext"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "cf5b8f50ac20847c1e511c916ded6ee50b5fb5e476e44d799678f63afb2c96fb"
+    },
+    {
+      "crate": "cap-net-ext",
+      "version": "3.4.5",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cap-net-ext/cap-net-ext-3.4.5.crate",
+      "registryIndexUrl": "https://index.crates.io/ca/p-/cap-net-ext",
+      "sourceSha256": "20a158160765c6a7d0d8c072a53d772e4cb243f38b04bfcf6b4939cfbe7482e7",
+      "sourceBytes": 14922,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/cap-std",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cap-net-ext-3.4.5/COPYRIGHT",
+          "sha256": "efee00a97232b284a62d3ca5b74e9c893749f57bc5de9953f67e8f550a5015ae",
+          "bytes": 873
+        },
+        {
+          "path": "crate-notices/cap-net-ext-3.4.5/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/cap-net-ext-3.4.5/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/cap-net-ext-3.4.5/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "e8cbd4b80788bc851c10c792c3f42c22fb89fb92"
+        },
+        "path_in_vcs": "cap-net-ext"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "9975e6b8219779b30a8ebfd66cc25e999d2dcdb8b8754f6b4188b2f001e04e50"
+    },
+    {
+      "crate": "cap-primitives",
+      "version": "3.4.5",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cap-primitives/cap-primitives-3.4.5.crate",
+      "registryIndexUrl": "https://index.crates.io/ca/p-/cap-primitives",
+      "sourceSha256": "b6cf3aea8a5081171859ef57bc1606b1df6999df4f1110f8eef68b30098d1d3a",
+      "sourceBytes": 93932,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/cap-std",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cap-primitives-3.4.5/COPYRIGHT",
+          "sha256": "a8799c2a07dabcb8d52481f885c5ab7000acb8a4d3cd9503fbcb97c84d350e65",
+          "bytes": 885
+        },
+        {
+          "path": "crate-notices/cap-primitives-3.4.5/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/cap-primitives-3.4.5/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/cap-primitives-3.4.5/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "e8cbd4b80788bc851c10c792c3f42c22fb89fb92"
+        },
+        "path_in_vcs": "cap-primitives"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "a56b4fb2d4fdc00af74bcede59e3b03c9d95bd1fdac5a512426142330925182a"
+    },
+    {
+      "crate": "cap-time-ext",
+      "version": "3.4.5",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cap-time-ext/cap-time-ext-3.4.5.crate",
+      "registryIndexUrl": "https://index.crates.io/ca/p-/cap-time-ext",
+      "sourceSha256": "def102506ce40c11710a9b16e614af0cde8e76ae51b1f48c04b8d79f4b671a80",
+      "sourceBytes": 12901,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/cap-std",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cap-time-ext-3.4.5/COPYRIGHT",
+          "sha256": "bbbc3bb05f87a040dda9907337208bf8808fb2f9fc939712c67eb906988fc4c2",
+          "bytes": 877
+        },
+        {
+          "path": "crate-notices/cap-time-ext-3.4.5/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/cap-time-ext-3.4.5/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/cap-time-ext-3.4.5/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "e8cbd4b80788bc851c10c792c3f42c22fb89fb92"
+        },
+        "path_in_vcs": "cap-time-ext"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "ec0dd038d9a2bfbe794fb3e9e76701b8bb3cb3fe060b1ca340ebe71eb66aa1eb"
+    },
+    {
+      "crate": "cesu8",
+      "version": "1.1.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cesu8/cesu8-1.1.0.crate",
+      "registryIndexUrl": "https://index.crates.io/ce/su/cesu8",
+      "sourceSha256": "6d43a04d8753f35258c91f8ec639f792891f748a1edbd759cf1dcea3382ad83c",
+      "sourceBytes": 10555,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0/MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/emk/cesu8-rs",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cesu8-1.1.0/COPYRIGHT-RUST.txt",
+          "sha256": "5ca77347e58205d3b543c04a9c5bdd11d20a9f3108a7b246640edffa999b5f35",
+          "bytes": 17426
+        }
+      ],
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "78e66dd24c12e0ac858e7524cdd7d51d1eee753c1e9c32e5b915dc9f1d767870"
+    },
+    {
+      "crate": "colorchoice",
+      "version": "1.0.5",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/colorchoice/colorchoice-1.0.5.crate",
+      "registryIndexUrl": "https://index.crates.io/co/lo/colorchoice",
+      "sourceSha256": "1d07550c9036bf2ae0c684c4297d503f838287c83c53686d05370d0e139ae570",
+      "sourceBytes": 8187,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-cli/anstyle.git",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/colorchoice-1.0.5/LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "bytes": 11358
+        },
+        {
+          "path": "crate-notices/colorchoice-1.0.5/LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6",
+          "bytes": 1062
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "0fe6f0ff6d52e9f91d4071199bd0b24bd46f3d35"
+        },
+        "path_in_vcs": "crates/colorchoice"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "403ea406945c6d350b0a0f6b5c01d5bee1e59d522059884b7f15a0b44c64b579"
+    },
+    {
+      "crate": "cpp_demangle",
+      "version": "0.4.5",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cpp_demangle/cpp_demangle-0.4.5.crate",
+      "registryIndexUrl": "https://index.crates.io/cp/p_/cpp_demangle",
+      "sourceSha256": "f2bb79cb74d735044c972aae58ed0aaa9a837e85b01106a54c39e42e97f62253",
+      "sourceBytes": 81574,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/gimli-rs/cpp_demangle",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cpp_demangle-0.4.5/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/cpp_demangle-0.4.5/LICENSE-MIT",
+          "sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0",
+          "bytes": 1071
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "1e679dd1979e1d323de26f81535dd9566263174c"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "e2cfc68f941de1294df67e28a4931752546b01f8ee3d3e6fa617bb84d74a1fc8"
+    },
+    {
+      "crate": "cranelift-assembler-x64",
+      "version": "0.133.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cranelift-assembler-x64/cranelift-assembler-x64-0.133.1.crate",
+      "registryIndexUrl": "https://index.crates.io/cr/an/cranelift-assembler-x64",
+      "sourceSha256": "e06aeba2c965fc446d13c56a6ccb2631b78445d7544543dd9a25289977630914",
+      "sourceBytes": 27130,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": null,
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cranelift-assembler-x64-0.133.1/upstream-root/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243,
+          "sourceUrl": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/823d1b8f251494a06288194d0df746191f535ff7/LICENSE",
+          "gitBlobSha1": "f9d81955f4bcb8f96a025e2ecc46f39ec536d465",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "cranelift/assembler-x64"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "77458c4a1e6ccf869713f1da0946c03823a17ca2ec20bb325cbbf5d34cd91dee"
+    },
+    {
+      "crate": "cranelift-bforest",
+      "version": "0.133.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cranelift-bforest/cranelift-bforest-0.133.1.crate",
+      "registryIndexUrl": "https://index.crates.io/cr/an/cranelift-bforest",
+      "sourceSha256": "03b4982ef9fa54ec9eee841e891e7ddc5434be1250e88de31572e000c888f30b",
+      "sourceBytes": 34209,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cranelift-bforest-0.133.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "cranelift/bforest"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "e63cb694ce436b422dd417f71aa6eba11a79e96687715aadc46bdcacb4ddb63f"
+    },
+    {
+      "crate": "cranelift-bitset",
+      "version": "0.133.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cranelift-bitset/cranelift-bitset-0.133.1.crate",
+      "registryIndexUrl": "https://index.crates.io/cr/an/cranelift-bitset",
+      "sourceSha256": "529143118c4eeb58c39ecb02319557d512be6c61348486422974ab8e3906b8a8",
+      "sourceBytes": 9195,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cranelift-bitset-0.133.1/upstream-root/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243,
+          "sourceUrl": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/823d1b8f251494a06288194d0df746191f535ff7/LICENSE",
+          "gitBlobSha1": "f9d81955f4bcb8f96a025e2ecc46f39ec536d465",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "cranelift/bitset"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "c9bee4f47c07b1e400a28237f3b5e7cfef6c4967bdc67f51d494be11308b7098"
+    },
+    {
+      "crate": "cranelift-codegen",
+      "version": "0.133.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cranelift-codegen/cranelift-codegen-0.133.1.crate",
+      "registryIndexUrl": "https://index.crates.io/cr/an/cranelift-codegen",
+      "sourceSha256": "b7780677247ad3577e3a6a3ebf43f39b325a11d6393db72b2c9968a910d4d13d",
+      "sourceBytes": 1102672,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cranelift-codegen-0.133.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "cranelift/codegen"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "315816e7bcb44f8414d07cca190e8269c93c5c6c1a133242b7441f0bb4608941"
+    },
+    {
+      "crate": "cranelift-entity",
+      "version": "0.133.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cranelift-entity/cranelift-entity-0.133.1.crate",
+      "registryIndexUrl": "https://index.crates.io/cr/an/cranelift-entity",
+      "sourceSha256": "a5300c49cf940526fe771517b3b3eabd5d0ff164ee61698579cf403fe8d3af3c",
+      "sourceBytes": 31193,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cranelift-entity-0.133.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "cranelift/entity"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "3ac6929df6db3b37bf5376ed7c548c27d6af26bb5c90f752952df5b5ce745714"
+    },
+    {
+      "crate": "cranelift-frontend",
+      "version": "0.133.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cranelift-frontend/cranelift-frontend-0.133.1.crate",
+      "registryIndexUrl": "https://index.crates.io/cr/an/cranelift-frontend",
+      "sourceSha256": "da4adbf760207fdbbe130f1191cce01cdef66831a9f648b1f39ff2800d126d45",
+      "sourceBytes": 59774,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cranelift-frontend-0.133.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "cranelift/frontend"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "f8b192a8d77e3d174cbe2430d785f3eb855a7f9d77a8b08d8c6a2f0509573dad"
+    },
+    {
+      "crate": "cranelift-native",
+      "version": "0.133.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/cranelift-native/cranelift-native-0.133.1.crate",
+      "registryIndexUrl": "https://index.crates.io/cr/an/cranelift-native",
+      "sourceSha256": "d506ef23a60715bde451b06620b14402166ded3b648454fccbf04f3e46a4aa70",
+      "sourceBytes": 11399,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/cranelift-native-0.133.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "cranelift/native"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "b3a30a9fcfe3bcc7f668a457671ec55372033db8859da5a5b38e82f11adfe22c"
+    },
+    {
+      "crate": "crossbeam-deque",
+      "version": "0.8.6",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/crossbeam-deque/crossbeam-deque-0.8.6.crate",
+      "registryIndexUrl": "https://index.crates.io/cr/os/crossbeam-deque",
+      "sourceSha256": "9dd111b7b7f7d55b72c0a6ae361660ee5853c9af73f70c3c2ef6858b950e2e51",
+      "sourceBytes": 22471,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/crossbeam-rs/crossbeam",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/crossbeam-deque-0.8.6/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/crossbeam-deque-0.8.6/LICENSE-MIT",
+          "sha256": "5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab",
+          "bytes": 1099
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "ccd83ac4108a2a1b41e9c6e79c87267167d18dfa"
+        },
+        "path_in_vcs": "crossbeam-deque"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "93550ef824cb400b7a92af6b2ebe9ef24aa5a37567d80be5e4ba149bdc651be1"
+    },
+    {
+      "crate": "crossbeam-epoch",
+      "version": "0.9.18",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/crossbeam-epoch/crossbeam-epoch-0.9.18.crate",
+      "registryIndexUrl": "https://index.crates.io/cr/os/crossbeam-epoch",
+      "sourceSha256": "5b82ac4a3c2ca9c3460964f020e1402edd5753411d7737aa39c3714ad1b5420e",
+      "sourceBytes": 46875,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/crossbeam-rs/crossbeam",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/crossbeam-epoch-0.9.18/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/crossbeam-epoch-0.9.18/LICENSE-MIT",
+          "sha256": "5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab",
+          "bytes": 1099
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "9c3182abebb36bdc9446d75d4644190fef70fa01"
+        },
+        "path_in_vcs": "crossbeam-epoch"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "cfbceb820c7a1519351826839decd3ff1b1ad54ef2c4dfc4d2c9f173e4726046"
+    },
+    {
+      "crate": "encoding_rs",
+      "version": "0.8.35",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/encoding_rs/encoding_rs-0.8.35.crate",
+      "registryIndexUrl": "https://index.crates.io/en/co/encoding_rs",
+      "sourceSha256": "75030f3c4f45dafd7586dd6780965a8c7e8e285a5ecb86713e63a79c5b2766f3",
+      "sourceBytes": 1381050,
+      "registryChecksumVerified": true,
+      "declaredLicense": "(Apache-2.0 OR MIT) AND BSD-3-Clause",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/hsivonen/encoding_rs",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/encoding_rs-0.8.35/COPYRIGHT",
+          "sha256": "11789f45bb180841cd362a5eee6789c68ddb573a11105e30768c308a6add0190",
+          "bytes": 713
+        },
+        {
+          "path": "crate-notices/encoding_rs-0.8.35/LICENSE-APACHE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "bytes": 11358
+        },
+        {
+          "path": "crate-notices/encoding_rs-0.8.35/LICENSE-MIT",
+          "sha256": "3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c",
+          "bytes": 1053
+        },
+        {
+          "path": "crate-notices/encoding_rs-0.8.35/LICENSE-WHATWG",
+          "sha256": "838118388fe5c2e7f1dbbaeed13e1c7f3ebf88be91319c7c1d77c18e987d1a50",
+          "bytes": 1501
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "2fa58aecf537cc76ff52c0eb3d5e9f8fda466844"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "d7405d2bcf99cf9729075473c45f677630f4c1947c8ba9757db607f2025a7da2"
+    },
+    {
+      "crate": "env_filter",
+      "version": "2.0.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/env_filter/env_filter-2.0.0.crate",
+      "registryIndexUrl": "https://index.crates.io/en/v_/env_filter",
+      "sourceSha256": "900d271a03799a1ee8d1ca9b19893b48ca674a9284fefcfb85f05e74ed314217",
+      "sourceBytes": 15184,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-cli/env_logger",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/env_filter-2.0.0/LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "bytes": 11358
+        },
+        {
+          "path": "crate-notices/env_filter-2.0.0/LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6",
+          "bytes": 1062
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "cc2b2efcd7454be82ca49f8ac165b3fbc3095ae3"
+        },
+        "path_in_vcs": "crates/env_filter"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "3eaa19c3bb93c5af4621e94fc222edb70c6661e954dc173129722e26884f3b90"
+    },
+    {
+      "crate": "env_logger",
+      "version": "0.11.11",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/env_logger/env_logger-0.11.11.crate",
+      "registryIndexUrl": "https://index.crates.io/en/v_/env_logger",
+      "sourceSha256": "de671bd27a75a797dc9ae289ba1e77276e75e2026408aab65185384e2d5cd3f6",
+      "sourceBytes": 31884,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-cli/env_logger",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/env_logger-0.11.11/LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "bytes": 11358
+        },
+        {
+          "path": "crate-notices/env_logger-0.11.11/LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6",
+          "bytes": 1062
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "b4d3f2b8dd3f1c3362f07da8f6f4a30c701358cf"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "42a384302cff073bef488bdccbd9553eaf408a81260c1e33f50bb191e3b9ec12"
+    },
+    {
+      "crate": "fs-set-times",
+      "version": "0.20.3",
+      "binaryEvidencePlatforms": [
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/fs-set-times/fs-set-times-0.20.3.crate",
+      "registryIndexUrl": "https://index.crates.io/fs/-s/fs-set-times",
+      "sourceSha256": "94e7099f6313ecacbe1256e8ff9d617b75d1bcb16a6fddef94866d225a01a14a",
+      "sourceBytes": 15964,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/fs-set-times",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/fs-set-times-0.20.3/COPYRIGHT",
+          "sha256": "e196ffeb5ab101e9ec8bbe395c9f367c5380ee2d28c47e5c03371523798a9af7",
+          "bytes": 877
+        },
+        {
+          "path": "crate-notices/fs-set-times-0.20.3/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/fs-set-times-0.20.3/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/fs-set-times-0.20.3/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "56406c912238a253f01f10446541f2cf2d9a88c3"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "4a2ac96fa15662d07b3c57016ec810d40be866f43d2888bcccf103a65e0adcb7"
+    },
+    {
+      "crate": "futures-channel",
+      "version": "0.3.32",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/futures-channel/futures-channel-0.3.32.crate",
+      "registryIndexUrl": "https://index.crates.io/fu/tu/futures-channel",
+      "sourceSha256": "07bbe89c50d7a535e539b8c17bc0b49bdb77747034daa8087407d655f3f7cc1d",
+      "sourceBytes": 33213,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-lang/futures-rs",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/futures-channel-0.3.32/LICENSE-APACHE",
+          "sha256": "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
+          "bytes": 10874
+        },
+        {
+          "path": "crate-notices/futures-channel-0.3.32/LICENSE-MIT",
+          "sha256": "6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd",
+          "bytes": 1094
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "d9bba94c239daa1175a5bb2958f37a5c72db3f6a"
+        },
+        "path_in_vcs": "futures-channel"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "4c67ec07e8a1013cfb90e09476f780c30902f603a091e27e7e78d92bd59b20b7"
+    },
+    {
+      "crate": "futures-core",
+      "version": "0.3.32",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/futures-core/futures-core-0.3.32.crate",
+      "registryIndexUrl": "https://index.crates.io/fu/tu/futures-core",
+      "sourceSha256": "7e3450815272ef58cec6d564423f6e755e25379b217b0bc688e295ba24df6b1d",
+      "sourceBytes": 14684,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-lang/futures-rs",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/futures-core-0.3.32/LICENSE-APACHE",
+          "sha256": "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
+          "bytes": 10874
+        },
+        {
+          "path": "crate-notices/futures-core-0.3.32/LICENSE-MIT",
+          "sha256": "6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd",
+          "bytes": 1094
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "d9bba94c239daa1175a5bb2958f37a5c72db3f6a"
+        },
+        "path_in_vcs": "futures-core"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "8e1fc1b21e82013b3accf43c8fc1bcdddeb3d41c810110fb83a61558a49742c3"
+    },
+    {
+      "crate": "futures-util",
+      "version": "0.3.32",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/futures-util/futures-util-0.3.32.crate",
+      "registryIndexUrl": "https://index.crates.io/fu/tu/futures-util",
+      "sourceSha256": "389ca41296e6190b48053de0321d02a77f32f8a5d2461dd38762c0593805c6d6",
+      "sourceBytes": 168797,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-lang/futures-rs",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/futures-util-0.3.32/LICENSE-APACHE",
+          "sha256": "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
+          "bytes": 10874
+        },
+        {
+          "path": "crate-notices/futures-util-0.3.32/LICENSE-MIT",
+          "sha256": "6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd",
+          "bytes": 1094
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "d9bba94c239daa1175a5bb2958f37a5c72db3f6a"
+        },
+        "path_in_vcs": "futures-util"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "154c37245e36982072655c79b83a9ba932a263824228ef6ddbd15cf1e4f47153"
+    },
+    {
+      "crate": "fxprof-processed-profile",
+      "version": "0.8.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/fxprof-processed-profile/fxprof-processed-profile-0.8.1.crate",
+      "registryIndexUrl": "https://index.crates.io/fx/pr/fxprof-processed-profile",
+      "sourceSha256": "25234f20a3ec0a962a61770cfe39ecf03cb529a6e474ad8cff025ed497eda557",
+      "sourceBytes": 45896,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/mstange/samply/",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/fxprof-processed-profile-0.8.1/upstream-root/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847,
+          "sourceUrl": "https://raw.githubusercontent.com/mstange/samply/1b8952b3607299fbdbc38d32cdeec2814bdb87b7/LICENSE-APACHE",
+          "gitBlobSha1": "16fe87b06e802f094b3fbb0894b137bca2b16ef1",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        },
+        {
+          "path": "crate-notices/fxprof-processed-profile-0.8.1/upstream-root/LICENSE-MIT",
+          "sha256": "a59f933e4ae3a569f798c651e3214a3576ce82d25d3d731158def05669dab79f",
+          "bytes": 1067,
+          "sourceUrl": "https://raw.githubusercontent.com/mstange/samply/1b8952b3607299fbdbc38d32cdeec2814bdb87b7/LICENSE-MIT",
+          "gitBlobSha1": "f8938e785a332263fd41b39975f5076beb8de074",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "1b8952b3607299fbdbc38d32cdeec2814bdb87b7"
+        },
+        "path_in_vcs": "fxprof-processed-profile"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "17ac7c1b9ea5c9abfbbfc70e42a2d68bb22decac4836600d0d3add9d268f589a"
+    },
+    {
+      "crate": "gimli",
+      "version": "0.32.3",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/gimli/gimli-0.32.3.crate",
+      "registryIndexUrl": "https://index.crates.io/gi/ml/gimli",
+      "sourceSha256": "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7",
+      "sourceBytes": 289789,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/gimli-rs/gimli",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/gimli-0.32.3/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/gimli-0.32.3/LICENSE-MIT",
+          "sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0",
+          "bytes": 1071
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "8bc8e622fcb9be20fc9f03c96bc6335d936b869d"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "2b0d60ffc8705bf1de535e36ffa090511284747388d84056d5d96a5acbb0704a"
+    },
+    {
+      "crate": "gimli",
+      "version": "0.33.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/gimli/gimli-0.33.0.crate",
+      "registryIndexUrl": "https://index.crates.io/gi/ml/gimli",
+      "sourceSha256": "0bf7f043f89559805f8c7cacc432749b2fa0d0a0a9ee46ce47164ed5ba7f126c",
+      "sourceBytes": 330197,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/gimli-rs/gimli",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/gimli-0.33.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/gimli-0.33.0/LICENSE-MIT",
+          "sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0",
+          "bytes": 1071
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "033ef8dd5748236aa5bcecc868207a40e4e3f597"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "cd5a93349050abe2f26cc863d00f318f16c1d0775a310e3e685e94fb02b385c0"
+    },
+    {
+      "crate": "h2",
+      "version": "0.4.15",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/h2/h2-0.4.15.crate",
+      "registryIndexUrl": "https://index.crates.io/2/h2",
+      "sourceSha256": "6cb093c84e8bd9b188d4c4a8cb6579fc016968d14c99882163cd3ff402a4f155",
+      "sourceBytes": 180875,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/hyperium/h2",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/h2-0.4.15/LICENSE",
+          "sha256": "b21623012e6c453d944b0342c515b631cfcbf30704c2621b291526b69c10724d",
+          "bytes": 1054
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "21211d065f8acd96827414020b5f53b63653f406"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "22f07080f3af36e3d6cfb724994dd9c74b1df41966d4429265d9503a82a9f940"
+    },
+    {
+      "crate": "hashbrown",
+      "version": "0.16.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/hashbrown/hashbrown-0.16.1.crate",
+      "registryIndexUrl": "https://index.crates.io/ha/sh/hashbrown",
+      "sourceSha256": "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100",
+      "sourceBytes": 147785,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-lang/hashbrown",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/hashbrown-0.16.1/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/hashbrown-0.16.1/LICENSE-MIT",
+          "sha256": "ff8f68cb076caf8cefe7a6430d4ac086ce6af2ca8ce2c4e5a2004d4552ef52a2",
+          "bytes": 1060
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "1876e4f02708b93903d55ef598f68e82a826518f"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "e5cbc66eeb71d7544bcbbda22065478c5ea270dd620fbcc6d9757e7b18485d47"
+    },
+    {
+      "crate": "hashbrown",
+      "version": "0.17.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/hashbrown/hashbrown-0.17.1.crate",
+      "registryIndexUrl": "https://index.crates.io/ha/sh/hashbrown",
+      "sourceSha256": "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a",
+      "sourceBytes": 155512,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-lang/hashbrown",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/hashbrown-0.17.1/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/hashbrown-0.17.1/LICENSE-MIT",
+          "sha256": "ff8f68cb076caf8cefe7a6430d4ac086ce6af2ca8ce2c4e5a2004d4552ef52a2",
+          "bytes": 1060
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "c62a63a61b7caf2de8f9ecb7b06a66b0ab6bdf3d"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "afcb0e62d498f756bd4ddf69785c8282d01ee4fa40016158c7eac12ceb302f8c"
+    },
+    {
+      "crate": "http",
+      "version": "1.4.2",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/http/http-1.4.2.crate",
+      "registryIndexUrl": "https://index.crates.io/ht/tp/http",
+      "sourceSha256": "6970f50e31d6fc17d3fa27329444bfa74e196cf62e95052a3f6fee181dba6425",
+      "sourceBytes": 110471,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/hyperium/http",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/http-1.4.2/LICENSE-APACHE",
+          "sha256": "8bb1b50b0e5c9399ae33bd35fab2769010fa6c14e8860c729a52295d84896b7a",
+          "bytes": 10835
+        },
+        {
+          "path": "crate-notices/http-1.4.2/LICENSE-MIT",
+          "sha256": "dc91f8200e4b2a1f9261035d4c18c33c246911a6c0f7b543d75347e61b249cff",
+          "bytes": 1059
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "82db5b8af1e3939678fee88f3c57b72fee7e3a7b"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "7dcf7df2cd47c3e77086da035ad4968773b5057f1b930e1a6102d0fa09749950"
+    },
+    {
+      "crate": "httparse",
+      "version": "1.10.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/httparse/httparse-1.10.1.crate",
+      "registryIndexUrl": "https://index.crates.io/ht/tp/httparse",
+      "sourceSha256": "6dbf3de79e51f3d586ab4cb9d5c3e2c14aa28ed23d180cf89b4df0454a69cc87",
+      "sourceBytes": 45190,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/seanmonstar/httparse",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/httparse-1.10.1/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/httparse-1.10.1/LICENSE-MIT",
+          "sha256": "391a5396cec6230bfabd4ef4eb2350eb895bc5efce377a2218f5702ed020d3e3",
+          "bytes": 1063
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "9f29e79f9832dbd0ae5220acb17c1866745bdecd"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "067da5f6334526ce5f080909e5c271dd0968ab4198a65eea51d93b242febb48a"
+    },
+    {
+      "crate": "hyper",
+      "version": "1.10.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/hyper/hyper-1.10.1.crate",
+      "registryIndexUrl": "https://index.crates.io/hy/pe/hyper",
+      "sourceSha256": "55281c53a1894c864990125767da440a4e630446785086f52523b20033b74498",
+      "sourceBytes": 165884,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/hyperium/hyper",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/hyper-1.10.1/LICENSE",
+          "sha256": "2d01890414494742ba4a509fcec8efa40f6d8be22cbd72be7cff08d6fda4ec89",
+          "bytes": 1062
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "e3bcd379118e707b3e49185b047d49ebbaa943fc"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "d96932e7172c7f267c27b15c7919304ae423bc1bdf911370f341933c850dfde2"
+    },
+    {
+      "crate": "icu_collections",
+      "version": "2.2.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/icu_collections/icu_collections-2.2.0.crate",
+      "registryIndexUrl": "https://index.crates.io/ic/u_/icu_collections",
+      "sourceSha256": "2984d1cd16c883d7935b9e07e44071dca8d917fd52ecc02c04d5fa0b5a3f191c",
+      "sourceBytes": 88011,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Unicode-3.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/unicode-org/icu4x",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/icu_collections-2.2.0/LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2",
+          "bytes": 2195
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "c9fac4e625ccb2c6a7aa35079fff9709db4385ac"
+        },
+        "path_in_vcs": "components/collections"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "5d9b5823c57b369a560661513d2399e8e1bf0d240bc3f44b689b14a66c2c4aef"
+    },
+    {
+      "crate": "icu_normalizer",
+      "version": "2.2.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/icu_normalizer/icu_normalizer-2.2.0.crate",
+      "registryIndexUrl": "https://index.crates.io/ic/u_/icu_normalizer",
+      "sourceSha256": "c56e5ee99d6e3d33bd91c5d85458b6005a22140021cc324cea84dd0e72cff3b4",
+      "sourceBytes": 78154,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Unicode-3.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/unicode-org/icu4x",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/icu_normalizer-2.2.0/LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2",
+          "bytes": 2195
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "c9fac4e625ccb2c6a7aa35079fff9709db4385ac"
+        },
+        "path_in_vcs": "components/normalizer"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "0b2859370d4c2ea8026fde77d76c79c08038a1b9934a541868e2900a21c20959"
+    },
+    {
+      "crate": "idna",
+      "version": "1.1.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/idna/idna-1.1.0.crate",
+      "registryIndexUrl": "https://index.crates.io/id/na/idna",
+      "sourceSha256": "3b0875f23caa03898994f6ddc501886a45c7d3d62d04d2d90788d47be1b1e4de",
+      "sourceBytes": 148747,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/servo/rust-url/",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/idna-1.1.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/idna-1.1.0/LICENSE-MIT",
+          "sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5",
+          "bytes": 1072
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "91377f48bf35011d042aa5abef9e7f2a0a625aaa",
+          "dirty": true
+        },
+        "path_in_vcs": "idna"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "f24a386a071c661e10acc366022adc8278d4f2ca8899d3b50b83e965d3933d00"
+    },
+    {
+      "crate": "indexmap",
+      "version": "2.14.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/indexmap/indexmap-2.14.0.crate",
+      "registryIndexUrl": "https://index.crates.io/in/de/indexmap",
+      "sourceSha256": "d466e9454f08e4a911e14806c24e16fba1b4c121d1ea474396f396069cf949d9",
+      "sourceBytes": 104085,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/indexmap-rs/indexmap",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/indexmap-2.14.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/indexmap-2.14.0/LICENSE-MIT",
+          "sha256": "ecc269ef87fd38a1d98e30bfac9ba964a9dbd9315c3770fed98d4d7cb5882055",
+          "bytes": 1049
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "bcd165baeb12bdf6e57a31d9869e9839e25679c6"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "0057dba2c19b1fc812bc3a98d0b01994071028a3497463358c98b98212792de8"
+    },
+    {
+      "crate": "itertools",
+      "version": "0.14.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/itertools/itertools-0.14.0.crate",
+      "registryIndexUrl": "https://index.crates.io/it/er/itertools",
+      "sourceSha256": "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285",
+      "sourceBytes": 152715,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-itertools/itertools",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/itertools-0.14.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/itertools-0.14.0/LICENSE-MIT",
+          "sha256": "7576269ea71f767b99297934c0b2367532690f8c4badc695edf8e04ab6a1e545",
+          "bytes": 1043
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a015a6831525ee1637df747d3f530a627d9741bf"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "77735549383196a4156a2246dd1cd6742029b223679b3004531456d33562b0ce"
+    },
+    {
+      "crate": "itoa",
+      "version": "1.0.18",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/itoa/itoa-1.0.18.crate",
+      "registryIndexUrl": "https://index.crates.io/it/oa/itoa",
+      "sourceSha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+      "sourceBytes": 15935,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/dtolnay/itoa",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/itoa-1.0.18/LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "bytes": 9723
+        },
+        {
+          "path": "crate-notices/itoa-1.0.18/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "af77385d0daf4d0e949e81f2588be2e44f69f086"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "894c215e4e7e973b556b0e9627bf9b6a719a043fac9b5af9838660816392a09f"
+    },
+    {
+      "crate": "ittapi",
+      "version": "0.4.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/ittapi/ittapi-0.4.0.crate",
+      "registryIndexUrl": "https://index.crates.io/it/ta/ittapi",
+      "sourceSha256": "6b996fe614c41395cdaedf3cf408a9534851090959d90d54a535f675550b64b1",
+      "sourceBytes": 7446,
+      "registryChecksumVerified": true,
+      "declaredLicense": "GPL-2.0-only OR BSD-3-Clause",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/intel/ittapi",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/ittapi-0.4.0/upstream-root/LICENSES/BSD-3-Clause.txt",
+          "sha256": "cf48cdd9ed87c2031b68fb1b9f4cfb55d00dcf815b21a30bf8304aa1e5e6f76a",
+          "bytes": 1485,
+          "sourceUrl": "https://raw.githubusercontent.com/intel/ittapi/a825eeacbcce13729ce1c9feb4c355b1c3be265a/LICENSES/BSD-3-Clause.txt",
+          "gitBlobSha1": "37478a55f35f5accc52724d38618d91aa79b8304",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        },
+        {
+          "path": "crate-notices/ittapi-0.4.0/upstream-root/LICENSES/GPL-2.0-only.txt",
+          "sha256": "cbe0f9505c5ca02ee34bfca453df31a98e31e6d56afcdf8ab0f87f4c94f1181b",
+          "bytes": 17599,
+          "sourceUrl": "https://raw.githubusercontent.com/intel/ittapi/a825eeacbcce13729ce1c9feb4c355b1c3be265a/LICENSES/GPL-2.0-only.txt",
+          "gitBlobSha1": "be1e815450496e0cc4c694004c2e0f5cbc7b000c",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a825eeacbcce13729ce1c9feb4c355b1c3be265a"
+        },
+        "path_in_vcs": "rust/ittapi"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "1be01ce6e8e95308f9ec8f077c70a5f95acd0ed7b71042d822b044cede83cc89",
+      "selectedDistributionLicense": "BSD-3-Clause"
+    },
+    {
+      "crate": "jiff",
+      "version": "0.2.31",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/jiff/jiff-0.2.31.crate",
+      "registryIndexUrl": "https://index.crates.io/ji/ff/jiff",
+      "sourceSha256": "ccfe6121cbe750cf81efa362d85c0bde7ea298ec43092d3a193baca59cdbd634",
+      "sourceBytes": 767455,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Unlicense OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/BurntSushi/jiff",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/jiff-0.2.31/COPYING",
+          "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+          "bytes": 126
+        },
+        {
+          "path": "crate-notices/jiff-0.2.31/LICENSE-MIT",
+          "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+          "bytes": 1081
+        },
+        {
+          "path": "crate-notices/jiff-0.2.31/UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c",
+          "bytes": 1211
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "8fb795fd96e6ff5bdcf320150b0af3347bf53f76"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "2c8c9fc8f94f7a462b6a17d11f1b2ae1d2c4d9a3e778cc1f0e4693a8e389e727"
+    },
+    {
+      "crate": "jni",
+      "version": "0.21.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/jni/jni-0.21.1.crate",
+      "registryIndexUrl": "https://index.crates.io/3/j/jni",
+      "sourceSha256": "1a87aa2bb7d2af34197c04845522473242e1aa17c12f4935d5856491a7fb8c97",
+      "sourceBytes": 105028,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT/Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/jni-rs/jni-rs",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/jni-0.21.1/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/jni-0.21.1/LICENSE-MIT",
+          "sha256": "fea1d5bf3dd71605ce5d7d2ff695c1837e914c77195e523a86b5391716477960",
+          "bytes": 1104
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "09a5911358ffa846b5c85451c050a0e64669e863"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "2fda05f58a29d6d9adc0cf69e1b313f3a25ab7d403d89bb05ca9eed48fd243dc"
+    },
+    {
+      "crate": "json-from-wast",
+      "version": "0.251.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/json-from-wast/json-from-wast-0.251.0.crate",
+      "registryIndexUrl": "https://index.crates.io/js/on/json-from-wast",
+      "sourceSha256": "8f2922792a3377d67a8fbdc92d89218622744361d2928fb0526bfe43c93db94b",
+      "sourceBytes": 15051,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/json-from-wast",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/json-from-wast-0.251.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/json-from-wast-0.251.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/json-from-wast-0.251.0/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a1a178a024c1204ac24ff957b9ba8cdca7f9c8ce"
+        },
+        "path_in_vcs": "crates/json-from-wast"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "e8f979ef1ef801a4016df872ca6ec9e77afdd55b7572e9230b07f2eacff57915"
+    },
+    {
+      "crate": "memchr",
+      "version": "2.8.2",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/memchr/memchr-2.8.2.crate",
+      "registryIndexUrl": "https://index.crates.io/me/mc/memchr",
+      "sourceSha256": "88904434abc2901f197fe8cc55f0445e7ded921dba5911dad2e2b39b48e663c4",
+      "sourceBytes": 99069,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Unlicense OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/BurntSushi/memchr",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/memchr-2.8.2/COPYING",
+          "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+          "bytes": 126
+        },
+        {
+          "path": "crate-notices/memchr-2.8.2/LICENSE-MIT",
+          "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+          "bytes": 1081
+        },
+        {
+          "path": "crate-notices/memchr-2.8.2/UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c",
+          "bytes": 1211
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a61ac1a3638e8b6bdc42226ad38431e626a02c72"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "0813b6eb1d993f713d55a0a71d06759969b1fbdec4575173884179e7efc4de6c"
+    },
+    {
+      "crate": "mio",
+      "version": "1.2.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/mio/mio-1.2.1.crate",
+      "registryIndexUrl": "https://index.crates.io/3/m/mio",
+      "sourceSha256": "02bd0af71c67b473010cbbc60715ee815645a4dc942899111f494b4b737d6fda",
+      "sourceBytes": 106774,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/tokio-rs/mio",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/mio-1.2.1/LICENSE",
+          "sha256": "07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b",
+          "bytes": 1082
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "80c693cf7a1977885d6a7d416f7f5b77afe53a27"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "1e12ae11ce71249d009f17e9ca6c710591726d3cf5210f5fe21caade2aa1863f"
+    },
+    {
+      "crate": "object",
+      "version": "0.39.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/object/object-0.39.1.crate",
+      "registryIndexUrl": "https://index.crates.io/ob/je/object",
+      "sourceSha256": "2e5a6c098c7a3b6547378093f5cc30bc54fd361ce711e05293a5cc589562739b",
+      "sourceBytes": 360376,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/gimli-rs/object",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/object-0.39.1/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/object-0.39.1/LICENSE-MIT",
+          "sha256": "0b74dfa0bcee5c420c6b7f67b4b2658f9ab8388c97b8e733975f2cecbdd668a6",
+          "bytes": 1064
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "e5ffee99b041b9fe12b9b203da587fccecdd72a1"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "373aa1a7d2fd042ac630d54e405147141e7a3da961e6a81d449c056fa3ae6152"
+    },
+    {
+      "crate": "once_cell",
+      "version": "1.21.4",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/once_cell/once_cell-1.21.4.crate",
+      "registryIndexUrl": "https://index.crates.io/on/ce/once_cell",
+      "sourceSha256": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50",
+      "sourceBytes": 35010,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/matklad/once_cell",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/once_cell-1.21.4/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/once_cell-1.21.4/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "80fe900b21f6d76c1a2ed74d3343e8a3a88c46d0"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "87e5b7ee438abdef12e46386e86370f54ad70cabdcf949556b9ef012a9da9587"
+    },
+    {
+      "crate": "parking_lot",
+      "version": "0.12.5",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/parking_lot/parking_lot-0.12.5.crate",
+      "registryIndexUrl": "https://index.crates.io/pa/rk/parking_lot",
+      "sourceSha256": "93857453250e3077bd71ff98b6a65ea6621a19bb0f559a85248955ac12c45a1a",
+      "sourceBytes": 46735,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/Amanieu/parking_lot",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/parking_lot-0.12.5/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/parking_lot-0.12.5/LICENSE-MIT",
+          "sha256": "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5",
+          "bytes": 1071
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "d7828fff7b5d6327ae608e82db45f888b344449a"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "3a52d781dd42d10f8c2dd3336bb61c4beaa850b5d62ebe7580070b8d0a4e3b98"
+    },
+    {
+      "crate": "parking_lot_core",
+      "version": "0.9.12",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/parking_lot_core/parking_lot_core-0.9.12.crate",
+      "registryIndexUrl": "https://index.crates.io/pa/rk/parking_lot_core",
+      "sourceSha256": "2621685985a2ebf1c516881c026032ac7deafcda1a2c9b7850dc81e3dfcb64c1",
+      "sourceBytes": 34110,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/Amanieu/parking_lot",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/parking_lot_core-0.9.12/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/parking_lot_core-0.9.12/LICENSE-MIT",
+          "sha256": "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5",
+          "bytes": 1071
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "d7828fff7b5d6327ae608e82db45f888b344449a"
+        },
+        "path_in_vcs": "core"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "617b6fd7c1133961c993fd5baa560180d688f6d42f59b73da11fb90089a93ca7"
+    },
+    {
+      "crate": "percent-encoding",
+      "version": "2.3.2",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/percent-encoding/percent-encoding-2.3.2.crate",
+      "registryIndexUrl": "https://index.crates.io/pe/rc/percent-encoding",
+      "sourceSha256": "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220",
+      "sourceBytes": 11583,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/servo/rust-url/",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/percent-encoding-2.3.2/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/percent-encoding-2.3.2/LICENSE-MIT",
+          "sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5",
+          "bytes": 1072
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "91377f48bf35011d042aa5abef9e7f2a0a625aaa",
+          "dirty": true
+        },
+        "path_in_vcs": "percent_encoding"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "e4ea043c47bbd5551fc5fcf8151eab94428b4be6f2337834a0f9020a4392fb19"
+    },
+    {
+      "crate": "petgraph",
+      "version": "0.6.5",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/petgraph/petgraph-0.6.5.crate",
+      "registryIndexUrl": "https://index.crates.io/pe/tg/petgraph",
+      "sourceSha256": "b4c5cc86750666a3ed20bdaf5ca2a0344f9c67674cae0515bec2da16fbaa47db",
+      "sourceBytes": 710970,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/petgraph/petgraph",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/petgraph-0.6.5/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/petgraph-0.6.5/LICENSE-MIT",
+          "sha256": "7576269ea71f767b99297934c0b2367532690f8c4badc695edf8e04ab6a1e545",
+          "bytes": 1043
+        },
+        {
+          "path": "crate-notices/petgraph-0.6.5/assets/LICENSE.md",
+          "sha256": "608fdcbb7daea2541c57228f21fc97deec310b19dafde70b2f4b84a96bf779f8",
+          "bytes": 281
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "c32a86b1b8c5c198079efc9149ea2fcf956b8f6c"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "86042d4d304c9f41a769abcabe27868074039268b8f620225270b70b3423a52b"
+    },
+    {
+      "crate": "rand",
+      "version": "0.10.2",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/rand/rand-0.10.2.crate",
+      "registryIndexUrl": "https://index.crates.io/ra/nd/rand",
+      "sourceSha256": "c7f5fa3a058cd35567ef9bfa5e75732bee0f9e4c55fa90477bef2dfcdbc4be80",
+      "sourceBytes": 104493,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-random/rand",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/rand-0.10.2/COPYRIGHT",
+          "sha256": "90eb64f0279b0d9432accfa6023ff803bc4965212383697eee27a0f426d5f8d5",
+          "bytes": 569
+        },
+        {
+          "path": "crate-notices/rand-0.10.2/LICENSE-APACHE",
+          "sha256": "35242e7a83f69875e6edeff02291e688c97caafe2f8902e4e19b49d3e78b4cab",
+          "bytes": 9724
+        },
+        {
+          "path": "crate-notices/rand-0.10.2/LICENSE-MIT",
+          "sha256": "209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b",
+          "bytes": 1117
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "1540ea327e8beaf0694ea64f6d9eb8eaadd47bd5"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "693bb2c063b0a06bfc62585d4c5913fa812c39c605b1b96d109c12da12b2bb36"
+    },
+    {
+      "crate": "rayon",
+      "version": "1.12.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/rayon/rayon-1.12.0.crate",
+      "registryIndexUrl": "https://index.crates.io/ra/yo/rayon",
+      "sourceSha256": "fb39b166781f92d482534ef4b4b1b2568f42613b53e5b6c160e24cfbfa30926d",
+      "sourceBytes": 183391,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rayon-rs/rayon",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/rayon-1.12.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/rayon-1.12.0/LICENSE-MIT",
+          "sha256": "0621878e61f0d0fda054bcbe02df75192c28bde1ecc8289cbd86aeba2dd72720",
+          "bytes": 1071
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "c9ced185ae3508246a9eb70c8407a1199bb1b77f"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "bcc6eda50025991d8db6ccaaad2e26477072a359762451a4e55a7e700ad0e42d"
+    },
+    {
+      "crate": "rayon-core",
+      "version": "1.13.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/rayon-core/rayon-core-1.13.0.crate",
+      "registryIndexUrl": "https://index.crates.io/ra/yo/rayon-core",
+      "sourceSha256": "22e18b0f0062d30d4230b2e85ff77fdfe4326feb054b9783a3460d8435c8ab91",
+      "sourceBytes": 73151,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rayon-rs/rayon",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/rayon-core-1.13.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/rayon-core-1.13.0/LICENSE-MIT",
+          "sha256": "0621878e61f0d0fda054bcbe02df75192c28bde1ecc8289cbd86aeba2dd72720",
+          "bytes": 1071
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "7af20d7692d5decbcb4adcaa079cd607e3e50814"
+        },
+        "path_in_vcs": "rayon-core"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "ab50ad4709436f6bda04e5345444f1197b1eda2bd3b49f9412c0cb318111b5a2"
+    },
+    {
+      "crate": "regalloc2",
+      "version": "0.15.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/regalloc2/regalloc2-0.15.1.crate",
+      "registryIndexUrl": "https://index.crates.io/re/ga/regalloc2",
+      "sourceSha256": "de2c52737737f8609e94f975dee22854a2d5c125772d4b1cf292120f4d45c186",
+      "sourceBytes": 149650,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/regalloc2",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/regalloc2-0.15.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "aa9680bce32f2ce9cad48ffe02ce03edc3c07e56"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "662ecb76c05d18e8ebbbdeb0f4d36f5f3c67df81c61f06615c25c700fd1cc8ce"
+    },
+    {
+      "crate": "regex",
+      "version": "1.12.4",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/regex/regex-1.12.4.crate",
+      "registryIndexUrl": "https://index.crates.io/re/ge/regex",
+      "sourceSha256": "f1292b7759ae1cb9ec195452d1390a074f0cd8541ab7a5a8c31cd6db45d4a6ba",
+      "sourceBytes": 153468,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-lang/regex",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/regex-1.12.4/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/regex-1.12.4/LICENSE-MIT",
+          "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb",
+          "bytes": 1071
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "7b96fdc9d5fe6a0cb4efe30e6689b050493fc1e1"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "746039e74f5192917d239506562018bcd8c31851b18caf042d7726e5502f090b"
+    },
+    {
+      "crate": "regex-automata",
+      "version": "0.4.14",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/regex-automata/regex-automata-0.4.14.crate",
+      "registryIndexUrl": "https://index.crates.io/re/ge/regex-automata",
+      "sourceSha256": "6e1dd4122fc1595e8162618945476892eefca7b88c52820e74af6262213cae8f",
+      "sourceBytes": 618012,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-lang/regex",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/regex-automata-0.4.14/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/regex-automata-0.4.14/LICENSE-MIT",
+          "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb",
+          "bytes": 1071
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "5e195de266e203441b2c8001d6ebefab1161a59e"
+        },
+        "path_in_vcs": "regex-automata"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "83e288a27db86536cc16d1b1b82e9c5e89276781340518d234ecc919dde093fc"
+    },
+    {
+      "crate": "regex-syntax",
+      "version": "0.8.11",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/regex-syntax/regex-syntax-0.8.11.crate",
+      "registryIndexUrl": "https://index.crates.io/re/ge/regex-syntax",
+      "sourceSha256": "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4",
+      "sourceBytes": 359055,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-lang/regex",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/regex-syntax-0.8.11/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/regex-syntax-0.8.11/LICENSE-MIT",
+          "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb",
+          "bytes": 1071
+        },
+        {
+          "path": "crate-notices/regex-syntax-0.8.11/src/unicode_tables/LICENSE-UNICODE",
+          "sha256": "74db5baf44a41b1000312c673544b3374e4198af5605c7f9080a402cec42cfa3",
+          "bytes": 2847
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "140167995737fa11dfe11b8af8b9aa143b790b4e"
+        },
+        "path_in_vcs": "regex-syntax"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "10c3f14629c0900ac452dd6d55a62aab561bbabbdf5774a802c8d223933cfa3b"
+    },
+    {
+      "crate": "ring",
+      "version": "0.17.14",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/ring/ring-0.17.14.crate",
+      "registryIndexUrl": "https://index.crates.io/ri/ng/ring",
+      "sourceSha256": "a4689e6c2294d81e88dc6261c768b63bc4fcdb852be6d1352498b114f61383b7",
+      "sourceBytes": 1502610,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 AND ISC",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/briansmith/ring",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/ring-0.17.14/LICENSE",
+          "sha256": "b3d734001a94efff3579978d953391aa7115f877657d25eb54037a43875d078a",
+          "bytes": 499
+        },
+        {
+          "path": "crate-notices/ring-0.17.14/LICENSE-BoringSSL",
+          "sha256": "005fc765ddc5115da796cca915baa9557abae13ff35e0a47c47affc56f6c414d",
+          "bytes": 14870
+        },
+        {
+          "path": "crate-notices/ring-0.17.14/LICENSE-other-bits",
+          "sha256": "f025ccfb7dfb6bdfedc75ca0f67acc69e6fb4998143d834f7c2f38a29989680f",
+          "bytes": 731
+        },
+        {
+          "path": "crate-notices/ring-0.17.14/src/polyfill/once_cell/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/ring-0.17.14/src/polyfill/once_cell/LICENSE-MIT",
+          "sha256": "6ee2ed6c77710de911761acd5fc1ad1da00f476beb1a7ef27e78c2d1858deafc",
+          "bytes": 1022
+        },
+        {
+          "path": "crate-notices/ring-0.17.14/third_party/fiat/LICENSE",
+          "sha256": "9eacbcb81be660840c714a560a9d65ba07913db98dd4baf969f78dd499fdd60f",
+          "bytes": 638
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "2723abbca9e83347d82b056d5b239c6604f786df",
+          "dirty": true
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "b81a19b27cc744410b056eb1d1195ecd41e25a163acadfca3c6457e96b797d3f"
+    },
+    {
+      "crate": "rustc-demangle",
+      "version": "0.1.27",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/rustc-demangle/rustc-demangle-0.1.27.crate",
+      "registryIndexUrl": "https://index.crates.io/ru/st/rustc-demangle",
+      "sourceSha256": "b50b8869d9fc858ce7266cce0194bd74df58b9d0e3f6df3a9fc8eb470d95c09d",
+      "sourceBytes": 30448,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT/Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-lang/rustc-demangle",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/rustc-demangle-0.1.27/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/rustc-demangle-0.1.27/LICENSE-MIT",
+          "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397",
+          "bytes": 1057
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "f65a6d8f63a7656c71649d92ff3cb000951c11a6"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "ec462e775f134cf7646d9dda346c43bbc2c0cd44def02e3af5b678bb6a9d879c"
+    },
+    {
+      "crate": "rustix",
+      "version": "1.1.4",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/rustix/rustix-1.1.4.crate",
+      "registryIndexUrl": "https://index.crates.io/ru/st/rustix",
+      "sourceSha256": "b6fe4565b9518b83ef4f91bb47ce29620ca828bd32cb7e408f0062e9930ba190",
+      "sourceBytes": 425241,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/rustix",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/rustix-1.1.4/COPYRIGHT",
+          "sha256": "377c2e7c53250cc5905c0b0532d35973392af16ffb9596a41d99d202cf3617c9",
+          "bytes": 853
+        },
+        {
+          "path": "crate-notices/rustix-1.1.4/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/rustix-1.1.4/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/rustix-1.1.4/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "c4caf5caaa7e93828a2e4a4cdba1dd0171e45717"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "13302af30f997a373ad50b7aa668d9612483e85be6b455e09d95bbd59fb5296f"
+    },
+    {
+      "crate": "rustix-linux-procfs",
+      "version": "0.1.1",
+      "binaryEvidencePlatforms": [
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/rustix-linux-procfs/rustix-linux-procfs-0.1.1.crate",
+      "registryIndexUrl": "https://index.crates.io/ru/st/rustix-linux-procfs",
+      "sourceSha256": "2fc84bf7e9aa16c4f2c758f27412dc9841341e16aa682d9c7ac308fe3ee12056",
+      "sourceBytes": 17465,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/sunfishcode/rustix-linux-procfs",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/rustix-linux-procfs-0.1.1/COPYRIGHT",
+          "sha256": "d415a86ccfd794129666247cbbadebee7a6d0ac3ff701c76c07b0f9424f0307d",
+          "bytes": 905
+        },
+        {
+          "path": "crate-notices/rustix-linux-procfs-0.1.1/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/rustix-linux-procfs-0.1.1/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/rustix-linux-procfs-0.1.1/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "84fe5f37e43bab027e1bd9f80460cf7a862a82e1"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "7c9d279c555b5b0454ff13436f2f329a071f79353ae989533869771cc40a33aa"
+    },
+    {
+      "crate": "rustls",
+      "version": "0.23.41",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/rustls/rustls-0.23.41.crate",
+      "registryIndexUrl": "https://index.crates.io/ru/st/rustls",
+      "sourceSha256": "6b92b125634d9b795e7beca796cc790df15a7fb38323bf3196fda83292d06b1f",
+      "sourceBytes": 374360,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 OR ISC OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rustls/rustls",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/rustls-0.23.41/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/rustls-0.23.41/LICENSE-ISC",
+          "sha256": "7cfafc877eccc46c0e346ccbaa5c51bb6b894d2b818e617d970211e232785ad4",
+          "bytes": 775
+        },
+        {
+          "path": "crate-notices/rustls-0.23.41/LICENSE-MIT",
+          "sha256": "709e3175b4212f7b13aa93971c9f62ff8c69ec45ad8c6532a7e0c41d7a7d6f8c",
+          "bytes": 1082
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "642a10300a1e703279bdc70e73f7e6db8d99ccbf"
+        },
+        "path_in_vcs": "rustls"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "3c7dca97723b68026a35f6f0a316b57dcc0365d21b88e470c9fc59ff8b3dc14d"
+    },
+    {
+      "crate": "rustls-pki-types",
+      "version": "1.15.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/rustls-pki-types/rustls-pki-types-1.15.0.crate",
+      "registryIndexUrl": "https://index.crates.io/ru/st/rustls-pki-types",
+      "sourceSha256": "764899a24af3980067ee14bc143654f297b22eaebfe3c7b6b211920a5a59b046",
+      "sourceBytes": 35697,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rustls/pki-types",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/rustls-pki-types-1.15.0/LICENSE-APACHE",
+          "sha256": "45fd05c4865e7c350b98ad7ac50e1b15462d49af4a91e9b0c9dd933dc9a69742",
+          "bytes": 10835
+        },
+        {
+          "path": "crate-notices/rustls-pki-types-1.15.0/LICENSE-MIT",
+          "sha256": "9117d922e667125508dde62b02c1f57ed22f5ad21eb536aa2e2d99e1c796e639",
+          "bytes": 1080
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "ab46a65e3b5f25ef4b33eba6805c9a23cd01aae1"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "33ccb8e180c5bc9312747d30a971f30c62c7992d305bbd200626100960ae8395"
+    },
+    {
+      "crate": "rustls-webpki",
+      "version": "0.103.13",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/rustls-webpki/rustls-webpki-0.103.13.crate",
+      "registryIndexUrl": "https://index.crates.io/ru/st/rustls-webpki",
+      "sourceSha256": "61c429a8649f110dddef65e2a5ad240f747e85f7758a6bccc7e5777bd33f756e",
+      "sourceBytes": 87513,
+      "registryChecksumVerified": true,
+      "declaredLicense": "ISC",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rustls/webpki",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/rustls-webpki-0.103.13/LICENSE",
+          "sha256": "5b698ca13897be3afdb7174256fa1574f8c6892b8bea1a66dd6469d3fe27885a",
+          "bytes": 916
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "2879b2ce7a476181ac3050f73fe0835f04728e86"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "a9b2f60ecbca2b9e33449899b15e344c2003664c5901bec9b8ada33722c18285"
+    },
+    {
+      "crate": "semver",
+      "version": "1.0.28",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/semver/semver-1.0.28.crate",
+      "registryIndexUrl": "https://index.crates.io/se/mv/semver",
+      "sourceSha256": "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd",
+      "sourceBytes": 33064,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/dtolnay/semver",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/semver-1.0.28/LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "bytes": 9723
+        },
+        {
+          "path": "crate-notices/semver-1.0.28/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "7625c7aa3f0e8ba21e099d1765bcebcb72aa8816"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "cf7fb84578260eec81ce5af4bdb176ec590d45fdcb78f06710f0aa13e3078761"
+    },
+    {
+      "crate": "serde",
+      "version": "1.0.228",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/serde/serde-1.0.228.crate",
+      "registryIndexUrl": "https://index.crates.io/se/rd/serde",
+      "sourceSha256": "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e",
+      "sourceBytes": 83652,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/serde-rs/serde",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/serde-1.0.228/LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "bytes": 9723
+        },
+        {
+          "path": "crate-notices/serde-1.0.228/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a866b336f14aa57a07f0d0be9f8762746e64ecb4"
+        },
+        "path_in_vcs": "serde"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "d7fc24e39691a0831eaa0eac677b46ecbae407a40fa816b904759822d10f42e8"
+    },
+    {
+      "crate": "serde_core",
+      "version": "1.0.228",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/serde_core/serde_core-1.0.228.crate",
+      "registryIndexUrl": "https://index.crates.io/se/rd/serde_core",
+      "sourceSha256": "41d385c7d4ca58e59fc732af25c3983b67ac852c1a25000afe1175de458b67ad",
+      "sourceBytes": 63111,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/serde-rs/serde",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/serde_core-1.0.228/LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "bytes": 9723
+        },
+        {
+          "path": "crate-notices/serde_core-1.0.228/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a866b336f14aa57a07f0d0be9f8762746e64ecb4"
+        },
+        "path_in_vcs": "serde_core"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "b1c07acb994f88418a0bbb0d393f76c4ca4276d9f4497ca734eb182286169ea8"
+    },
+    {
+      "crate": "serde_json",
+      "version": "1.0.150",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/serde_json/serde_json-1.0.150.crate",
+      "registryIndexUrl": "https://index.crates.io/se/rd/serde_json",
+      "sourceSha256": "e8014e44b4736ed0538adeecded0fce2a272f22dc9578a7eb6b2d9993c74cfb9",
+      "sourceBytes": 155574,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/serde-rs/json",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/serde_json-1.0.150/LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "bytes": 9723
+        },
+        {
+          "path": "crate-notices/serde_json-1.0.150/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a1ae73ac6a6940a4a57c673aebaa13ed4dfe3e8c"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "96f36f0d4419ce7ab53008df556017ef7b8891c1e913ac648e9b2b7f0537a472"
+    },
+    {
+      "crate": "signal-hook-registry",
+      "version": "1.4.8",
+      "binaryEvidencePlatforms": [
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/signal-hook-registry/signal-hook-registry-1.4.8.crate",
+      "registryIndexUrl": "https://index.crates.io/si/gn/signal-hook-registry",
+      "sourceSha256": "c4db69cba1110affc0e9f7bcd48bbf87b3f4fc7c61fc9155afd4c469eb3d6c1b",
+      "sourceBytes": 21668,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/vorner/signal-hook",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/signal-hook-registry-1.4.8/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/signal-hook-registry-1.4.8/LICENSE-MIT",
+          "sha256": "503558bfefe66ca15e4e3f7955b3cb0ec87fd52f29bf24b336af7bd00e946d5c",
+          "bytes": 1068
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "4d5fd6a6663be38e70774e4ac733d65916c70951"
+        },
+        "path_in_vcs": "signal-hook-registry"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "54bcf376404635b6cfc7e20474cc84a756ef5c8b54e2954d3186e44b68854fac"
+    },
+    {
+      "crate": "slab",
+      "version": "0.4.12",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/slab/slab-0.4.12.crate",
+      "registryIndexUrl": "https://index.crates.io/sl/ab/slab",
+      "sourceSha256": "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5",
+      "sourceBytes": 19080,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/tokio-rs/slab",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/slab-0.4.12/LICENSE",
+          "sha256": "8ce0830173fdac609dfb4ea603fdc002c2f4af0dc9b1a005653f5da9cf534b18",
+          "bytes": 1055
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a1e4346070a48c936d808de75191dee5d01e433c"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "11f31284be0c30b612f4e2c2e46aa14494a81639b12661f01f07394e270c0070"
+    },
+    {
+      "crate": "smallvec",
+      "version": "1.15.2",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/smallvec/smallvec-1.15.2.crate",
+      "registryIndexUrl": "https://index.crates.io/sm/al/smallvec",
+      "sourceSha256": "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90",
+      "sourceBytes": 34899,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/servo/rust-smallvec",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/smallvec-1.15.2/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/smallvec-1.15.2/LICENSE-MIT",
+          "sha256": "0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9",
+          "bytes": 1072
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "c469051a1ba05ef1a03dd69e14b4a5aa329e6f10"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "93c1f8da58bf139f7a3447c6d2a98a9e764d77b96cc44497d7356f1e3c2e8e5a"
+    },
+    {
+      "crate": "socket2",
+      "version": "0.6.4",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/socket2/socket2-0.6.4.crate",
+      "registryIndexUrl": "https://index.crates.io/so/ck/socket2",
+      "sourceSha256": "52d1cfed4120b4d927bf7c0f86d2087a4a7d6027c906d9f9d525a80573b9be51",
+      "sourceBytes": 59888,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rust-lang/socket2",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/socket2-0.6.4/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/socket2-0.6.4/LICENSE-MIT",
+          "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397",
+          "bytes": 1057
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "9f41644efeb2f494f31f8ee7792d060f4c76e533"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "7a7b65614c962c206ff7d5cad598fd0d3c92281a3e376de66a9aac91fc59ed40"
+    },
+    {
+      "crate": "target-lexicon",
+      "version": "0.13.5",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/target-lexicon/target-lexicon-0.13.5.crate",
+      "registryIndexUrl": "https://index.crates.io/ta/rg/target-lexicon",
+      "sourceSha256": "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca",
+      "sourceBytes": 26928,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/target-lexicon",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/target-lexicon-0.13.5/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "6647bd7d681d3e218c88568d8285dfd8cae2dd97"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "68c92fd64e0ba0311fffd938aa03a2c58a13341c37523da1dd465c7eea9269ea"
+    },
+    {
+      "crate": "termcolor",
+      "version": "1.4.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/termcolor/termcolor-1.4.1.crate",
+      "registryIndexUrl": "https://index.crates.io/te/rm/termcolor",
+      "sourceSha256": "06794f8f6c5c898b3275aebefa6b8a1cb24cd2c6c79397ab15774837a0bc5755",
+      "sourceBytes": 18773,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Unlicense OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/BurntSushi/termcolor",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/termcolor-1.4.1/COPYING",
+          "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+          "bytes": 126
+        },
+        {
+          "path": "crate-notices/termcolor-1.4.1/LICENSE-MIT",
+          "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+          "bytes": 1081
+        },
+        {
+          "path": "crate-notices/termcolor-1.4.1/UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c",
+          "bytes": 1211
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "71f0921f1eeceda85487098588a1602979d52493"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "572fae34cf0bee9ca39a1398501c17fed5e98a2de908136cabbaba98cf97208e"
+    },
+    {
+      "crate": "tokio",
+      "version": "1.52.3",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/tokio/tokio-1.52.3.crate",
+      "registryIndexUrl": "https://index.crates.io/to/ki/tokio",
+      "sourceSha256": "8fc7f01b389ac15039e4dc9531aa973a135d7a4135281b12d7c1bc79fd57fffe",
+      "sourceBytes": 901393,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/tokio-rs/tokio",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/tokio-1.52.3/LICENSE",
+          "sha256": "253cd04c6714889df2d32f3f64d669179a1c95c76ac43c40882c52eb06bc3552",
+          "bytes": 1070
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "d87569164fb61145e79e7ffe0b25783569cc8f93"
+        },
+        "path_in_vcs": "tokio"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "53fbe58d71858bf5364c6f2235a3fd4af4797b61d700424550bbeed776da8ae2"
+    },
+    {
+      "crate": "tokio-rustls",
+      "version": "0.26.4",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/tokio-rustls/tokio-rustls-0.26.4.crate",
+      "registryIndexUrl": "https://index.crates.io/to/ki/tokio-rustls",
+      "sourceSha256": "1729aa945f29d91ba541258c8df89027d5792d85a8841fb65e8bf0f4ede4ef61",
+      "sourceBytes": 35430,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/rustls/tokio-rustls",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/tokio-rustls-0.26.4/LICENSE-APACHE",
+          "sha256": "cc117d90b498b32b11a886f279b359da16a73c3b01efbb2f5cc004b20262334e",
+          "bytes": 10832
+        },
+        {
+          "path": "crate-notices/tokio-rustls-0.26.4/LICENSE-MIT",
+          "sha256": "e20fa2b8e0a2565f24a792b94b4bf4b6c2b9d36f781d8a9516e218a036e6677a",
+          "bytes": 1056
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "0c14e1496ef50adade4ac7c7d1f0270dfb3cdda5"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "0d31e152c9b6b244edc30339a91043d5db4aebb61eb4e7c74acdda1a0a8979e1"
+    },
+    {
+      "crate": "toml",
+      "version": "0.9.12+spec-1.1.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/toml/toml-0.9.12%2Bspec-1.1.0.crate",
+      "registryIndexUrl": "https://index.crates.io/to/ml/toml",
+      "sourceSha256": "cf92845e79fc2e2def6a5d828f0801e29a2f8acc037becc5ab08595c7d5e9863",
+      "sourceBytes": 56485,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/toml-rs/toml",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/toml-0.9.12+spec-1.1.0/LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "bytes": 11358
+        },
+        {
+          "path": "crate-notices/toml-0.9.12+spec-1.1.0/LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6",
+          "bytes": 1062
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a26defd343a2fdb04a193b3fb70b58c80d48ef71"
+        },
+        "path_in_vcs": "crates/toml"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "c7cd18a26f0a1e8129cf6f97e80c40d775ab0f940eac463194e5f7a914326fcb"
+    },
+    {
+      "crate": "toml_datetime",
+      "version": "0.7.5+spec-1.1.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/toml_datetime/toml_datetime-0.7.5%2Bspec-1.1.0.crate",
+      "registryIndexUrl": "https://index.crates.io/to/ml/toml_datetime",
+      "sourceSha256": "92e1cfed4a3038bc5a127e35a2d360f145e1f4b971b551a2ba5fd7aedf7e1347",
+      "sourceBytes": 17975,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/toml-rs/toml",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/toml_datetime-0.7.5+spec-1.1.0/LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "bytes": 11358
+        },
+        {
+          "path": "crate-notices/toml_datetime-0.7.5+spec-1.1.0/LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6",
+          "bytes": 1062
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "e32c7a2f9b126d42fab0705e9783fec42b88e861"
+        },
+        "path_in_vcs": "crates/toml_datetime"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "7a291ac0c84cad123c2bb2d6b797c24299822dee9b0d6db25244cc7523531933"
+    },
+    {
+      "crate": "toml_parser",
+      "version": "1.1.2+spec-1.1.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/toml_parser/toml_parser-1.1.2%2Bspec-1.1.0.crate",
+      "registryIndexUrl": "https://index.crates.io/to/ml/toml_parser",
+      "sourceSha256": "a2abe9b86193656635d2411dc43050282ca48aa31c2451210f4202550afb7526",
+      "sourceBytes": 35485,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/toml-rs/toml",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/toml_parser-1.1.2+spec-1.1.0/LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "bytes": 11358
+        },
+        {
+          "path": "crate-notices/toml_parser-1.1.2+spec-1.1.0/LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6",
+          "bytes": 1062
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a3d0047c95dfc6e82997d508dd93c9908650a418"
+        },
+        "path_in_vcs": "crates/toml_parser"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "59e9a9cdaf0542f2a6c03df166153580c6b6348b5967c50675740f6fa564e195"
+    },
+    {
+      "crate": "toml_writer",
+      "version": "1.1.1+spec-1.1.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/toml_writer/toml_writer-1.1.1%2Bspec-1.1.0.crate",
+      "registryIndexUrl": "https://index.crates.io/to/ml/toml_writer",
+      "sourceSha256": "756daf9b1013ebe47a8776667b466417e2d4c5679d441c26230efd9ef78692db",
+      "sourceBytes": 18841,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/toml-rs/toml",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/toml_writer-1.1.1+spec-1.1.0/LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "bytes": 11358
+        },
+        {
+          "path": "crate-notices/toml_writer-1.1.1+spec-1.1.0/LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6",
+          "bytes": 1062
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "9db8aad6eafbc62f6b9d1950117649cc41eaf695"
+        },
+        "path_in_vcs": "crates/toml_writer"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "51a4ee6782bd473efcb531976aae0113872be513616b1ae23958e707cd513f86"
+    },
+    {
+      "crate": "tracing-core",
+      "version": "0.1.36",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/tracing-core/tracing-core-0.1.36.crate",
+      "registryIndexUrl": "https://index.crates.io/tr/ac/tracing-core",
+      "sourceSha256": "db97caf9d906fbde555dd62fa95ddba9eecfd14cb388e4f491a66d74cd5fb79a",
+      "sourceBytes": 63967,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/tokio-rs/tracing",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/tracing-core-0.1.36/LICENSE",
+          "sha256": "898b1ae9821e98daf8964c8d6c7f61641f5f5aa78ad500020771c0939ee0dea1",
+          "bytes": 1062
+        },
+        {
+          "path": "crate-notices/tracing-core-0.1.36/src/spin/LICENSE",
+          "sha256": "58545fed1565e42d687aecec6897d35c6d37ccb71479a137c0deb2203e125c79",
+          "bytes": 1085
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "10a9e838a35e6ded79d66af246be2ee05417136d"
+        },
+        "path_in_vcs": "tracing-core"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "610cf318865f1d349164f4420b53b49b2b3662b6938c2e730873371eb92e050e"
+    },
+    {
+      "crate": "unicode-width",
+      "version": "0.2.2",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/unicode-width/unicode-width-0.2.2.crate",
+      "registryIndexUrl": "https://index.crates.io/un/ic/unicode-width",
+      "sourceSha256": "b4ac048d71ede7ee76d585517add45da530660ef4390e49b098733c6e897f254",
+      "sourceBytes": 282768,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/unicode-rs/unicode-width",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/unicode-width-0.2.2/COPYRIGHT",
+          "sha256": "23860c2a7b5d96b21569afedf033469bab9fe14a1b24a35068b8641c578ce24d",
+          "bytes": 321
+        },
+        {
+          "path": "crate-notices/unicode-width-0.2.2/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/unicode-width-0.2.2/LICENSE-MIT",
+          "sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0",
+          "bytes": 1071
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "9d98411769fe13c7c18cab0b3fbbab29ba8350ea"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "dbf0a72e293238d87afd46f58ba597408f40c86e372a1d0b271c89fb4c3639c4"
+    },
+    {
+      "crate": "untrusted",
+      "version": "0.9.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/untrusted/untrusted-0.9.0.crate",
+      "registryIndexUrl": "https://index.crates.io/un/tr/untrusted",
+      "sourceSha256": "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1",
+      "sourceBytes": 14447,
+      "registryChecksumVerified": true,
+      "declaredLicense": "ISC",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/briansmith/untrusted",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/untrusted-0.9.0/LICENSE.txt",
+          "sha256": "7abd9b6960dcf7d4d0a48606a5b71bfe37d472db68d70637f3a58a56785f1621",
+          "bytes": 769
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "89c8b8415f692d3803d183fc5fbf9ec08a6adcf4"
+        }
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "25efda62e6e0a7e3cf463ff88bd9d9321befb22de7660cd63b2a0a195d70aed6"
+    },
+    {
+      "crate": "url",
+      "version": "2.5.8",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/url/url-2.5.8.crate",
+      "registryIndexUrl": "https://index.crates.io/3/u/url",
+      "sourceSha256": "ff67a8a4397373c3ef660812acab3268222035010ab8680ec4215f38ba3d0eed",
+      "sourceBytes": 86512,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/servo/rust-url",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/url-2.5.8/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/url-2.5.8/LICENSE-MIT",
+          "sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5",
+          "bytes": 1072
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "d6ea13c5f8e7e6e627f6390161b3e185bda5e5ce"
+        },
+        "path_in_vcs": "url"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "7003e5562b5ab8454b9d78376303151af79011f5dd684c1891e0f46bc9112016"
+    },
+    {
+      "crate": "want",
+      "version": "0.3.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/want/want-0.3.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/nt/want",
+      "sourceSha256": "bfa7760aed19e106de2c7c0b581b509f2f25d3dacaf737cb82ac61bc6d760b0e",
+      "sourceBytes": 6398,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/seanmonstar/want",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/want-0.3.1/LICENSE",
+          "sha256": "a65f5d0a945d267751344c95665945b90c030ea107faf5c85d518929886187da",
+          "bytes": 1063
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "6e65401c71fa55c75b6fb52f595a692ef3643939"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "41b6f47b839dfb51337ca7b84a7bd7d0723619ddb5230b64f9f31b76b9ac0a57"
+    },
+    {
+      "crate": "wasm-compose",
+      "version": "0.251.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasm-compose/wasm-compose-0.251.0.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasm-compose",
+      "sourceSha256": "b089037d7eb453ed57b560fe7833de0707411c8b9fdc429745ced77e2a1bacb9",
+      "sourceBytes": 57576,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-compose",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasm-compose-0.251.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/wasm-compose-0.251.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wasm-compose-0.251.0/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a1a178a024c1204ac24ff957b9ba8cdca7f9c8ce"
+        },
+        "path_in_vcs": "crates/wasm-compose"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "4ad17b9e9d91cb46a76296b0983a06a8d6b19d02bae07bef980273ac64f1ad9c"
+    },
+    {
+      "crate": "wasm-encoder",
+      "version": "0.251.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasm-encoder/wasm-encoder-0.251.0.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasm-encoder",
+      "sourceSha256": "5a879a421bd17c528b74721b2abf4c62e8f1d1889c2ba8c3c50d02deaf2ce395",
+      "sourceBytes": 91942,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-encoder",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasm-encoder-0.251.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/wasm-encoder-0.251.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wasm-encoder-0.251.0/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a1a178a024c1204ac24ff957b9ba8cdca7f9c8ce"
+        },
+        "path_in_vcs": "crates/wasm-encoder"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "8914cffa52700695aa9e553c3402d3c0f1539d6cb6f9e5e573155c079b292eed"
+    },
+    {
+      "crate": "wasm-encoder",
+      "version": "0.252.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasm-encoder/wasm-encoder-0.252.0.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasm-encoder",
+      "sourceSha256": "8185ae345fa5687c054626ff9a50e7089797a343d9904d1dc9820eb4c4d3196f",
+      "sourceBytes": 91949,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-encoder",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasm-encoder-0.252.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/wasm-encoder-0.252.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wasm-encoder-0.252.0/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "d66d4364c441d8b0122628509be52bd53c352a6e"
+        },
+        "path_in_vcs": "crates/wasm-encoder"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "a95635a944d6a35be79561763f756b8b60a257083c81f28891e26ace0c278069"
+    },
+    {
+      "crate": "wasmparser",
+      "version": "0.251.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmparser/wasmparser-0.251.0.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmparser",
+      "sourceSha256": "437970b35b1a85cfde9c74b2398352d8d653f3bd8e3a3db0c063ea8f5b4b36ff",
+      "sourceBytes": 274703,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmparser",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmparser-0.251.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/wasmparser-0.251.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wasmparser-0.251.0/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a1a178a024c1204ac24ff957b9ba8cdca7f9c8ce"
+        },
+        "path_in_vcs": "crates/wasmparser"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "624b52af2cca7df782af3aec3ff93ea5c9602e3fefd5e2b1df4a9bd648ecdf4e"
+    },
+    {
+      "crate": "wasmparser",
+      "version": "0.252.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmparser/wasmparser-0.252.0.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmparser",
+      "sourceSha256": "d3eb099dcadcde5be9eef55e3a337128efd4e44b4c93122487e4d2e4e1c6627c",
+      "sourceBytes": 274702,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmparser",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmparser-0.252.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/wasmparser-0.252.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wasmparser-0.252.0/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "d66d4364c441d8b0122628509be52bd53c352a6e"
+        },
+        "path_in_vcs": "crates/wasmparser"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "2fccedf7a738468fc3c07684fac6ffe00e1cd76218b14e949518d45b5a15b962"
+    },
+    {
+      "crate": "wasmprinter",
+      "version": "0.251.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmprinter/wasmprinter-0.251.0.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmprinter",
+      "sourceSha256": "8798c1a699bd25648b6708eefe94d97c6f9891febb94b42cca1f7a4b086ea64e",
+      "sourceBytes": 49960,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmprinter",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmprinter-0.251.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/wasmprinter-0.251.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wasmprinter-0.251.0/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a1a178a024c1204ac24ff957b9ba8cdca7f9c8ce"
+        },
+        "path_in_vcs": "crates/wasmprinter"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "044a7444e6743a04bd086451d1fb2e07008dd57a55471c80fbb641531281e892"
+    },
+    {
+      "crate": "wasmtime",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime/wasmtime-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime",
+      "sourceSha256": "c4213d2f019a5e44aa8a61d8826dd33a505bff79f749b14a8bafd67321cb9351",
+      "sourceBytes": 1019837,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-46.0.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wasmtime-46.0.1/src/runtime/vm/gc/enabled/copying.rs",
+          "sha256": "8ff053bc150ebaa2dc31f7a726450bf0931e8e3c31823587a06df8b406289c76",
+          "bytes": 46805
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/wasmtime"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "f9f14448c2b790c441d1992198f38a2dcb5d9aefa590bd9fbd66ed479e633cda"
+    },
+    {
+      "crate": "wasmtime-environ",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-environ/wasmtime-environ-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-environ",
+      "sourceSha256": "d45863de41977ec6453e859cf843d456fa3fcb45a659b66d16e794f90ec4f5b7",
+      "sourceBytes": 289312,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-environ-46.0.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wasmtime-environ-46.0.1/src/gc/copying.rs",
+          "sha256": "842ff09ff6aeaa4a634ab1849b176465b670c0b2daed90a318413f2d2d161e29",
+          "bytes": 7348
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/environ"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "77778f965446ff7f198b9b11064c39191ce51a1686f2cb1c622f9082f890e17f"
+    },
+    {
+      "crate": "wasmtime-internal-cache",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-internal-cache/wasmtime-internal-cache-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-internal-cache",
+      "sourceSha256": "438bc7dc45fb75297d75f79a9a0ce852345d13ebc6a6863f6f688f013836a9dd",
+      "sourceBytes": 36850,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-internal-cache-46.0.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/cache"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "323a2df1302646c983e9baa29fe8a33f7ee7b3dcdc88939a48d4e6e038185b42"
+    },
+    {
+      "crate": "wasmtime-internal-component-util",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-internal-component-util/wasmtime-internal-component-util-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-internal-component-util",
+      "sourceSha256": "819ad5abd5822a22dbf4014475cdfd1fe790707761cd732d74aaa3ba4d5ba489",
+      "sourceBytes": 2788,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-internal-component-util-46.0.1/upstream-root/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243,
+          "sourceUrl": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/823d1b8f251494a06288194d0df746191f535ff7/LICENSE",
+          "gitBlobSha1": "f9d81955f4bcb8f96a025e2ecc46f39ec536d465",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/component-util"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "7bdafa5cdfcca69f08d21401f068384a0ad7fd1ae29a27f4d348d4dc2129451e"
+    },
+    {
+      "crate": "wasmtime-internal-core",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-internal-core/wasmtime-internal-core-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-internal-core",
+      "sourceSha256": "3fc28372e36eaf8cf70faa83b5779137f7e99c8d18569a125d1580e735cc9e4d",
+      "sourceBytes": 53861,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": null,
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-internal-core-46.0.1/upstream-root/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243,
+          "sourceUrl": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/823d1b8f251494a06288194d0df746191f535ff7/LICENSE",
+          "gitBlobSha1": "f9d81955f4bcb8f96a025e2ecc46f39ec536d465",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/core"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "f3f76a7ea1e48f88c0a605993db616862e91214a75632ca8989a0f9f2d618322"
+    },
+    {
+      "crate": "wasmtime-internal-cranelift",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-internal-cranelift/wasmtime-internal-cranelift-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-internal-cranelift",
+      "sourceSha256": "a433efc6e35112a5457e1dc8bc4d8d39820ac7722267e89bc04e5df641f32124",
+      "sourceBytes": 245333,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-internal-cranelift-46.0.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wasmtime-internal-cranelift-46.0.1/src/func_environ/gc/copying.rs",
+          "sha256": "a0b7a88aec7a3b4682575241914bceb535457752523e3e678f0a8dad287ff05d",
+          "bytes": 17477
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/cranelift"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "abe1442427a8a5c0d11579230842131c811b39b1a15916767b5a151beee91e83"
+    },
+    {
+      "crate": "wasmtime-internal-fiber",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-internal-fiber/wasmtime-internal-fiber-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-internal-fiber",
+      "sourceSha256": "18a1d3a39d0d210f6b8574ee96a4315e0a14c67f3a1fc3cd5372cb10d2fb4422",
+      "sourceBytes": 32643,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-internal-fiber-46.0.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/fiber"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "8edab3ba7280514b04579c659c523660425dd06c02c0570041c9d105d08d5691"
+    },
+    {
+      "crate": "wasmtime-internal-jit-debug",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-internal-jit-debug/wasmtime-internal-jit-debug-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-internal-jit-debug",
+      "sourceSha256": "9f667288cb4dfa68a4639ffac4d5628535dda64ebdc2b990526efb12b30ba803",
+      "sourceBytes": 10076,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-internal-jit-debug-46.0.1/upstream-root/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243,
+          "sourceUrl": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/823d1b8f251494a06288194d0df746191f535ff7/LICENSE",
+          "gitBlobSha1": "f9d81955f4bcb8f96a025e2ecc46f39ec536d465",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/jit-debug"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "4f8eda4f0c5b238c1ddae15df764192b8636fda474045d75ec56c5795163abbc"
+    },
+    {
+      "crate": "wasmtime-internal-unwinder",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-internal-unwinder/wasmtime-internal-unwinder-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-internal-unwinder",
+      "sourceSha256": "2ecc52563b0558af2a7487eb710de07cc4532564b55528876129238e83118cb1",
+      "sourceBytes": 25153,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-internal-unwinder-46.0.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/unwinder"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "62c74b4e36c54e703db5670416ae25a30b590a5236757c8752beaef47af4c530"
+    },
+    {
+      "crate": "wasmtime-wasi",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-wasi/wasmtime-wasi-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-wasi",
+      "sourceSha256": "e9f65ef30a2c5478873cdb619085a7a649d3ce41cc3eaf298a7ce3dee96a8e11",
+      "sourceBytes": 224295,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-wasi-46.0.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/wasi"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "640e540c3c0503c753a9365d233faa7fb619647e5a63577cb6c82be7ee19761e"
+    },
+    {
+      "crate": "wasmtime-wasi-config",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-wasi-config/wasmtime-wasi-config-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-wasi-config",
+      "sourceSha256": "7304e98b110835eedacd5e5565d6e4457489f8cf1e2571674887320fab2815ea",
+      "sourceBytes": 16422,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-wasi-config-46.0.1/upstream-root/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243,
+          "sourceUrl": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/823d1b8f251494a06288194d0df746191f535ff7/LICENSE",
+          "gitBlobSha1": "f9d81955f4bcb8f96a025e2ecc46f39ec536d465",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/wasi-config"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "7a48c561c667fa9d89c2a16ec9bb1519c2511363ecef853a2b6e11cabf0c6168"
+    },
+    {
+      "crate": "wasmtime-wasi-http",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-wasi-http/wasmtime-wasi-http-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-wasi-http",
+      "sourceSha256": "cb65eeb8116615c2a22f51b19672c0d5b652ca7b051086da5c7c0a9eb39f4af7",
+      "sourceBytes": 144732,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-wasi-http-46.0.1/upstream-root/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243,
+          "sourceUrl": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/823d1b8f251494a06288194d0df746191f535ff7/LICENSE",
+          "gitBlobSha1": "f9d81955f4bcb8f96a025e2ecc46f39ec536d465",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/wasi-http"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "1d2968a001936d0859bb8ac55e4defdbcd352a6dcc576012abd33d388e3976d3"
+    },
+    {
+      "crate": "wasmtime-wasi-io",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-wasi-io/wasmtime-wasi-io-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-wasi-io",
+      "sourceSha256": "cee57d5fef4976b1ab542615f4cef2c43278eb549d8078939668ea0f13d5c696",
+      "sourceBytes": 19193,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-wasi-io-46.0.1/upstream-root/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243,
+          "sourceUrl": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/823d1b8f251494a06288194d0df746191f535ff7/LICENSE",
+          "gitBlobSha1": "f9d81955f4bcb8f96a025e2ecc46f39ec536d465",
+          "sourceBasis": "crate .cargo_vcs_info.json pinned upstream root license"
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/wasi-io"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "844cd52272827b927a01ea2c31fc9eb0084d0ed43b1cada5f0930b1380239527"
+    },
+    {
+      "crate": "wasmtime-wast",
+      "version": "46.0.1",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wasmtime-wast/wasmtime-wast-46.0.1.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/sm/wasmtime-wast",
+      "sourceSha256": "16ea7fc30a489e50d14541bb63a56b17992b81707c21c00bfad613f719648116",
+      "sourceBytes": 28160,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasmtime",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wasmtime-wast-46.0.1/LICENSE",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "823d1b8f251494a06288194d0df746191f535ff7"
+        },
+        "path_in_vcs": "crates/wast"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "c6e38c5a14b6d2c6ab711f6112241948cfcdaa40148d48c73e7ce9030698dea3"
+    },
+    {
+      "crate": "wast",
+      "version": "251.0.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wast/wast-251.0.0.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/st/wast",
+      "sourceSha256": "5cc7467dda0a96142eb2c980329dfb62480b1e1d3622fdeb1a44e2bca6ceed74",
+      "sourceBytes": 166309,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wast",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wast-251.0.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/wast-251.0.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wast-251.0.0/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "a1a178a024c1204ac24ff957b9ba8cdca7f9c8ce"
+        },
+        "path_in_vcs": "crates/wast"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "493db267fe82a5018569ee6c72810a19eb1943f009b82555dc2fc540bb1fa3b5"
+    },
+    {
+      "crate": "wast",
+      "version": "252.0.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wast/wast-252.0.0.crate",
+      "registryIndexUrl": "https://index.crates.io/wa/st/wast",
+      "sourceSha256": "942a3449d6a593fccc111a6241c8df52bda168af30e40bf9580d4394d7374c65",
+      "sourceBytes": 166296,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wast",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wast-252.0.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/wast-252.0.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wast-252.0.0/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "d66d4364c441d8b0122628509be52bd53c352a6e"
+        },
+        "path_in_vcs": "crates/wast"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "79bfe549d1cedde59ae004c165703bf1b751a2a77be971b1cc3445b8df5bf2bd"
+    },
+    {
+      "crate": "wat",
+      "version": "1.252.0",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/wat/wat-1.252.0.crate",
+      "registryIndexUrl": "https://index.crates.io/3/w/wat",
+      "sourceSha256": "c72a4ba7088f7bac94cf516e49882bdf97068904a563768cf249efc839ec42cb",
+      "sourceBytes": 13667,
+      "registryChecksumVerified": true,
+      "declaredLicense": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wat",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/wat-1.252.0/LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "bytes": 10847
+        },
+        {
+          "path": "crate-notices/wat-1.252.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "bytes": 12243
+        },
+        {
+          "path": "crate-notices/wat-1.252.0/LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "d66d4364c441d8b0122628509be52bd53c352a6e"
+        },
+        "path_in_vcs": "crates/wat"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "31268e05441ca47d3a134dfa29bcf429b092fd6be6145895989d5c80aec179bb"
+    },
+    {
+      "crate": "winnow",
+      "version": "1.0.3",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/winnow/winnow-1.0.3.crate",
+      "registryIndexUrl": "https://index.crates.io/wi/nn/winnow",
+      "sourceSha256": "0592e1c9d151f854e6fd382574c3a0855250e1d9b2f99d9281c6e6391af352f1",
+      "sourceBytes": 187990,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/winnow-rs/winnow",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/winnow-1.0.3/LICENSE-MIT",
+          "sha256": "cb5aedb296c5246d1f22e9099f925a65146f9f0d6b4eebba97fd27a6cdbbab2d",
+          "bytes": 1023
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "aabae22f0426695f72a89fed1de6174e221100b3"
+        },
+        "path_in_vcs": ""
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "a08a132fc8e75df42de49e822fb6262cdcbc61748e690750ca5d98ffc6b3d19f"
+    },
+    {
+      "crate": "zstd-safe",
+      "version": "7.2.4",
+      "binaryEvidencePlatforms": [
+        "natives/windows-x86_64/wasmtime4j.dll",
+        "natives/linux-x86_64/libwasmtime4j.so"
+      ],
+      "scope": "observed crate version, not complete linked inventory",
+      "sourceUrl": "https://static.crates.io/crates/zstd-safe/zstd-safe-7.2.4.crate",
+      "registryIndexUrl": "https://index.crates.io/zs/td/zstd-safe",
+      "sourceSha256": "8f49c4d5f0abb602a93fb8736af2a4f4dd9512e36f7f570d66e65ff867ed3b9d",
+      "sourceBytes": 29350,
+      "registryChecksumVerified": true,
+      "declaredLicense": "MIT OR Apache-2.0",
+      "declaredLicenseFile": null,
+      "upstreamRepository": "https://github.com/gyscos/zstd-rs",
+      "noticeFiles": [
+        {
+          "path": "crate-notices/zstd-safe-7.2.4/LICENSE",
+          "sha256": "a77b7cfeaf911ed410ffbe76f0cb2b24ad8a4d94e7ead5727e914425c416cc63",
+          "bytes": 18
+        },
+        {
+          "path": "crate-notices/zstd-safe-7.2.4/LICENSE.Apache-2.0",
+          "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+          "bytes": 10174
+        },
+        {
+          "path": "crate-notices/zstd-safe-7.2.4/LICENSE.Mit",
+          "sha256": "129e8edef29e9abcd2ebabe252f4ef1b1289cdca356bf0040284a2fbccfb96c8",
+          "bytes": 1080
+        }
+      ],
+      "publishedVcsInfo": {
+        "git": {
+          "sha1": "229054099aa73f7e861762f687d7e07cac1d9b3b"
+        },
+        "path_in_vcs": "zstd-safe"
+      },
+      "success": true,
+      "hasOriginalNotices": true,
+      "manifestSha256": "5af4c418d6b293b6f1892fc7ba92b4586f96829abf133be1519818ea42dce159"
+    }
+  ]
+}

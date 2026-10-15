@@ -16,6 +16,7 @@ public final class GenericNetplayProbe {
     static byte[] content;
     static volatile byte[] saved;
     static volatile int commits;
+    static void stage(String value){System.out.println("STAGE "+value);}
     static void healthy(){for(var r:runs.values())if(r.error()!=null)throw new AssertionError(r.diagnostic());}
     static void until(java.util.function.BooleanSupplier condition)throws Exception {
         long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(25);
@@ -51,23 +52,63 @@ public final class GenericNetplayProbe {
         Object hostKey=new Object(),p2Key=new Object(),watchKey=new Object();
         relay=new NetplayRelay<>(911,hostKey,(target,packet)->wire.schedule(()->{var r=runs.get(target);if(r!=null)r.receive(packet.chunk(),packet.port());},50,TimeUnit.MILLISECONDS));
         wire.scheduleAtFixedRate(()->relay.renew(Set.copyOf(runs.keySet())),0,100,TimeUnit.MILLISECONDS);
+        Throwable primaryFailure=null;
         try {
+            stage("host");
             var host=start(hostKey,0,true,false);until(host::ready);
+            stage("p2");
             var p2=start(p2Key,1,false,false);until(p2::ready);
             host.inputRetroPad(256);p2.inputRetroPad(1);until(()->p2.framesReceived()>125);
+            stage("p2 125 frames");
             host.inputRetroPad(16);p2.inputRetroPad(128);until(()->p2.framesReceived()>250);
+            if(args.length>3&&args[3].equals("p2-only")){
+                stage("p2 sustained 1200 frames");
+                until(()->p2.framesReceived()>1200);
+                stop(p2Key);stop(hostKey);
+                if(NativeLibretroBridge.availableSlots()!=4)throw new AssertionError("native leak");
+                System.out.println("GENERIC_JNI_NETPLAY_P2_ONLY_OK; 1200 frames; no late observer");
+                return;
+            }
+            if(args.length>3&&args[3].equals("save-only")){
+                stage("save while p2 active");
+                host.saveNow().get(20,TimeUnit.SECONDS);
+                until(()->p2.framesReceived()>700);
+                stop(p2Key);stop(hostKey);
+                if(NativeLibretroBridge.availableSlots()!=4)throw new AssertionError("native leak");
+                System.out.println("GENERIC_JNI_NETPLAY_SAVE_ONLY_OK; 700 frames; no late observer");
+                return;
+            }
+            stage("late observer");
             var watch=start(watchKey,-1,false,false);until(watch::ready);until(()->watch.framesReceived()>125);
             var picture=watch.poll();if(picture==null||picture.width()<1||picture.stereo().length==0||picture.sampleRate()!=48000)throw new AssertionError("generic AV output");
+            stage("p2 rejoin");
             stop(p2Key);p2Key=new Object();var rejoin=start(p2Key,1,false,false);until(rejoin::ready);rejoin.inputRetroPad(512);until(()->rejoin.framesReceived()>125);
+            stage("save");
             host.saveNow().get(20,TimeUnit.SECONDS);if(saved==null)throw new AssertionError("manual save missing");
             stop(watchKey);stop(p2Key);stop(hostKey);if(commits<2)throw new AssertionError("final save missing");
             long before=NetplaySaveState.decode(saved,NetplaySaveState.identity(profile,NetplaySaveState.hash(content),Map.of())).frame();
+            stage("reopen");
             relay=new NetplayRelay<>(911,hostKey,(target,packet)->{});
             var reopened=start(hostKey,0,true,true);until(reopened::ready);until(()->reopened.framesReceived()>100);reopened.saveNow().get(20,TimeUnit.SECONDS);
             if(NetplaySaveState.decode(saved,NetplaySaveState.identity(profile,NetplaySaveState.hash(content),Map.of())).frame()<before+90)throw new AssertionError("resume frame");
             stop(hostKey);if(NativeLibretroBridge.availableSlots()!=4)throw new AssertionError("native leak");
             Files.write(root.resolve("generic-save.pns"),saved,StandardOpenOption.CREATE_NEW);
             System.out.println("GENERIC_JNI_NETPLAY_OK "+profile.jni().name()+"; two pads; 50ms each direction; late observer; reconnect; CRC; stereo; manual/final save/reopen");
-        } finally {for(var r:runs.values())r.close();wire.shutdownNow();relay.close();}
+        } catch(Exception|Error failure) {
+            primaryFailure=failure;
+            System.err.println("PROBE_FIRST_FAILURE relay="+relay.lastRejection());
+            for(var r:runs.values())System.err.println(r.diagnostic());
+            failure.printStackTrace();
+            throw failure;
+        } finally {
+            try {
+                for(var r:runs.values())r.close();
+                for(var r:runs.values())r.terminated().get(20,TimeUnit.SECONDS);
+                // Closing a relay can enqueue CLOSE packets: keep its executor alive until then.
+                relay.close();
+            } catch(Exception|Error cleanup) {
+                if(primaryFailure!=null)primaryFailure.addSuppressed(cleanup);else throw cleanup;
+            } finally {wire.shutdownNow();}
+        }
     }
 }

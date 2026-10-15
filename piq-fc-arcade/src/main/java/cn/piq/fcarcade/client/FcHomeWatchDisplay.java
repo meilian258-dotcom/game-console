@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client;
 
 import cn.piq.fcarcade.cabinet.WatchDescriptor;
@@ -66,6 +68,11 @@ final class FcHomeWatchDisplay implements WatchClient.DisplayAdapter {
                 * (float)Math.max(0, 1 - Math.sqrt(mc.player.distanceToSqr(d.screens().getFirst().pos().getCenter())) / 16);
     }
     @Override public void render(RenderLevelStageEvent event, WatchDescriptor d, ResourceLocation texture, float aspect, int rotation) {
+        try { renderOwned(event, d, texture, aspect, rotation); }
+        finally { cn.piq.fcarcade.api.replay.ReplayPresentation.clearAnchor(); }
+    }
+
+    private void renderOwned(RenderLevelStageEvent event, WatchDescriptor d, ResourceLocation texture, float aspect, int rotation) {
         if (rotation != 0 || !valid(d) || event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) return;
         var mc = Minecraft.getInstance(); var pos = d.screens().getFirst().pos();
         if (!HomeApplianceService.videoAllowed(mc.level,pos)) return;

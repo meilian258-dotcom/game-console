@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.layout;
 
 /** Visual-only scale of user-supplied console geometry. Coordinates here are 1/16-block model units. */

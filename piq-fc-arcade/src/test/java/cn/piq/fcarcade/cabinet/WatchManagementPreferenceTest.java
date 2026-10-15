@@ -71,7 +71,7 @@ class WatchManagementPreferenceTest {
     @Test void productionHooksUseAuthenticatedServerRelationshipAndRealClosingOwners()throws Exception{
         var dir=Path.of("src/main/java/cn/piq/fcarcade");var network=Files.readString(dir.resolve("cabinet/WatchNetwork.java"));var server=Files.readString(dir.resolve("cabinet/WatchService.java"));
         var client=Files.readString(dir.resolve("client/watch/WatchClient.java"));var screen=Files.readString(dir.resolve("client/watch/WatchManagementScreen.java"));
-        assertTrue(network.contains("create(event,\"watch-4\")"));assertFalse(network.contains("create(event,\"watch-3\")"));
+        assertTrue(network.contains("create(event,\"watch-5\")"));assertFalse(network.contains("create(event,\"watch-3\")"));
         assertTrue(network.contains(".playToServer(Preference.TYPE,Preference.CODEC"));assertTrue(network.contains(".playToClient(PreferenceResult.TYPE,PreferenceResult.CODEC"));
         assertTrue(server.contains("state.ledger.authorized(player.getUUID(),c.connection,packet.lease(),packet.revision(),now)"));
         assertTrue(server.contains("WatchPreferenceState.Source.of(live.source.descriptor()).equals(packet.source())"));

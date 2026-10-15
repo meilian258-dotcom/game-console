@@ -21,6 +21,9 @@ TEXTURES={'hardware':('piq_sfc_home:block/user_sfc_20260911',SOURCE/'02_SFC双�
           'card':('piq_sfc_home:block/user_sfc_cartridge_20260911',SOURCE/'03_SFC独立卡带/SFC卡带_完整UV.png')}
 INSERT=np.array([0.,2.18,3.711]); ITEM=np.array([0.,6.55,0.])
 PAD_CENTER=np.array([11.5,.375,1.7225]); PAD_SCALE=2.
+# Omit only the author's separate front branding decal; the original atlas and
+# editable source remain untouched. Other print, controls and shell are retained.
+EXCLUDED_BRANDING=frozenset({'7d4e2597-b721-4810-ab5f-28e102ea0446'})
 
 def console_item_bytes():
     """Pure GUI wrapper; every non-GUI key equals the frozen SFC9 item wrapper."""
@@ -87,10 +90,14 @@ def convert(model,ids,material,transform=lambda a:a,pad=False):
 
 def build():
     m,c=Model(CONSOLE),Model(CARD)
+    for uuid in EXCLUDED_BRANDING:
+        e=m.elements[uuid]
+        assert e['name']=='前盖品牌' and uuid in m.members['console']
+        assert [face for face,f in e['faces'].items() if f.get('texture') is not None]==['up']
     # Plug and strain relief belong to console_ports in the supplied hierarchy;
     # include them in their matching docked layer so claiming a pad leaves no stub.
     plugs={p:[u for u in m.members['console_ports'] if m.elements[u]['name'].startswith(f'{p}P') and ('已插入插头' in m.elements[u]['name'] or '插头出线护套' in m.elements[u]['name'])] for p in (1,2)}
-    moved=set(plugs[1]+plugs[2]); body=[u for u in m.members['console'] if u not in moved]
+    moved=set(plugs[1]+plugs[2]); body=[u for u in m.members['console'] if u not in moved and u not in EXCLUDED_BRANDING]
     groups={'body':convert(m,body,'hardware'),
             'p1_docked':convert(m,m.members['controller_1']+m.members['p1_cable']+plugs[1],'hardware',pad=True),
             'p2_docked':convert(m,m.members['controller_2']+m.members['p2_cable']+plugs[2],'hardware',pad=True),
@@ -105,11 +112,12 @@ def build():
     counts={k:sum(len(p['triangles']) for p in v['parts']) for k,v in groups.items()}
     assert all(v<=18000 for v in counts.values())
     # All user console/controller/cable elements accounted for exactly once;
-    # only the obsolete 38-element preinserted cartridge is excluded.
+    # Only the obsolete preinserted cartridge and explicit branding decal are excluded.
     represented=len(body)+sum(len(m.members[f'controller_{p}'])+len(m.members[f'p{p}_cable'])+len(plugs[p]) for p in (1,2))
-    assert represented+len(m.members['cartridge'])==len(m.elements)
+    assert represented+len(m.members['cartridge'])+len(EXCLUDED_BRANDING)==len(m.elements)
     report={'ok':True,'source_bbmodel_sha256':{str(p.relative_to(ROOT)):sha(p.read_bytes()) for p in (CONSOLE,CARD)},
             'source_elements':{'console_set':len(m.elements),'independent_card':len(c.elements)},'excluded_old_card':len(m.members['cartridge']),
+            'excluded_branding_elements':sorted(EXCLUDED_BRANDING),
             'represented_world_elements':represented+len(c.elements),'docked_plugs_moved':{str(k):len(v) for k,v in plugs.items()},
             'triangles':counts,'contract':doc['contract'],'textures':{k:{'source':str(p.relative_to(ROOT)),'sha256':sha(p.read_bytes())} for k,(_,p) in TEXTURES.items()},
             'notes':['Actual converted model/UV; not a Minecraft screenshot.','Source atlases copied byte-for-byte; no bitmap editing.',
@@ -144,10 +152,15 @@ def preview(doc):
     sheet.save(OUT/'overview.png')
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--write',action='store_true');parser.add_argument('--preview',action='store_true');args=parser.parse_args()
+    global OUT
+    parser=argparse.ArgumentParser();parser.add_argument('--write',action='store_true');parser.add_argument('--preview',action='store_true')
+    parser.add_argument('--mesh-only',action='store_true',help='Write only the mesh, preserving item wrappers and all textures')
+    parser.add_argument('--output',type=Path,help='Audit/preview directory (does not change asset destinations)');args=parser.parse_args()
+    if args.output is not None:OUT=args.output
     doc,report=build();raw=json.dumps(doc,ensure_ascii=False,separators=(',',':')).encode('utf-8');report['mesh_sha256']=sha(raw);report['bytes']=len(raw);report['console_item_sha256']=sha(console_item_bytes())
-    if args.write:
+    if args.write or args.mesh_only:
         (ASSETS/'meshes').mkdir(parents=True,exist_ok=True);(ASSETS/'meshes/sfc_hardware.json').write_bytes(raw)
+    if args.write:
         (ASSETS/'models/item/console.json').write_bytes(console_item_bytes())
         for _,(resource,path) in TEXTURES.items():
             target=ASSETS/'textures'/(resource.split(':',1)[1]+'.png');target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(path.read_bytes());assert sha(target.read_bytes())==sha(path.read_bytes())

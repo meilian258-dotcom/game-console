@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.audio;
 
 import cn.piq.fcarcade.FcArcadeMod;
@@ -48,7 +50,7 @@ public final class NesAudioPlayer implements AutoCloseable {
             encoder.reset();
         }
         SourceDataLine activeLine = line;
-        if (activeLine != null) activeLine.flush();
+        if (activeLine != null) ReplayAudioOutput.flush(activeLine);
     }
 
     public boolean failed() {
@@ -69,7 +71,7 @@ public final class NesAudioPlayer implements AutoCloseable {
                 if (pcm == null) continue;
                 int written = 0;
                 while (!closed && written < pcm.length) {
-                    written += openedLine.write(pcm, written, pcm.length - written);
+                    written += ReplayAudioOutput.write(openedLine, pcm, written, pcm.length - written);
                 }
             }
         } catch (InterruptedException interrupted) {
@@ -84,8 +86,8 @@ public final class NesAudioPlayer implements AutoCloseable {
             line = null;
             if (activeLine != null) {
                 activeLine.stop();
-                activeLine.flush();
-                activeLine.close();
+                ReplayAudioOutput.flush(activeLine);
+                ReplayAudioOutput.close(activeLine);
             }
         }
     }
@@ -99,8 +101,8 @@ public final class NesAudioPlayer implements AutoCloseable {
         SourceDataLine activeLine = line;
         if (activeLine != null) {
             activeLine.stop();
-            activeLine.flush();
-            activeLine.close();
+            ReplayAudioOutput.flush(activeLine);
+            ReplayAudioOutput.close(activeLine);
         }
     }
 }

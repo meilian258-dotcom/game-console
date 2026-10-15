@@ -5,6 +5,44 @@ and not a separate Minecraft mod. The main mod packages the approved DLL once;
 addons supply fixed, SHA-verified core resources, content rules and capabilities.
 Execution defaults belong to the caller's supported mode, not to this bridge.
 
+The PIQ-authored bridge remains GPL-3.0-or-later with the limited additional
+permission in [SNES9X-LINKING-EXCEPTION.txt](../../SNES9X-LINKING-EXCEPTION.txt).
+New main-mod builds carry that text beside the bridge licenses and in
+`META-INF/licenses/`. It does not authorize other parties' GPL code or change
+Snes9x's original non-commercial license.
+
+## Fixed shared runtime dependencies
+
+The development bundle adds dependency API 1 without changing the session ABI 2.
+Java, bridge, manifest and fixed runtime resources must be upgraded as one main
+mod. An old ABI 2 bridge without the new capability is explicitly rejected.
+The current manifest contains the official LLVM/MSYS2 `libc++.dll`; full licenses
+and binary provenance are in [licenses/NOTICE.md](licenses/NOTICE.md).
+
+The bridge remains static. `retainRuntimeDependencies(paths, sha256)` owns at
+most two ordinary Windows module references until process exit. It does not pin
+an emulator core or change the existing per-session `FreeLibrary` behavior.
+Java accepts only the exact main-mod manifest schema and stages all verified
+files before loading. Native code locks files against write/delete, retains
+ancestor directories against rename/delete, and checks SHA, AMD64 PE, bounded
+imports/delay imports and same-name module conflicts before loading dependencies.
+It uses `DLL_LOAD_DIR | SYSTEM32`, then verifies the actual module file identity.
+Neither PATH nor the process DLL search policy changes.
+
+Only this loader's exact ready bundle is reusable. A foreign copy with the same
+basename is rejected even if its bytes match. Partial initialization failure
+keeps references and the pinned workspace, reports that a restart is required,
+and does not retry. The bridge rechecks the retained modules before each core
+load; a newly detected same-name conflict prevents that core's entry point from
+executing and makes subsequent opens fail until restart. These are consistency protections for trusted libraries,
+not isolation from malicious code inside the same JVM.
+
+The dependency API has isolated JVM, malformed-input, conflict, software/WGL,
+multi-owner and shared mock-core coverage. It does not establish that a complete
+MAME build or all emulator heap allocations have been validated. Existing core
+profiles and saved games are unchanged. This development bundle is not a complete
+arcade crash-fix release.
+
 ## Safety and ownership
 
 Every core operation belongs to the Java thread that called `reserve()`.
@@ -44,6 +82,8 @@ Class: `cn.piq.retro.libretro.jni.NativeLibretroBridge`.
 
 ```java
 static native int abiVersion(); // 2; Java/bridge must be upgraded together
+static native int runtimeDependencyApiVersion(); // 1; no core execution
+static native void retainRuntimeDependencies(String[] absolutePaths, String[] expectedSha256);
 static native int availableSlots(); // 0..4, excludes quarantined reservations
 static native long reserve(); // owner thread; throws at capacity
 static native boolean reservationHeld(long handle); // any thread, no core call
@@ -172,6 +212,14 @@ toolchain and exact executed arguments belong in the build receipt.
 
 ## Tests (isolated JVM only)
 
+Additional bounded test runners are `tests/run_runtime_dependencies.py` (native
+validation and conflict/partial-failure behavior),
+`tests/run_production_runtime_load.py` (actual Java loader, including old bridge
+rejection), and `tests/run_shared_production.py` (actual `LibretroJniRuntime`
+loading and closing a redistributable shared-runtime mock core). Each requires
+explicit verified input paths, hashes and a new output directory; use `--help`
+for its arguments. They never install files in a Minecraft instance.
+
 ```powershell
 python tests/run_mock.py --compiler "C:/toolchain/bin/x86_64-w64-mingw32-clang++.exe" `
   --jdk "C:/path/to/jdk-21" --bridge "C:/scratch/new-native-build/piq-libretro-jni.dll" `
@@ -212,3 +260,12 @@ This copy normalizes CRLF to LF via a reviewed patch; SHA256:
 Upstream project: <https://github.com/libretro/libretro-common> (`include/libretro.h`).
 The original vendored snapshot has no supplied upstream commit identifier; do
 not invent one or imply all original core binaries were reproducibly built.
+
+The PIQ-authored bridge files identified in
+`../../MD-ARCADE-LINKING-EXCEPTION.txt` also have the limited permission
+specified there for the fixed MD/Arcade libraries. This is independent of
+`../../SNES9X-LINKING-EXCEPTION.txt` and grants no exception for RetroArch
+or any third-party GPL code. New FC builds package both canonical texts
+with the JNI notices. Original compiler/runtime notices and their exact
+scope are described in `licenses/NOTICE.md`; these notices do not modify
+the compiled bridge or any core.

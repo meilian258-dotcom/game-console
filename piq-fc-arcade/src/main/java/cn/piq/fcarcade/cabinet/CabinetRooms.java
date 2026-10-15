@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.cabinet;
 
 import cn.piq.fcarcade.server.ServerArcadeSessions;
@@ -269,6 +271,7 @@ public final class CabinetRooms {
         // Revalidate after all authorization callbacks, immediately before sending the bounded action.
         if(authorized(player,room.id,member.id)!=member)return "当前操作权限已改变，请重新领取 1P。";
         state.pgmServiceNext.put(member.id,tick+300);
+        CabinetNetplay.authorizeOperating(player,room.id);
         PacketDistributor.sendToPlayer(player,new CabinetRoomNetwork.PgmService(room.id,member.id));
         for(var seat:room.members)if(seat!=null){var other=player.getServer().getPlayerList().getPlayer(seat.player);
             if(other!=null)notice(other,"街机维护请求：请先松开游戏按键，由 OP 1P 调整；整局都会受影响。没有 Test 菜单的游戏不会响应。");}

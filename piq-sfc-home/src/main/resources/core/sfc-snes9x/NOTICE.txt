@@ -1,0 +1,63 @@
+Snes9x: fixed, unmodified Windows x64 libretro LOCAL TEST CANDIDATE.
+This is not a publication approval or a claim of complete licensing review.
+
+DLL: snes9x_libretro.dll (3840000 bytes)
+SHA256: 5ce01616184f255623405793e192f79aef5089fa796b29bc11ddc5e052060124
+Reported runtime: Snes9x 1.63 fae2fea
+Original binary: https://buildbot.libretro.com/nightly/windows/x86_64/latest/snes9x_libretro.dll.zip
+Archive SHA256: af334c14699af8784f751223d6ee63a0c22226eaa95d448dd95d3543452ff845
+Retrieved 2026-10-11T03:00:49.708712+00:00. The latest URL is mutable;
+if it changes, the builder requires a separately supplied identical pinned DLL.
+No core code or core binary has been modified by this adapter.
+
+Reference source, supplied separately (not embedded in the JAR):
+https://codeload.github.com/libretro/snes9x/zip/fae2fea08f74180759ef540ee94259213f503480
+snes9x-fae2fea08f74180759ef540ee94259213f503480.zip (760336 bytes)
+SHA256: 7f6dee7ab1a367da86bc86a87a204bf8fe0be389d62e7cfbd568dc2ccac32055
+Its revision matches the runtime short version. This alone does NOT establish
+the exact source/build flags used by Buildbot, or source-to-binary reproducibility.
+
+The unmodified top-level license is licenses/LICENSE-Snes9x.txt. It grants
+non-commercial use/copy/modification/distribution without fee provided its
+license and copyright accompany all copies and derived work; it also describes
+personal-use freeware and commercial restrictions. The libretro-port notice
+does not grant commercial rights. The original text, not this summary, governs.
+The frontend/public JNI bridge's GPL license does not relicense this separate
+core, erase these restrictions, or establish permission for a combined product.
+
+PIQ-authored integration code has the separate limited permission in
+META-INF/licenses/SNES9X-LINKING-EXCEPTION.txt in new builds. Frozen SFC54
+copies require that notice as a companion; their JAR bytes are unchanged.
+It covers only the stated PIQ copyrights and this pinned Snes9x revision,
+not RetroArch or other third-party code, and does not authorize commercial
+use of Snes9x. GPL/source obligations for covered code remain applicable.
+
+The pinned reference Makefile.common directly includes filter/snes_ntsc.c and
+the APU DSP implementation. snes_ntsc and SPC_DSP.cpp state LGPL 2.1-or-later;
+licenses/LICENSE-LGPL-2.1.txt preserves the complete original license from this
+tree. licenses/UPSTREAM-COMMENTS.txt preserves verbatim copyright/permission
+comments, including libretro/libretro-common MIT notices, with source paths.
+That inventory is not proof that every referenced source was compiled into the DLL.
+
+The top-level license also references JMA and xBRZ. Neither source nor their
+license files occur in this pinned libretro tree, and its Makefile.common does
+not list either. The reference-only/ directory supplies verbatim texts from a
+different, explicitly pinned official snes9xgit/snes9x tree. These supplements
+are NOT evidence of incorporation, corresponding source, or an exception for
+the distributed DLL. In particular the JMA text limits its stated GPL exception
+to Snes9x, not derivatives. See reference-only/sources.json for exact provenance.
+
+The fixed tree/build list has no JMA/xBRZ compilation units; the fixed DLL
+also identifies JMA as disabled. Reference-only texts do not establish their
+incorporation. Runtime notices and source/build scope are described in
+piq-sfc-home/third-party/snes9x-runtime/NOTICE.md in the source distribution.
+
+Before public distribution: verify delivery of the limited linking permission,
+GPL, fixed complete source, applicable LGPL relinking materials and runtime
+notices, together with compliance with non-commercial bundle/use terms. The
+snapshot publication validator explicitly rejects this candidate until that
+review is completed in a separate approved change; no download/build switch
+bypasses that gate. Local compilation and isolated tests are still permitted.
+
+The legacy Mesen-S resource, SHA, build identity and old saves remain separate.
+No ROM, BIOS, player save or private test content is included in this candidate.

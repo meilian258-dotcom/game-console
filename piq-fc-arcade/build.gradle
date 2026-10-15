@@ -23,6 +23,7 @@ def jnaInput = piqLockedInput('jna-5-14-0')
 def mesenWindowsInput = piqLockedInput('mesen-windows')
 def mesenLinuxInput = piqLockedInput('mesen-linux')
 def jniBridgeInput = piqLockedInput('libretro-jni-abi2')
+def jniLibcxxInput = piqLockedInput('libcxx-windows')
 def netplayInput = piqLockedInput('retroarch-netplay')
 def pinnedCoreInputs = [
         'core/nes_rust_wasm_bg.wasm': piqLockedInput('nes-wasm'),
@@ -128,13 +129,32 @@ tasks.named('processResources') { dependsOn prepareLibretroRuntime }
 // Rebuilt native DLLs require a reviewed lock change and verified cache import.
 def prepareJniRuntime = tasks.register('prepareJniRuntime', Sync) {
     from(jniBridgeInput) { into 'windows-x64' }
+    from(jniLibcxxInput) { into 'windows-x64'; rename { 'libc++.dll' } }
     from('native/libretro-jni/README.md')
+    from('native/libretro-jni/licenses') { into 'licenses' }
+    from('SNES9X-LINKING-EXCEPTION.txt') { into 'licenses' }
+    from('MD-ARCADE-LINKING-EXCEPTION.txt') { into 'licenses' }
     into layout.buildDirectory.dir('generated/jni-resources/core/libretro-jni')
     doLast {
         def dll = new File(destinationDir, 'windows-x64/piq-libretro-jni.dll')
+        def runtime = new File(destinationDir, 'windows-x64/libc++.dll')
         if (!dll.isFile()) throw new GradleException('Build native/libretro-jni into dist first; see its README')
+        if (!runtime.isFile()) throw new GradleException('Missing reviewed JNI runtime dependency')
+        ['libcxx-LICENSE.txt', 'libcxxabi-LICENSE.txt', 'libunwind-LICENSE.txt',
+         'compiler-rt-LICENSE.txt', 'MinGW-w64-v14.0.0-COPYING',
+         'MinGW-w64-v14.0.0-project-notices.txt', 'MinGW-w64-v14.0.0-runtime-notices.txt',
+         'NOTICE.md', 'SNES9X-LINKING-EXCEPTION.txt', 'MD-ARCADE-LINKING-EXCEPTION.txt'].each { name ->
+            def license = new File(destinationDir, 'licenses/' + name)
+            if (!license.isFile() || license.length() == 0) {
+                throw new GradleException('Missing JNI runtime license/notice: ' + name)
+            }
+        }
         def sha = java.security.MessageDigest.getInstance('SHA-256').digest(dll.bytes).encodeHex().toString()
-        new File(destinationDir, 'runtime.properties').setText("abi=2\nwindows-x64.sha256=${sha}\n", 'UTF-8')
+        def runtimeSha = java.security.MessageDigest.getInstance('SHA-256').digest(runtime.bytes).encodeHex().toString()
+        new File(destinationDir, 'runtime.properties').setText(
+            "abi=2\nwindows-x64.sha256=${sha}\nruntime-dependency-api=1\n" +
+            "windows-x64.runtime.count=1\nwindows-x64.runtime.0.name=libc++.dll\n" +
+            "windows-x64.runtime.0.sha256=${runtimeSha}\nwindows-x64.runtime.0.bytes=${runtime.length()}\n", 'UTF-8')
     }
 }
 sourceSets.main.resources.srcDir layout.buildDirectory.dir('generated/jni-resources')
@@ -193,14 +213,19 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-def asciiClasspathRoot = new File(
-        System.getProperty('java.io.tmpdir'),
-        "piq-fc-arcade-gradle-${Integer.toUnsignedString(rootDir.absolutePath.hashCode())}"
-)
+apply from: '../source-control/build-workspace.gradle'
+def asciiClasspathRoot = piqAsciiClasspathRoot
 def asciiTestOutput = new File(asciiClasspathRoot, 'test-output')
 def asciiMainOutput = new File(asciiClasspathRoot, 'main-output')
 def asciiRuntimeJar = new File(asciiClasspathRoot, "${mod_id}-runtime.jar")
 def asciiGameDependencies = new File(asciiClasspathRoot, 'game-dependencies')
+// Keep only test runtime instances short enough for the unmodified Win32 bridge.
+// The general task tmp/JNA/Wasmtime paths and actual ModDev game tasks are unchanged.
+def testRuntimeRoot = new File(piqBuildWorkspace, 'rt')
+def useTestRuntimeRoot = { task ->
+    task.systemProperty 'piq.test.runtimeRoot', testRuntimeRoot.absolutePath
+    task.doFirst { piqPrepareBuildDirectory(testRuntimeRoot) }
+}
 def prepareAsciiGameDependencies = tasks.register('prepareAsciiGameDependencies', Sync) {
     from sourceSets.main.compileClasspath
     into asciiGameDependencies
@@ -226,6 +251,7 @@ def prepareAsciiMainOutput = tasks.register('prepareAsciiMainOutput', Sync) {
 }
 
 tasks.named('test', Test).configure {
+    useTestRuntimeRoot(delegate)
     dependsOn prepareAsciiTestOutput, prepareAsciiMainOutput, prepareAsciiGameDependencies
     useJUnitPlatform()
     // JDK/Gradle worker argument files can corrupt non-ASCII paths on Windows.
@@ -251,9 +277,17 @@ neoForge.ideSyncTask generateModMetadata
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    // Unlike ordinary bundled-license collisions, shared Replay API collisions
+    // must never be silently hidden by the general shaded-JAR exclusion policy.
+    filesMatching(['cn/piq/retro/replay/**', 'cn/piq/fcarcade/api/replay/**',
+                   'META-INF/game-console/replay-api.properties']) {
+        duplicatesStrategy = DuplicatesStrategy.FAIL
+    }
     // Ship readable dependency attribution beside the verbatim license resources.
     from('THIRD_PARTY_NOTICES.md')
     from('LICENSE.md')
+    from('SNES9X-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
+    from('MD-ARCADE-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
     from {
         configurations.wasmtimeBundle.collect { zipTree(it) }
     }
@@ -271,9 +305,10 @@ jar {
 }
 
 tasks.register('packagedRuntimeSmoke', JavaExec) {
+    piqUseBuildWorkspace(delegate)
     dependsOn tasks.named('jar'), prepareAsciiTestOutput
     doFirst {
-        asciiClasspathRoot.mkdirs()
+        piqPrepareBuildDirectory(asciiClasspathRoot)
         copy {
             from tasks.named('jar').get().archiveFile
             into asciiClasspathRoot
@@ -289,6 +324,8 @@ tasks.named('check') {
 }
 
 tasks.register('packagedLibretroSmoke', JavaExec) {
+    piqUseBuildWorkspace(delegate)
+    useTestRuntimeRoot(delegate)
     dependsOn tasks.named('packagedRuntimeSmoke')
     classpath = files(asciiTestOutput, asciiRuntimeJar)
     mainClass = 'cn.piq.fcarcade.core.libretro.LibretroPackagedSmoke'
@@ -296,6 +333,8 @@ tasks.register('packagedLibretroSmoke', JavaExec) {
 tasks.named('check') { dependsOn tasks.named('packagedLibretroSmoke') }
 
 tasks.register('packagedGenericLibretroSmoke', JavaExec) {
+    piqUseBuildWorkspace(delegate)
+    useTestRuntimeRoot(delegate)
     dependsOn tasks.named('packagedRuntimeSmoke')
     classpath = files(asciiTestOutput, asciiRuntimeJar)
     mainClass = 'cn.piq.fcarcade.core.libretro.GenericLibretroCompatibilitySmoke'
@@ -304,3 +343,28 @@ tasks.register('packagedGenericLibretroSmoke', JavaExec) {
     }
 }
 tasks.named('check') { dependsOn tasks.named('packagedGenericLibretroSmoke') }
+
+// Parse the actual player JAR without loading Minecraft or trusting a marker.
+// snapshot_build/release independently reuse the same data-only verifier.
+tasks.register('packagedReplayApiCheck', Exec) {
+    group = 'verification'
+    description = 'Verifies final Replay v1 signatures, explicit provider wiring and ownership.'
+    dependsOn tasks.named('jar')
+    def verifier = file('../source-control/replay_api.py')
+    def python = providers.gradleProperty('replayApiPython')
+            .orElse(providers.gradleProperty('snapshotPython'))
+            .orElse(providers.environmentVariable('PIQ_BUILD_PYTHON')).getOrElse('python')
+    inputs.file(verifier)
+    inputs.file(tasks.named('jar').flatMap { it.archiveFile })
+    environment 'PYTHONDONTWRITEBYTECODE', '1'
+    doFirst {
+        def temporary = new File(piqBuildWorkspace, 'packagedReplayApiCheck')
+        piqPrepareBuildDirectory(temporary)
+        environment 'TEMP', temporary.absolutePath
+        environment 'TMP', temporary.absolutePath
+        environment 'TMPDIR', temporary.absolutePath
+        commandLine python, '-B', verifier.absolutePath, '--require', '--jar',
+                tasks.named('jar').get().archiveFile.get().asFile.absolutePath
+    }
+}
+tasks.named('check') { dependsOn tasks.named('packagedReplayApiCheck') }

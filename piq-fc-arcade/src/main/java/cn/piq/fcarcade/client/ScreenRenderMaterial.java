@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client;
 
 import net.minecraft.client.renderer.RenderType;
@@ -47,6 +49,8 @@ public final class ScreenRenderMaterial extends RenderType {
         return SHADER_PACK.getAsBoolean() ? GameRenderer.getRendertypeEntityCutoutNoCullShader() : shader;
     }
     public static RenderType of(ResourceLocation texture) {
-        return TYPES.apply(texture);
+        RenderType type = TYPES.apply(texture);
+        cn.piq.fcarcade.api.replay.ReplayPresentation.material(texture, type);
+        return type;
     }
 }

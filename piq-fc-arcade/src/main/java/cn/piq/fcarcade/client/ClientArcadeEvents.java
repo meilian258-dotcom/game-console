@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client;
 
 import cn.piq.fcarcade.ArcadeFramePayload;
@@ -53,6 +55,7 @@ import java.util.Map;
 import java.util.Set;
 
 public final class ClientArcadeEvents {
+    private static final cn.piq.retro.replay.ReplayGuard.Retirement REPLAY_RETIREMENT=new cn.piq.retro.replay.ReplayGuard.Retirement();
     private static final Map<Long, ClientArcadeSession> SESSIONS = new HashMap<>();
     private static final Map<Long, BlockPos> SESSION_POSITIONS = new HashMap<>();
     private static final Map<Long, ArcadePersistentStatePayload>
@@ -99,6 +102,7 @@ public final class ClientArcadeEvents {
     }
 
     public static void applySession(ArcadeSessionPayload payload) {
+        if(cn.piq.retro.replay.ReplayGuard.playing())return;
         ClientRomTransfers.applySession(payload);
     }
 
@@ -106,6 +110,7 @@ public final class ClientArcadeEvents {
         applySessionReady(payload,null,null,false);
     }
     private static void applySessionReady(ArcadeSessionPayload payload,java.util.UUID hostedSource,java.util.UUID hostedToken,boolean hostedOperator) {
+        if(cn.piq.retro.replay.ReplayGuard.playing())return;
         if (!payload.active()) {
             NetplayClient.forget(payload.sessionId());
             ClientArcadeSession session = SESSIONS.remove(payload.sessionId());
@@ -177,10 +182,13 @@ public final class ClientArcadeEvents {
     }
 
     public static void promptExit(ArcadeExitPromptPayload payload) {
+        if(cn.piq.retro.replay.ReplayGuard.playing())return;
+        long replayEpoch=cn.piq.retro.replay.ReplayGuard.epoch();
         Minecraft minecraft = Minecraft.getInstance();
         CartridgeScreenCompat.prepare();
         minecraft.setScreen(new DeviceConfirmScreen(
                 save -> {
+                    if(!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))return;
                     minecraft.setScreen(null);
                     FcNetwork.decideExit(payload.sessionId(), save);
                 },
@@ -192,10 +200,13 @@ public final class ClientArcadeEvents {
     }
 
     public static void promptResume(ArcadeResumePromptPayload payload) {
+        if(cn.piq.retro.replay.ReplayGuard.playing())return;
+        long replayEpoch=cn.piq.retro.replay.ReplayGuard.epoch();
         Minecraft minecraft = Minecraft.getInstance();
         CartridgeScreenCompat.prepare();
         minecraft.setScreen(new DeviceConfirmScreen(
                 resume -> {
+                    if(!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))return;
                     minecraft.setScreen(null);
                     FcNetwork.decideResume(
                             payload.blockPos(),
@@ -210,12 +221,15 @@ public final class ClientArcadeEvents {
     }
 
     public static void offerMultiplayer(ArcadeMultiplayerOfferPayload payload) {
+        if(cn.piq.retro.replay.ReplayGuard.playing())return;
+        long replayEpoch=cn.piq.retro.replay.ReplayGuard.epoch();
         Minecraft minecraft = Minecraft.getInstance();
         var source=minecraft.getConnection();
         if(source==null||!source.getConnection().isConnected())return;
         CartridgeScreenCompat.prepare();
         minecraft.setScreen(new DeviceConfirmScreen(
                 enabled -> {
+                    if(!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))return;
                     minecraft.setScreen(null);
                     if(minecraft.getConnection()!=source||!source.getConnection().isConnected())return;
                     FcNetwork.setMultiplayerEnabled(payload.sessionId(), enabled);
@@ -228,6 +242,8 @@ public final class ClientArcadeEvents {
     }
 
     public static void requestJoinApproval(ArcadeJoinApprovalPayload payload) {
+        if(cn.piq.retro.replay.ReplayGuard.playing())return;
+        long replayEpoch=cn.piq.retro.replay.ReplayGuard.epoch();
         Minecraft minecraft = Minecraft.getInstance();
         if(payload.requestToken()!=null){requestHomeApproval(payload);return;}
         var source=minecraft.getConnection();
@@ -235,6 +251,7 @@ public final class ClientArcadeEvents {
         CartridgeScreenCompat.prepare();
         minecraft.setScreen(new DeviceConfirmScreen(
                 accepted -> {
+                    if(!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))return;
                     if(payload.requestToken()!=null&&(minecraft.getConnection()!=source||SESSIONS.get(payload.sessionId())==null||!SESSIONS.get(payload.sessionId()).isHomeOperator()))return;
                     minecraft.setScreen(null);
                     FcNetwork.decideJoin(
@@ -250,6 +267,8 @@ public final class ClientArcadeEvents {
     }
 
     private static void requestHomeApproval(ArcadeJoinApprovalPayload payload){
+        if(cn.piq.retro.replay.ReplayGuard.playing())return;
+        long replayEpoch=cn.piq.retro.replay.ReplayGuard.epoch();
         Minecraft mc=Minecraft.getInstance();var source=mc.getConnection();var session=SESSIONS.get(payload.sessionId());long now=System.nanoTime();
         HOME_APPROVALS.values().removeIf(until->until<now);
         if(source==null||!source.getConnection().isConnected()||session==null||!session.isHomeOperator()||mc.screen!=null||HOME_APPROVALS.containsKey(payload.requestToken())||HOME_APPROVALS.size()>=32)return;
@@ -257,6 +276,7 @@ public final class ClientArcadeEvents {
         final net.minecraft.client.gui.screens.Screen[] own=new net.minecraft.client.gui.screens.Screen[1];
         CartridgeScreenCompat.prepare();
         own[0]=new DeviceConfirmScreen(accepted->{
+            if(!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))return;
             if(mc.screen!=own[0])return;
             boolean stale=mc.getConnection()!=source||!source.getConnection().isConnected()||SESSIONS.get(payload.sessionId())!=session||!session.isHomeOperator()||System.nanoTime()>deadline;
             mc.setScreen(null);if(stale)return;
@@ -565,6 +585,7 @@ public final class ClientArcadeEvents {
     }
 
     private static void refreshSimulationSelection(boolean force) {
+        if(cn.piq.retro.replay.ReplayGuard.playing())return;
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null || minecraft.player == null
                 || minecraft.getConnection() == null) return;
@@ -634,6 +655,7 @@ public final class ClientArcadeEvents {
     }
 
     private static void onRenderFrame(RenderFrameEvent.Pre event) {
+        if(REPLAY_RETIREMENT.block(ClientArcadeEvents::clearOnDisconnect))return;
         Minecraft minecraft = Minecraft.getInstance();
         try {
             if (minecraft.level == null || minecraft.player == null
@@ -677,6 +699,7 @@ public final class ClientArcadeEvents {
     }
 
     private static void updateTransfers() {
+        if(cn.piq.retro.replay.ReplayGuard.playing())return;
         try {
             ClientRomTransfers.update();
         } catch (RuntimeException error) {

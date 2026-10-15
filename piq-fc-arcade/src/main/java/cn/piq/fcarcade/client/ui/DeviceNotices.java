@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client.ui;
 
 import java.io.PrintWriter;
@@ -18,7 +20,12 @@ public final class DeviceNotices {
     private DeviceNotices() {}
 
     public static Entry record(String device, String detail) { return record(device, detail, null); }
-    public static synchronized Entry record(String device, String detail, Throwable failure) {
+    public static Entry record(String device, String detail, Throwable failure) {return record(device,detail,failure,null);}
+    public static Entry recordFailure(String device, NetplayFailureCode code, String detail, Throwable failure) {
+        java.util.Objects.requireNonNull(code);
+        return record(device,"["+code.name()+"] "+(detail==null?"":detail),failure,code.summary());
+    }
+    private static synchronized Entry record(String device, String detail, Throwable failure, String classifiedSummary) {
         String source = device == null || device.isBlank() ? "模拟器" : device;
         String context = detail == null || detail.isBlank() ? "操作未完成" : detail;
         StringWriter trace = new StringWriter();
@@ -32,8 +39,8 @@ public final class DeviceNotices {
         if (failure == null) LOGGER.log(System.Logger.Level.WARNING,"[" + source + "] " + context);
         else LOGGER.log(System.Logger.Level.WARNING,"[" + source + "] " + context,failure);
         // The actual failure has priority over incidental ROM/DLL names in a normal startup log.
-        String summary=failure==null?summarize(full):summarize(failure.toString());
-        if(summary.equals("操作未完成，请查看运行环境"))summary=summarize(full);
+        String summary=classifiedSummary!=null?classifiedSummary:failure==null?summarize(full):summarize(failure.toString());
+        if(classifiedSummary==null&&summary.equals("操作未完成，请查看运行环境"))summary=summarize(full);
         Entry entry = new Entry(++sequence, Instant.now(), source, summary,
                 full.length() <= 16_384 ? full : full.substring(0, 16_384) + "\n[显示已截断；完整记录见客户端日志]");
         ENTRIES.addFirst(entry);
@@ -44,10 +51,35 @@ public final class DeviceNotices {
     public static synchronized Entry last() { return ENTRIES.peekFirst(); }
     public static synchronized void clear() { ENTRIES.clear(); lastKey = ""; lastAt = 0; }
 
+    /** Native detail stays in bounded client memory; only the path-free summary goes to logs. */
+    public static synchronized Entry recordLocalDiagnostic(String device, String reason, String diagnostic) {
+        String source = device == null || device.isBlank() ? "模拟器" : device;
+        String context = reason == null || reason.isBlank() ? "操作未完成" : reason;
+        String summary = summarize(context);
+        String full = context + (diagnostic == null || diagnostic.isBlank() ? "" : "\n" + diagnostic);
+        if (full.length() > 16_384) full = full.substring(0, 16_384) + "\n[本机诊断显示已截断；原生输出未写入客户端日志]";
+        String key = "local\n" + source + '\n' + full;
+        long now = System.nanoTime();
+        if (key.equals(lastKey) && now - lastAt < 2_000_000_000L && !ENTRIES.isEmpty()) return ENTRIES.getFirst();
+        lastKey = key; lastAt = now;
+        LOGGER.log(System.Logger.Level.WARNING, "[" + source + "] " + summary);
+        Entry entry = new Entry(++sequence, Instant.now(), source, summary, full);
+        ENTRIES.addFirst(entry);
+        while (ENTRIES.size() > 32) ENTRIES.removeLast();
+        return entry;
+    }
+
     /** Stable, path-free summaries. Detailed paths/core errors remain available in the diagnostics page/log. */
     public static String summarize(String text) {
         String value = text == null ? "" : text.toLowerCase(Locale.ROOT);
         if (cn.piq.retro.storage.RuntimeWorkspace.diskFull(value)) return "磁盘空间不足，请清理运行目录所在磁盘";
+        if (value.contains("游戏数据缺失")) return "游戏数据不完整，请复制诊断查看缺失文件";
+        if(value.contains("retroarch")){
+            if(contains(value,"协议不匹配","音画边界异常","旋转边界异常"))return "RetroArch 组件不匹配，请核对配套版本";
+            if(contains(value,"启动退出","核心输出已结束"))return "RetroArch 核心已退出，请复制诊断";
+            if(contains(value,"timeout","timed out","超时"))return "RetroArch 本机运行超时，请查看诊断";
+            if(value.contains("仅支持 windows x64"))return "RetroArch 需要 Windows x64 客户端";
+        }
         if(value.contains("netplay")){
             if(contains(value,"积压","顺序异常"))return "联机数据积压或顺序异常，请重新加入";
             if(contains(value,"连接已结束","已结束"))return "本局联机连接已结束";

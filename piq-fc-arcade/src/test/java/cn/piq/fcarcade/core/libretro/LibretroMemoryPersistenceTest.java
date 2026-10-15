@@ -3,6 +3,7 @@ package cn.piq.fcarcade.core.libretro;
 
 import cn.piq.retro.libretro.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.io.TempDir;
 import java.nio.file.*;
 import java.io.IOException;
@@ -11,6 +12,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LibretroMemoryPersistenceTest {
     @TempDir Path root;
+    @BeforeAll static void configureRuntimeInstance() throws IOException {
+        cn.piq.retro.storage.RuntimeWorkspaceTestSupport.configure();
+    }
     private LibretroProcess start(byte[] rom) {
         var core = new LibretroProcess(GenericLibretroNesCore.profile(false));
         try { core.load(rom); return core; } catch (RuntimeException e) { core.close(); throw e; }

@@ -1,4 +1,9 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.cabinet;
+
+import cn.piq.fcarcade.netplay.NetplayLaunchSpec;
+import cn.piq.fcarcade.netplay.NetplayLaunchCodec;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -34,7 +39,7 @@ public final class WatchNetwork {
     static int heartbeatBytes(long revision){int bytes=17;while((revision>>>=7)!=0)bytes++;return bytes;}
     public static void register(RegisterPayloadHandlersEvent event){
         CabinetRooms.registerWatchProvider();
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"watch-4")
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"watch-5")
             .playToServer(Available.TYPE,Available.CODEC,(p,c)->server(c,s->WatchService.available(s,p)))
             .playToServer(Release.TYPE,Release.CODEC,(p,c)->server(c,s->WatchService.release(s,p)))
             .playToServer(Preference.TYPE,Preference.CODEC,(p,c)->server(c,s->WatchService.preference(s,p)))
@@ -82,13 +87,14 @@ public final class WatchNetwork {
         public static final StreamCodec<RegistryFriendlyByteBuf,Start> CODEC=StreamCodec.of((b,p)->{b.writeVarLong(p.revision);b.writeUUID(p.lease);WatchNetwork.descriptor(b,p.descriptor);},b->new Start(b.readVarLong(),b.readUUID(),WatchNetwork.descriptor(b)));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
-    public record NetplayStart(Start watch,long wire,UUID ticket,ResourceLocation backend,String romHash) implements CustomPacketPayload {
-        public NetplayStart{Objects.requireNonNull(watch);Objects.requireNonNull(ticket);Objects.requireNonNull(backend);
+    public record NetplayStart(Start watch,long wire,UUID ticket,ResourceLocation backend,String romHash,NetplayLaunchSpec launch) implements CustomPacketPayload {
+        public NetplayStart(Start watch,long wire,UUID ticket,ResourceLocation backend,String romHash){this(watch,wire,ticket,backend,romHash,NetplayLaunchSpec.UNSPECIFIED);}
+        public NetplayStart{Objects.requireNonNull(watch);Objects.requireNonNull(ticket);Objects.requireNonNull(backend);Objects.requireNonNull(launch);
             if(wire<0||backend.toString().length()>128||!CabinetGameManifest.hash(romHash))throw new IllegalArgumentException("Netplay observer grant");}
         public static final Type<NetplayStart> TYPE=new Type<>(id("netplay"));
         public static final StreamCodec<RegistryFriendlyByteBuf,NetplayStart> CODEC=StreamCodec.of((b,p)->{
-            Start.CODEC.encode(b,p.watch);b.writeVarLong(p.wire);b.writeUUID(p.ticket);b.writeUtf(p.backend.toString(),128);b.writeUtf(p.romHash,64);
-        },b->new NetplayStart(Start.CODEC.decode(b),b.readVarLong(),b.readUUID(),ResourceLocation.parse(b.readUtf(128)),b.readUtf(64)));
+            Start.CODEC.encode(b,p.watch);b.writeVarLong(p.wire);b.writeUUID(p.ticket);b.writeUtf(p.backend.toString(),128);b.writeUtf(p.romHash,64);NetplayLaunchCodec.CODEC.encode(b,p.launch);
+        },b->new NetplayStart(Start.CODEC.decode(b),b.readVarLong(),b.readUUID(),ResourceLocation.parse(b.readUtf(128)),b.readUtf(64),NetplayLaunchCodec.CODEC.decode(b)));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     public record Stop(long revision,UUID lease,String reason) implements CustomPacketPayload {

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.mdhome;
 
 import cn.piq.fcarcade.home.*;
@@ -85,7 +86,7 @@ public final class MdConsole extends ExternalHomeConsoleBlockEntity {
         if(loan(port)!=null){say(p,p.getUUID().equals(borrower(port))?"请从物品栏拿起已借出的手柄。":(port+1)+"P 手柄已被其他玩家借走。");return;}
         if(p.getUUID().equals(borrower(1-port))){say(p,"每位玩家只能借用一个端口，请先归还另一只手柄。");return;}
         if(busy()&&!running){say(p,"主机正在准备或结束保存，请等待就绪再取手柄。");return;}
-        if(running&&(!publicPlay&&(port!=0||!p.getUUID().equals(powerHost))||publicPlay&&!MdPublicServer.allowedPort(this,port))){say(p,"当前开局未开放这个手柄端口；请关机后由主持重新选择。");return;}
+        if(running&&(!publicPlay&&(port!=0||!p.getUUID().equals(powerHost))||publicPlay&&!MdPublicServer.allowedPort(this,port))){say(p,"本局未开放此端口；请核对设备 2P 许可、游戏人数及私人模式，设置下次开机生效。");return;}
         int empty=MdInteractionPolicy.emptyHand(p.getMainHandItem().isEmpty(),p.getOffhandItem().isEmpty());
         if(empty<0||!p.containerMenu.getCarried().isEmpty()){say(p,"请放下光标中的物品并腾出一只手。");return;}
         borrowers[port]=p.getUUID();loans[port]=UUID.randomUUID();loanConnections[port]=p.connection.getConnection();

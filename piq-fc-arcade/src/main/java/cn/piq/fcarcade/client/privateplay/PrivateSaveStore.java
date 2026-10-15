@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client.privateplay;
 
 import java.io.*;
@@ -10,6 +12,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.zip.*;
+import cn.piq.retro.replay.ReplayGuard;
 
 /**
  * Worker-only private save transactions. The caller supplies its local identity-scoped root.
@@ -23,6 +26,10 @@ public final class PrivateSaveStore {
     private static final Set<String> MEMBERS = Set.of("metadata.bin", "state.bin", "sram.bin");
     private final Path root;
     private final Operations operations;
+    private final long replayEpoch = ReplayGuard.epoch();
+    private void requireLive() throws IOException {
+        if (!ReplayGuard.valid(replayEpoch)) throw new IOException("Replay retired this private save owner; previous save retained");
+    }
 
     public record Key(String system, String coreNamespace, String romSha256) {
         public Key {
@@ -85,10 +92,12 @@ public final class PrivateSaveStore {
 
     /** All existing owned archives must verify before either can be replaced. No non-atomic fallback. */
     public void save(Key key, byte[] state, byte[] sram) throws IOException {
+        requireLive();
         Snapshot snapshot;
         try { snapshot = new Snapshot(state, sram); }
         catch (IllegalArgumentException invalid) { throw new IOException(invalid.getMessage(), invalid); }
         synchronized (IO_LOCK) {
+            requireLive();
             Path directory = directory(key); directories(directory, true);
             int count = 0;
             try (DirectoryStream<Path> entries = Files.newDirectoryStream(directory)) {
@@ -106,15 +115,18 @@ public final class PrivateSaveStore {
             try {
                 writeArchive(temporary, key, snapshot);
                 readArchive(temporary, key);
+                requireLive();
                 if (hasLatest) {
                     backup = Files.createTempFile(directory, ".private-backup-", ".part");
                     copyForced(latest, backup);
                     readArchive(backup, key);
                     directories(directory, false);
+                    requireLive();
                     operations.replace(backup, previous);
                     backup = null;
                 }
                 directories(directory, false);
+                requireLive();
                 operations.replace(temporary, latest);
                 temporary = null;
                 readArchive(latest, key);

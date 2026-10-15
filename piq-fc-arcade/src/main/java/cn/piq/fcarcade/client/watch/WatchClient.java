@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client.watch;
 
 import cn.piq.fcarcade.cabinet.*;
@@ -6,6 +8,7 @@ import cn.piq.fcarcade.client.cabinet.WatchAudio;
 import cn.piq.fcarcade.client.cabinet.WatchMediaStream;
 import cn.piq.fcarcade.client.cabinet.CabinetBackend;
 import cn.piq.retro.input.InputOwnership;
+import cn.piq.retro.replay.ReplayGuard;
 import cn.piq.retro.libretro.jni.NativeLibretroBridge;
 import cn.piq.fcarcade.netplay.NetplayProcess;
 import cn.piq.fcarcade.netplay.NetplayNetwork;
@@ -29,6 +32,8 @@ import java.util.concurrent.*;
 /** Nearby read-only displays. Each source owns its lease, preparation and native lifetime. */
 @EventBusSubscriber(modid="piq_fc_arcade", value=Dist.CLIENT)
 public final class WatchClient implements WatchNetwork.ClientSink {
+    private static final ReplayGuard.Retirement REPLAY_RETIREMENT=new ReplayGuard.Retirement();
+    private static void retireForReplay(){closeAll(false);clearDemands();syncConnection();available=null;}
     public interface DisplayAdapter {
         boolean valid(WatchDescriptor descriptor);
         boolean isParticipant(WatchDescriptor descriptor);
@@ -66,6 +71,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
     private static final ThreadPoolExecutor CONTENT=new ThreadPoolExecutor(1,1,30,TimeUnit.SECONDS,new ArrayBlockingQueue<>(4),r->{var t=new Thread(r,"PIQ-Watch-Content");t.setDaemon(true);return t;},new ThreadPoolExecutor.AbortPolicy());
     private record Demand(WatchNetwork.HostDemand value,long expires,boolean expired) {}
     private static final class Receiver {
+        final long replayEpoch=ReplayGuard.epoch();
         final WatchNetwork.Start start;
         final WatchNetwork.NetplayStart grant;
         final Connection connection;
@@ -125,17 +131,18 @@ public final class WatchClient implements WatchNetwork.ClientSink {
     }
     private static boolean availableNow() {
         var mc=Minecraft.getInstance();
-        return !shuttingDown&&mc.level!=null&&mc.player!=null&&mc.player.isAlive();
+        return !ReplayGuard.playing()&&!shuttingDown&&mc.level!=null&&mc.player!=null&&mc.player.isAlive();
     }
     private static boolean operating(){return InputOwnership.occupied()||ClientArcadeEvents.isControlling();}
-    private static boolean live(Receiver r){return !r.closed&&RECEIVERS.get(r.start.lease())==r&&r.connection==connection;}
+    private static boolean live(Receiver r){return ReplayGuard.valid(r.replayEpoch)&&!r.closed&&RECEIVERS.get(r.start.lease())==r&&r.connection==connection;}
     private static void syncConnection() {
         Connection next=liveConnection();
         if(next==connection)return;
         closeAll(false);clearDemands();connection=next;HISTORY.connection(next);MANAGEMENT.connection(next);PAUSED_DISPLAYS.clear();available=null;ticks=0;
     }
-    @Override public boolean acceptsConnection(Connection source){return source!=null&&source==liveConnection();}
+    @Override public boolean acceptsConnection(Connection source){return !ReplayGuard.playing()&&source!=null&&source==liveConnection();}
     private static Receiver admit(WatchNetwork.Start start,WatchNetwork.NetplayStart grant){
+        if(ReplayGuard.playing())return null;
         syncConnection();
         if(HISTORY.matches(start.revision(),start.lease()))return null;
         Source source=Source.of(start.descriptor());
@@ -165,6 +172,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
     @Override public void netplay(WatchNetwork.NetplayStart grant){if(admit(grant.watch(),grant)!=null)prepareNext();}
     /** Capture/download one source at a time; cancellation retains the claim until the worker really returns. */
     private static void prepareNext(){
+        if(ReplayGuard.playing())return;
         if(RECEIVERS.values().stream().anyMatch(r->r.task!=null&&!r.task.done())
                 ||CLOSING.stream().anyMatch(r->r.task!=null&&!r.task.done()))return;
         for(var r:List.copyOf(RECEIVERS.values())){
@@ -173,6 +181,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
                 var captured=NetplayWatchContent.prepare(r.grant,r.connection);r.preparation=captured;
                 r.task=new WatchPreparationTask<>(captured.load());
                 r.task.result().whenComplete((content,failure)->Minecraft.getInstance().execute(()->{
+                    if(!ReplayGuard.valid(r.replayEpoch)){close(r,false);return;}
                     if(!live(r))return;
                     if(!valid(r)){close(r,true);return;}
                     if(failure!=null){nativeFailure(r,failure);return;}
@@ -182,6 +191,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
                         r.nativeMode=content.profile().jni()!=null;
                         if(!r.nativeMode&&(RECEIVERS.size()!=1||operating()))throw new IllegalStateException("Process Netplay supports one idle observer only");
                         var grant=r.grant;
+                        WatchStartConsent.requireAllowed(r.nativeMode,cn.piq.fcarcade.client.JniNetplayConsent::allowed);
                         r.netplay=captured.open(new NetplayProcess.Grant(grant.wire(),grant.ticket(),false,false),content,
                                 chunk->NetplayNetwork.upstream(r.connection,chunk));
                         NetplayNetwork.bind(r.connection,r.netplay);r.netplay.start();r.audio=new WatchAudio();
@@ -215,7 +225,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         if(r.task==null)return "排队准备";
         if(!r.task.done())return "准备游戏内容";
         if(r.netplay==null)return "准备核心";
-        return r.netplay.ready()?"正在旁观":r.netplay.status();
+        return r.netplay.ready()?(Boolean.FALSE.equals(r.nativeMode)?"本机音画就绪 / 同步未验":"正在旁观"):r.netplay.status();
     }
     /** Main-thread snapshot. Includes closing owners; a closed window is not a freed native slot. */
     public static ManagementView managementView(){
@@ -271,6 +281,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         DEMANDS.put(source,new Demand(value,System.nanoTime()+TIMEOUT,false));dispatchDemand(value);
     }
     private static void dispatchDemand(WatchNetwork.HostDemand value){
+        if(ReplayGuard.playing())return;
         var consumer=HOSTS.get(value.descriptor().provider());
         if(consumer!=null)try{consumer.accept(value);}catch(RuntimeException|LinkageError ignored){/* No observer failure exits a game. */}
     }
@@ -314,6 +325,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         return result;
     }
     private static void release(Receiver r){
+        if(!ReplayGuard.valid(r.replayEpoch))return;
         if(r.connection!=null&&r.connection==liveConnection()&&r.connection.isConnected())
             try{WatchNetwork.send(new WatchNetwork.Release(r.start.revision(),r.start.lease()));}catch(RuntimeException|LinkageError ignored){}
     }
@@ -351,6 +363,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         return WatchPresentationPolicy.capacity(free,held,closingUnreserved,pendingControls());
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event){
+        if(REPLAY_RETIREMENT.block(WatchClient::retireForReplay))return;
         syncConnection();CLOSING.removeIf(Receiver::released);
         if(shuttingDown||connection==null||!connection.isConnected())return;
         ticks++;
@@ -404,6 +417,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         Minecraft.getInstance().getTextureManager().register(r.textureId,r.texture);
     }
     @SubscribeEvent public static void render(RenderLevelStageEvent event){
+        if(REPLAY_RETIREMENT.block(WatchClient::retireForReplay))return;
         if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES)return;
         selectAudio();
         for(var r:List.copyOf(RECEIVERS.values())){

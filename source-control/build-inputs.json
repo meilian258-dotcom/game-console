@@ -25,10 +25,17 @@
     },
     "libretro-jni-abi2": {
       "filename": "piq-libretro-jni.dll",
-      "bytes": 1375744,
-      "sha256": "aec72d00384d89de94c214e12fe32a19c1c54c93ea80c9bc82727895be509a36",
-      "legacyPath": "outputs/content-library-closure-20261004/jni-large-content-v1/piq-libretro-jni.dll",
-      "purpose": "Common JNI ABI2: four independent owners, full-path content 96 MiB / memory content 64 MiB; native/libretro-jni/README.md and build_native.py; matching build receipt alongside legacyPath"
+      "bytes": 1320960,
+      "sha256": "fc731f3b83b0b23f473b48bb9f399582ace264c0646eec45fbffafaf0fb36923",
+      "legacyPath": "piq-fc-arcade/native/libretro-jni/dist/piq-libretro-jni.dll",
+      "purpose": "Common JNI ABI2 plus runtime dependency API1; four owners and existing content limits retained; native/libretro-jni/README.md and build_native.py; candidate only, requires matching reviewed libc++ bundle"
+    },
+    "libcxx-windows": {
+      "filename": "libcxx.dll",
+      "bytes": 1659392,
+      "sha256": "7344daed05388589e9bd691ed1d30c568c374da4b8b6a12e1502185948c03cd4",
+      "legacyPath": "piq-fc-arcade/native/libretro-jni/dist/libcxx.dll",
+      "purpose": "Unmodified MSYS2 CLANG64 libc++ 22.1.8-1, package SHA256 de0bd1b9d62f81b6ac06ea915af8da3fbd63e6705e1bb62ef3f553d1e5fbe4ef; cache-safe name, packaged as libc++.dll with upstream licenses; no nightly replacement"
     },
     "retroarch-netplay": {
       "filename": "piq-retroarch.exe",

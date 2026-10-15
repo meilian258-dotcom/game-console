@@ -11,6 +11,7 @@
 !/.github/workflows/
 /.github/workflows/*
 !/.github/workflows/snapshot.yml
+!/.github/workflows/mame-lifecycle-candidate.yml
 !/source-control/
 !/piq-fc-arcade/
 !/piq-retro-platform/
@@ -24,6 +25,7 @@
 !/piq-pvz-addon/
 !/piq-md-home/
 !/piq-replay-quickmode-compat/
+!/piq-replay-compat/
 
 # 构建输出、IDE、本机运行数据；只忽略，绝不删除原文件。
 **/.git/
@@ -44,6 +46,10 @@
 **/run/
 **/logs/
 **/game-console/
+# Public provider metadata is source, never the runtime data directory.
+!/piq-fc-arcade/src/main/resources/META-INF/game-console/
+/piq-fc-arcade/src/main/resources/META-INF/game-console/*
+!/piq-fc-arcade/src/main/resources/META-INF/game-console/replay-api.properties
 **/private-qa/
 **/private/
 **/backups/

@@ -1,5 +1,8 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client.cabinet;
 
+import cn.piq.fcarcade.audio.ReplayAudioOutput;
 import javax.sound.sampled.*;
 import java.util.ArrayDeque;
 import java.util.concurrent.locks.LockSupport;
@@ -49,7 +52,7 @@ final class CabinetAudio implements AutoCloseable {
                     chunk=null;bytes=null;offset=0;
                     // This also removes samples from a write that was in progress during reset.
                     // A newer reset during flush is handled again before any subsequent write.
-                    opened.stop();opened.flush();if(!running)break;opened.start();applied=desired;
+                    opened.stop();ReplayAudioOutput.flush(opened);if(!running)break;opened.start();applied=desired;
                     continue;
                 }
                 if(chunk==null){
@@ -64,7 +67,7 @@ final class CabinetAudio implements AutoCloseable {
                 int count=Math.min(Math.min(opened.available(),1920),bytes.length-offset)&~3;
                 if(count<=0){LockSupport.parkNanos(2_000_000L);continue;}
                 if(generation!=applied)continue;
-                int written=opened.write(bytes,offset,count);
+                int written=ReplayAudioOutput.write(opened,bytes,offset,count);
                 if(written<0||written>count||(written&3)!=0)throw new IllegalStateException("Invalid audio write size");
                 offset+=written;
                 if(offset==bytes.length){chunk=null;bytes=null;}
@@ -75,8 +78,8 @@ final class CabinetAudio implements AutoCloseable {
             synchronized(state){running=false;queue.clear();}
             if(opened!=null){
                 try{opened.stop();}catch(Exception ignored){}
-                try{opened.flush();}catch(Exception ignored){}
-                try{opened.close();}catch(Exception ignored){}
+                try{ReplayAudioOutput.flush(opened);}catch(Exception ignored){}
+                try{ReplayAudioOutput.close(opened);}catch(Exception ignored){}
             }
         }
     }

@@ -11,3 +11,4 @@ public final class NativeArcadeButtons {
         return (mask&~((1<<1)|(1<<8)))|((mask&(1<<1))<<7)|((mask&(1<<8))>>>7);
     }
 }
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.

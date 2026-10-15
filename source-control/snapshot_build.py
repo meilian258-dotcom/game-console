@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -22,6 +23,9 @@ import tomllib
 import zipfile
 
 from release_artifacts import inspect, sha256
+import snapshot_stock
+import sfc_stock
+import replay_api
 
 ROOT = Path(__file__).resolve().parents[1]
 META = 'META-INF/neoforge.mods.toml'
@@ -30,19 +34,24 @@ HELPER = 'native-runtime/win-x64-v1/piq-native-arcade/runtime/piq-native-helper-
 HELPER_BYTES = 18858
 HELPER_SHA256 = '51a1a6a0a326e5e855647a414dbb78894ca01e9d766627ef272ce59bc809a304'
 BOOTSTRAP = {
-    'fc': '7d4db04cc8bafb3f7dc426e3e8412459ba1308dac9d33c434f99c1fcf5eac716',
+    'fc': '3632de31cc6658f32f9e7c498c916c1680218fe58ae160f58e9fa0f0551d0549',
     'sfc': 'a9c8bdd2ae068383310ac57efcfb18df29eca67238218b12bc6da38b47cf1816',
     'md': '9ea8727a77e2cc10fc59a2e34bb1b16466be2fcb1d23e941216b79921fc4b6df',
     'gba': '7e991d3151c140c01a4acc094d68f9ccaf2e285b6a0fadf6abb15cb345d40f0a',
-    'arcade': '575f16d2123f1e91cadba12d8ace9dead63936770fcdec4476c260c13ce5d925',
+    'arcade': '32ffbf3e2245495dd35dbfed9704595a534a40690dedaec709771e3c07d62b3c',
     'pvz': 'e010b4185c8a9e51edcba3ef40718a81781068320681892cf869d68c3046f04a',
 }
+MAME_LIFECYCLE_RESOURCES = (
+    'core/mame-jni/windows-x64/mame_piq_lifecycle1.dll',
+    'META-INF/piq-native/mame-lifecycle/runtime.json',
+)
 RESOURCE_SCOPES = {
     'sfc-core': ('assets/piq_sfc_arcade/core/piq_sfc_wasm.wasm', 'META-INF/piq-sfc-wasm-privacy.json'),
     'sfc-home': ('core/sfc-libretro/',),
     'md': ('core/windows-x64/',),
     'pvz': ('core/pvz/', 'META-INF/pvz/licenses/'),
-    'arcade': ('native-runtime/', 'META-INF/piq-native/fbneo/', 'META-INF/licenses/native-runtime17/'),
+    'arcade': ('native-runtime/', 'META-INF/piq-native/fbneo/', 'META-INF/licenses/native-runtime17/',
+               *MAME_LIFECYCLE_RESOURCES),
 }
 EXPECTED_IDS = {'piq_fc_arcade', 'piq_sfc_arcade', 'piq_sfc_home', 'piq_md_home',
                 'piq_gba', 'piq_native_arcade', 'piq_computer', 'piq_pvz'}
@@ -59,6 +68,14 @@ def safe_name(name: str) -> str:
 def no_links(path: Path) -> None:
     for part in (path, *path.parents):
         if part.is_symlink() or (hasattr(part, 'is_junction') and part.is_junction()):
+            raise ValueError('Linked input/output path is not accepted')
+        try:
+            attributes = os.lstat(part)
+        except FileNotFoundError:
+            continue
+        # Path.is_junction() is only available from Python 3.12. Reject Windows
+        # reparse points on the supported Python 3.11 path as well, before resolve.
+        if getattr(attributes, 'st_file_attributes', 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT:
             raise ValueError('Linked input/output path is not accepted')
 
 
@@ -84,6 +101,31 @@ def verify_file(path: Path, record: dict) -> None:
         raise ValueError('Snapshot input is absent or changed: ' + record.get('path', path.name))
 
 
+def verify_mame_lifecycle_resources(resource_root: Path, source_root: Path | None = None) -> None:
+    """Reuse the project's fixed identity checks; never prepare or execute a core."""
+    for name in MAME_LIFECYCLE_RESOURCES:
+        path = resource_root / name
+        no_links(path.absolute())
+        if not path.is_file():
+            raise ValueError('Missing fixed MAME lifecycle resource: ' + name)
+    project = (ROOT if source_root is None else source_root) / 'piq-native-arcade'
+    lock = project / 'native/mame-lifecycle/runtime.json'
+    tool_path = project / 'tools/prepare_mame_lifecycle_runtime.py'
+    no_links(lock.absolute())
+    no_links(tool_path.absolute())
+    if not lock.is_file():
+        raise ValueError('Reviewed MAME lifecycle manifest is required')
+    spec = importlib.util.spec_from_file_location('snapshot_mame_lifecycle_tool', tool_path)
+    tool = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(tool)
+    if (tool.RESOURCE, tool.NOTICE) != MAME_LIFECYCLE_RESOURCES:
+        raise ValueError('MAME lifecycle resource mapping changed; review snapshot scopes')
+    manifest = tool.load_manifest(lock, lock.parent / tool.PATCH.name, lock.parent / tool.SHARED_PATCH.name)
+    tool.verify_core(resource_root / tool.RESOURCE, manifest)
+    if (resource_root / tool.NOTICE).read_bytes() != tool.notice_bytes(manifest):
+        raise ValueError('MAME lifecycle notice differs from the reviewed manifest')
+
+
 def verify_resources(resource_root: Path, receipt_path: Path) -> None:
     """Called again by Gradle immediately before processResources."""
     input_root = receipt_path.absolute().parent
@@ -105,14 +147,19 @@ def verify_resources(resource_root: Path, receipt_path: Path) -> None:
         if not any(resource == prefix or (prefix.endswith('/') and resource.startswith(prefix))
                    for prefix in RESOURCE_SCOPES[bucket]):
             raise ValueError('Foreign snapshot resource: ' + resource)
-        if resource.endswith('.class') or resource == HELPER or resource.lower().endswith('blastem_libretro.dll'):
-            raise ValueError('Compiled MOD classes/current helper/retired core must not be bootstrapped')
+        if (resource.endswith('.class') or resource == HELPER or resource.lower().endswith('blastem_libretro.dll')
+                or snapshot_stock.generated_resource(resource)):
+            raise ValueError('Compiled MOD classes/current helper/stock resource/retired core must not be bootstrapped')
         if name not in expected:
             raise ValueError('Unreceipted resource: ' + resource)
         verify_file(path, expected[name])
         actual.add(name)
     if not actual or actual != set(expected):
         raise ValueError('Incomplete snapshot resource tree')
+    if bucket == 'arcade':
+        verify_mame_lifecycle_resources(resource_root)
+    if bucket == 'sfc-home':
+        verify_file(resource_root / sfc_stock.LEGACY_RESOURCE, sfc_stock.LEGACY)
 
 
 def verify_inputs(input_root: Path) -> dict:
@@ -120,6 +167,8 @@ def verify_inputs(input_root: Path) -> dict:
     receipt, records = load_receipt(receipt_path)
     for name, record in records.items():
         verify_file(input_root / name, record)
+    stock = snapshot_stock.verify_receipt(input_root, records)
+    sfc = sfc_stock.verify_receipt(input_root, records)
     pins = {}
     for entry in receipt.get('bootstrap', []):
         ident = entry.get('id')
@@ -133,7 +182,19 @@ def verify_inputs(input_root: Path) -> dict:
         raise ValueError('Exactly the six approved native input distributions are required')
     for bucket in RESOURCE_SCOPES:
         verify_resources(input_root / 'resources' / bucket, receipt_path)
-    return dict(receipt=receipt, bootstrap=pins, receipt_path=receipt_path)
+    return dict(receipt=receipt, bootstrap=pins, receipt_path=receipt_path, fbneo_stock=stock, sfc_snes9x=sfc)
+
+
+def arcade_gradle_properties(fc: Path, inputs: dict) -> dict:
+    stock = inputs['fbneo_stock']
+    return dict(gameConsoleJar=str(fc), embeddedRuntimePython=sys.executable,
+                fbneoStockCore=str(stock['core']), fbneoStockSource=str(stock['source']))
+
+
+def sfc_gradle_properties(fc: Path, core: Path, inputs: dict) -> dict:
+    fixed = inputs['sfc_snes9x']
+    return dict(gameConsoleJar=str(fc), sfcCoreJar=str(core), sfcRuntimePython=sys.executable,
+                sfcSnes9xCore=str(fixed['core']), sfcSnes9xSource=str(fixed['source']))
 
 
 def archive_entries(path: Path) -> dict[str, bytes]:
@@ -202,19 +263,42 @@ def merge_sfc(core: Path, home: Path, output: Path) -> Path:
 
 
 def version(module: str) -> str:
-    values = (ROOT / module / 'gradle.properties').read_text(encoding='utf-8-sig')
-    match = re.search(r'^mod_version=(.+)$', values, re.M)
-    if not match:
-        raise ValueError('Module has no explicit mod_version: ' + module)
-    result = match.group(1).strip()
+    properties = ROOT / module / 'gradle.properties'
+    matches = []
+    if properties.is_file():
+        matches = re.findall(r'^mod_version[ \t]*=[ \t]*(.*)$', properties.read_text(encoding='utf-8-sig'), re.M)
+    if not matches:
+        # Computer/PvZ declare a literal project version, not gradle.properties.
+        # Do not evaluate Gradle expressions or guess from old build artifacts.
+        script = (ROOT / module / 'build.gradle').read_text(encoding='utf-8-sig')
+        declarations = re.findall(r'^version[ \t]*=[ \t]*(.+)$', script, re.M)
+        literal = re.fullmatch(r"(['\"])([^'\"]+)\1", declarations[0].strip()) if len(declarations) == 1 else None
+        matches = [literal.group(2)] if literal else []
+    if len(matches) != 1:
+        raise ValueError('Module needs one explicit source version: ' + module)
+    result = matches[0].strip()
     if not re.fullmatch(r'[0-9][A-Za-z0-9.+_-]{0,95}', result):
         raise ValueError('Unsafe module version')
     return result
 
 
+def configured_jar(module: str, archive_prefix: str, mod_id: str) -> Path:
+    """Select the configured artifact, never a latest/stale directory guess."""
+    declared = version(module)
+    expected = ROOT / module / 'build/libs' / (archive_prefix + '-' + declared + '.jar')
+    no_links(expected)
+    candidates = list(expected.parent.glob('*.jar'))
+    if len(candidates) != 1 or candidates[0].name != expected.name or not expected.is_file():
+        raise ValueError('Expected exactly the configured JAR: ' + expected.name)
+    if inspect(expected)['versions'] != {mod_id: declared}:
+        raise ValueError('Configured JAR MOD identity/version mismatch: ' + module)
+    return expected
+
+
 def stage_outputs(paths: list[Path], output: Path, manifest: dict) -> dict:
     if len(paths) != 7 or output.exists():
         raise ValueError('Exactly seven new JARs and a new distribution directory are required')
+    replay_api.verify_suite(paths)
     metadata = [inspect(path) for path in paths]
     ids, classes = set(), set()
     for path, item in zip(paths, metadata):
@@ -290,14 +374,47 @@ def verify_arcade_helper(arcade: Path, fresh_helper: Path, catalog: Path) -> Non
         raise ValueError('Fresh arcade helper does not match the FC runtime catalog')
 
 
-def prepare_gba_probe_classpath(dependencies: Path, minecraft: Path, receipt: Path) -> tuple[Path, Path]:
+def prepare_build_environment(work: Path) -> tuple[Path, dict[str, str]]:
+    """Keep every nested compiler/test temp path canonical and privately owned.
+
+    Windows TEMP can contain an 8.3 alias. JUnit preserves that spelling while
+    the production storage guards compare it to toRealPath(), so normal test
+    files can be rejected. Select a fresh real path, never relax those guards.
+    """
+    no_links(work.absolute())
+    temporary = work.resolve(strict=True) / 'temp'
+    no_links(temporary)
+    if not str(temporary).isascii():
+        raise ValueError('Snapshot builds require an ASCII work directory for Windows Java argfiles')
+    temporary.mkdir(exist_ok=False)
+    environment = os.environ.copy()
+    for key in ('TEMP', 'TMP', 'TMPDIR'):
+        environment[key] = str(temporary)
+    return temporary, environment
+
+
+def run_build_step(label: str, command: list[str], root: Path, logs: Path,
+                   environment: dict[str, str]) -> None:
+    print('Building/verifying ' + label, flush=True)
+    with (logs / (label + '.log')).open('xb') as log:
+        result = subprocess.run(command, cwd=root, env=environment,
+                                stdout=log, stderr=subprocess.STDOUT, timeout=2700)
+    if result.returncode:
+        # Keep the complete local log; this is not a release asset.
+        print((logs / (label + '.log')).read_text(encoding='utf-8', errors='replace')[-12000:])
+        raise RuntimeError(label + ' failed; no snapshot may be published')
+
+
+def prepare_gba_probe_classpath(dependencies: Path, minecraft: Path, receipt: Path,
+                               temporary: Path) -> tuple[Path, Path]:
     """The Windows java launcher decodes @argfiles using its native code page.
 
     GBA's checker already stages its two MOD JARs, but its other classpath
     entries need the same treatment when the checkout path contains Unicode.
     Keep the owned copies and hashes as private diagnostics, not release assets.
     """
-    root = Path(tempfile.mkdtemp(prefix='gc-snapshot-gba-deps-'))
+    no_links(temporary.absolute())
+    root = Path(tempfile.mkdtemp(prefix='gc-snapshot-gba-deps-', dir=temporary.resolve(strict=True)))
     if not str(root).isascii():
         raise ValueError('GBA probe requires an ASCII TEMP directory for Windows Java argfiles')
     deps = root / 'dependencies'
@@ -341,19 +458,14 @@ def build(work: Path, output: Path) -> dict:
         raise ValueError('This seven-MOD build currently requires Windows and JAVA_HOME pointing to JDK 21')
     work.mkdir(parents=True, exist_ok=True)
     (work / 'build-started.json').write_text(json.dumps({'commit': commit}), encoding='utf-8')
+    temporary, environment = prepare_build_environment(work)
     logs = work / 'logs'
     logs.mkdir()
     commands = []
 
     def run(label: str, command: list[str]) -> None:
-        print('Building/verifying ' + label, flush=True)
         commands.append(label)
-        with (logs / (label + '.log')).open('xb') as log:
-            result = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, timeout=2700)
-        if result.returncode:
-            # The complete log remains private to the CI artifact, never in the release.
-            print((logs / (label + '.log')).read_text(encoding='utf-8', errors='replace')[-12000:])
-            raise RuntimeError(label + ' failed; no snapshot may be published')
+        run_build_step(label, command, ROOT, logs, environment)
 
     def gradle(module: str, tasks: list[str], properties: dict | None = None, resources: str | None = None) -> None:
         props = dict(properties or {})
@@ -388,17 +500,17 @@ def build(work: Path, output: Path) -> dict:
     common = dict(gameConsoleJar=str(fc))
     gradle('piq-sfc-arcade', ['clean', 'check', 'jar'], common, 'sfc-core')
     sfc_core = ROOT / 'piq-sfc-arcade/build/libs' / ('piq_sfc_arcade-' + version('piq-sfc-arcade') + '.jar')
-    gradle('piq-sfc-home', ['clean', 'check', 'jar'], dict(common, sfcCoreJar=str(sfc_core)), 'sfc-home')
+    gradle('piq-sfc-home', ['clean', 'check', 'jar'], sfc_gradle_properties(fc, sfc_core, inputs), 'sfc-home')
     sfc_home = ROOT / 'piq-sfc-home/build/libs' / ('piq_sfc_home-' + version('piq-sfc-home') + '.jar')
     sfc = merge_sfc(sfc_core, sfc_home, work / 'merged/sfc-complete.jar')
     gradle('piq-md-home', ['clean', 'check', 'jar'], common, 'md')
     md = ROOT / 'piq-md-home/build/libs' / ('game_console_md-' + version('piq-md-home') + '.jar')
-    gradle('piq-native-arcade', ['clean', 'check', 'jar'], dict(common, embeddedRuntimePython=sys.executable), 'arcade')
+    gradle('piq-native-arcade', ['clean', 'check', 'jar'], arcade_gradle_properties(fc, inputs), 'arcade')
     arcade = ROOT / 'piq-native-arcade/build/libs' / ('piq_native_arcade-' + version('piq-native-arcade') + '.jar')
     gradle('piq-pvz-addon', ['clean', 'check', 'jar'], common, 'pvz')
-    pvz = ROOT / 'piq-pvz-addon/build/libs/game_console_pvz-0.1.0-prototype.12.jar'
+    pvz = configured_jar('piq-pvz-addon', 'game_console_pvz', 'piq_pvz')
     gradle('piq-computer', ['clean', 'check', 'jar'], dict(common, pvzJar=str(pvz)))
-    computer = ROOT / 'piq-computer/build/libs/game_console_computer-0.1.0-prototype.12.jar'
+    computer = configured_jar('piq-computer', 'game_console_computer', 'piq_computer')
     run('piq-gba', [sys.executable, str(ROOT / 'piq-gba/tools/build_current.py'), '--fc', str(fc),
                     '--runtime-base', str(runtime_base), '--dependencies', str(deps),
                     '--jdk', str(jdk), '--output', str(work / 'gba')])
@@ -408,7 +520,8 @@ def build(work: Path, output: Path) -> dict:
     minecraft_resources = list((ROOT / 'piq-fc-arcade/build/moddev/artifacts').glob('*-client-extra-aka-minecraft-resources.jar'))
     if len(minecraft_resources) != 1:
         raise ValueError('FC build did not provide a unique Minecraft resource artifact for GBA verification')
-    probe_deps, probe_minecraft = prepare_gba_probe_classpath(deps, minecraft_resources[0], work / 'gba-probe-inputs.json')
+    probe_deps, probe_minecraft = prepare_gba_probe_classpath(
+        deps, minecraft_resources[0], work / 'gba-probe-inputs.json', temporary)
     run('piq-gba-probes', [sys.executable, str(ROOT / 'piq-gba/tools/check_current.py'), '--fc', str(fc),
                          '--gba', str(gba_outputs[0]), '--dependencies', str(probe_deps),
                          '--minecraft-client', str(probe_minecraft), '--jdk', str(jdk),

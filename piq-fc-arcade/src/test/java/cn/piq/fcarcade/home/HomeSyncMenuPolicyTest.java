@@ -32,13 +32,18 @@ class HomeSyncMenuPolicyTest {
         assertTrue(HomeSyncMenuPolicy.buttonState(0,1,7,true,"").contains("管理员"));
         assertTrue(HomeSyncMenuPolicy.buttonState(0,0,7,false,"").contains("当前"));
     }
-    @Test void externalDeviceHasNoFcJniRowUnlessExplicitlyCapable(){
-        assertFalse(HomeSyncMenuPolicy.showMode(4,true,false,1));
-        assertFalse(HomeSyncMenuPolicy.showMode(4,true,false,15));
+    @Test void identicalRowsRemainVisibleWithoutGrantingUnimplementedCapabilities(){
+        assertTrue(HomeSyncMenuPolicy.showMode(4,true,false,1));
+        assertTrue(HomeSyncMenuPolicy.showMode(4,true,false,15));
+        assertFalse(HomeSyncMenuPolicy.supported(1,4));
+        assertFalse(HomeSyncMenuPolicy.supported(15,4));
+        assertEquals("尚未实现",HomeSyncMenuPolicy.buttonState(4,0,1,true,"尚未实现"));
         assertTrue(HomeSyncMenuPolicy.showMode(4,true,false,17));
         assertTrue(HomeSyncMenuPolicy.showMode(4,false,false,31));
         assertTrue(HomeSyncMenuPolicy.showMode(4,true,true,0));
         for(int mode=0;mode<4;mode++)assertTrue(HomeSyncMenuPolicy.showMode(mode,true,false,1));
+        assertFalse(HomeSyncMenuPolicy.showMode(-1,true,false,31));
+        assertFalse(HomeSyncMenuPolicy.showMode(5,true,false,31));
     }
     @Test void masksNeverGrantInvalidModes(){
         for(int mask=0;mask<32;mask++)for(int mode=-1;mode<=5;mode++)

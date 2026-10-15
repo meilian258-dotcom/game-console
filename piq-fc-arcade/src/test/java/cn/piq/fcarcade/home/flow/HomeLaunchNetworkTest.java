@@ -11,6 +11,29 @@ import static cn.piq.fcarcade.home.flow.HomeLaunchNetwork.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HomeLaunchNetworkTest {
+    @Test void resumeOnlyRowsRejectNewGamesAtTheServerContract(){
+        var row=new Row(2,"v","旧核心进度","content",2,1,true,false,false);
+        assertTrue(row.accepts(new Choice(2,"v","旧核心进度",2,true)));
+        assertFalse(row.accepts(new Choice(2,"v","旧核心进度",2,false)));
+        assertFalse(new Row(2,"","旧核心进度","content",2,0,true,false,false)
+                .accepts(new Choice(2,"","旧核心进度",2,true)));
+        assertFalse(new Row(2,"v","旧核心进度","content",2,1,false,false,false)
+                .accepts(new Choice(2,"v","旧核心进度",2,true)));
+        assertTrue(new Row(1,"","可新开","content",2,0,true,false)
+                .accepts(new Choice(1,"","可新开",2,false)));
+    }
+    @Test void resumeOnlyCapabilitySurvivesRealWireAndDraftRefresh(){
+        var row=new Row(2,"v","旧核心进度","content",1,1,true,false,false);
+        var view=new View(UUID.randomUUID(),1,ResourceLocation.parse("test:sfc"),"SFC","游戏",2,2,
+                Stage.SAVE_SELECTION,List.of(row),"不转换旧档");
+        var b=buffer();try{
+            View.CODEC.encode(b,view);var decoded=View.CODEC.decode(b);
+            assertEquals(view,decoded);assertEquals(0,b.readableBytes());
+            var draft=new HomeLaunchDraft();draft.receive(decoded);
+            assertTrue(decoded.rows().getFirst().accepts(draft.choice(true)));
+            assertFalse(decoded.rows().getFirst().accepts(draft.choice(false)));
+        }finally{b.release();}
+    }
     @Test void readOnlyRowsRejectForgedMetadataAndStaleOrMissingProgress(){
         var row=new Row(1,"v","原有进度","hash",1,0,true,false);
         assertTrue(row.accepts(new Choice(1,"v","原有进度",1,true)));

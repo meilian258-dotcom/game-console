@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.client;
 
 import cn.piq.sfchome.net.SfcHomeNetwork;
@@ -41,9 +42,22 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
         return current!=null&&current.syncMode()==3&&sessionCurrent(current,Minecraft.getInstance().getConnection())
                 &&(playback==null||!playback.nativeSlotHeld())?1:0;
     }
-    @Override public void netplay(SfcHomeNetwork.NetplayStart value){session(value.session());if(waiting==value.session()){
-        cn.piq.fcarcade.client.watch.WatchClient.controlStarting(value.wire());waitingNetplay=value;
-    }}
+    @Override public void netplay(SfcHomeNetwork.NetplayStart value){
+        var mc=Minecraft.getInstance();var incoming=value.session();
+        // Opt-out governs new starts, not an already admitted run or a duplicate grant.
+        if(SESSION_ORDER.seen(mc.getConnection(),incoming.sessionId(),incoming.epoch(),incoming.controllerLease()))return;
+        try{
+            NetplayAdmission.requireGrant(value);
+            NetplayAdmission.requirePermission(cn.piq.fcarcade.client.JniNetplayConsent::allowed);
+        }catch(RuntimeException|LinkageError failure){
+            SESSION_ORDER.accept(mc.getConnection(),incoming.sessionId(),incoming.epoch(),incoming.controllerLease());
+            if(mc.getConnection()!=null)SfcHomeNetwork.leave(incoming.controllerLease(),new SfcHomeNetwork.Leave(incoming.sessionId(),incoming.epoch()));
+            cn.piq.fcarcade.client.ui.DeviceNotices.record("SFC","SFC Netplay 启动授权已拒绝",failure);return;
+        }
+        session(incoming);if(waiting==incoming){
+            cn.piq.fcarcade.client.watch.WatchClient.controlStarting(value.wire());waitingNetplay=value;
+        }
+    }
     @Override public void netplayActivated(SfcHomeNetwork.NetplayActivated value){
         var current=playback;
         if(isCurrent(current)&&current.matches(value.sessionId(),value.epoch())){
@@ -130,7 +144,7 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
     }
     @Override public void session(SfcHomeNetwork.Session message) {
         var mc=Minecraft.getInstance();
-        if(mc.level==null||mc.getConnection()==null||!mc.level.dimension().location().equals(message.dimension())||!SfcHomeNetwork.CORE_BUILD.equals(message.coreBuild())) {
+        if(mc.level==null||mc.getConnection()==null||!mc.level.dimension().location().equals(message.dimension())||!NetplayAdmission.buildSupported(message.syncMode(),message.coreBuild())) {
             if(mc.getConnection()!=null)SfcHomeNetwork.leave(message.controllerLease(),new SfcHomeNetwork.Leave(message.sessionId(),message.epoch()));toast("SFC 核心或维度不匹配");return;
         }
         // Another host's still-running session may have a lower ID. Track exact
@@ -188,6 +202,10 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
     }
     private static void maybeBegin(){
         if(waiting==null||waitingRom==null||!hardwareCurrent(waiting))return;
+        // This is still the client thread. Recheck after asynchronous content work,
+        // before opening any native owner; an earlier permission is not a reservation.
+        try{NetplayAdmission.requirePrepared(waiting,waitingNetplay,cn.piq.fcarcade.client.JniNetplayConsent::allowed);}
+        catch(RuntimeException|LinkageError failure){fail("SFC Netplay 启动授权已失效，原档保留",failure);return;}
         if(!waiting.receivesMedia()&&SfcCoreLease.occupied()){startup.enter(SfcStartupProgress.Stage.PREVIOUS_CORE);return;}
         try{playback=new SfcPlayback(waiting,waitingRom,startup,waitingNetplay);waiting=null;waitingRom=null;waitingNetplay=null;}
         catch(RuntimeException error){if(SfcCoreLease.occupied())startup.enter(SfcStartupProgress.Stage.PREVIOUS_CORE);else fail("SFC 准备失败",error);}
@@ -207,7 +225,12 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
     }
     @Override public void stopped(SfcHomeNetwork.Stopped message) {
         var s=currentSession();
-        if(sessionCurrent(s,sessionConnection)&&s.sessionId()==message.sessionId()&&s.epoch()==message.epoch()){SfcJoinClient.stopped(message.sessionId(),message.epoch());closeLocal();toast(message.reason());}
+        if(sessionCurrent(s,sessionConnection)&&s.sessionId()==message.sessionId()&&s.epoch()==message.epoch()){
+            // A server close can race the worker's failure before the next client tick.
+            String reason=playback!=null&&playback.error()!=null?playback.errorForLeaveNotice():message.reason();
+            SfcJoinClient.stopped(message.sessionId(),message.epoch());closeLocal();
+            if(reason!=null&&!reason.isBlank())toast(reason);
+        }
     }
     @Override public void control(SfcHomeNetwork.Control message){
         var s=currentSession();if(!sessionCurrent(s,sessionConnection)||s.sessionId()!=message.sessionId()||s.epoch()!=message.epoch()||!s.executionHost())return;
@@ -293,7 +316,7 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
         showStartup();
         if(playback!=null) {
             if(!mc.level.dimension().location().equals(playback.session.dimension())){leave("");return;}
-            if(playback.error()!=null){leave(playback.error());return;}
+            if(playback.error()!=null){leave(playback.errorForLeaveNotice());return;}
             String mediaNotice=playback.pollMediaNotice();if(mediaNotice!=null)cn.piq.fcarcade.client.ui.DeviceNoticesClient.workflow(mediaNotice);
             String audioNotice=playback.pollAudioNotice();if(audioNotice!=null)cn.piq.fcarcade.client.ui.DeviceNoticesClient.workflow(audioNotice);
             double distance=mc.player.distanceToSqr(playback.session.tvPos().getX()+.5,playback.session.tvPos().getY()+.5,playback.session.tvPos().getZ()+.5);
@@ -314,12 +337,36 @@ public final class SfcHomeClient implements SfcHomeNetwork.ClientHandler {
         playback.upload();var s=playback.session;
         if(playback.textureId()!=null)HomeVideoDisplay.render(event,SYSTEM,s.consolePos(),s.consoleId(),s.tvPos(),s.tvId(),s.linkId(),playback.textureId(),playback.aspect());
     }
+    /** Testable admission decisions only; callers invoke these on the client thread. */
+    static final class NetplayAdmission {
+        static boolean buildSupported(int syncMode,String build){
+            if(syncMode!=3)return SfcHomeNetwork.CORE_BUILD.equals(build);
+            try{cn.piq.sfchome.core.SfcNetplayProfile.resolveBuild(build);return true;}
+            catch(IllegalArgumentException|NullPointerException unknown){return false;}
+        }
+        static void requirePermission(java.util.function.BooleanSupplier allowed){
+            if(!allowed.getAsBoolean())throw new IllegalStateException("本机已停用 JNI Netplay 或平台不支持；不会切换核心。Windows x64 可用 /gameconsole-jni-netplay 恢复");
+        }
+        static void requireGrant(SfcHomeNetwork.NetplayStart grant){
+            var variant=cn.piq.sfchome.core.SfcNetplayProfile.resolve(grant.launch());
+            if(grant.session().syncMode()!=3||!cn.piq.sfchome.core.SfcNetplayProfile.buildKey(variant).equals(grant.session().coreBuild()))
+                throw new IllegalArgumentException("SFC 本局核心与启动授权不一致，不会自动切换核心");
+        }
+        static void requirePrepared(SfcHomeNetwork.Session session,SfcHomeNetwork.NetplayStart grant,java.util.function.BooleanSupplier allowed){
+            if(session.syncMode()!=3)return;
+            if(grant==null||grant.session()!=session)throw new IllegalArgumentException("SFC Netplay 启动授权已失效");
+            requireGrant(grant);requirePermission(allowed);
+        }
+    }
     /** Pure connection-identity and bounded assignment replay fence; survives local leave. */
     static final class SessionOrder {
         private Object connection;private boolean limitReached;
         private final java.util.Set<Assignment> seen=new java.util.HashSet<>();
         private record Assignment(long session,int epoch,java.util.UUID lease){}
         static boolean sameConnection(Object expected,Object actual){return expected!=null&&expected==actual;}
+        boolean seen(Object source,long id,int epoch,java.util.UUID lease){
+            return source!=null&&source==connection&&seen.contains(new Assignment(id,epoch,lease));
+        }
         boolean accept(Object source,long nextId,int nextEpoch,java.util.UUID lease){
             limitReached=false;
             if(source==null||nextId<=0||nextEpoch<=0||lease==null)return false;

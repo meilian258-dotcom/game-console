@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client;
 
 import cn.piq.fcarcade.world.ArcadeStructure;
@@ -26,6 +28,11 @@ final class ArcadeBlockScreenRenderer {
             ClientArcadeSession session,
             BlockPos pos
     ) {
+        try { renderOwned(event, session, pos); }
+        finally { cn.piq.fcarcade.api.replay.ReplayPresentation.clearAnchor(); }
+    }
+
+    private static void renderOwned(RenderLevelStageEvent event, ClientArcadeSession session, BlockPos pos) {
         Minecraft minecraft = Minecraft.getInstance();
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES
                 || minecraft.level == null || pos == null) {

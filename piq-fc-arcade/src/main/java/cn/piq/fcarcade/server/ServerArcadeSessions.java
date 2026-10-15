@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.server;
 
 import cn.piq.fcarcade.ArcadeFramePayload;
@@ -1026,7 +1028,7 @@ public final class ServerArcadeSessions {
         private void prepareHome(ServerPlayer p,cn.piq.fcarcade.home.HomeConsoleBlockEntity c,cn.piq.fcarcade.home.HomeTvBlockEntity tv,String rom,boolean gun,
                                  RomSaveMode mode,String saveKey,String name,int players,boolean resume){
             var server=p.getServer();var card=c.insertedCartridge().copy();var consoleId=c.hardwareId();var tvId=tv.hardwareId();var link=c.linkId();
-            var syncMode=c.synchronizationMode();boolean netplay=c.netplayExperimental(),jni=c.netplayJniTrial();
+            var syncMode=c.synchronizationMode();boolean netplay=c.netplayExperimental(),jni=c.netplayJniTrial(),secondPort=c.secondPortAllowed();
             int max=gun?2:library(server).homeMaxPlayers(rom);
             var expected=mode==RomSaveMode.NONE?null:saves(server).list().stream().filter(i->i.saveKey().equals(saveKey)).findFirst().orElse(null);
             String cardTitle=cn.piq.fcarcade.home.FcCartridgeData.title(card);
@@ -1034,12 +1036,12 @@ public final class ServerArcadeSessions {
             final String title=label.length()>128?label.substring(0,128):label;
             HomeLaunchServer.start(p,launchKey(p.serverLevel(),c),new HomeLaunchServer.Adapter<Boolean>(){
                 Session created;
-                public HomeLaunchServer.Definition definition(){return new HomeLaunchServer.Definition("FC",title,max,0,false,"");}
+                public HomeLaunchServer.Definition definition(){return new HomeLaunchServer.Definition("FC",title,max,0,false,"",secondPort);}
                 public boolean valid(){
                     if(!current(p)||!tv.powered()||!cn.piq.fcarcade.home.HomeZapperService.facts(p,c,tv)
                             ||!consoleId.equals(c.hardwareId())||!tvId.equals(tv.hardwareId())||!Objects.equals(link,c.linkId())
                             ||!net.minecraft.world.item.ItemStack.isSameItemSameComponents(card,c.insertedCartridge())||c.insertedCartridge().getCount()!=1
-                            ||cartridgeMode(c)!=mode||c.synchronizationMode()!=syncMode||c.netplayExperimental()!=netplay||c.netplayJniTrial()!=jni
+                            ||cartridgeMode(c)!=mode||c.synchronizationMode()!=syncMode||c.netplayExperimental()!=netplay||c.netplayJniTrial()!=jni||c.secondPortAllowed()!=secondPort
                             ||!rom.equals(HomeHardware.selectedRom(p.serverLevel(),tv.getBlockPos()))||library(server).find(rom)==null
                             ||(gun?2:library(server).homeMaxPlayers(rom))!=max)return false;
                     var actual=sessions.get(new SessionKey(p.level().dimension(),tv.getBlockPos(),ArcadeMode.LOCKSTEP));

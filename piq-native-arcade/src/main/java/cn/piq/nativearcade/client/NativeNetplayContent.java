@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.nativearcade.client;
 
 import cn.piq.fcarcade.client.cabinet.CabinetBackend;
@@ -16,8 +17,12 @@ public final class NativeNetplayContent {
     public static final String CORE_SHA=cn.piq.nativearcade.NativeNetplayProfile.CORE_SHA;
     public static final String CORE_RESOURCE=cn.piq.nativearcade.NativeNetplayProfile.CORE_RESOURCE;
     private NativeNetplayContent(){}
-    /** JNI-only bounded named files. No ROM-sized Java arrays, no implicit content permission. */
+    /** Bounded named files. No ROM-sized Java arrays, no implicit content permission. */
     public static CabinetBackend.NetplayContent loadFiles(Path rom)throws IOException{
+        return loadFiles(rom,cn.piq.nativearcade.NativeNetplayProfile.LEGACY);
+    }
+    public static CabinetBackend.NetplayContent loadFiles(Path rom,String variant)throws IOException{
+        var trusted=cn.piq.nativearcade.NativeNetplayProfile.variant(variant);
         Path source=rom.toAbsolutePath().normalize();String name=source.getFileName().toString().toLowerCase(Locale.ROOT);
         if(!validGameName(name))throw new IOException("请选择原名的街机 ZIP（例如 dino.zip / kov.zip），不要选择 BIOS");
         var paths=new TreeMap<String,Path>();paths.put(name,source);
@@ -31,7 +36,7 @@ public final class NativeNetplayContent {
             byte[] magic;try(var in=Files.newInputStream(entry.getValue().source(),LinkOption.NOFOLLOW_LINKS)){magic=in.readNBytes(4);}
             if(magic.length!=4||magic[0]!='P'||magic[1]!='K'||magic[2]!=3||magic[3]!=4)throw new IOException("不是有效的街机 ZIP："+entry.getKey());
         }
-        return new CabinetBackend.NetplayContent(profile(name),files);
+        return new CabinetBackend.NetplayContent(trusted.profile(name),files);
     }
     public static CabinetBackend.NetplayContent load(Path rom)throws IOException{
         Path source=rom.toAbsolutePath().normalize();
@@ -51,6 +56,9 @@ public final class NativeNetplayContent {
     public static NetplayProfile profile(String name){
         if(!validGameName(name))throw new IllegalArgumentException("Invalid arcade ZIP name");
         return cn.piq.nativearcade.NativeNetplayProfile.profile(name);
+    }
+    public static NetplayProfile profile(String name,String variant){
+        return cn.piq.nativearcade.NativeNetplayProfile.profile(name,variant);
     }
     static boolean validGameName(String name){
         return name!=null&&name.matches("[a-z0-9_]{1,32}\\.zip")&&!CabinetGameManifest.BIOS.contains(name)

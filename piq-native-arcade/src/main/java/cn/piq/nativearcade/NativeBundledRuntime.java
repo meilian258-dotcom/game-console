@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.nativearcade;
 
 import cn.piq.fcarcade.runtime.RuntimeCatalog.RuntimeId;
@@ -85,7 +86,7 @@ public final class NativeBundledRuntime {
     }
 
     private static RuntimeInstaller.Report remember(Path root, RuntimeInstaller.Report report) {
-        RuntimeStartupState.recordReport(root, report);
+        RuntimeStartupState.recordReport(root, report, EnumSet.of(RuntimeId.MAME, RuntimeId.NEOGEO_SNAPSHOT));
         LOGGER.log(report.ready() ? System.Logger.Level.INFO : System.Logger.Level.WARNING,
                 "街机运行库启动检查：{0}；目录：{1}", report.summary(), root);
         if (!report.ready() && !report.details().isEmpty())

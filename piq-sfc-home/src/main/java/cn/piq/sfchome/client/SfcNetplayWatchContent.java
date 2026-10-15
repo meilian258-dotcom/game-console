@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.client;
 
 import cn.piq.fcarcade.cabinet.WatchNetwork;
@@ -33,6 +34,7 @@ final class SfcNetplayWatchContent {
     private SfcNetplayWatchContent(){}
     static NetplayWatchContent.Preparation prepare(WatchNetwork.NetplayStart grant,Connection connection){
         if(!grant.backend().equals(SfcHomeMod.CABINET_BACKEND))throw new IllegalArgumentException("SFC observer backend");
+        var variant=SfcNetplayProfile.resolve(grant.launch());
         var mc=Minecraft.getInstance();var game=mc.gameDirectory.toPath();var pending=new Download(grant.romHash(),connection);
         var ticket=new AtomicReference<SfcRomDownloads.Ticket>();
         Runnable cancel=()->{pending.cancel();mc.execute(()->{var owned=ticket.getAndSet(null);if(owned!=null)owned.cancel();});};
@@ -49,7 +51,7 @@ final class SfcNetplayWatchContent {
                     SfcClientFiles.cacheRom(game,pending.hash,bytes);
                 }
                 if(!SfcClientFiles.hash(bytes).equals(pending.hash))throw new IllegalStateException("SFC 旁观游戏校验失败");
-                return new CabinetBackend.NetplayContent(SfcNetplayProfile.profile(),bytes,Map.of());
+                return new CabinetBackend.NetplayContent(variant.template(),bytes,Map.of());
             }finally{cancel.run();}
         },cancel);
     }

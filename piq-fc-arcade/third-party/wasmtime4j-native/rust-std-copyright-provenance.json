@@ -1,0 +1,50 @@
+{
+  "version": "1.96.1",
+  "compilerSourceCommit": "31fca3adb283cc9dfd56b49cdee9a96eb9c96ffd",
+  "sourceManifestUrl": "https://static.rust-lang.org/dist/channel-rust-1.96.1.toml",
+  "sourceManifestSha256": "87eb76c53073e72b766083bed5530820694253b832a762d8385bda5759f03975",
+  "archiveUrl": "https://static.rust-lang.org/dist/2026-06-30/rustc-1.96.1-x86_64-pc-windows-msvc.tar.xz",
+  "archiveSha256": "d226a2e142b4cd796df9db527f4f3ff79bc9ce4118b36dcd7c82b7eca557d0b8",
+  "archiveBytes": 71907128,
+  "retrievedArchiveTarget": "x86_64-pc-windows-msvc",
+  "distributionComponent": "rustc",
+  "scope": "Unmodified official Rust standard-library distribution notices; source commit matches both observed compiler markers. Not a newly installed runtime or exact linked-object inventory.",
+  "noticeFiles": [
+    {
+      "path": "rust-std-1.96.1/COPYRIGHT-library.html",
+      "sourceMember": "rustc-1.96.1-x86_64-pc-windows-msvc/rustc/share/doc/rust/COPYRIGHT-library.html",
+      "bytes": 425651,
+      "sha256": "78c163fcec50e64bfd85fedb850c273595602fafa2b41f30f75d4e410b80ee83"
+    },
+    {
+      "path": "rust-std-1.96.1/licenses/Apache-2.0.txt",
+      "sourceMember": "rustc-1.96.1-x86_64-pc-windows-msvc/rustc/share/doc/rust/licenses/Apache-2.0.txt",
+      "bytes": 10280,
+      "sha256": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff"
+    },
+    {
+      "path": "rust-std-1.96.1/licenses/Unicode-3.0.txt",
+      "sourceMember": "rustc-1.96.1-x86_64-pc-windows-msvc/rustc/share/doc/rust/licenses/Unicode-3.0.txt",
+      "bytes": 1995,
+      "sha256": "f5062c9a188d81dfe66b56db4182dcf9e4b17c0d9b0d311a8e20b3a1b075c443"
+    },
+    {
+      "path": "rust-std-1.96.1/licenses/MIT.txt",
+      "sourceMember": "rustc-1.96.1-x86_64-pc-windows-msvc/rustc/share/doc/rust/licenses/MIT.txt",
+      "bytes": 1078,
+      "sha256": "b85dcd3e453d05982552c52b5fc9e0bdd6d23c6f8e844b984a88af32570b0cc0"
+    },
+    {
+      "path": "rust-std-1.96.1/licenses/BSD-2-Clause.txt",
+      "sourceMember": "rustc-1.96.1-x86_64-pc-windows-msvc/rustc/share/doc/rust/licenses/BSD-2-Clause.txt",
+      "bytes": 1267,
+      "sha256": "f32fb3b417a194167cfad068223fc975ba96c5960513a10f66a3c28720aec1df"
+    },
+    {
+      "path": "rust-std-1.96.1/licenses/LLVM-exception.txt",
+      "sourceMember": "rustc-1.96.1-x86_64-pc-windows-msvc/rustc/share/doc/rust/licenses/LLVM-exception.txt",
+      "bytes": 919,
+      "sha256": "e34c58338bd89d43e709e226610d8f32b3e3c47f4ad9a99a8dc1d4ac7842488e"
+    }
+  ]
+}

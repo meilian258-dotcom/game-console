@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.config;
 
 import cn.piq.fcarcade.cabinet.CabinetHostingConfig;
@@ -44,7 +46,7 @@ public final class GameConsoleAdminCommands {
     }
     private static int pgm(CommandSourceStack source,boolean confirm) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
         if(!authorized(source))return 0;
-        if(!confirm){source.sendSuccess(()->Component.literal("[街机通用维护 · FBNeo Netplay]\n仅 OP 主柜 1P 可请求，影响本局所有玩家；请在标题/演示画面操作并让其他人松键。\n关闭聊天后发送 Test/Diagnostic 组合键，按实际菜单提示调整，用菜单 EXIT 返回。没有 Test 菜单的游戏不会响应；旧 MAME 串流暂不支持。\n这不是通用 DIP 编辑器，也不新增 NVRAM 保存；重开后设置可能需要重设。")
+        if(!confirm){source.sendSuccess(()->Component.literal("[街机通用维护 · FBNeo Netplay]\n仅 OP 主柜 1P 可请求，影响本局所有玩家；请在标题/演示画面操作并让其他人松键。\n关闭聊天后发送 Test/Diagnostic 组合键，按实际菜单提示调整，用菜单 EXIT 返回。没有 Test 菜单的游戏不会响应；旧 MAME 串流暂不支持。\nJNI FBNeo：修改后先用 EXIT 退出后台再正常关机，运营设置按本柜当前游戏保存；停在菜单中关机可能不保存。MAME/RetroArch 暂未接此保存。恢复旧游戏即时档也可能带回旧设置。")
                 .append(choice("确认发送维护按键","/gameconsole arcade service confirm")),false);return 1;}
         String error=cn.piq.fcarcade.cabinet.CabinetRooms.pgmService(source.getPlayerOrException());
         if(error!=null){source.sendFailure(Component.literal(error));return 0;}

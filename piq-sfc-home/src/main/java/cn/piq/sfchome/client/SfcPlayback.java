@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.client;
 
 import cn.piq.sfcarcade.audio.SfcAudioPlayer;
@@ -75,10 +76,13 @@ final class SfcPlayback implements AutoCloseable {
             };
         }
         public Netplay openNetplay(SfcHomeNetwork.NetplayStart grant,byte[] rom,boolean waitForActivation){
+            var variant=cn.piq.sfchome.core.SfcNetplayProfile.resolve(grant.launch());
+            if(!cn.piq.sfchome.core.SfcNetplayProfile.buildKey(variant).equals(grant.session().coreBuild()))
+                throw new IllegalArgumentException("SFC 联机授权与核心身份不一致");
             var authority=new cn.piq.fcarcade.netplay.NetplayProcess.Grant(grant.wire(),grant.ticket(),grant.session().executionHost(),true);
             var run=new cn.piq.fcarcade.netplay.NetplayProcess(authority,()->rom,
                     c->cn.piq.fcarcade.netplay.NetplayNetwork.upstream(connection,c),
-                    cn.piq.sfchome.core.SfcNetplayProfile.profile(),java.util.Map::of,false,false,waitForActivation);
+                    variant.template(),java.util.Map::of,false,false,waitForActivation);
             try{cn.piq.fcarcade.netplay.NetplayNetwork.bind(connection,run);}
             catch(RuntimeException|Error failure){run.close();throw failure;}
             return new Netplay(){
@@ -147,6 +151,8 @@ final class SfcPlayback implements AutoCloseable {
     private volatile boolean started;
     private volatile float gain;
     private volatile String error;
+    // Published before error: the client cleanup must not replace the detailed notice.
+    private boolean errorNoticeRecorded;
     private volatile SfcJoinNetwork.Capture capture;
     private volatile Restore restore;
     private DynamicTexture texture;
@@ -188,10 +194,11 @@ final class SfcPlayback implements AutoCloseable {
             run=host.openNetplay(grant,rom,session.executionHost());netplay=run;
             if(!running)return;run.start();
             while(running){
-                if(run.error()!=null)throw new IllegalStateException(run.error()+"\n"+run.diagnostic());
+                String reason=run.error();
+                if(reason!=null)throw new cn.piq.fcarcade.client.ui.NetplayFailureCode.Failure(reason);
                 if(run.ready()&&netplayStart.prepared()){
                     startup.enter(SfcStartupProgress.Stage.READY);
-                    host.execute(()->{if(running&&host.isCurrent(this))host.ready(this,new SfcHomeNetwork.Ready(session.sessionId(),session.epoch(),session.romSha(),SfcHomeNetwork.CORE_BUILD,60,session.romSha()));});
+                    host.execute(()->{if(running&&host.isCurrent(this))host.ready(this,new SfcHomeNetwork.Ready(session.sessionId(),session.epoch(),session.romSha(),session.coreBuild(),60,session.romSha()));});
                 }
                 if(!netplayStart.active()){Thread.sleep(2);continue;}
                 if(audio==null)audio=host.openAudio();
@@ -205,7 +212,12 @@ final class SfcPlayback implements AutoCloseable {
                 if(frame.stereo().length>0)audio.submit(frame.stereo(),frame.stereo().length/2,gain);observeAudioFailure(audio);
             }
         }catch(InterruptedException interrupted){Thread.currentThread().interrupt();}
-        catch(Exception|LinkageError failure){if(running){LoggerFactory.getLogger("PIQ SFC Home").warn("Netplay stopped",failure);cn.piq.fcarcade.client.ui.DeviceNotices.record("SFC",run==null?"Netplay 启动失败":run.diagnostic(),failure);error="SFC Netplay 已停止，请查看运行环境诊断";}}
+        catch(Exception|LinkageError failure){if(running){
+            var code=cn.piq.fcarcade.client.ui.NetplayFailureCode.classify(failure);
+            cn.piq.fcarcade.client.ui.DeviceNotices.recordFailure("SFC",code,run==null?"Netplay 启动失败":run.diagnostic(),failure);
+            errorNoticeRecorded=true;
+            error=code.summary();
+        }}
         finally{running=false;netplayStart.close();try{if(run!=null)run.close();}finally{netplay=null;try{if(audio!=null)audio.close();}finally{lease.close();}}}
     }
     boolean matches(long id,int epoch) { return session.sessionId()==id && session.epoch()==epoch; }
@@ -281,6 +293,8 @@ final class SfcPlayback implements AutoCloseable {
         host.execute(()->{if(running&&host.isCurrent(this))host.repairedFrames(this,done,true);});return true;}
     boolean started(){return started;}
     String error() { return error; }
+    /** Null means the single detailed failure notice is already published. */
+    String errorForLeaveNotice(){return errorNoticeRecorded?null:error;}
     /** Required player-hosted media must never fail silently while the authoritative core advances. */
     void playerMediaFailed(){
         if(!running||!session.playerHosted()||!session.executionHost())return;

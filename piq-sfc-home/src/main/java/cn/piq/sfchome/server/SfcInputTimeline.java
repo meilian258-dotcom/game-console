@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.server;
 import java.util.ArrayDeque;
 /** At most 32 ordered transitions, one consumed per emulated frame. Overflow stops the session. */

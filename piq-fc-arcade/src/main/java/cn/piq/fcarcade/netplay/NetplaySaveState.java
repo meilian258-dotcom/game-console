@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.netplay;
 
 import java.nio.ByteBuffer;
@@ -44,6 +46,32 @@ public final class NetplaySaveState {
             checkHash(sha);content.append(name).append('=').append(sha.toLowerCase(Locale.ROOT)).append('\n');
         });
         return new Identity(hash(descriptor.toString().getBytes(StandardCharsets.UTF_8)),hash(content.toString().getBytes(StandardCharsets.UTF_8)));
+    }
+    /** Separate LOCAL domain. No legacy Netplay/JNI/process state is implicitly imported. */
+    public static Identity localIdentity(cn.piq.fcarcade.retroarch.RetroArchSession.Config config,
+                                         String romHash,Map<String,String> auxiliaries,String runnerHash){
+        Objects.requireNonNull(config);checkHash(romHash);checkHash(runnerHash);
+        var profile=config.profile();
+        if(auxiliaries.size()>4)throw new IllegalArgumentException("LOCAL auxiliary count");
+        var descriptor=new StringBuilder("PIQ-RetroArch-LOCAL-save-v1\nPNP7-pad12\n")
+                .append(runnerHash).append('\n').append(profile.sha().toLowerCase(Locale.ROOT))
+                .append('\n').append(profile.contentName()).append('\n').append(profile.device()).append(':')
+                .append(profile.ports()).append(':').append(profile.sampleRate()).append('\n').append(profile.config());
+        config.dependencies().stream().sorted(Comparator.comparing(cn.piq.fcarcade.retroarch.RetroArchSession.Dependency::fileName))
+                .forEach(dependency->descriptor.append('\n').append(dependency.fileName()).append('=')
+                        .append(dependency.artifact().sha256().toLowerCase(Locale.ROOT)).append(':').append(dependency.bytes()));
+        var content=new StringBuilder(romHash).append('\n');
+        new TreeMap<>(auxiliaries).forEach((name,sha)->{
+            if(!safeLocalName(name)||name.equalsIgnoreCase(profile.contentName()))
+                throw new IllegalArgumentException("LOCAL auxiliary name");
+            checkHash(sha);content.append(name).append('=').append(sha).append('\n');
+        });
+        return new Identity(hash(descriptor.toString().getBytes(StandardCharsets.UTF_8)),hash(content.toString().getBytes(StandardCharsets.UTF_8)));
+    }
+    public static boolean safeLocalName(String name){
+        return name!=null&&name.matches("[a-zA-Z0-9_-]{1,64}\\.[a-zA-Z0-9]{1,10}")
+                &&Set.of("nes","sfc","smc","zip","md","gba","bin","rom","bios","dat").contains(name.substring(name.lastIndexOf('.')+1).toLowerCase(Locale.ROOT))
+                &&!name.split("\\.",2)[0].toUpperCase(Locale.ROOT).matches("CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9]");
     }
     public static String hash(byte[] bytes){return HexFormat.of().formatHex(digest(bytes,bytes.length));}
     private static void checkHash(String value){if(value==null||!value.matches("[a-f0-9]{64}"))throw new IllegalArgumentException("Netplay 存档身份无效");}

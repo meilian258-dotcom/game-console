@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SfcNetplayRegistrationTest {
     @Test
     @SuppressWarnings("unchecked")
-    void productionRegistersStartAndActivationOnceAsRequiredClientboundPlayVersion13() throws Exception {
+    void productionRegistersStartAndActivationOnceAsRequiredClientboundPlayVersion15() throws Exception {
         if (net.neoforged.fml.loading.LoadingModList.get() == null) {
             net.neoforged.fml.loading.LoadingModList.of(List.of(), List.of(), List.of(), List.of(), Map.of());
         }
@@ -56,15 +56,29 @@ class SfcNetplayRegistrationTest {
             assertNotEquals(startId, activatedId);
             assertRegistration(all, startId);
             assertRegistration(all, activatedId);
+            var editor=all.get(ConnectionProtocol.PLAY).get(SfcHomeNetwork.EditorAction.TYPE.id());
+            assertEquals("15",editor.version());assertFalse(editor.optional());assertEquals(PacketFlow.SERVERBOUND,editor.flow().orElseThrow());
+            @SuppressWarnings("unchecked")
+            var editorCodec=(StreamCodec<RegistryFriendlyByteBuf,SfcHomeNetwork.EditorAction>)(Object)NetworkRegistry.getCodec(SfcHomeNetwork.EditorAction.TYPE.id(),ConnectionProtocol.PLAY,PacketFlow.SERVERBOUND);
+            var editorBuffer=new RegistryFriendlyByteBuf(Unpooled.buffer(),RegistryAccess.EMPTY);
+            try{UUID binding=UUID.randomUUID();editorCodec.encode(editorBuffer,new SfcHomeNetwork.EditorAction(binding,SfcHomeNetwork.SAVE_LIBRARY,"a".repeat(64),"",0,0,new byte[0]));
+                var decoded=editorCodec.decode(editorBuffer);assertEquals(binding,decoded.token());assertEquals(SfcHomeNetwork.SAVE_LIBRARY,decoded.operation());assertEquals(0,editorBuffer.readableBytes());
+            }finally{editorBuffer.release();}
+            var sfcIds=all.values().stream().flatMap(registrations->registrations.keySet().stream())
+                    .filter(SfcNetplayRegistrationTest::isSfc).toList();
+            assertFalse(sfcIds.isEmpty());
+            assertEquals(sfcIds.size(),new java.util.HashSet<>(sfcIds).size(),"All SFC payloads must occur in only one protocol");
 
             long wire = (1L << 50) + 32;
             UUID ticket = UUID.randomUUID();
-            var session = new SfcHomeNetwork.Session(31, 2, ResourceLocation.parse("minecraft:overworld"),
-                    new BlockPos(-10, 64, 4), UUID.randomUUID(), new BlockPos(-8, 64, 4),
-                    UUID.randomUUID(), UUID.randomUUID(), "a".repeat(64), SfcHomeNetwork.CORE_BUILD,
-                    -1, UUID.randomUUID(), true, 3, UUID.randomUUID(), UUID.randomUUID());
             // Exercise the actual registered codec, including traffic wrappers.
-            roundTrip(startId, new SfcHomeNetwork.NetplayStart(session, wire, ticket));
+            for(var variant:List.of(cn.piq.sfchome.core.SfcNetplayProfile.current(),cn.piq.sfchome.core.SfcNetplayProfile.legacy())){
+                var session = new SfcHomeNetwork.Session(31, 2, ResourceLocation.parse("minecraft:overworld"),
+                        new BlockPos(-10, 64, 4), UUID.randomUUID(), new BlockPos(-8, 64, 4),
+                        UUID.randomUUID(), UUID.randomUUID(), "a".repeat(64), cn.piq.sfchome.core.SfcNetplayProfile.buildKey(variant),
+                        -1, UUID.randomUUID(), true, 3, UUID.randomUUID(), UUID.randomUUID());
+                roundTrip(startId, new SfcHomeNetwork.NetplayStart(session, wire, ticket,variant.launch()));
+            }
             roundTrip(activatedId, new SfcHomeNetwork.NetplayActivated(31, 2, wire, ticket));
             assertThrows(UnsupportedOperationException.class,
                     () -> SfcHomeNetwork.register(new RegisterPayloadHandlersEvent()));
@@ -86,7 +100,7 @@ class SfcNetplayRegistrationTest {
                 () -> id + " must occur in exactly one protocol");
         var registration = all.get(ConnectionProtocol.PLAY).get(id);
         assertNotNull(registration, () -> id + " must be a PLAY payload");
-        assertEquals("13", registration.version());
+        assertEquals("15", registration.version());
         assertFalse(registration.optional());
         assertEquals(PacketFlow.CLIENTBOUND, registration.flow().orElseThrow());
     }

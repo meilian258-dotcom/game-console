@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.net;
 
 /** Wire mode captured once per session; receiving media never implies emulator authority. */

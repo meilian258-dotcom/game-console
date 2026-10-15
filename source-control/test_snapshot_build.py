@@ -1,9 +1,15 @@
 """Fast fixture tests; no network, Gradle, native library or Minecraft required."""
 import hashlib
 import json
+import os
 from pathlib import Path
+import shutil
+import struct
+import subprocess
+import sys
 import tempfile
 import tomllib
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 import zipfile
@@ -29,6 +35,91 @@ class SnapshotBuildTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
 
+    def test_preparation_and_build_require_identical_bootstrap_pins(self):
+        import snapshot_inputs
+        self.assertEqual({ident: entry[2] for ident, entry in snapshot_inputs.BOOTSTRAP.items()},
+                         build.BOOTSTRAP)
+
+    def test_source_version_supports_properties_or_one_literal_gradle_declaration(self):
+        module = self.root / 'module'
+        module.mkdir()
+        with patch.object(build, 'ROOT', self.root):
+            for declaration in ("version = '0.1.0-prototype.13'\n", 'version = "0.1.0-prototype.13"\n'):
+                (module / 'build.gradle').write_text(declaration)
+                self.assertEqual('0.1.0-prototype.13', build.version('module'))
+            (module / 'gradle.properties').write_text('org.gradle.jvmargs=-Xmx1G\n')
+            (module / 'build.gradle').write_text("version = '0.1.0-prototype.12'\n")
+            self.assertEqual('0.1.0-prototype.12', build.version('module'))
+            (module / 'gradle.properties').write_text('mod_version=0.2.3\n')
+            self.assertEqual('0.2.3', build.version('module'))
+            (module / 'gradle.properties').write_text('mod_version=0.2.3\nmod_version=0.2.4\n')
+            with self.assertRaisesRegex(ValueError, 'one explicit source version'):
+                build.version('module')
+            (module / 'gradle.properties').write_text('mod_version=\n')
+            with self.assertRaisesRegex(ValueError, 'Unsafe module version'):
+                build.version('module')
+
+    def test_source_version_rejects_missing_dynamic_duplicate_and_unsafe_declarations(self):
+        module = self.root / 'module'
+        module.mkdir()
+        for declaration in ('', 'version = mod_version\n', "version = '1.0'\nversion = other\n",
+                            "version = '../1.0'\n", 'version = "${releaseVersion}"\n'):
+            with self.subTest(declaration=declaration), patch.object(build, 'ROOT', self.root):
+                (module / 'build.gradle').write_text(declaration)
+                with self.assertRaises(ValueError):
+                    build.version('module')
+
+    def test_configured_jar_uses_exact_declared_computer_version_and_metadata(self):
+        module = self.root / 'piq-computer'
+        libs = module / 'build/libs'
+        libs.mkdir(parents=True)
+        (module / 'build.gradle').write_text("version = '0.1.0-prototype.13'\n")
+        path = libs / 'game_console_computer-0.1.0-prototype.13.jar'
+        jar(path, {build.META: metadata('piq_computer', '0.1.0-prototype.13')})
+        with patch.object(build, 'ROOT', self.root):
+            self.assertEqual(path, build.configured_jar('piq-computer', 'game_console_computer', 'piq_computer'))
+            jar(libs / 'game_console_computer-0.1.0-prototype.12.jar', {build.META: metadata('piq_computer')})
+            with self.assertRaisesRegex(ValueError, 'exactly the configured JAR'):
+                build.configured_jar('piq-computer', 'game_console_computer', 'piq_computer')
+
+    def test_configured_jar_rejects_missing_old_wrong_id_or_wrong_metadata_version(self):
+        for index, (filename, ident, declared) in enumerate((
+                (None, 'piq_computer', '0.1.0-prototype.13'),
+                ('game_console_computer-0.1.0-prototype.12.jar', 'piq_computer', '0.1.0-prototype.12'),
+                ('game_console_computer-0.1.0-prototype.13.jar', 'piq_pvz', '0.1.0-prototype.13'),
+                ('game_console_computer-0.1.0-prototype.13.jar', 'piq_computer', '0.1.0-prototype.12'))):
+            module = self.root / ('case-' + str(index))
+            libs = module / 'build/libs'
+            libs.mkdir(parents=True)
+            (module / 'build.gradle').write_text("version = '0.1.0-prototype.13'\n")
+            if filename:
+                jar(libs / filename, {build.META: metadata(ident, declared)})
+            with self.subTest(filename=filename, ident=ident, version=declared), patch.object(build, 'ROOT', self.root):
+                with self.assertRaisesRegex(ValueError, 'configured JAR|identity/version mismatch'):
+                    build.configured_jar(module.name, 'game_console_computer', 'piq_computer')
+
+    def test_build_rejects_old_unknown_duplicate_or_case_aliased_bootstrap(self):
+        approved = [dict(id=ident, path='bootstrap/' + ident + '.jar', bytes=1, sha256=digest)
+                    for ident, digest in build.BOOTSTRAP.items()]
+        cases = []
+        for ident, digest in (('fc', '7d4db04cc8bafb3f7dc426e3e8412459ba1308dac9d33c434f99c1fcf5eac716'),
+                              ('arcade', '575f16d2123f1e91cadba12d8ace9dead63936770fcdec4476c260c13ce5d925')):
+            cases.append([dict(entry, sha256=digest) if entry['id'] == ident else entry for entry in approved])
+        cases.extend(([dict(approved[0], id='FC'), *approved[1:]],
+                      [dict(approved[0], id='unknown'), *approved[1:]],
+                      [*approved, approved[0]], approved[1:]))
+        for entries in cases:
+            records = {entry['path']: entry for entry in entries}
+            with self.subTest(entries=[(entry['id'], entry['sha256']) for entry in entries]), \
+                    patch.object(build, 'load_receipt', return_value=(dict(bootstrap=entries), records)), \
+                    patch.object(build, 'verify_file'), \
+                    patch.object(build.snapshot_stock, 'verify_receipt'), \
+                    patch.object(build.sfc_stock, 'verify_receipt'), \
+                    patch.object(build, 'verify_resources') as resources:
+                with self.assertRaisesRegex(ValueError, 'bootstrap|six approved'):
+                    build.verify_inputs(self.root)
+                resources.assert_not_called()
+
     def resources(self, resource='core/windows-x64/genesis_plus_gx_libretro.dll', data=b'fixture'):
         relative = 'resources/md/' + resource
         path = self.root / relative
@@ -51,6 +142,101 @@ class SnapshotBuildTests(unittest.TestCase):
         path.with_name('extra.dll').write_bytes(b'not in receipt')
         with self.assertRaises(ValueError):
             build.verify_resources(self.root / 'resources/md', receipt)
+
+    def mame_resources(self):
+        source = self.root / 'source'
+        project = source / 'piq-native-arcade'
+        tool = project / 'tools/prepare_mame_lifecycle_runtime.py'
+        tool.parent.mkdir(parents=True)
+        shutil.copyfile(Path(build.__file__).resolve().parents[1] / 'piq-native-arcade/tools' / tool.name, tool)
+        native = project / 'native/mame-lifecycle'
+        native.mkdir(parents=True)
+        patches = {'lifecycle-4fc9a931.patch': b'reviewed lifecycle fixture',
+                   'clang64-shared-4fc9a931.patch': b'reviewed shared-runtime fixture'}
+        for name, data in patches.items():
+            (native / name).write_bytes(data)
+        raw = bytearray(4096)
+        raw[:2] = b'MZ'
+        struct.pack_into('<I', raw, 0x3c, 0x80)
+        raw[0x80:0x84] = b'PE\0\0'
+        struct.pack_into('<H', raw, 0x84, 0x8664)
+        struct.pack_into('<H', raw, 0x96, 0x2000)
+        struct.pack_into('<H', raw, 0x98, 0x20b)
+        manifest = dict(schema=2, upstreamCommit='4fc9a9312baaf34963847f884961ad9793fbbc1d',
+                        resource=build.MAME_LIFECYCLE_RESOURCES[0], platform='windows-x64',
+                        savePolicy='separate-identity-no-migration', profile='clang64-shared',
+                        patches={name: hashlib.sha256(data).hexdigest() for name, data in patches.items()},
+                        runtime=dict(file='libc++.dll', bytes=1659392,
+                                     sha256='7344daed05388589e9bd691ed1d30c568c374da4b8b6a12e1502185948c03cd4'),
+                        artifact=dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()))
+        notice = (json.dumps(manifest, sort_keys=True, indent=2) + '\n').encode()
+        lock = native / 'runtime.json'
+        lock.write_bytes(notice)
+        resources = self.root / 'resources/arcade'
+        for name, data in {**dict(zip(build.MAME_LIFECYCLE_RESOURCES, (raw, notice))),
+                           'native-runtime/legacy.bin': b'legacy fixture'}.items():
+            target = resources / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
+        return source, resources, lock
+
+    def arcade_receipt(self, resources):
+        receipt = self.root / 'receipt.json'
+        records = [dict(path=p.relative_to(self.root).as_posix(), bytes=p.stat().st_size,
+                        sha256=hashlib.sha256(p.read_bytes()).hexdigest())
+                   for p in resources.rglob('*') if p.is_file()]
+        receipt.write_text(json.dumps(dict(schema=1, files=records)))
+        return receipt
+
+    def test_mame_validates_real_packaging_tool_with_small_shared_pe_fixture(self):
+        source, resources, _ = self.mame_resources()
+        with patch.object(build, 'ROOT', source):
+            build.verify_resources(resources, self.arcade_receipt(resources))
+
+    def test_mame_requires_both_resources_even_when_receipt_omits_them(self):
+        source, resources, _ = self.mame_resources()
+        originals = {name: (resources / name).read_bytes() for name in build.MAME_LIFECYCLE_RESOURCES}
+        for missing in ((build.MAME_LIFECYCLE_RESOURCES[0],),
+                        (build.MAME_LIFECYCLE_RESOURCES[1],), build.MAME_LIFECYCLE_RESOURCES):
+            for name, data in originals.items():
+                (resources / name).write_bytes(data)
+            for name in missing:
+                (resources / name).unlink()
+            with self.subTest(missing=missing), patch.object(build, 'ROOT', source), \
+                    self.assertRaisesRegex(ValueError, 'Missing fixed MAME lifecycle resource'):
+                build.verify_resources(resources, self.arcade_receipt(resources))
+
+    def test_mame_missing_reviewed_manifest_fails_closed(self):
+        source, resources, lock = self.mame_resources()
+        lock.unlink()
+        with patch.object(build, 'ROOT', source), self.assertRaisesRegex(ValueError, 'manifest is required'):
+            build.verify_resources(resources, self.arcade_receipt(resources))
+
+    def test_mame_changed_dll_or_notice_cannot_hide_in_rewritten_receipt(self):
+        source, resources, _ = self.mame_resources()
+        for name in build.MAME_LIFECYCLE_RESOURCES:
+            target = resources / name
+            original = target.read_bytes()
+            target.write_bytes(original + b' ')
+            with self.subTest(name=name), patch.object(build, 'ROOT', source), self.assertRaises(ValueError):
+                build.verify_resources(resources, self.arcade_receipt(resources))
+            target.write_bytes(original)
+
+    def test_mame_changed_source_patch_still_fails(self):
+        source, resources, lock = self.mame_resources()
+        lock.with_name('lifecycle-4fc9a931.patch').write_bytes(b'not reviewed')
+        with patch.object(build, 'ROOT', source), self.assertRaisesRegex(ValueError, 'source patches changed'):
+            build.verify_resources(resources, self.arcade_receipt(resources))
+
+    def test_mame_scope_does_not_admit_neighboring_core_or_notice(self):
+        source, resources, _ = self.mame_resources()
+        for name in ('core/mame-jni/windows-x64/other.dll', 'META-INF/piq-native/mame-lifecycle/other.json'):
+            target = resources / name
+            target.write_bytes(b'unapproved neighbor')
+            with self.subTest(name=name), patch.object(build, 'ROOT', source), \
+                    self.assertRaisesRegex(ValueError, 'Foreign snapshot resource'):
+                build.verify_resources(resources, self.arcade_receipt(resources))
+            target.unlink()
 
     def test_mod_class_and_retired_core_are_refused(self):
         for name in ('core/windows-x64/Forged.class', 'core/windows-x64/blastem_libretro.dll'):
@@ -148,12 +334,127 @@ class SnapshotBuildTests(unittest.TestCase):
         staging = self.root / 'ascii-staging'
         staging.mkdir()
         receipt = self.root / 'probe-inputs.json'
-        with patch.object(build.tempfile, 'mkdtemp', return_value=str(staging)):
-            copied, client = build.prepare_gba_probe_classpath(deps, minecraft, receipt)
+        temporary, _ = build.prepare_build_environment(self.root)
+        with patch.object(build.tempfile, 'mkdtemp', return_value=str(staging)) as create:
+            copied, client = build.prepare_gba_probe_classpath(deps, minecraft, receipt, temporary)
+        create.assert_called_once_with(prefix='gc-snapshot-gba-deps-', dir=temporary)
         self.assertEqual(b'library bytes', (copied / 'dependency-000.jar').read_bytes())
         self.assertEqual(b'resource bytes', client.read_bytes())
         self.assertTrue(str(client).isascii())
         self.assertEqual(2, len(json.loads(receipt.read_text())['files']))
+
+    def test_build_temp_is_canonical_owned_and_does_not_mutate_parent_environment(self):
+        inherited = dict(os.environ)
+        temporary, environment = build.prepare_build_environment(self.root)
+        self.assertEqual(self.root.resolve() / 'temp', temporary)
+        self.assertEqual(temporary.resolve(), temporary)
+        self.assertTrue(temporary.is_dir())
+        for key in ('TEMP', 'TMP', 'TMPDIR'):
+            self.assertEqual(str(temporary), environment[key])
+        self.assertEqual(inherited, dict(os.environ))
+        for key, value in inherited.items():
+            if key not in ('TEMP', 'TMP', 'TMPDIR'):
+                self.assertEqual(value, environment[key])
+
+    def test_build_temp_never_reuses_existing_directory_or_file(self):
+        temporary, _ = build.prepare_build_environment(self.root)
+        marker = temporary / 'prior-failure.txt'
+        marker.write_bytes(b'preserve failed build evidence')
+        with self.assertRaises(FileExistsError):
+            build.prepare_build_environment(self.root)
+        self.assertEqual(b'preserve failed build evidence', marker.read_bytes())
+        other = self.root / 'other'
+        other.mkdir()
+        (other / 'temp').write_bytes(b'not a directory')
+        with self.assertRaises(FileExistsError):
+            build.prepare_build_environment(other)
+        self.assertEqual(b'not a directory', (other / 'temp').read_bytes())
+
+    def test_build_temp_requires_ascii_without_creating_hidden_fallback(self):
+        work = self.root / '构建'
+        work.mkdir()
+        with self.assertRaisesRegex(ValueError, 'ASCII work directory'):
+            build.prepare_build_environment(work)
+        self.assertFalse((work / 'temp').exists())
+
+    def test_build_temp_rejects_link_before_resolving_it(self):
+        target, link = self.root / 'target', self.root / 'link'
+        target.mkdir()
+        if os.name == 'nt':
+            environment = dict(os.environ, GC_TEST_LINK=str(link), GC_TEST_TARGET=str(target))
+            subprocess.run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command',
+                            'New-Item -ItemType Junction -Path $env:GC_TEST_LINK '
+                            '-Target $env:GC_TEST_TARGET -ErrorAction Stop | Out-Null'],
+                           env=environment, capture_output=True, check=True)
+            self.addCleanup(link.rmdir)
+        else:
+            link.symlink_to(target, target_is_directory=True)
+            self.addCleanup(link.unlink)
+        with self.assertRaisesRegex(ValueError, 'Linked input/output path'):
+            build.prepare_build_environment(link)
+        with self.assertRaisesRegex(ValueError, 'Linked input/output path'):
+            build.prepare_build_environment(link / 'child')
+        self.assertFalse((target / 'temp').exists())
+        self.assertFalse((target / 'child').exists())
+
+    def test_no_links_rejects_windows_reparse_without_python312_helper(self):
+        class Python311Path(type(self.root)):
+            def __getattribute__(self, name):
+                if name == 'is_junction':
+                    raise AttributeError(name)
+                return super().__getattribute__(name)
+
+        path = Python311Path(self.root)
+        self.assertFalse(hasattr(path, 'is_junction'))
+        attributes = SimpleNamespace(st_mode=build.stat.S_IFDIR | 0o700,
+                                     st_file_attributes=build.stat.FILE_ATTRIBUTE_REPARSE_POINT)
+        with patch.object(build.os, 'lstat', return_value=attributes):
+            with self.assertRaisesRegex(ValueError, 'Linked input/output path'):
+                build.no_links(path)
+
+    def test_build_step_passes_temp_to_real_child_and_grandchild(self):
+        temporary, environment = build.prepare_build_environment(self.root)
+        logs = self.root / 'logs'
+        logs.mkdir()
+        probe = ('import json, os, tempfile; '
+                 'print(json.dumps([tempfile.gettempdir(), '
+                 '[os.environ[key] for key in ("TEMP", "TMP", "TMPDIR")]]))')
+        child = ('import subprocess, sys; '
+                 'subprocess.run([sys.executable, "-c", ' + repr(probe) + '], check=True)')
+        build.run_build_step('temp-probe', [sys.executable, '-c', child], self.root, logs, environment)
+        result = json.loads((logs / 'temp-probe.log').read_text())
+        self.assertEqual(temporary, Path(result[0]))
+        self.assertEqual([str(temporary)] * 3, result[1])
+
+    def test_failed_build_step_keeps_log_and_blocks_continuation(self):
+        temporary, environment = build.prepare_build_environment(self.root)
+        evidence = temporary / 'before-failure.txt'
+        evidence.write_bytes(b'keep temporary evidence')
+        logs = self.root / 'logs'
+        logs.mkdir()
+        command = [sys.executable, '-c', 'import sys; print("failure evidence"); sys.exit(7)']
+        with self.assertRaisesRegex(RuntimeError, 'failed; no snapshot may be published'):
+            build.run_build_step('failure', command, self.root, logs, environment)
+        self.assertIn('failure evidence', (logs / 'failure.log').read_text())
+        self.assertTrue(temporary.is_dir())
+        self.assertEqual(b'keep temporary evidence', evidence.read_bytes())
+        with self.assertRaises(FileExistsError):
+            build.run_build_step('failure', command, self.root, logs, environment)
+
+    def test_gba_probe_uses_owned_temp_even_when_python_cached_another_root(self):
+        deps = self.root / 'dependencies'
+        deps.mkdir()
+        (deps / 'library.jar').write_bytes(b'library bytes')
+        minecraft = self.root / 'minecraft.jar'
+        minecraft.write_bytes(b'resource bytes')
+        temporary, _ = build.prepare_build_environment(self.root)
+        receipt = self.root / 'probe-inputs.json'
+        with patch.object(build.tempfile, 'tempdir', str(self.root / 'unavailable-temp')):
+            copied, client = build.prepare_gba_probe_classpath(deps, minecraft, receipt, temporary)
+        self.assertEqual(temporary, copied.parent.parent)
+        self.assertEqual(temporary, client.parent.parent)
+        self.assertEqual(b'library bytes', (copied / 'dependency-000.jar').read_bytes())
+        self.assertEqual(b'resource bytes', client.read_bytes())
 
     def test_seven_artifacts_with_exact_ids_and_checksum_manifest(self):
         groups = [('piq_fc_arcade',), ('piq_sfc_arcade', 'piq_sfc_home'), ('piq_md_home',),

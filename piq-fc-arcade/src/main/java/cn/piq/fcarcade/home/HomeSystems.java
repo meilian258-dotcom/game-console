@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.home;
 
 import cn.piq.fcarcade.FcArcadeMod;
@@ -45,6 +47,8 @@ public final class HomeSystems {
         default boolean synchronizationSettingsAvailable() { return false; }
         /** Opt in only after wiring/validating a JNI room, not merely a native runner. */
         default boolean jniNetplaySettingsAvailable() { return false; }
+        /** Supports a persistent second-port preference, applied at the next public launch. */
+        default boolean secondPortSettingsAvailable() { return false; }
         /** Read-only device diagnostics must not advertise an unsupported execution mode. */
         default boolean deviceSettingsAvailable() { return synchronizationSettingsAvailable(); }
         /** Opt-in only when the provider publishes real, currently authorized operators. */

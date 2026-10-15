@@ -8,6 +8,8 @@ import java.util.concurrent.atomic.AtomicReference;
 /** Independent test-only ABI declarations. Never package this class in the mod. */
 public class NativeLibretroBridge {
     public static native int abiVersion();
+    public static native int runtimeDependencyApiVersion();
+    public static native void retainRuntimeDependencies(String[] paths,String[] sha256)throws IOException;
     public static native int availableSlots();
     public static native long reserve()throws IOException;
     public static native boolean reservationHeld(long token);

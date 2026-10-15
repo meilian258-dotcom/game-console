@@ -5,6 +5,21 @@ this project is licensed under GNU GPL version 3 or, at your option, any later
 version. The full text is in `src/main/resources/META-INF/licenses/GPL-3.0.txt`.
 This software is provided without warranty.
 
+The PIQ-authored parts of the FC frontend, internal public platform, SFC
+integration and native JNI bridge identified in
+[`SNES9X-LINKING-EXCEPTION.txt`](SNES9X-LINKING-EXCEPTION.txt) have the limited
+Snes9x additional permission stated there, effective 2026-10-15. Their GPL
+terms otherwise remain unchanged. This is not an exception for RetroArch or
+other third-party GPL code and is not a commercial license for Snes9x.
+
+The separately scoped
+[`MD-ARCADE-LINKING-EXCEPTION.txt`](MD-ARCADE-LINKING-EXCEPTION.txt) grants a
+limited additional permission for the PIQ-authored code identified there
+to combine with the specified fixed ordinary GX, GX piqnp1 and FBNeo state-v3 cores. It applies from
+2026-10-15, including to the stated existing compiled PIQ code. It does not
+grant an exception for RetroArch or commercial rights to either core, and
+does not alter the Snes9x permission.
+
 Third-party code retains its existing copyright notices and licenses; see
 `THIRD_PARTY_NOTICES.md`. In particular, the Mesen core has its own GPL terms.
 The Java/libretro process boundary is not a claim that GPL obligations disappear.

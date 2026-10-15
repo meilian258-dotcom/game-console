@@ -3,6 +3,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.141'
 }
 apply from: '../source-control/neoforge-compat.gradle'
+apply from: '../source-control/build-workspace.gradle'
 apply from: '../source-control/snapshot-resources.gradle'
 
 group = mod_group_id
@@ -66,31 +67,55 @@ tasks.withType(JavaCompile).configureEach {
     options.release = 21
 }
 
+def asciiRoot = piqAsciiClasspathRoot
+def asciiTests = new File(asciiRoot, 'tests')
+def asciiMain = new File(asciiRoot, 'main')
+def asciiDependencies = new File(asciiRoot, 'dependencies')
+def asciiRuntimeJar = new File(asciiRoot, 'sfc-runtime.jar')
+def copyTests = tasks.register('prepareAsciiTestOutput', Sync) {
+    dependsOn tasks.named('testClasses'); from sourceSets.test.output; into asciiTests
+}
+def copyMain = tasks.register('prepareAsciiMainOutput', Sync) {
+    dependsOn tasks.named('classes'); from sourceSets.main.output; into asciiMain
+}
+def copyDependencies = tasks.register('prepareAsciiRuntimeDependencies', Sync) {
+    from configurations.testRuntimeClasspath; into asciiDependencies
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+}
+def asciiTestClasspath = files(asciiTests, asciiMain) + fileTree(asciiDependencies)
+def configureCoreProbe = { task ->
+    piqUseBuildWorkspace(task)
+    task.dependsOn copyTests, copyMain, copyDependencies
+    task.classpath = asciiTestClasspath
+}
+
 tasks.register('coreSelfTest', JavaExec) {
+    configureCoreProbe(delegate)
     group = 'verification'
     description = 'Runs the ROM/input/video ABI self-test without a copyrighted ROM.'
     dependsOn tasks.named('testClasses')
-    classpath = sourceSets.test.runtimeClasspath
     mainClass = 'cn.piq.sfcarcade.core.SfcCoreSelfTest'
 }
 
 tasks.register('wasmRuntimeSmoke', JavaExec) {
+    configureCoreProbe(delegate)
     group = 'verification'
     description = 'Runs an original legal LoROM through the packaged jgenesis WASM core.'
     dependsOn tasks.named('testClasses')
-    classpath = sourceSets.test.runtimeClasspath
     mainClass = 'cn.piq.sfcarcade.core.SfcWasmRuntimeSmoke'
 }
 
 tasks.register('romRepositorySelfTest', JavaExec) {
+    configureCoreProbe(delegate)
     group = 'verification'
     description = 'Verifies SFC ROM catalog, normalized hashing and downloaded-file storage.'
     dependsOn tasks.named('testClasses')
-    classpath = sourceSets.test.runtimeClasspath
     mainClass = 'cn.piq.sfcarcade.core.SfcRomRepositorySelfTest'
 }
 
 tasks.named('test', Test) {
+    dependsOn copyTests, copyMain, copyDependencies
+    classpath = asciiTestClasspath
     // The phase-1 verification is a dependency-free executable self-test,
     // not a JUnit engine test. Gradle 9 otherwise treats this as an error.
     failOnNoDiscoveredTests = false
@@ -121,6 +146,8 @@ neoForge.ideSyncTask generateModMetadata
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from('third-party/wasm-runtime') { into 'META-INF/licenses/sfc-wasm-runtime' }
+    from('../piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
     exclude 'META-INF/MANIFEST.MF',
             'META-INF/*.SF',
             'META-INF/*.RSA',
@@ -142,8 +169,17 @@ jar {
 }
 
 tasks.register('packagedRuntimeSmoke', JavaExec) {
-    dependsOn tasks.named('jar'), tasks.named('testClasses')
-    classpath = files(sourceSets.test.output, tasks.named('jar').flatMap { it.archiveFile }) + configurations.wasmtimeRuntime
+    piqUseBuildWorkspace(delegate)
+    dependsOn tasks.named('jar'), copyTests, copyDependencies
+    doFirst {
+        piqPrepareBuildDirectory(asciiRoot)
+        copy {
+            from tasks.named('jar').get().archiveFile
+            into asciiRoot
+            rename { asciiRuntimeJar.name }
+        }
+    }
+    classpath = files(asciiTests, asciiRuntimeJar) + fileTree(asciiDependencies)
     mainClass = 'cn.piq.sfcarcade.core.SfcWasmRuntimeSmoke'
 }
 

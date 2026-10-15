@@ -49,12 +49,30 @@ class NativeNetplayContentTest {
         Path stage=Files.createDirectory(tmp.resolve("stage"));assertEquals(32,c.files().stage(stage,()->{}).length);
         for(var e:c.files().files().entrySet())assertEquals(-1,Files.mismatch(e.getValue().source(),stage.resolve(e.getKey())));
     }
-    @Test void seventyNineMiBFileIsJniOnlyAndLegacyArrayRouteStillRefusesIt()throws Exception {
+    @Test void seventyNineMiBFileUsesNamedFilesAndLegacyArrayRouteStillRefusesIt()throws Exception {
         Path game=zip("samsho5.zip");try(var f=new java.io.RandomAccessFile(game.toFile(),"rw")){f.setLength(83_164_356);}
         var c=NativeNetplayContent.loadFiles(game);assertEquals(83_164_356,c.files().main().size());assertEquals(0,c.rom().length);
         assertThrows(java.io.IOException.class,()->NativeNetplayContent.load(game));
         try(var f=new java.io.RandomAccessFile(game.toFile(),"rw")){f.setLength(96L*1024*1024+1);}
         assertThrows(java.io.IOException.class,()->NativeNetplayContent.loadFiles(game));
+    }
+    @Test void stockFileAdapterCarriesAllBiosAndTrustedProfileWithoutRomArrays()throws Exception {
+        Path game=zip("dino.zip");for(String name:List.of("neogeo.zip","pgm.zip","qsound.zip","qsound_hle.zip"))zip(name);
+        String stock=cn.piq.nativearcade.NativeNetplayProfile.RETROARCH_STOCK;
+        var c=NativeNetplayContent.loadFiles(game,stock);
+        assertNull(c.profile().jni());assertEquals(cn.piq.nativearcade.NativeNetplayProfile.STOCK_CORE_SHA,c.profile().sha());
+        assertEquals(NativeNetplayContent.profile("dino.zip",stock),c.profile());
+        assertEquals(Set.of("dino.zip","neogeo.zip","pgm.zip","qsound.zip","qsound_hle.zip"),c.files().files().keySet());
+        assertEquals(0,c.rom().length);assertTrue(c.auxiliary().isEmpty());
+        try(var file=new java.io.RandomAccessFile(game.toFile(),"rw")){file.setLength(83_164_356);}
+        var large=NativeNetplayContent.loadFiles(game,stock);assertEquals(83_164_356,large.files().main().size());
+        assertEquals(0,large.rom().length);
+    }
+    @Test void unknownFileVariantIsRejectedBeforeReadingPath(){
+        assertThrows(IllegalArgumentException.class,()->NativeNetplayContent.loadFiles(tmp.resolve("missing.zip"),"unknown"));
+        var backend=new NativeCabinetBackend();
+        assertNotNull(backend.netplayUnavailableReason("unknown"));
+        assertThrows(IllegalArgumentException.class,()->backend.prepareNetplayFactory("unknown"));
     }
     @Test void fileAdapterRejectsInvalidAndOversizedCompanionsExplicitly()throws Exception {
         Path game=zip("samsho5.zip"),bios=zip("neogeo.zip");

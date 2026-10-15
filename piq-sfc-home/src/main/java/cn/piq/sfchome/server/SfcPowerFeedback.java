@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.server;
 
 /** Server-thread transition bookkeeping; pending preparation is not a power-on sound. */

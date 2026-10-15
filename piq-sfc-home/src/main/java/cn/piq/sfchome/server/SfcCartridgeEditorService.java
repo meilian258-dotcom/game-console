@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.server;
 import cn.piq.fcarcade.home.CartridgeComputerBlockEntity;
 import cn.piq.fcarcade.access.PlayerContentAccess;
@@ -51,8 +52,18 @@ public final class SfcCartridgeEditorService {
         if(e.upload==null&&a.hash().equals(e.abortedUploadHash)&&(a.operation()==SfcHomeNetwork.UPLOAD_CHUNK||a.operation()==SfcHomeNetwork.UPLOAD_FINISH))return;
         if(e.upload!=null&&!uploadAllowed(p,e.uploadCover)){abortUpload(p,st,e);return;}
         if(e.committingCover!=null&&!uploadAllowed(p,e.committingCover))e.commitRevoked=true;
-        if(e.busy){reply(p,e,false,"正在处理，请稍候",e.catalog);return;}
+        if(e.busy){if(a.operation()==SfcHomeNetwork.SAVE_LIBRARY)SfcSaveLibraryService.reject(p,e.token,"正在处理，请稍后打开存档库");else reply(p,e,false,"正在处理，请稍候",e.catalog);return;}
         switch(a.operation()){
+            case SfcHomeNetwork.SAVE_LIBRARY->{
+                if(e.upload!=null||!a.hash().equals(SfcCartridgeData.romSha(e.stack))||a.hash().isEmpty()){
+                    SfcSaveLibraryService.reject(p,e.token,"请先完成写卡，再查看当前卡带的存档");return;
+                }
+                // A frozen read-only grant survives closing the workbench, not changing the card or computer.
+                Edit snapshot=new Edit(p,e.hand,e.stack,e.computer,st.tick);
+                var server=p.getServer();UUID card=SfcCartridgeData.id(e.stack);String rom=SfcCartridgeData.romSha(e.stack);
+                SfcSaveLibraryService.open(p,e.token,card,rom,()->STATES.get(server)==st
+                        &&p.containerMenu==p.inventoryMenu&&valid(p,snapshot));
+            }
             case SfcHomeNetwork.SET_SAVE_MODE->{
                 if(e.upload!=null||a.offset()!=0||a.data().length!=0||!a.hash().equals(SfcCartridgeData.romSha(e.stack))||a.total()<0||a.total()>2||!a.name().isEmpty()){reply(p,e,false,"存档设置参数无效",e.catalog);return;}
                 if(cn.piq.fcarcade.netplay.NetplaySaveServer.busyPrefix("sfc-card|"+SfcCartridgeData.id(e.stack)+"|")){reply(p,e,false,"此卡带的 Netplay 仍在运行或保存，请稍后修改",e.catalog);return;}
@@ -120,10 +131,10 @@ public final class SfcCartridgeEditorService {
         Edit e=st.edits.get(p.getUUID());return p.hasPermissions(2)&&e!=null&&valid(p,e)&&e.catalog.stream().anyMatch(x->x.sha256().equals(hash));}
     public static void download(ServerPlayer p,String hash){State st=state(p.getServer());if(!downloadAuthorized(p,hash,st)||st.downloads.containsKey(p.getUUID())||st.downloads.size()>=4||st.tick-st.lastDownload.getOrDefault(p.getUUID(),-100L)<40)return;st.lastDownload.put(p.getUUID(),st.tick);Download pending=new Download(hash);st.downloads.put(p.getUUID(),pending);MinecraftServer server=p.getServer();try{IO.execute(()->{byte[]data=null;try{data=st.store.read(hash);}catch(Exception ignored){}byte[]result=data;server.execute(()->{if(STATES.get(server)!=st||st.downloads.get(p.getUUID())!=pending)return;if(result==null||!downloadAuthorized(p,hash,st)||!st.downloadBudget.reserve(result.length)){removeDownload(st,p.getUUID());return;}pending.bytes=result;});});}catch(RejectedExecutionException ex){removeDownload(st,p.getUUID());}}
     private static void removeDownload(State st,UUID player){Download d=st.downloads.remove(player);if(d!=null&&d.bytes!=null)st.downloadBudget.release(d.bytes.length);}
-    public static void tick(MinecraftServer server){SfcCoverService.tick(server);State st=state(server);st.tick++;for(var entry:List.copyOf(st.edits.entrySet())){ServerPlayer p=server.getPlayerList().getPlayer(entry.getKey());Edit e=entry.getValue();if(p==null){st.edits.remove(entry.getKey());if(e.upload!=null){st.uploadBudget.release(e.upload.length);e.upload=null;}continue;}if(st.tick-e.last>1200||!valid(p,e)){cancel(p,st,e,"电脑授权失效或超时，编辑已取消");continue;}if(e.upload!=null&&!uploadAllowed(p,e.uploadCover))abortUpload(p,st,e);if(e.committingCover!=null&&!uploadAllowed(p,e.committingCover))e.commitRevoked=true;if(e.lastCapabilities!=PlayerContentAccess.capabilities(p))reply(p,e,false,"PERMISSIONS_UPDATED",e.catalog);}
+    public static void tick(MinecraftServer server){SfcCoverService.tick(server);SfcSaveLibraryService.tick(server);State st=state(server);st.tick++;for(var entry:List.copyOf(st.edits.entrySet())){ServerPlayer p=server.getPlayerList().getPlayer(entry.getKey());Edit e=entry.getValue();if(p==null){st.edits.remove(entry.getKey());if(e.upload!=null){st.uploadBudget.release(e.upload.length);e.upload=null;}continue;}if(st.tick-e.last>1200||!valid(p,e)){cancel(p,st,e,"电脑授权失效或超时，编辑已取消");continue;}if(e.upload!=null&&!uploadAllowed(p,e.uploadCover))abortUpload(p,st,e);if(e.committingCover!=null&&!uploadAllowed(p,e.committingCover))e.commitRevoked=true;if(e.lastCapabilities!=PlayerContentAccess.capabilities(p))reply(p,e,false,"PERMISSIONS_UPDATED",e.catalog);}
         for(var entry:List.copyOf(st.downloads.entrySet())){ServerPlayer p=server.getPlayerList().getPlayer(entry.getKey());Download d=entry.getValue();if(p==null||!downloadAuthorized(p,d.hash,st)){removeDownload(st,entry.getKey());continue;}if(d.bytes==null)continue;int n=Math.min(SfcHomeNetwork.CHUNK,d.bytes.length-d.offset);SfcHomeNetwork.send(p,new SfcHomeNetwork.RomChunk(d.hash,d.bytes.length,d.offset,Arrays.copyOfRange(d.bytes,d.offset,d.offset+n)));d.offset+=n;if(d.offset==d.bytes.length)removeDownload(st,entry.getKey());}
     }
-    public static void closeServer(MinecraftServer s){STATES.remove(s);SfcCoverService.close(s);}
+    public static void closeServer(MinecraftServer s){STATES.remove(s);SfcCoverService.close(s);SfcSaveLibraryService.close(s);}
     private static final class State{final SfcRomStore store;final SfcTransferBudget uploadBudget=new SfcTransferBudget(),downloadBudget=new SfcTransferBudget();long tick;final Map<UUID,Edit>edits=new HashMap<>();final Map<UUID,Download>downloads=new HashMap<>();final Map<UUID,Long>lastDownload=new HashMap<>(),lastOpen=new HashMap<>(),lastUpload=new HashMap<>();State(SfcRomStore s){store=s;}}
     private static final class Download{final String hash;byte[]bytes;int offset;Download(String h){hash=h;}}
     private static final class Edit{final UUID token=UUID.randomUUID(),computerId;final String originalCover;final Object connection;final ServerLevel level;final BlockPos pos;final CartridgeComputerBlockEntity computer;final InteractionHand hand;final int slot;final ItemStack stack;ItemStack snapshot;long last,lastUpload=-100,packetTick=-1;int packetCount,offset,lastCapabilities=-1;boolean busy,uploadCover,commitRevoked;Boolean committingCover;byte[]upload;String uploadHash,uploadName,abortedUploadHash="";List<SfcHomeNetwork.RomEntry>catalog=List.of();List<String>covers=List.of();Edit(ServerPlayer p,InteractionHand h,ItemStack s,CartridgeComputerBlockEntity c,long tick){connection=p.connection.getConnection();level=p.serverLevel();pos=c.getBlockPos().immutable();computer=c;computerId=c.computerId();hand=h;slot=p.getInventory().selected;stack=s;snapshot=s.copy();originalCover=SfcCartridgeData.coverSha(s);last=tick;}}

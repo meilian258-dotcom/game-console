@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.netplay;
 
 import cn.piq.fcarcade.ArcadeSessionPayload;
@@ -29,8 +31,12 @@ public final class NetplayNetwork {
     /** Server-owned namespace distinct from legacy FC session counters. */
     public static long nextAddonId(){long id=ADDON_IDS.incrementAndGet();if(id<=0)throw new IllegalStateException("Netplay ID exhausted");return id;}
     public static void bind(Connection source,NetplayProcess process){
+        bind(source,process,true);
+    }
+    /** Explicit unsupported-save routes still bind transport, but never request a save capability. */
+    public static void bind(Connection source,NetplayProcess process,boolean allowPersistence){
         var key=new Key(source,process.grant().session());if(CLIENTS.putIfAbsent(key,process)!=null)throw new IllegalStateException("Netplay already bound");
-        try{var factory=persistenceFactory;if(process.grant().host()&&factory!=null)process.persistence(factory.create(source,process.grant()));}
+        try{var factory=persistenceFactory;if(allowPersistence&&process.grant().host()&&factory!=null)process.persistence(factory.create(source,process.grant()));}
         catch(RuntimeException failed){CLIENTS.remove(key,process);throw failed;}
     }
     public static void unbind(Connection source,NetplayProcess process){CLIENTS.remove(new Key(source,process.grant().session()),process);}

@@ -38,7 +38,9 @@ class CabinetAudioGenerationTest {
                     if(n==1&&writeEntered!=null){writeEntered.countDown();assertTrue(writeGo.await(3,TimeUnit.SECONDS));}
                     if(failWrite)throw new IllegalStateException("controlled device failure");
                     byte[] bytes=Arrays.copyOfRange((byte[])args[0],(int)args[1],(int)args[1]+(int)args[2]);
-                    writes.add(bytes);events.add("write:"+(bytes[0]&255));return bytes.length;
+                    // Tests await writes.size(); publish the event first so that observation also
+                    // guarantees the ordering record is visible, not a half-recorded device call.
+                    events.add("write:"+(bytes[0]&255));writes.add(bytes);return bytes.length;
                 case "toString":return "ControlledSourceDataLine";
                 default:throw new AssertionError("Unexpected device call "+m.getName());
             }

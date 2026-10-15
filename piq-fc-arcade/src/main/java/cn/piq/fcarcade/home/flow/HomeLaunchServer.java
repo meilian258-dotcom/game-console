@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.home.flow;
 
 import cn.piq.retro.flow.DeviceSessionFlow;
@@ -23,7 +25,10 @@ public final class HomeLaunchServer {
     public record Key(ResourceLocation system,ResourceLocation dimension,BlockPos pos,UUID hardware){
         public Key{Objects.requireNonNull(system);Objects.requireNonNull(dimension);pos=Objects.requireNonNull(pos).immutable();Objects.requireNonNull(hardware);}
     }
-    public record Definition(String label,String title,int maxPlayers,int saveMode,boolean privatePlay,String saveHint){
+    public record Definition(String label,String title,int maxPlayers,int saveMode,boolean privatePlay,String saveHint,Boolean secondPortAllowed){
+        /** Binary-compatible legacy adapter: retains the independent confirmation page. */
+        public Definition(String label,String title,int maxPlayers,int saveMode,boolean privatePlay,String saveHint){this(label,title,maxPlayers,saveMode,privatePlay,saveHint,null);}
+        public Definition(String label,String title,int maxPlayers,int saveMode,boolean privatePlay,String saveHint,boolean secondPortAllowed){this(label,title,maxPlayers,saveMode,privatePlay,saveHint,Boolean.valueOf(secondPortAllowed));}
         public Definition{text(label,64);text(title,128);text(saveHint,240);if(maxPlayers<1||maxPlayers>2||saveMode<0||saveMode>2)throw new IllegalArgumentException("Launch definition");}
     }
     public record Launch<P>(P save,Choice choice,boolean allowSecondPort){}
@@ -34,7 +39,7 @@ public final class HomeLaunchServer {
         void list(Consumer<List<Row>> success,Consumer<String> failure);
         /** Null choice is the explicit no-save branch. Must never mutate old progress while selecting. */
         void select(Choice choice,Consumer<P> success,Consumer<String> failure);
-        /** Called exactly once, only after save validation and the applicable independent join confirmation. */
+        /** Called exactly once after save validation and resolution of the second-port policy. */
         void load(Launch<P> launch,Handle handle);
         /** Preparation cancelled/failed, or bounded runtime close expired. Must be idempotent. */
         void cancelled(String reason);
@@ -118,7 +123,7 @@ public final class HomeLaunchServer {
     private static final class Pending<P>{
         final MinecraftServer server;final ServerPlayer player;final Connection connection;final Key key;final Adapter<P> adapter;final Definition definition;
         final UUID token=UUID.randomUUID();final DeviceSessionFlow flow;final Handle handle;List<Row> rows=List.of();Choice choice;P plan;long deadline;
-        Pending(ServerPlayer player,Key key,Adapter<P> adapter){this.player=player;server=player.getServer();connection=player.connection.getConnection();this.key=key;this.adapter=Objects.requireNonNull(adapter);definition=adapter.definition();flow=new DeviceSessionFlow(definition.maxPlayers(),definition.saveMode()!=0,definition.privatePlay());handle=new Handle(this);deadline=tick(server)+PREPARE_TICKS;}
+        Pending(ServerPlayer player,Key key,Adapter<P> adapter){this.player=player;server=player.getServer();connection=player.connection.getConnection();this.key=key;this.adapter=Objects.requireNonNull(adapter);definition=adapter.definition();flow=new DeviceSessionFlow(definition.maxPlayers(),definition.saveMode()!=0,definition.privatePlay(),definition.secondPortAllowed());handle=new Handle(this);deadline=tick(server)+PREPARE_TICKS;}
     }
     private static String message(Throwable e){return e.getMessage()==null?e.getClass().getSimpleName():e.getMessage();}
     private static String cut(String s,int max){if(s==null)return "操作失败";s=s.replaceAll("[\\p{Cntrl}]"," ");return s.length()>max?s.substring(0,max):s;}

@@ -1,5 +1,6 @@
 // Internal library, compiled into the FC main mod; not a separately installed mod.
 plugins { id 'java-library' }
+apply from: '../source-control/build-workspace.gradle'
 group = 'cn.piq.retro'
 version = mod_version
 base { archivesName = 'piq_retro_internal' }
@@ -15,7 +16,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
-def asciiRoot = new File(System.getProperty('java.io.tmpdir'), 'piq-retro-platform-tests')
+def asciiRoot = piqAsciiClasspathRoot
 def asciiTests = new File(asciiRoot, 'tests'), asciiMain = new File(asciiRoot, 'main')
 def copyTests = tasks.register('prepareAsciiTestOutput', Sync) { dependsOn tasks.named('testClasses'); from sourceSets.test.output; into asciiTests }
 def copyMain = tasks.register('prepareAsciiMainOutput', Sync) { dependsOn tasks.named('classes'); from sourceSets.main.output; into asciiMain }
@@ -23,4 +24,9 @@ tasks.named('test', Test) {
     dependsOn copyTests, copyMain; useJUnitPlatform()
     classpath = files(asciiTests, asciiMain) + configurations.testRuntimeClasspath
 }
-jar { manifest { attributes 'Implementation-Title': 'Game Console Internal Library (not a mod)', 'Implementation-Version': project.version } }
+jar {
+    from('../piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
+    from('../piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
+    from('../piq-fc-arcade/src/main/resources/META-INF/licenses/GPL-3.0.txt') { into 'META-INF/licenses' }
+    manifest { attributes 'Implementation-Title': 'Game Console Internal Library (not a mod)', 'Implementation-Version': project.version }
+}

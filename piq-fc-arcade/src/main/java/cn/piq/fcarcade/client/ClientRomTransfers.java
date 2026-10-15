@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client;
 
 import cn.piq.fcarcade.ArcadeJoinPromptPayload;
@@ -291,11 +293,14 @@ final class ClientRomTransfers {
     }
 
     private static <T> void submitIo(Callable<T> action, BiConsumer<T, Throwable> callback) {
+        if(cn.piq.retro.replay.ReplayGuard.playing())return;
+        long replayEpoch=cn.piq.retro.replay.ReplayGuard.epoch();
         long token = generation;
         var connection = MINECRAFT.getConnection();
         if (connection == null) return;
         try {
             ClientIoExecutor.execute(() -> {
+                if(!cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))return;
                 T result = null;
                 Throwable failure = null;
                 try {
@@ -306,13 +311,13 @@ final class ClientRomTransfers {
                 T completed = result;
                 Throwable error = failure;
                 MINECRAFT.execute(() -> {
-                    if (generation == token && MINECRAFT.getConnection() == connection) {
+                    if (cn.piq.retro.replay.ReplayGuard.valid(replayEpoch) && generation == token && MINECRAFT.getConnection() == connection) {
                         callback.accept(completed, error);
                     }
                 });
             });
         } catch (java.util.concurrent.RejectedExecutionException error) {
-            callback.accept(null, error);
+            if(cn.piq.retro.replay.ReplayGuard.valid(replayEpoch))callback.accept(null, error);
         }
     }
 

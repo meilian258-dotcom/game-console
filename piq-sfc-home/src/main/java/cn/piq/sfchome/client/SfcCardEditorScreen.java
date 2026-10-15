@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.client;
 
 import cn.piq.fcarcade.client.rom.LocalRomLibrary;
 import cn.piq.fcarcade.client.ui.DeviceUi;
 import cn.piq.fcarcade.client.ui.DeviceLayout;
 import cn.piq.fcarcade.client.ui.CartridgeWorkbenchLayout;
+import cn.piq.fcarcade.client.ui.CartridgeSaveSettingsLayout;
+import cn.piq.fcarcade.client.CartridgeSaveScreen;
 import cn.piq.fcarcade.home.CartridgeCoverCodec;
 import cn.piq.fcarcade.home.CartridgeLimits;
 import cn.piq.sfchome.net.SfcHomeNetwork;
@@ -38,13 +41,14 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
     private CartridgeWorkbenchLayout workbench;
     private EditBox titleField,searchField;
     private Button writeButton,romFolderButton,coverFolderButton,refreshButton,previousButton,nextButton;
-    private Button gamesTabButton,coversTabButton,playersButton,saveNameButton,clearCoverButton,restoreCoverButton,saveManagerButton;
+    private Button gamesTabButton,coversTabButton,playersButton,saveNameButton,clearCoverButton,restoreCoverButton,saveManagerButton,saveLibraryButton,saveBackButton;
+    private final List<Button> saveChoices=new ArrayList<>();
     private String status="",serverStatus="",libraryStatus="",uploadSha="",uploadName="",searchQuery="";
     private byte[] upload;
     private SfcUploadTitle uploadTitle;
     private int uploadOffset;
     private Phase phase=Phase.IDLE;
-    private boolean closed,scanning,initialScan,coverTab,uploadCover;
+    private boolean closed,scanning,initialScan,coverTab,uploadCover,saveSettings;
     private long actionAt;
 
     SfcCardEditorScreen(SfcHomeNetwork.Editor data){
@@ -73,7 +77,14 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
         int titleCursor=titleField==null?-1:titleField.getCursorPosition(),searchCursor=searchField==null?-1:searchField.getCursorPosition();
         layout=DeviceLayout.browser(width,height,2);rowButtons.clear();
         titleField=searchField=null;writeButton=romFolderButton=coverFolderButton=refreshButton=previousButton=nextButton=null;
+        saveChoices.clear();saveManagerButton=saveLibraryButton=saveBackButton=null;
         if(!layout.supported())return;
+        if(saveSettings){
+            var settings=new CartridgeSaveSettingsLayout(layout.panel());
+            for(int i=0;i<3;i++){int choice=i;saveChoices.add(action("",settings.choice(i),()->setting(SfcHomeNetwork.SET_SAVE_MODE,SfcSaveSettings.mode(choice)),DeviceUi.Tone.NORMAL));}
+            saveBackButton=action("返回卡带工作台",settings.back(),()->{if(!busy()){saveSettings=false;rebuildWidgets();}},DeviceUi.Tone.NORMAL);
+            controls();return;
+        }
         workbench=CartridgeWorkbenchLayout.of(layout);var name=workbench.name();
         titleField=new EditBox(font,name.x(),name.y(),name.width(),name.height(),Component.literal("卡带名称草稿"));
         titleField.setMaxLength(128);titleField.setValue(library.title());titleField.setResponder(library::title);addRenderableWidget(titleField);
@@ -99,9 +110,10 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
             restoreCoverButton=action("恢复",workbench.restoreCover(),()->setting(SfcHomeNetwork.RESTORE_COVER,0),DeviceUi.Tone.NORMAL);
             restoreCoverButton.setTooltip(Tooltip.create(Component.literal("恢复本次打开电脑时的封面；不改变 ROM、名称或人数")));
         }else{
-            var a=workbench.clearCover();var b=workbench.restoreCover();
-            saveManagerButton=action("Netplay 存档："+new String[]{"不保存","个人","卡带"}[data.saveMode()],new DeviceLayout.Rect(a.x(),a.y(),b.right()-a.x(),a.height()),()->setting(SfcHomeNetwork.SET_SAVE_MODE,(data.saveMode()+1)%3),DeviceUi.Tone.NORMAL);
-            saveManagerButton.setTooltip(Tooltip.create(Component.literal("仅 Netplay：个人档属于开机玩家和游戏；卡带档随实体卡带，换主机可继续。每 30 秒及正常关机保存，开机自动读取；与旧本机备份隔离。点击切换，不迁移或删除原档。")));
+            saveManagerButton=action("存档设置",workbench.clearCover(),()->{if(!busy()&&!scanning){saveSettings=true;status="选择保存归属；下次开机生效，不迁移或删除原档。";rebuildWidgets();}},DeviceUi.Tone.NORMAL);
+            saveManagerButton.setTooltip(Tooltip.create(Component.literal("设置 JNI Netplay 的不保存／卡带／个人归属；不转换或删除已有进度")));
+            saveLibraryButton=action("存档库",workbench.restoreCover(),this::openSaveLibrary,DeviceUi.Tone.NORMAL);
+            saveLibraryButton.setTooltip(Tooltip.create(Component.literal("查看当前已写入游戏的本人及当前卡带 JNI 进度；只读，不支持重命名或删除")));
         }
         previousButton=action("上一页",workbench.previous(),()->{shownLibrary().turn(-1,layout.rows());rebuildRows();},DeviceUi.Tone.QUIET);
         nextButton=action("下一页",workbench.next(),()->{shownLibrary().turn(1,layout.rows());rebuildRows();},DeviceUi.Tone.QUIET);
@@ -113,6 +125,7 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
     private Button action(String label,DeviceLayout.Rect rect,Runnable callback,DeviceUi.Tone tone){return addRenderableWidget(DeviceUi.button(font,label,rect.x(),rect.y(),rect.width(),rect.height(),callback,true,tone));}
     private void tab(boolean covers){if(coverTab==covers||busy()||scanning)return;coverTab=covers;rebuildWidgets();scanLocal(false);}
     private void rebuildRows(){
+        if(saveSettings){controls();return;}
         for(Button button:rowButtons)removeWidget(button);rowButtons.clear();
         if(layout==null||!layout.supported()||writeButton==null)return;
         SfcCardLibrary library=shownLibrary();
@@ -126,6 +139,14 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
         controls();
     }
     private void controls(){
+        if(saveSettings){
+            for(int i=0;i<saveChoices.size();i++){
+                var button=saveChoices.get(i);boolean current=data.saveMode()==SfcSaveSettings.mode(i);
+                button.setMessage(Component.literal((current?"✓ ":"")+SfcSaveSettings.label(i)+(current?"（当前）":"")));
+                button.active=!busy()&&canBrowse()&&!current;
+                button.setTooltip(Tooltip.create(Component.literal(SfcSaveSettings.description(i))));
+            }if(saveBackButton!=null)saveBackButton.active=!busy();return;
+        }
         if(writeButton==null)return;
         SfcCardLibrary.Row selected=visibleSelection();
         writeButton.active=!busy()&&canWrite(selected);
@@ -142,7 +163,8 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
         playersButton.setMessage(Component.literal(SfcWorkbenchDisplay.players(data.maxPlayers())));
         playersButton.setTooltip(Tooltip.create(Component.literal(canAdmin()?"设置可加入人数；是否需要申请由主机设置决定。游戏本身也需要支持双人。":"人数设置仅管理员可修改；名称可保存到自己手中的卡带")));
         if(clearCoverButton!=null){clearCoverButton.active=!busy()&&canBrowse()&&!data.coverSha().isEmpty();restoreCoverButton.active=!busy()&&canBrowse();}
-        if(saveManagerButton!=null)saveManagerButton.active=!busy()&&canBrowse();if(saveManagerButton!=null)saveManagerButton.setMessage(Component.literal("Netplay 存档："+new String[]{"不保存","个人","卡带"}[data.saveMode()]));
+        if(saveManagerButton!=null)saveManagerButton.active=!busy()&&!scanning&&canBrowse();
+        if(saveLibraryButton!=null)saveLibraryButton.active=!busy()&&!scanning&&canBrowse()&&!data.currentRom().isEmpty();
         previousButton.active=!busy()&&shownLibrary().page(layout.rows())>0;
         nextButton.active=!busy()&&shownLibrary().page(layout.rows())+1<shownLibrary().pages(layout.rows());
         titleField.setEditable(!busy()&&canBrowse());searchField.setEditable(!busy());
@@ -189,6 +211,11 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
         send(coverTab?SfcHomeNetwork.USE_COVER:SfcHomeNetwork.WRITE,selected.hash(),coverTab?"":library.title().strip(),0,0,new byte[0]);
     }
     private record Imported(byte[] bytes,String sha){}
+    private void openSaveLibrary(){
+        if(!active()||busy()||scanning||!canBrowse()||data.currentRom().isEmpty())return;
+        if(CartridgeSaveScreen.expectOpen("piq_sfc_home:sfc",token(),data.currentRom()))
+            send(SfcHomeNetwork.SAVE_LIBRARY,data.currentRom(),"",0,0,new byte[0]);
+    }
     private void setting(int operation,int players){
         if(!active()||busy()||!canBrowse()||operation==SfcHomeNetwork.SET_PLAYERS&&!canAdmin())return;
         phase=Phase.WRITING;actionAt=System.nanoTime();status="正在保存设置…";controls();
@@ -281,6 +308,13 @@ final class SfcCardEditorScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
         if(layout==null)return;
         if(!layout.supported()){g.drawCenteredString(font,Component.literal("界面空间不足，请减小 GUI 缩放；Esc 关闭"),width/2,height/2,0xffffff);return;}
         var panel=layout.panel();int x=panel.x(),y=panel.y(),w=panel.width();
+        if(saveSettings){
+            var settings=new CartridgeSaveSettingsLayout(panel);
+            DeviceUi.panel(g,font,x,y,w,panel.height(),"SFC / 存档设置","仅 JNI Netplay · 旧进度与私人档保持隔离");
+            for(int i=0;i<3;i++)DeviceUi.text(g,font,SfcSaveSettings.description(i),x+10,settings.descriptionY(i),w-20,DeviceUi.MUTED);
+            var line=settings.status();DeviceUi.status(g,font,status.isBlank()?"选择后由服务器确认；下次开机生效，不迁移或删除原档。":status,line.x(),line.y(),line.width(),busy());
+            super.render(g,mouseX,mouseY,delta);return;
+        }
         DeviceUi.panel(g,font,x,y,w,panel.height(),title.getString(),"当前卡带 · "+SfcWorkbenchDisplay.current(data.title()));
         var list=layout.list();var details=layout.details();DeviceUi.section(g,list.x(),list.y(),list.width(),list.height());DeviceUi.section(g,details.x(),details.y(),details.width(),details.height());
         if(shownLibrary().filtered().isEmpty())DeviceUi.text(g,font,scanning?"正在扫描…":!canUpload(coverTab)?uploadDenied(coverTab):"没有匹配文件；打开文件夹后刷新",list.x()+8,list.y()+8,list.width()-16,DeviceUi.MUTED);

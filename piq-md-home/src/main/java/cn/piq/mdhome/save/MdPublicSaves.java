@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.mdhome.save;
 
 import cn.piq.fcarcade.home.*;
@@ -38,13 +39,13 @@ public final class MdPublicSaves {
     }
     private static final class Pending {
         final ServerPlayer player;final Connection connection;final MdConsole console;final HomeSystems.Connection link;
-        final ContentCardStore.Entry entry;final ItemStack snapshot;final UUID card,playerId;final int mode,maxPlayers;final boolean netplay;
+        final ContentCardStore.Entry entry;final ItemStack snapshot;final UUID card,playerId;final int mode,maxPlayers;final boolean netplay,secondPort;
         Pending(ServerPlayer p,MdConsole c,HomeSystems.Connection l,ContentCardStore.Entry e){
             player=p;playerId=p.getUUID();connection=p.connection.getConnection();console=c;link=l;entry=e;card=ContentCardData.ensureId(c.cartridge());
-            c.setChanged();snapshot=c.cartridge().copy();mode=ContentCardData.saveMode(snapshot);maxPlayers=Math.min(2,ContentCardData.players(snapshot));netplay=c.netplayJniTrial();
+            c.setChanged();snapshot=c.cartridge().copy();mode=ContentCardData.saveMode(snapshot);maxPlayers=Math.min(2,ContentCardData.players(snapshot));netplay=c.netplayJniTrial();secondPort=c.secondPortAllowed();
         }
         boolean valid(){return online(player,connection)&&player.serverLevel()==link.level()
-                &&!console.isRemoved()&&!console.running()&&console.netplayJniTrial()==netplay&&HomeSystems.isCurrent(link)&&link.television().powered()
+                &&!console.isRemoved()&&!console.running()&&console.netplayJniTrial()==netplay&&console.secondPortAllowed()==secondPort&&HomeSystems.isCurrent(link)&&link.television().powered()
                 &&console.usable(player)&&HomeHardware.mayUse(player,console.getBlockPos())
                 &&HomeHardware.mayUse(player,link.television().getBlockPos())&&ItemStack.isSameItemSameComponents(snapshot,console.cartridge())
                 &&console.cartridge().getCount()==1&&card.equals(ContentCardData.id(console.cartridge()));}
@@ -92,7 +93,7 @@ public final class MdPublicSaves {
         final Pending q;try{q=new Pending(p,console,link,entry);}catch(RuntimeException invalid){return false;}
         if(!q.valid())return false;s.pending.put(console.hardwareId(),q);
         var saveRoot=root(server,q.netplay);var saveIdentity=identity(entry.hash(),q.netplay);var catalog=new MdSaveCatalog(saveRoot);s.launches.put(console.hardwareId(),key(console));var handle=HomeLaunchServer.start(p,key(console),new HomeLaunchServer.Adapter<SavePlan>(){
-            public HomeLaunchServer.Definition definition(){String title=ContentCardData.title(q.snapshot);String hint=q.mode==0?"本局不保存，旧档保留":q.mode==2?"个人总共 3 槽；选择后独立确认本局加入许可":"进度跟随这张实体卡；选择后独立确认本局加入许可";return new HomeLaunchServer.Definition("MD",title.isBlank()?entry.displayName():title,q.maxPlayers,q.mode,false,(q.netplay?"JNI Netplay 独立档，不迁移串流进度；":"JNI 串流；")+hint);}
+            public HomeLaunchServer.Definition definition(){String title=ContentCardData.title(q.snapshot);String hint=q.mode==0?"本局不保存，旧档保留":q.mode==2?"个人总共 3 槽；2P 许可按设备设置":"进度跟随这张实体卡；2P 许可按设备设置";return new HomeLaunchServer.Definition("MD",title.isBlank()?entry.displayName():title,q.maxPlayers,q.mode,false,(q.netplay?"JNI Netplay 独立档，不迁移串流进度；":"JNI 串流；")+hint,q.secondPort);}
             public boolean valid(){return !s.closed&&q.valid();}
             public void list(Consumer<List<HomeLaunchNetwork.Row>> success,Consumer<String> failure){work(server,s,()->{
                 var rows=new ArrayList<HomeLaunchNetwork.Row>();for(int slot=1;slot<=(q.mode==1?1:3);slot++){var r=slot(slot,catalog.read(owner(q,slot)),q);rows.add(new HomeLaunchNetwork.Row(r.slot(),r.version(),r.name(),r.rom(),r.players(),r.modified(),r.compatible()));}return rows;

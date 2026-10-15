@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.config;
 
 /** Pure bounds and placement-only resolution; -1 means preserve the model's automatic default. */
@@ -11,6 +13,10 @@ public final class GameConsoleAdminPolicy {
     public static boolean validRange(int range) { return range >= MIN_RANGE && range <= MAX_RANGE; }
     /** Applied only to new FC placements; explicit global modes and old NBT are preserved. */
     public static boolean defaultFcJni(int preferred,int supported) {
+        return defaultHomeJni(preferred,supported);
+    }
+    /** New home placements only; explicit global modes and all loaded NBT are preserved. */
+    public static boolean defaultHomeJni(int preferred,int supported) {
         if(!validMode(preferred)||(supported&~KNOWN_CAPABILITIES)!=0)throw new IllegalArgumentException("Invalid console defaults");
         return preferred==-1&&(supported&16)!=0;
     }

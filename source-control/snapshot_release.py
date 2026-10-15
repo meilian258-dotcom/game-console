@@ -19,6 +19,8 @@ import urllib.parse
 import zipfile
 
 from release_artifacts import inspect, sha256
+import sfc_stock
+import replay_api
 
 MOD_SETS = {
     frozenset({'piq_fc_arcade'}), frozenset({'piq_sfc_home', 'piq_sfc_arcade'}),
@@ -32,8 +34,6 @@ CORE_LOCATIONS = {
                       'windows-x64', 'mesen_libretro.dll'),
     'mesen-linux': ('piq_fc_arcade', 'core/libretro/linux-x64/mesen_libretro.so',
                     'linux-x64', 'mesen_libretro.so'),
-    'mesen-s-windows': ('piq_sfc_home', 'core/sfc-libretro/windows-x64/mesen-s_libretro.dll',
-                        'windows-x64', 'mesen-s_libretro.dll'),
     'genesis-plus-gx-windows': ('piq_md_home', 'core/windows-x64/genesis_plus_gx_libretro.dll',
                                'windows-x64', 'genesis_plus_gx_libretro.dll'),
     'mgba-windows': ('piq_gba', 'native-runtime/win-x64-v1/piq-gba/runtime/mgba_libretro.dll',
@@ -49,9 +49,24 @@ HEX40 = re.compile(r'[0-9a-f]{40}')
 HEX64 = re.compile(r'[0-9a-f]{64}')
 
 
-def context(env: dict) -> dict:
-    if env.get('GITHUB_REF') != 'refs/heads/main':
-        raise ValueError('Snapshots may only run from refs/heads/main')
+def context(env: dict, *, validate_only: bool = False) -> dict:
+    validation_mode = env.get('SNAPSHOT_VALIDATION_ONLY', '')
+    if validation_mode not in {'', 'false', 'true'}:
+        raise ValueError('Invalid snapshot validation mode')
+    if validation_mode == 'true':
+        if not validate_only:
+            raise ValueError('Validation-only runs cannot publish snapshots')
+        if env.get('GITHUB_EVENT_NAME') != 'workflow_dispatch':
+            raise ValueError('Validation-only mode requires workflow_dispatch')
+        if env.get('GITHUB_REPOSITORY') != 'meilian258-dotcom/game-console':
+            raise ValueError('Validation-only dispatch must belong to the source repository')
+    ref = env.get('GITHUB_REF', '')
+    if ref != 'refs/heads/main':
+        if not (validate_only and validation_mode == 'true'
+                and env.get('GITHUB_EVENT_NAME') == 'workflow_dispatch'
+                and re.fullmatch(r'refs/heads/[A-Za-z0-9][A-Za-z0-9._/-]*', ref)
+                and '..' not in ref and '//' not in ref and not ref.endswith(('/', '.'))):
+            raise ValueError('Snapshots may only publish from refs/heads/main; branch validation requires an explicit trusted dispatch')
     if env.get('GITHUB_EVENT_NAME') not in {'push', 'workflow_dispatch'}:
         raise ValueError('Unsupported snapshot event')
     repository = env.get('GITHUB_REPOSITORY', '')
@@ -120,6 +135,9 @@ def validate(directory: Path, commit: str) -> list[dict]:
         checked.append(dict(name=name, bytes=actual['bytes'], sha256=actual['sha256']))
     if seen_mods != MOD_SETS or {p.name for p in paths} != seen_names | METADATA:
         raise ValueError('Unexpected release file set')
+    # Independently re-check actual API bytes/call sites and class ownership;
+    # neither a recomputed SHA manifest nor an editable capability marker suffices.
+    replay_api.verify_suite([directory / name for name in sorted(seen_names)])
     manifest_path = directory / 'manifest.json'
     checked.append(dict(name='manifest.json', bytes=manifest_path.stat().st_size,
                         sha256=sha256(manifest_path)))
@@ -142,7 +160,7 @@ def validate_core_sources(manifest: dict) -> dict[str, dict]:
         raise ValueError('Missing snapshot input receipt identity')
     sources = manifest.get('coreSources')
     if not isinstance(sources, list) or len(sources) != len(CORE_LOCATIONS):
-        raise ValueError('Expected the five reviewed nightly core identities')
+        raise ValueError('Expected the four reviewed nightly core identities; SFC identities are fixed')
     cores = {}
     for source in sources:
         ident = source.get('id')
@@ -163,6 +181,17 @@ def validate_core_sources(manifest: dict) -> dict[str, dict]:
 def validate_jar_provenance(jar: zipfile.ZipFile, manifest: dict,
                             cores: dict[str, dict], mod_set: frozenset) -> None:
     """A recomputed outer manifest cannot turn an older JAR into this snapshot."""
+    # Explicit local-candidate gate, not a waiver hidden in editable metadata.
+    # Remove only in a separately reviewed publication change addressing NOTICE.
+    if any(name.startswith(sfc_stock.RESOURCE) for name in jar.namelist()):
+        raise ValueError(sfc_stock.PUBLICATION_BLOCK)
+    if 'piq_sfc_home' in mod_set:
+        resource = sfc_stock.LEGACY_RESOURCE
+        if resource not in jar.namelist() or jar.getinfo(resource).file_size != sfc_stock.LEGACY['bytes']:
+            raise ValueError('Legacy SFC core must retain its fixed identity')
+        with jar.open(resource) as stream:
+            if hashlib.file_digest(stream, 'sha256').hexdigest() != sfc_stock.LEGACY['sha256']:
+                raise ValueError('Legacy SFC core must retain its fixed identity')
     for name in (STAMP, 'META-INF/MANIFEST.MF'):
         if name not in jar.namelist() or jar.getinfo(name).file_size > MAX_METADATA_BYTES:
             raise ValueError('Missing or oversized embedded snapshot provenance')
@@ -321,12 +350,13 @@ def main() -> None:
         raise ValueError('Invalid local source commit')
     # A read-only local check needs no Actions identity or credentials. It still
     # verifies all provenance and rejects dirty-source artifacts inside validate.
-    # The publication path below always enforces the complete main/event context.
+    # Branch Actions checks require an explicit validation-only dispatch. The
+    # publication path still enforces main and refuses validation-only mode.
     if args.validate_only and os.environ.get('GITHUB_ACTIONS') != 'true':
         validate(args.directory, head)
         print(f'Validated seven JARs and two metadata files for local commit {head}', flush=True)
         return
-    ctx = context(os.environ)
+    ctx = context(os.environ, validate_only=args.validate_only)
     if head != ctx['commit']:
         raise ValueError('Publisher checkout must match the triggering commit')
     files = validate(args.directory, ctx['commit'])

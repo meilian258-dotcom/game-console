@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.home.flow;
 
 import cn.piq.retro.flow.DeviceSessionFlow.Stage;
@@ -15,14 +17,15 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 /** Bounded common launch metadata. No paths, save owner keys, core bytes or client authority. */
 @EventBusSubscriber(modid="piq_fc_arcade",bus=EventBusSubscriber.Bus.MOD)
 public final class HomeLaunchNetwork {
-    public static final String PROTOCOL="home-launch-2";
+    public static final String PROTOCOL="home-launch-3";
     public static final int SELECT=0,ALLOW=1,DENY=2,CANCEL=3,BACK=4;
-    public record Row(int slot,String version,String name,String content,int players,long modified,boolean compatible,boolean metadataEditable){
+    public record Row(int slot,String version,String name,String content,int players,long modified,boolean compatible,boolean metadataEditable,boolean startNewAllowed){
+        public Row(int slot,String version,String name,String content,int players,long modified,boolean compatible,boolean metadataEditable){this(slot,version,name,content,players,modified,compatible,metadataEditable,true);}
         public Row(int slot,String version,String name,String content,int players,long modified,boolean compatible){this(slot,version,name,content,players,modified,compatible,true);}
         public Row{if(slot<1||slot>16||players<1||players>2||modified<0)throw new IllegalArgumentException("Save row");text(version,128);text(name,32);text(content,128);}
         public boolean occupied(){return !version.isEmpty();}
         public boolean accepts(Choice choice){return choice!=null&&slot==choice.slot()&&version.equals(choice.version())&&!choice.name().isBlank()
-            &&(!choice.resume()||occupied()&&compatible)&&(metadataEditable||name.equals(choice.name())&&players==choice.savePlayers());}
+            &&(choice.resume()?occupied()&&compatible:startNewAllowed)&&(metadataEditable||name.equals(choice.name())&&players==choice.savePlayers());}
     }
     public record Choice(int slot,String version,String name,int savePlayers,boolean resume){
         public Choice{if(slot<1||slot>16||savePlayers<1||savePlayers>2)throw new IllegalArgumentException("Save choice");text(version,128);text(name,32);}
@@ -34,8 +37,8 @@ public final class HomeLaunchNetwork {
         public static final Type<View> TYPE=new Type<>(ResourceLocation.fromNamespaceAndPath("piq_fc_arcade","home_launch_view"));
         public static final StreamCodec<RegistryFriendlyByteBuf,View> CODEC=StreamCodec.of((b,v)->{
             b.writeUUID(v.token);b.writeVarLong(v.revision);b.writeUtf(v.system.toString(),128);b.writeUtf(v.label,64);b.writeUtf(v.title,128);b.writeByte(v.mode);b.writeByte(v.maxPlayers);b.writeByte(v.stage.ordinal());b.writeVarInt(v.rows.size());
-            for(var r:v.rows){b.writeByte(r.slot);b.writeUtf(r.version,128);b.writeUtf(r.name,32);b.writeUtf(r.content,128);b.writeByte(r.players);b.writeVarLong(r.modified);b.writeBoolean(r.compatible);b.writeBoolean(r.metadataEditable);}b.writeUtf(v.message,240);
-        },b->{var id=b.readUUID();long rev=b.readVarLong();var sys=ResourceLocation.parse(b.readUtf(128));String label=b.readUtf(64),title=b.readUtf(128);int mode=b.readUnsignedByte(),max=b.readUnsignedByte(),stage=b.readUnsignedByte(),count=b.readVarInt();if(stage>=Stage.values().length||count<0||count>16)throw new IllegalArgumentException("Launch bounds");var rows=new ArrayList<Row>();for(int i=0;i<count;i++)rows.add(new Row(b.readUnsignedByte(),b.readUtf(128),b.readUtf(32),b.readUtf(128),b.readUnsignedByte(),b.readVarLong(),b.readBoolean(),b.readBoolean()));return new View(id,rev,sys,label,title,mode,max,Stage.values()[stage],rows,b.readUtf(240));});
+            for(var r:v.rows){b.writeByte(r.slot);b.writeUtf(r.version,128);b.writeUtf(r.name,32);b.writeUtf(r.content,128);b.writeByte(r.players);b.writeVarLong(r.modified);b.writeBoolean(r.compatible);b.writeBoolean(r.metadataEditable);b.writeBoolean(r.startNewAllowed);}b.writeUtf(v.message,240);
+        },b->{var id=b.readUUID();long rev=b.readVarLong();var sys=ResourceLocation.parse(b.readUtf(128));String label=b.readUtf(64),title=b.readUtf(128);int mode=b.readUnsignedByte(),max=b.readUnsignedByte(),stage=b.readUnsignedByte(),count=b.readVarInt();if(stage>=Stage.values().length||count<0||count>16)throw new IllegalArgumentException("Launch bounds");var rows=new ArrayList<Row>();for(int i=0;i<count;i++)rows.add(new Row(b.readUnsignedByte(),b.readUtf(128),b.readUtf(32),b.readUtf(128),b.readUnsignedByte(),b.readVarLong(),b.readBoolean(),b.readBoolean(),b.readBoolean()));return new View(id,rev,sys,label,title,mode,max,Stage.values()[stage],rows,b.readUtf(240));});
         public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     public record Action(UUID token,long revision,int operation,Choice choice) implements CustomPacketPayload {

@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.retro.worker;
 
 /** Private local transport, not a public network protocol or RetroArch Netplay. */

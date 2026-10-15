@@ -14,3 +14,4 @@ public final class BridgeProtocol {
             ||samples<0||samples>MAX_PCM||(samples&1)!=0)throw new java.io.IOException("Invalid native frame header");
     }
 }
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.

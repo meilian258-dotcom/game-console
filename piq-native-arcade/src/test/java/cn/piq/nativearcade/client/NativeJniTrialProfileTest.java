@@ -51,7 +51,12 @@ class NativeJniTrialProfileTest {
         assertTrue(provider.contains("new NativeJniMediaSession("));
         var media = cn.piq.nativearcade.bridge.NativeJniMediaSession.profile();
         assertEquals("MAME", media.name());
-        assertEquals(372431360, media.cores().get("windows-x64").maxBytes());
+        var mame = media.cores().get("windows-x64");
+        assertEquals(309413888, mame.maxBytes());
+        assertEquals("/core/mame-jni/windows-x64/mame_piq_lifecycle1.dll", mame.resource());
+        assertEquals("00d1a8319378dc94f50cc6610a9947217bdf23f05f70d2fc4d5665357a50b603", mame.sha256());
+        assertNotEquals(cn.piq.nativearcade.bridge.BridgeProtocol.CORE_SHA, mame.sha256(),
+                "JNI lifecycle repair must not overwrite the legacy core/save identity");
         assertFalse(provider.contains("NativeJniTrialProfile"));
         assertFalse(provider.contains("LibretroJniRuntime"));
     }

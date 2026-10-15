@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client;
 
 import cn.piq.fcarcade.home.ExternalHomeConsoleBlockEntity;
@@ -18,6 +20,16 @@ public final class HomeVideoDisplay {
     private HomeVideoDisplay() {}
 
     public static boolean render(RenderLevelStageEvent event, ResourceLocation systemId,
+                                 BlockPos consolePos, UUID consoleId, BlockPos televisionPos,
+                                 UUID televisionId, UUID linkId, ResourceLocation texture,
+                                 double pictureAspect) {
+        cn.piq.fcarcade.api.replay.ReplayPresentation.anchor(televisionPos);
+        try {
+            return renderOwned(event, systemId, consolePos, consoleId, televisionPos, televisionId, linkId, texture, pictureAspect);
+        } finally { cn.piq.fcarcade.api.replay.ReplayPresentation.clearAnchor(); }
+    }
+
+    private static boolean renderOwned(RenderLevelStageEvent event, ResourceLocation systemId,
                                  BlockPos consolePos, UUID consoleId, BlockPos televisionPos,
                                  UUID televisionId, UUID linkId, ResourceLocation texture,
                                  double pictureAspect) {

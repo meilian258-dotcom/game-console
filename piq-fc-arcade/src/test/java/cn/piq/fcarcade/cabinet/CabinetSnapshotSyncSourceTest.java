@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CabinetSnapshotSyncSourceTest {
     private static String read(String name)throws Exception{return Files.readString(Path.of("src/main/java/cn/piq/fcarcade/cabinet/"+name+".java"));}
     @Test void protocolUpgradeRetainsExactConnectionGuardAndWireBounds()throws Exception{
-        var s=read("CabinetSyncNetwork");assertTrue(s.contains("TrafficPayloadRegistrar.create(event,\"cabinet-sync-10\")"));assertFalse(s.contains("\"cabinet-sync-7\""));
+        var s=read("CabinetSyncNetwork");assertTrue(s.contains("TrafficPayloadRegistrar.create(event,\"cabinet-sync-11\")"));assertFalse(s.contains("\"cabinet-sync-7\""));
         assertTrue(s.contains("source.isConnected()&&s.connection.getConnection()==source"));assertTrue(s.contains("s.getServer().getPlayerList().getPlayer(s.getUUID())==s"));
         assertTrue(s.contains("total>CabinetSyncCore.MAX_STATE_BYTES"));assertTrue(s.contains("b.readByteArray(CabinetSyncState.CHUNK)"));
     }

@@ -31,7 +31,18 @@ class NetplayProfileTest {
     }
     @Test void managedWorkingCopiesDoNotSendUnicodeAbsoluteContentThroughNativeArgv()throws Exception {
         String source=Files.readString(Path.of("src/main/java/cn/piq/fcarcade/netplay/NetplayProcess.java"));
-        assertTrue(source.contains("args.add(profile.contentName())"));
+        var profile=new NetplayProfile(getClass(),"/core/test.dll","a".repeat(64),"invaders.zip",Map.of(),1,48000,1024);
+        try(var local=NetplayProcess.local(cn.piq.fcarcade.retroarch.RetroArchSession.Config.of(profile),()->new byte[16],Map::of)){
+            assertEquals("./invaders.zip",local.command("runner.exe").getLast());
+        }
+        // The existing host/participant/spectator command contract is unchanged.
+        for(var grant:List.of(new NetplayProcess.Grant(1,UUID.randomUUID(),true,true),
+                new NetplayProcess.Grant(1,UUID.randomUUID(),false,true),
+                new NetplayProcess.Grant(1,UUID.randomUUID(),false,false))){
+            try(var remote=new NetplayProcess(grant,()->new byte[16],chunk->{},profile,Map::of)){
+                assertEquals("invaders.zip",remote.command("runner.exe").getLast());
+            }
+        }
         assertTrue(source.contains(".directory(directory.toFile())"));
         assertTrue(source.contains("workspace.start(builder)"));
         assertFalse(source.contains("Files.createTempDirectory("));
@@ -52,6 +63,6 @@ class NetplayProfileTest {
         var server=Files.readString(Path.of(root+"cabinet/CabinetNetplay.java"));
         for(String guard:List.of("CabinetRooms.authorized(p,a.room(),a.member())","run.server()!=p.getServer()","run.relay().renew(current)","NetplayNetwork.retire(run.relay())"))assertTrue(server.contains(guard));
         var client=Files.readString(Path.of(root+"client/cabinet/CabinetClientBackends.java"));
-        for(String guard:List.of("generation!=token||launch!=request||room!=assignment||netplayGrant!=grant||!current()","if(netplay()){startNetplay(chosen,remember);return;}","room=null;netplayGrant=null","if(netplay()){if(serverNetplayInput()&&current())CabinetRoomNetwork.send(new CabinetRoomNetwork.Reset(room.room(),room.member(),inputSequence++));else if(emulator!=null)emulator.clearInput();return;}"))assertTrue(client.contains(guard));
+        for(String guard:List.of("generation!=token||!ReplayGuard.valid(replayEpoch)||launch!=request||room!=assignment||netplayGrant!=grant||!current()","if(netplay()){startNetplay(chosen,remember);return;}","room=null;netplayGrant=null","if(netplay()){if(serverNetplayInput()&&current())CabinetRoomNetwork.send(new CabinetRoomNetwork.Reset(room.room(),room.member(),inputSequence++));else if(emulator!=null)emulator.clearInput();return;}"))assertTrue(client.contains(guard),guard);
     }
 }

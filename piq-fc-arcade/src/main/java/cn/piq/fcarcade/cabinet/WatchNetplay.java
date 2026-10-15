@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.cabinet;
 
 import cn.piq.fcarcade.netplay.*;
@@ -9,8 +11,9 @@ import net.minecraft.server.level.ServerPlayer;
 
 /** Read-only capabilities subordinate to the existing nearby-watch lease. Never a seat. */
 public final class WatchNetplay {
-    public record Offer(long wire,NetplayRelay<Connection> relay,ResourceLocation backend,String romHash,CabinetTarget target) {
-        public Offer {if(wire<0||relay==null||backend==null||!CabinetGameManifest.hash(romHash))throw new IllegalArgumentException("Watch offer");}
+    public record Offer(long wire,NetplayRelay<Connection> relay,ResourceLocation backend,String romHash,CabinetTarget target,NetplayLaunchSpec launch) {
+        public Offer(long wire,NetplayRelay<Connection> relay,ResourceLocation backend,String romHash,CabinetTarget target){this(wire,relay,backend,romHash,target,NetplayLaunchSpec.UNSPECIFIED);}
+        public Offer {if(wire<0||relay==null||backend==null||launch==null||!CabinetGameManifest.hash(romHash))throw new IllegalArgumentException("Watch offer");}
     }
     private record Entry(ServerPlayer player,Connection connection,WatchNetwork.Start watch,Offer offer,UUID ticket) {}
     private static final Map<MinecraftServer,Map<UUID,Entry>> ENTRIES=new WeakHashMap<>();
@@ -25,7 +28,7 @@ public final class WatchNetplay {
         var entry=new Entry(p,p.connection.getConnection(),watch,offer,ticket.id());
         try{
             NetplayNetwork.authorize(offer.wire(),entry.connection(),offer.relay());
-            var start=new WatchNetwork.NetplayStart(watch,offer.wire(),ticket.id(),offer.backend(),offer.romHash());
+            var start=new WatchNetwork.NetplayStart(watch,offer.wire(),ticket.id(),offer.backend(),offer.romHash(),offer.launch());
             entries.put(watch.lease(),entry);return start;
         }catch(RuntimeException|LinkageError failed){offer.relay().revoke(entry.connection(),ticket.id());throw failed;}
     }

@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.world;
 
 import cn.piq.fcarcade.registry.ModBlockEntities;
@@ -32,6 +34,8 @@ public class LegacyFcArcadeBlockEntity extends BlockEntity {
     private int idleShutdownSeconds = cn.piq.fcarcade.cabinet.CabinetPowerSettings.DEFAULT_SECONDS;
     private int screenRenderDistance = cn.piq.fcarcade.cabinet.CabinetPowerSettings.DEFAULT_RENDER_DISTANCE;
     private boolean adminDefaultsInitialized;
+    // Only newly placed hardware opts in; old NBT without the tag preserves its old route.
+    private boolean placedJniDefault = true;
     private int placedDefaultMode = -1;
     private int observationRange;
     private UUID visualLinkId;
@@ -84,6 +88,7 @@ public class LegacyFcArcadeBlockEntity extends BlockEntity {
         server.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),Block.UPDATE_CLIENTS);
     }
     public int placedDefaultMode() { return placedDefaultMode; }
+    public boolean placedJniDefault() { return placedJniDefault; }
     public int observationRange(int fallback) { return cn.piq.fcarcade.config.GameConsoleAdminPolicy.persistedRange(observationRange, fallback); }
     public void setObservationRange(int range) {
         if (!(level instanceof ServerLevel server)||!server.getServer().isSameThread()||isRemoved()||!server.hasChunkAt(worldPosition)||server.getBlockEntity(worldPosition)!=this
@@ -172,6 +177,7 @@ public class LegacyFcArcadeBlockEntity extends BlockEntity {
         displayProfile=cn.piq.fcarcade.cabinet.CabinetGameProfile.EMPTY;
         if(level!=null&&level.isClientSide)try{displayProfile=cn.piq.fcarcade.cabinet.CabinetGameProfiles.read(tag.getCompound("VisualGameProfile"));}catch(IllegalArgumentException ignored){}
         adminDefaultsInitialized=true;
+        placedJniDefault=tag.getBoolean("PlacedJniDefault");
         placedDefaultMode=tag.contains("PlacedSyncDefault",3)&&cn.piq.fcarcade.config.GameConsoleAdminPolicy.validMode(tag.getInt("PlacedSyncDefault"))?tag.getInt("PlacedSyncDefault"):-1;
         observationRange=cn.piq.fcarcade.config.GameConsoleAdminPolicy.persistedRange(tag.getInt("ConsoleWatchRange"),0);
         String loadedHash = tag.getString(SKIN_HASH_TAG);
@@ -201,6 +207,7 @@ public class LegacyFcArcadeBlockEntity extends BlockEntity {
             HolderLookup.Provider registries
     ) {
         super.saveAdditional(tag, registries);
+        tag.putBoolean("PlacedJniDefault",placedJniDefault);
         if(placedDefaultMode>=0)tag.putInt("PlacedSyncDefault",placedDefaultMode);
         if(observationRange!=0)tag.putInt("ConsoleWatchRange",observationRange);
         tag.putUUID("CabinetId", cabinetId);

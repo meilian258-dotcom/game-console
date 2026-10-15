@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.cabinet;
 
 import java.nio.file.*;
@@ -121,6 +123,7 @@ public final class CabinetSharedGameService {
                 try{Runnable commit=()->{
                         Runnable abortCommit=CabinetNetplay.contentReady(j.player,j.lease,j.backend,j.target,j.manifest);
                         try{if(j.upload)CabinetSharedGameData.get(server).put(j.target,j.manifest);
+                            CabinetNetplay.contentPublished(server,j.target,j.manifest);
                             s.grants.put(j.lease,new Grant(j.player,j.connection,j.lease,j.backend,j.target,j.manifest));
                         }catch(RuntimeException failure){abortCommit.run();throw failure;}};
                     if(j.upload)j.uploadPlan.finish(commit);else commit.run();

@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.sfchome.server;
 /** Micro-Hz rational remainder: PAL alternates 2/3 frames, NTSC occasionally 4. */
 public final class SfcFrameClock {

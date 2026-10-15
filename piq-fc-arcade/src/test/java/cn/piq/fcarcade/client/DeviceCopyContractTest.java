@@ -59,6 +59,18 @@ class DeviceCopyContractTest {
             assertTrue(network.contains(detail), detail);
     }
 
+    @Test void cabinetSaveTooltipFollowsTheSelectedBackendCapability() throws Exception {
+        String cabinet = source("client/cabinet/CabinetSyncSettingsScreen");
+        String tooltip = cabinet.substring(cabinet.indexOf("save.setTooltip("));
+        tooltip = tooltip.substring(0, tooltip.indexOf('\n'));
+        assertTrue(tooltip.contains("Component.literal(persistence()?\"仅 Netplay："));
+        assertTrue(tooltip.contains("每 30 秒及正常关机保存，开机自动读取。"));
+        assertTrue(tooltip.contains("\":\"此后端不读写存档，不会自动读取、转换或覆盖旧 JNI 存档；旧档与原有保存策略保留。\""));
+        String api = Files.readString(Path.of("design/Netplay附属接入接口.md"));
+        assertTrue(api.contains("RA 核心可在 MC 就绪确认前自主运行，没有精确准备／激活屏障。"));
+        assertFalse(api.contains("席位／输入授权仍先于运行"));
+    }
+
     @Test void conciseItemsKeepCableCostAndSaveLossWarnings() throws Exception {
         JsonObject zh = language("zh_cn"), en = language("en_us");
         assertTrue(zh.get("tooltip.piq_fc_arcade.data_cable.connect").getAsString().contains("消耗一根线"));

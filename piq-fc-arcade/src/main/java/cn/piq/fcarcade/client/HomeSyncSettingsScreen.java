@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.client;
 
 import cn.piq.fcarcade.home.ExternalHomeConsoleBlockEntity;
@@ -96,10 +98,12 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         addRenderableWidget(occupancy);
         boolean fc=minecraft.level==null||!(minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity);
         boolean startupSecond=fc||actions()!=null&&actions().choosesSecondPortAtStartup();
-        var approval=Button.builder(Component.literal(diagnosticsOnly()?"2P：尚未接入":startupSecond?"2P：开局选择":"加入需同意："+(setting.approval()?"开":"关")),
-            b->apply(-1,-1,setting.approval()?0:1)).bounds(right,top+HomeSyncSettingsLayout.ADVANCED_ROW,half,20).build();
-        approval.active=!diagnosticsOnly()&&!startupSecond&&ready()&&setting.editable();
-        approval.setTooltip(Tooltip.create(Component.literal(diagnosticsOnly()?"此附属尚未接入公共多席位；不会借出无法操作的 2P 手柄。":startupSecond?"开机玩家决定是否允许 2P；本局不再弹出申请。":"需 OP2；加入仍受席位、游戏人数和交互权限限制。")));
+        var approval=Button.builder(Component.literal(diagnosticsOnly()?"2P：尚未接入":setting.secondPortSupported()?"2P："+(setting.secondPortAllowed()?"允许":"禁止"):startupSecond?"2P：开局选择":"加入需同意："+(setting.approval()?"开":"关")),
+            b->{if(setting.secondPortSupported())apply(-1,-1,-1,setting.secondPortAllowed()?0:1);else apply(-1,-1,setting.approval()?0:1);}).bounds(right,top+HomeSyncSettingsLayout.ADVANCED_ROW,half,20).build();
+        approval.active=!diagnosticsOnly()&&(setting.secondPortSupported()||!startupSecond)&&ready()&&setting.editable();
+        approval.setTooltip(Tooltip.create(Component.literal(diagnosticsOnly()?"此附属尚未接入公共多席位；不会借出无法操作的 2P 手柄。":setting.secondPortSupported()
+                ?"需 OP2；关机后修改，按本设备保存、下次开机生效，不再逐次询问。仍受游戏人数、私人模式、席位及交互权限限制。"
+                :startupSecond?"开机玩家决定是否允许 2P；本局不再弹出申请。":"需 OP2；加入仍受席位、游戏人数和交互权限限制。")));
         addRenderableWidget(approval);
         int footer=(panelWidth-44)/5;
         var refresh=Button.builder(Component.literal("刷新"),b->apply(-1,-1,-1))
@@ -123,10 +127,13 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         return minecraft.level!=null&&minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity c?c.systemId():cn.piq.fcarcade.home.HomeSystems.NES_SYSTEM;
     }
     private void apply(int mode,int occupancy,int approval) {
-        if(!ready()||!current()||(mode>=0||occupancy>=0||approval>=0)&&!setting.editable()
-            ||mode>=0&&(setting.supported()&(1<<mode))==0||occupancy>=0&&!setting.occupancySupported())return;
+        apply(mode,occupancy,approval,-1);
+    }
+    private void apply(int mode,int occupancy,int approval,int secondPort) {
+        if(!ready()||!current()||(mode>=0||occupancy>=0||approval>=0||secondPort>=0)&&!setting.editable()
+            ||mode>=0&&(setting.supported()&(1<<mode))==0||occupancy>=0&&!setting.occupancySupported()||secondPort>=0&&!setting.secondPortSupported())return;
         pending=true;waiting=0;status="等待服务器确认…";
-        HomeSyncNetwork.request(setting.token(),setting.revision(),mode,occupancy,approval);rebuildWidgets();
+        HomeSyncNetwork.request(setting.token(),setting.revision(),mode,occupancy,approval,secondPort);rebuildWidgets();
     }
     private void receive(HomeSyncNetwork.Setting value) {
         if(!current()||!setting.token().equals(value.token())||!setting.hardware().equals(value.hardware())

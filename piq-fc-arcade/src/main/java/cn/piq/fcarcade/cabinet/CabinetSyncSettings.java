@@ -1,3 +1,5 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.cabinet;
 
 import java.util.*;
@@ -11,6 +13,7 @@ import net.minecraft.world.phys.*;
 import net.neoforged.neoforge.network.PacketDistributor;
 import cn.piq.fcarcade.home.DeviceDebugService;
 import cn.piq.fcarcade.home.DeviceDebugPolicy;
+import cn.piq.fcarcade.netplay.NetplayLaunchSpec;
 import cn.piq.fcarcade.world.LegacyFcArcadeBlockEntity;
 import net.minecraft.world.InteractionHand;
 
@@ -19,8 +22,12 @@ public final class CabinetSyncSettings extends SavedData {
     private final Map<String,CabinetSyncMode> modes=new HashMap<>();
     private final Set<String> netplayModes=new HashSet<>();
     private final Map<String,Integer> saveModes=new HashMap<>();
+    private final Map<String,String> netplayVariants=new HashMap<>();
     static int saveMode(MinecraftServer s,CabinetTarget t,ResourceLocation b){return data(s).saveModes.getOrDefault(key(t,b),0);}
-    static boolean netplay(MinecraftServer s,CabinetTarget t,ResourceLocation b){return data(s).netplayModes.contains(key(t,b))&&get(s,t,b)==CabinetSyncMode.LOCAL_SYNC;}
+    static String netplayVariant(MinecraftServer s,CabinetTarget t,ResourceLocation b){return data(s).netplayVariants.getOrDefault(key(t,b),CabinetNetplay.defaultVariant(b));}
+    static boolean supportsPersistence(ResourceLocation backend,String variant){var selected=CabinetNetplay.variant(backend,variant);return selected!=null?selected.persistenceSupported():CabinetNetplay.variants(backend).isEmpty()&&NetplayLaunchSpec.LEGACY.equals(variant);}
+    static int effectiveSaveMode(ResourceLocation backend,String variant,int savedMode){return supportsPersistence(backend,variant)?savedMode:0;}
+    static boolean netplay(MinecraftServer s,CabinetTarget t,ResourceLocation b){return get(s,t,b)==CabinetSyncMode.LOCAL_SYNC&&data(s).netplayModes.contains(key(t,b));}
     private static final Map<ServerPlayer,DebugIntent> DEBUG=new WeakHashMap<>();
     private static final ThreadLocal<Boolean> CHECKING=ThreadLocal.withInitial(()->false);
     private static final ThreadLocal<Boolean> COMMAND=ThreadLocal.withInitial(()->false);
@@ -70,27 +77,35 @@ public final class CabinetSyncSettings extends SavedData {
     private static void debugRejected(ServerPlayer p,DebugIntent i,String reason){
         var old=i.lastSetting;if(old==null){p.displayClientMessage(net.minecraft.network.chat.Component.literal(reason),true);return;}
         PacketDistributor.sendToPlayer(p,new CabinetSyncNetwork.Setting(old.target(),old.backend(),old.mode(),old.supported(),!i.invalid&&old.editable(),reason,
-                old.hosted(),old.playerMedia(),old.hostedReason(),i.token,old.coinRequired(),!i.invalid&&old.coinEditable(),old.gameInfo(),old.autoPowerOff(),old.idleSeconds(),old.renderDistance(),old.saveMode()));
+                old.hosted(),old.playerMedia(),old.hostedReason(),i.token,old.coinRequired(),!i.invalid&&old.coinEditable(),old.gameInfo(),old.autoPowerOff(),old.idleSeconds(),old.renderDistance(),old.saveMode(),old.variant()));
     }
     private static CabinetSyncSettings data(MinecraftServer s){return s.overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(CabinetSyncSettings::new,CabinetSyncSettings::load),"piq_cabinet_sync_modes");}
     private static String key(CabinetTarget t,ResourceLocation b){return t.dimension()+"|"+t.identity()+"|"+b;}
     static CabinetSyncMode get(MinecraftServer s,CabinetTarget t,ResourceLocation b){
         if(b.equals(CabinetBackends.NES))return CabinetSyncMode.LOCAL_SYNC; // Original physical FC cabinet has its own input-sync sessions.
         var saved=data(s).modes.get(key(t,b));if(saved!=null)return saved;
+        // A full settings table must neither crash an ordinary lookup nor claim an
+        // unsaved Netplay choice. Explicit existing entries above remain usable.
+        if(data(s).modes.size()>=4096)return CabinetSyncMode.MEDIA;
         var level=s.getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,t.dimension()));
         if(level!=null&&t.matches(level)&&level.getBlockEntity(t.anchor()) instanceof LegacyFcArcadeBlockEntity placed) {
             int desired=placed.placedDefaultMode();
+            String variantId=CabinetNetplay.defaultVariant(b);
+            var variant=CabinetNetplay.variant(b,variantId);
+            boolean defaultJni=CabinetPlacementDefaults.jni(placed.placedJniDefault(),desired,
+                    CabinetHostingConfig.localAllowed(),CabinetNetplay.supported(b),
+                    variant!=null&&variant.template().jni()!=null);
+            if(defaultJni) return data(s).rememberDefault(key(t,b),CabinetSyncMode.LOCAL_SYNC,true,variantId);
             var secondary=CabinetLinks.peer(s,t);
             boolean local=CabinetHostingConfig.localAllowed()&&CabinetBackends.supportsSync(b)
                     &&CabinetSeats.capacity(CabinetBackends.syncMaxPlayers(b),secondary!=null,t.dual(),secondary!=null&&secondary.dual())>0;
-            if(desired>=0) {
+            if(desired>=0||placed.placedJniDefault()) {
                 boolean hosted=CabinetHostedSessions.unavailable(s,t,b)==null;
                 int fallback=hosted?2:b.toString().equals("piq_sfc_home:sfc")&&local?1:0;
                 int supported=(CabinetHostingConfig.playerAllowed()?1:0)|(local?2:0)|(hosted?4:0);
                 var selected=CabinetSyncMode.checked(cn.piq.fcarcade.config.GameConsoleAdminPolicy.selectNewMode(desired,supported,fallback));
                 // Resolve once per backend. Later policy/runtime changes must not silently activate a formerly unavailable default.
-                var store=data(s);String identity=key(t,b);
-                if(store.modes.size()<4096||store.modes.containsKey(identity)){store.modes.put(identity,selected);store.setDirty();return selected;}
+                return data(s).rememberDefault(key(t,b),selected,false,null);
             }
         }
         // Never rewrite explicit preferences. Unconfigured public cabinets prefer server hosting
@@ -98,6 +113,16 @@ public final class CabinetSyncSettings extends SavedData {
         if(CabinetHostedSessions.unavailable(s,t,b)==null)return CabinetSyncMode.SERVER_MEDIA;
         if(b.toString().equals("piq_sfc_home:sfc")&&CabinetHostingConfig.localAllowed()&&CabinetBackends.supportsSync(b))return CabinetSyncMode.LOCAL_SYNC;
         return CabinetSyncMode.MEDIA;
+    }
+    /** One-time resolution also freezes an unavailable default, preventing later silent activation. */
+    CabinetSyncMode rememberDefault(String identity,CabinetSyncMode selected,boolean netplay,String variant) {
+        var existing=modes.get(identity);if(existing!=null)return existing;
+        if(modes.size()>=4096)throw new IllegalStateException("同步配置数量已达上限，未创建默认设置");
+        if(netplay&&(selected!=CabinetSyncMode.LOCAL_SYNC||variant==null))throw new IllegalArgumentException("Invalid Netplay placement");
+        if(variant!=null)NetplayLaunchSpec.checkVariant(variant);
+        modes.put(identity,selected);
+        if(netplay){netplayModes.add(identity);netplayVariants.put(identity,variant);}
+        setDirty();return selected;
     }
     static void request(ServerPlayer p,CabinetSyncNetwork.Mode packet){
         if(CHECKING.get())return;
@@ -153,8 +178,22 @@ public final class CabinetSyncSettings extends SavedData {
         String unavailable=!CabinetHostingConfig.localAllowed()?"服主已禁用本地输入同步":registered?"此核心本地同步最多支持 "+syncPlayers+" 席，当前通讯线席位超限；请先断开通讯线或使用音画串流。":packet.backend().toString().equals("piq_native_arcade:mame")?"当前附属未注册匹配的本地同步核心，请更新配套模组或使用音画串流。":"该核心尚未通过本地确定性同步验证，请使用音画串流";
         String reason=supported?(CabinetBackends.hostSnapshotSync(packet.backend())?"本地输入同步仅限已核验的游戏版本；最多 "+syncPlayers+" 席，下次启动生效":"同步方式只对下次启动生效"):unavailable;
         if(!editable)reason=p.hasPermissions(2)?"整组街机仍在运行或退出收尾中；请等待释放后刷新，不要强制切换":"只有管理员可以更改同步方式";
-        if(packet.mode()>=4){
+        String selectedVariant=netplayVariant(server,primary,packet.backend());
+        if(!packet.variant().isEmpty()){
+            var selected=CabinetNetplay.variant(packet.backend(),packet.variant());
+            if(!editable)reason="只有管理员可在整组街机空闲且退出收尾完成后更改 Netplay 后端";
+            else if(selected==null)reason="服务器未注册此 Netplay 后端版本；未修改，也不会自动改用其它后端";
+            else if(!CabinetHostingConfig.localAllowed()||CabinetSeats.capacity(selected.template().ports(),secondary!=null,primary.dual(),secondary!=null&&secondary.dual())<=0)reason="此后端的 Netplay 未获准或当前整组席位超限";
+            else{
+                for(var end:secondary==null?List.of(primary):List.of(primary,secondary))if(!end.equals(ServerCabinets.validatedTarget(p,end.anchor(),new BlockHitResult(Vec3.atCenterOf(end.anchor()),Direction.UP,end.anchor(),false),hand)))return;
+                if(debug!=null&&!debugValid(p,debug)||!p.hasPermissions(2)||p.hasDisconnected()||server.getPlayerList().getPlayer(p.getUUID())!=p||p.connection.getConnection()!=connection||!connection.isConnected()||!primary.matches(p.serverLevel())||p.serverLevel().getBlockEntity(primary.anchor())!=block||!block.cabinetBackend().equals(packet.backend())||!primary.equals(CabinetLinks.master(server,target))||!Objects.equals(secondary,CabinetLinks.peer(server,primary))||ServerCabinets.isCabinetBusy(server,primary)||secondary!=null&&(!secondary.matches(p.serverLevel())||ServerCabinets.isCabinetBusy(server,secondary)))return;
+                var store=data(server);String k=key(primary,packet.backend());
+                if(store.modes.size()>=4096&&!store.modes.containsKey(k))reason="配置数量已达上限";
+                else{store.modes.putIfAbsent(k,get(server,primary,packet.backend()));store.netplayVariants.put(k,selected.id());store.setDirty();selectedVariant=selected.id();reason="整组 Netplay 后端已选："+selected.label()+"。下次启动生效；所有参与者须安装相同版本，不自动切换。"+(selected.persistenceSupported()?"旧 JNI 存档策略保留。":"此试验后端不读写存档，旧 JNI 档案及策略保留。");}
+            }
+        }else if(packet.mode()>=4){
             if(!editable||!netplaySupported)reason="存档策略仅允许管理员在整组街机空闲时设置";
+            else if(!supportsPersistence(packet.backend(),selectedVariant))reason="当前 Netplay 后端不支持存档；旧 JNI 档案及策略保留，未修改";
             else{
                 for(var end:secondary==null?List.of(primary):List.of(primary,secondary))if(!end.equals(ServerCabinets.validatedTarget(p,end.anchor(),new BlockHitResult(Vec3.atCenterOf(end.anchor()),Direction.UP,end.anchor(),false),hand)))return;
                 if(debug!=null&&!debugValid(p,debug)||!p.hasPermissions(2)||p.hasDisconnected()||server.getPlayerList().getPlayer(p.getUUID())!=p||p.connection.getConnection()!=connection||!connection.isConnected()||!primary.matches(p.serverLevel())||p.serverLevel().getBlockEntity(primary.anchor())!=block||!primary.equals(CabinetLinks.master(server,target))||!Objects.equals(secondary,CabinetLinks.peer(server,primary))||ServerCabinets.isCabinetBusy(server,primary)||secondary!=null&&ServerCabinets.isCabinetBusy(server,secondary))return;
@@ -167,6 +206,7 @@ public final class CabinetSyncSettings extends SavedData {
             else if(!editable)reason="请先结束两端游戏；只有管理员可更改同步方式";
             else if(packet.mode()==1&&!supported)reason=unavailable;
             else if(packet.mode()==3&&!netplaySupported)reason="Netplay 实验需允许本地同步及配套附属，席位数不能超过附属声明上限";
+            else if(packet.mode()==3&&!CabinetNetplay.variants(packet.backend()).isEmpty()&&CabinetNetplay.variant(packet.backend(),selectedVariant)==null)reason="已选 Netplay 后端在服务器不可用，请明确重新选择；不会自动切换";
             else if(packet.mode()==2&&!hosted)reason=hostedReason;
             else if(packet.mode()==0&&!CabinetHostingConfig.playerAllowed())reason="服主已禁用玩家托管";
             else {
@@ -183,7 +223,7 @@ public final class CabinetSyncSettings extends SavedData {
                         ||!Objects.equals(secondary,CabinetLinks.peer(server,primary))||ServerCabinets.isCabinetBusy(server,primary)
                         ||secondary!=null&&ServerCabinets.isCabinetBusy(server,secondary))return;
                 var store=data(server);String key=key(primary,packet.backend());if(store.modes.size()>=4096&&!store.modes.containsKey(key))reason="同步配置数量已达上限";
-                else{store.modes.put(key,CabinetSyncMode.checked(packet.mode()==3?1:packet.mode()));if(packet.mode()==3)store.netplayModes.add(key);else store.netplayModes.remove(key);store.setDirty();reason=packet.mode()==3?"Netplay 实验已选：最多 "+CabinetNetplay.maxPlayers(packet.backend())+" 席；实体投币仍有效，保存按本机策略执行":"已保存；下次启动生效，不同托管位置的存档不会自动互转";}
+                else{store.modes.put(key,CabinetSyncMode.checked(packet.mode()==3?1:packet.mode()));if(packet.mode()==3)store.netplayModes.add(key);else store.netplayModes.remove(key);store.setDirty();reason=packet.mode()==3?"Netplay 实验已启用，下次开机生效；实体投币仍有效。"+(supportsPersistence(packet.backend(),selectedVariant)?"保存按本机策略执行。":"当前试验后端不读写存档，旧 JNI 档案保留。") :"已保存；下次启动生效，不同托管位置的存档不会自动互转";}
             }
         }
         boolean coinSupported=CabinetCoinPolicy.supported(packet.backend().toString());
@@ -213,9 +253,9 @@ public final class CabinetSyncSettings extends SavedData {
         }
         if(reason.length()>256)reason=reason.substring(0,255)+"…";
         if(COMMAND.get())p.displayClientMessage(net.minecraft.network.chat.Component.literal(reason+"；当前模式："+get(server,primary,packet.backend())+"。街机GUI可用调试螺丝刀打开。"),false);
-        var response=new CabinetSyncNetwork.Setting(target,packet.backend(),netplay(server,primary,packet.backend())?3:get(server,primary,packet.backend()).ordinal(),supported,editable,reason,hosted,CabinetHostingConfig.playerAllowed(),hostedReason==null?"服务器运算，所有玩家接收音画；停机后才能切换":hostedReason,debug==null?null:debug.token,coinSupported&&block.coinRequired(),coinEditable,CabinetGameInfo.describe(server,target,packet.backend()),block.autoPowerOffOnExit(),block.idleShutdownSeconds(),block.screenRenderDistance(),saveMode(server,primary,packet.backend()));
+        var response=new CabinetSyncNetwork.Setting(target,packet.backend(),netplay(server,primary,packet.backend())?3:get(server,primary,packet.backend()).ordinal(),supported,editable,reason,hosted,CabinetHostingConfig.playerAllowed(),hostedReason==null?"服务器运算，所有玩家接收音画；停机后才能切换":hostedReason,debug==null?null:debug.token,coinSupported&&block.coinRequired(),coinEditable,CabinetGameInfo.describe(server,target,packet.backend()),block.autoPowerOffOnExit(),block.idleShutdownSeconds(),block.screenRenderDistance(),effectiveSaveMode(packet.backend(),selectedVariant,saveMode(server,primary,packet.backend())),selectedVariant);
         if(debug!=null)debug.lastSetting=response;PacketDistributor.sendToPlayer(p,response);
     }
-    static CabinetSyncSettings load(CompoundTag tag,HolderLookup.Provider registries){var value=new CabinetSyncSettings();var rows=tag.getList("Modes",10);for(int i=0;i<Math.min(4096,rows.size());i++){var row=rows.getCompound(i);String key=row.getString("Key");int mode=row.getInt("Mode");if(key.length()<=512&&!key.isBlank()&&mode>=0&&mode<=2){value.modes.put(key,CabinetSyncMode.checked(mode));int save=row.getInt("SaveMode");if(save>=0&&save<=2)value.saveModes.put(key,save);if(mode==1&&row.getBoolean("Netplay"))value.netplayModes.add(key);}}return value;}
-    @Override public CompoundTag save(CompoundTag tag,HolderLookup.Provider registries){var rows=new ListTag();modes.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(e->{var row=new CompoundTag();row.putString("Key",e.getKey());row.putInt("Mode",e.getValue().ordinal());row.putInt("SaveMode",saveModes.getOrDefault(e.getKey(),0));row.putBoolean("Netplay",netplayModes.contains(e.getKey())&&e.getValue()==CabinetSyncMode.LOCAL_SYNC);rows.add(row);});tag.put("Modes",rows);return tag;}
+    static CabinetSyncSettings load(CompoundTag tag,HolderLookup.Provider registries){var value=new CabinetSyncSettings();var rows=tag.getList("Modes",10);for(int i=0;i<Math.min(4096,rows.size());i++){var row=rows.getCompound(i);String key=row.getString("Key");int mode=row.getInt("Mode");if(key.length()<=512&&!key.isBlank()&&mode>=0&&mode<=2){value.modes.put(key,CabinetSyncMode.checked(mode));int save=row.getInt("SaveMode");if(save>=0&&save<=2)value.saveModes.put(key,save);if(row.contains("NetplayVariant")){String variant=row.getString("NetplayVariant");try{NetplayLaunchSpec.checkVariant(variant);}catch(IllegalArgumentException bad){variant="unavailable";}value.netplayVariants.put(key,variant);}if(mode==1&&row.getBoolean("Netplay"))value.netplayModes.add(key);}}return value;}
+    @Override public CompoundTag save(CompoundTag tag,HolderLookup.Provider registries){var rows=new ListTag();modes.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(e->{var row=new CompoundTag();row.putString("Key",e.getKey());row.putInt("Mode",e.getValue().ordinal());row.putInt("SaveMode",saveModes.getOrDefault(e.getKey(),0));row.putBoolean("Netplay",netplayModes.contains(e.getKey())&&e.getValue()==CabinetSyncMode.LOCAL_SYNC);if(netplayVariants.containsKey(e.getKey()))row.putString("NetplayVariant",netplayVariants.get(e.getKey()));rows.add(row);});tag.put("Modes",rows);return tag;}
 }
