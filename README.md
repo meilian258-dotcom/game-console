@@ -1,52 +1,66 @@
 # 方块电玩 Game Console
 
-方块电玩是一个 Minecraft 模组：把游戏机、电视、街机和掌机放进方块世界，插上卡带、拿起手柄游玩，也可以和附近的朋友一起玩或观看。
+方块电玩把可以游玩的游戏机、电视、街机、掌机和可组装电脑带进 Minecraft。摆放设备、接上视频线、制作卡带，再拿起手柄，在自己的房间或朋友搭建的游戏厅里游玩。
 
-主模组已经包含 **FC/NES、电视、机柜和卡带制作等公共设备**。想玩 SFC、MD、GBA 或原生街机，再安装对应附属，不需要把所有组件都装上。
+**[最新公开下载](piq-fc-arcade/docs/下载中心.md#当前下载) · [各模组历史版本](piq-fc-arcade/docs/下载中心.md#历史版本) · [安装与游玩](piq-fc-arcade/docs/玩家指南.md) · [文档中心](piq-fc-arcade/docs/README.md)**
 
-项目仍在测试阶段。源码公开不等于所有功能都已稳定，也不代表每款游戏、光影或联机方式都兼容。
+主模组内置 FC/NES 和公共设备，其他机型按需添加。项目目前提供测试版，不包含 ROM、BIOS 或商业游戏数据；游戏、联机方式和光影兼容性以所用版本的说明为准。
 
-## 我想开始使用
+## 可以玩什么
 
-先看[玩家指南](piq-fc-arcade/docs/玩家指南.md)，里面说明怎么获取安装包、选择附属、准备游戏，以及第一次开机的操作。
+- **布置游戏空间**：摆放主机、不同电视与机柜，用视频线连接显示设备。
+- **使用实体设备**：制作和插入卡带，开关机器，领取手柄或操作摇杆；不同机型保留各自的操作方式。
+- **和朋友一起玩或观看**：支持的设备可开放操作席和附近旁观。串流、JNI Netplay 等模式的能力与要求不同，见[联机与旁观说明](piq-fc-arcade/docs/玩家指南.md#联机和观看有什么区别)。
+- **按需扩展机型**：不必安装全部附属，先用 FC 熟悉流程，再添加需要的设备。
 
-- **游戏环境**：Minecraft 1.21.1、NeoForge 21.1.229 起、Java 21。当前原生游戏运行端以 Windows x64 为支持范围；其他平台不能照搬安装。
-- **多人服务器**：客户端和服务端安装配套版本的主模组及所用附属。
-- **游戏文件**：自行准备有权使用的 ROM；部分街机游戏还需要匹配的 BIOS。仓库不提供这些游戏内容。
-- **下载**：[FC76.54 设备体验候选](https://github.com/meilian258-dotcom/game-console/releases/tag/device-polish-fc7654-20261012-r1)已公开主包、街机、电脑和可选 Replay 补丁四件，**不是完整套装**；按发行页的精确版本表选配。变更见[设备体验候选说明](piq-fc-arcade/docs/设备体验候选-20261012.md)。SFC54 及包含它的整套 ZIP 仍待分发审核，不能用旧 SFC 包补位。
-- **历史完整套装**：[2026-10-07 整套测试版](https://github.com/meilian258-dotcom/game-console/releases/tag/full-test-20261007-r1)仍保留原批次 7 件成品，版本和步骤见[历史安装说明](piq-fc-arcade/docs/整套测试版-20261007.md)。它不包含后续修复，不要与新候选跨批混装。GitHub 的 Code → Download ZIP 是源码，不能放进 `mods`。
+## 主模组与附属
 
-NeoForge 最低版本不是对所有更新版本或整个整合包的兼容保证。具体范围见[兼容说明](piq-fc-arcade/design/NeoForge兼容范围-20261004.md)。
+| 组件 | 提供什么 | 安装关系与说明 |
+| --- | --- | --- |
+| 主模组 / FC | FC/NES、电视、公共机柜、卡带工作台、线材及公共设置 | 必装；[主模组说明](piq-fc-arcade/README.md) |
+| SFC | SFC 家用机、卡带和手柄 | 主模组 + 完整附属包；[SFC 说明](piq-sfc-home/README.md) |
+| MD | MD 家用机、卡带和手柄 | 主模组 + 附属；[MD 说明](piq-md-home/README.md) |
+| GBA | GBA 掌机及对应机柜 | 主模组 + 附属；[GBA 说明](piq-gba/README.md) |
+| 街机 | 原生街机游戏运行支持 | 主模组 + 附属；[街机说明](piq-native-arcade/README.md) |
+| 电脑 | 可组装主机、键鼠与程序入口 | 主模组 + 附属，再准备对应程序；[电脑说明](piq-computer/README.md) |
 
-## 有哪些设备
+这是组件用途表，不是混装清单。**实际可下载版本、配套主包及客户端／服务端要求统一看[下载中心](piq-fc-arcade/docs/下载中心.md)。** 内部 `piq-retro-platform`、SFC 家用薄包与独立内部核心不是额外的玩家前置；SFC 玩家选择完整包。
 
-| 想使用的设备 | 需要的组件 |
+[Flash Box](piq-flash-box/README.md) 和 [PvZ](piq-pvz-addon/README.md) 属于开发验证机型，[Java ME](piq-j2me-arcade/README.md) 是独立原型，不是入门必装项。
+
+## 下载和安装
+
+| 环境 | 要求 |
 | --- | --- |
-| FC/NES、电视和公共机柜 | [主模组](piq-fc-arcade/README.md) |
-| SFC 家用机 | 主模组 + [SFC 完整附属包](piq-sfc-home/README.md) |
-| MD 家用机 | 主模组 + [MD 附属](piq-md-home/README.md) |
-| GBA 掌机及对应机柜 | 主模组 + [GBA 附属](piq-gba/README.md) |
-| 原生街机游戏 | 主模组 + [街机附属](piq-native-arcade/README.md) |
-| 可组装电脑与程序 | 主模组 + [电脑附属](piq-computer/README.md)，再按程序说明准备内容 |
+| Minecraft | 1.21.1 |
+| 加载器与 Java | NeoForge 21.1.229 起、Java 21；可选补丁可能要求更高的 NeoForge 版本 |
+| 原生游戏运行端 | 当前以 Windows x64 为支持范围；其他平台不能照搬安装 |
+| 多人游戏 | 客户端与服务端安装配套主模组及所用设备附属；仅客户端工具不装到服务端 |
 
-[Flash Box](piq-flash-box/README.md) 和 [PvZ](piq-pvz-addon/README.md) 暂作开发验证机型；[Java ME](piq-j2me-arcade/README.md) 是独立原型。它们不是新玩家必须安装的前置。
+1. 从[当前下载](piq-fc-arcade/docs/下载中心.md#当前下载)选择主模组和同批附属；查旧版则使用[按模组分类的历史列表](piq-fc-arcade/docs/下载中心.md#历史版本)。加入服务器时，以服主提供的配套为准。
+2. 正常退出游戏，升级服务器先停服；备份世界、配置和 `game-console`，将玩家 JAR 放入 `mods`，移出并备份同一模组的旧版本。
+3. 自备有权使用的游戏文件和适用 BIOS，按[玩家指南](piq-fc-arcade/docs/玩家指南.md#第一次玩家用机)完成拷卡、接线与第一次开机。
 
-源码中的 `piq-retro-platform` 和 `piq-sfc-arcade` 是内部组件，**不要看到一个源码目录就另装一个 JAR**。SFC 玩家使用包含所需核心的完整包。
+GitHub 的 **Code → Download ZIP** 和自动生成的 **Source code** 是源码，不是安装包。不要将各附属不同批次的最高版本拼装在一起。NeoForge 最低要求不代表全部新版本和整合包均已验证，详见[兼容范围](piq-fc-arcade/design/NeoForge兼容范围-20261004.md)。
 
-## 我想参与开发
+## 可选工具与联动
 
-可选客户端工具：[快速回放兼容补丁](piq-replay-quickmode-compat/README.md)提供 ReForgedPlay 的握手和 Sable 玩家位置适配源码。它不是方块电玩设备运行的前置，也不是屏幕/声音录制补丁；具体依赖、构建与待验范围见组件说明。
-
-- [构建源码](source-control/BUILDING.md)：固定核心开发构建、配套版本，以及 `main` 自动快照流程的输入和发布门槛；当前分批候选不代表整套快照门槛已解除。
-- [开发协作](GIT_WORKFLOW.md)：克隆、分支、提交与审查。
-- [制作新设备](piq-fc-arcade/design/机器制作与交互标准.md)：玩家应该得到怎样的操作体验。
-- [公共接口与现状](piq-fc-arcade/design/全组件运行流程与复用接口总览.md)：哪些可以复用，哪些仍需适配。
-
-更多资料在[文档导航](piq-fc-arcade/docs/README.md)。各组件首页介绍当前用途，旧版本日志放在各自的 `README-history.md`，不必按日期逐篇阅读才能开始。
+- **Replay 屏幕与声音兼容**：用于录像中的设备音画，下载及配套条件见[下载中心](piq-fc-arcade/docs/下载中心.md#回放兼容)。不是运行游戏设备的前置。
+- **快速回放兼容**：处理 ReForgedPlay 握手和 Sable 玩家位置，和屏幕／声音补丁用途不同；见[组件说明](piq-replay-quickmode-compat/README.md)及[公开下载状态](piq-fc-arcade/docs/下载中心.md#回放兼容)。
+- **WaterFrames**：可选显示联动，不是内置电视和机柜的必装前置。
 
 ## 遇到问题
 
 请在 [Issues](https://github.com/meilian258-dotcom/game-console/issues) 描述问题，附上游戏和模组版本、单人或服务器、操作步骤，以及必要的日志片段。光影问题请同时写 Iris 和光影包名称；不要上传游戏 ROM、BIOS、令牌或个人存档。完整反馈清单见[玩家指南](piq-fc-arcade/docs/玩家指南.md#遇到问题时提供什么)。
+
+## 参与开发
+
+- [开发协作](GIT_WORKFLOW.md)：获取源码、分支、提交、检查与 PR。
+- [构建指南](source-control/BUILDING.md)：固定依赖、附属构建和自动快照要求；`main` 源码不等于已发布成品。
+- [制作新设备](piq-fc-arcade/design/机器制作与交互标准.md)：统一的玩家体验与验收要求。
+- [公共接口与现状](piq-fc-arcade/design/全组件运行流程与复用接口总览.md)：可复用入口、当前能力及尚未完成的部分。
+
+完整导航见[文档中心](piq-fc-arcade/docs/README.md)。历史实现记录保留在各组件的 `README-history.md` 和专项版本说明中。
 
 ## 源码与许可
 
