@@ -92,7 +92,7 @@ Ruffle 的顶级 [MIT](piq-flash-box/runtime/vendor/LICENSE_MIT) / [Apache](piq-
 4. **核心来源**：固定 SHA、版本字符串、官方取得记录、完整源树与构建脚本共同说明来源；若缺原构建记录，明确对应关系的证据范围。字节完全一致的可重复构建是另一个验证目标，不能仅因尚未做到它就断言不可分发，也不能用同名版本代替完整对应源码。
 5. **JNA、PvZ 与编译运行库**：逐发行包核对完整 Apache/libffi、public-r1 补充材料和静态链接库 notices；修改说明不能证明每个旧 JAR 都已携带它们。
 6. **素材权利**：电脑上述两套原创素材的随模组公开分发授权已确认；其他素材继续逐项核对提供者、来源和获准范围，不从程序 GPL、文件公开或去掉 Logo 推断素材可以自由使用。
-7. **RetroArch 与普通 FBNeo 试验组合**：街机 `retroarch-stock-v1` 通过 RetroArch 的 `-L` 参数加载固定 `52343f…` 普通 FBNeo，区别于自有 JNI 的 `state-v3`。本项目不能为第三方 RetroArch 代码授予链接例外。两者的源包和许可证存在，不等于此组合的许可兼容性已经确认；该项仍待单独核对，不借用上述 PIQ 许可宣布全部后端获准发行。
+7. **RetroArch 与普通 FBNeo 试验组合**：街机 `retroarch-stock-v1` 通过 RetroArch 的 `-L` 参数加载固定 `52343f…` 普通 FBNeo，区别于自有 JNI 的 `state-v3`。本项目不能为第三方 RetroArch 代码授予链接例外，但也不能仅凭“GPL 前端＋非商业核心”就断言该组合禁止分发。[本批固定 FBNeo 源码的 libretro README](https://github.com/libretro/FBNeo/blob/a251c76229f1637e433b93e29845039752771b6d/src/burner/libretro/README.md#license-and-changelog)已说明上游对这一组合的立场：该 port 不含 GPL 代码，并引用欧盟下独立程序互操作的解释，同时明确非欧盟适用尚不清楚。其引用的[欧盟官方门户分析](https://interoperable-europe.ec.europa.eu/collection/eupl/licence-compatibility-permissivity-reciprocity-and-interoperability)是关于独立作品链接的分析，不是本模组的裁判或 RetroArch 的额外许可。分发仍须保留双方原文、完整对应源码及本项目修改，按实际组合和适用地区核对；这份 PIQ 例外不改变上游立场，也不构成全部后端的法律保证。
 
 完整 SFC54 保留的 jgenesis/WASM 另有[实际运行依赖通知与历史构建锁](piq-sfc-arcade/third-party/wasm-runtime/README.md)：25 个 crate 的 52 份原通知、Rust 1.97.1 标准库原文及实际 Cargo.lock。它与 Wasmtime 的 Rust 1.96.1 材料分开，不以旧的项目锁冒充该 WASM 的精确构建锁。完整源、隐私路径变换脚本和这些通知须配套提供。公共 JNI 也补充了[compiler-rt 与 MinGW CRT 原文](piq-fc-arcade/native/libretro-jni/licenses/NOTICE.md)，保留运行库例外，不把整个工具链清单当作实际链接清单。
 

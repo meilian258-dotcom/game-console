@@ -1,4 +1,5 @@
 """Fixed-input notice and packaging contracts; not a legal approval."""
+import hashlib
 from pathlib import Path
 import unittest
 
@@ -6,6 +7,12 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 NAME = 'MD-ARCADE-LINKING-EXCEPTION.txt'
 MODULES = ('piq-fc-arcade', 'piq-retro-platform', 'piq-md-home', 'piq-native-arcade')
+HELPER_SOURCE_BODIES = {
+    'BridgeProtocol.java': '68e6dd99a6bd0669ed390e00ab586561ab3ebe3846b9e1eec41b0bcc3cf8eb20',
+    'NativeInputPorts.java': 'c6190d42e3e72c2af6c2338094990387f6ee6aa8f838381e8d636443a55f2c2b',
+    'NativeArcadeButtons.java': 'a250d0d0728e7871217f01c5bdc018e0d63d9542b184f6ea4dac52df04fc7fb2',
+}
+HELPER_SOURCE_ROOT = ROOT / 'piq-native-arcade/src/main/java/cn/piq/nativearcade/bridge'
 
 
 class FixedCorePermissionTests(unittest.TestCase):
@@ -45,8 +52,22 @@ class FixedCorePermissionTests(unittest.TestCase):
         sources += list((ROOT / 'piq-fc-arcade/libretro-generic-helper/src/main/java').rglob('*.java'))
         self.assertTrue(sources)
         for path in sources:
-            header = '\n'.join(path.read_text('utf8').splitlines()[:5])
-            self.assertIn(NAME, header, str(path.relative_to(ROOT)))
+            lines = path.read_text('utf8').splitlines()
+            location = lines[-1:] if path.parent == HELPER_SOURCE_ROOT and path.name in HELPER_SOURCE_BODIES else lines[:5]
+            self.assertIn(NAME, '\n'.join(location), str(path.relative_to(ROOT)))
+
+    def test_helper_permission_footer_preserves_reviewed_source_line_numbers(self):
+        # javac includes LineNumberTable: prepending even a notice changes the
+        # fixed helper identity. Keep the notice and the reviewed body intact;
+        # the production helper JAR/catalog/manifest checks remain authoritative.
+        footer = '// PIQ-authored code: additional permission in piq-fc-arcade/' + NAME + '.\n'
+        for name, digest in HELPER_SOURCE_BODIES.items():
+            text = (HELPER_SOURCE_ROOT / name).read_text('utf8')
+            with self.subTest(source=name):
+                self.assertEqual(1, text.count(footer))
+                self.assertTrue(text.endswith(footer))
+                body = text[:-len(footer)]
+                self.assertEqual(digest, hashlib.sha256(body.encode('utf8')).hexdigest())
 
     def test_runtime_notices_are_part_of_future_package_inputs(self):
         main = (ROOT / 'piq-fc-arcade/build.gradle').read_text('utf8')

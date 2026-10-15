@@ -1,4 +1,3 @@
-// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.nativearcade.bridge;
 
 import java.util.ArrayDeque;
@@ -30,3 +29,4 @@ public final class NativeInputPorts {
     public synchronized void clear(){for(int p=0;p<PORTS;p++)releasePort(p);}
     public synchronized int pending(int port){checkPort(port);return pending[port].size();}
 }
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.

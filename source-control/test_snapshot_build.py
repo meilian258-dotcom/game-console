@@ -40,6 +40,64 @@ class SnapshotBuildTests(unittest.TestCase):
         self.assertEqual({ident: entry[2] for ident, entry in snapshot_inputs.BOOTSTRAP.items()},
                          build.BOOTSTRAP)
 
+    def test_source_version_supports_properties_or_one_literal_gradle_declaration(self):
+        module = self.root / 'module'
+        module.mkdir()
+        with patch.object(build, 'ROOT', self.root):
+            for declaration in ("version = '0.1.0-prototype.13'\n", 'version = "0.1.0-prototype.13"\n'):
+                (module / 'build.gradle').write_text(declaration)
+                self.assertEqual('0.1.0-prototype.13', build.version('module'))
+            (module / 'gradle.properties').write_text('org.gradle.jvmargs=-Xmx1G\n')
+            (module / 'build.gradle').write_text("version = '0.1.0-prototype.12'\n")
+            self.assertEqual('0.1.0-prototype.12', build.version('module'))
+            (module / 'gradle.properties').write_text('mod_version=0.2.3\n')
+            self.assertEqual('0.2.3', build.version('module'))
+            (module / 'gradle.properties').write_text('mod_version=0.2.3\nmod_version=0.2.4\n')
+            with self.assertRaisesRegex(ValueError, 'one explicit source version'):
+                build.version('module')
+            (module / 'gradle.properties').write_text('mod_version=\n')
+            with self.assertRaisesRegex(ValueError, 'Unsafe module version'):
+                build.version('module')
+
+    def test_source_version_rejects_missing_dynamic_duplicate_and_unsafe_declarations(self):
+        module = self.root / 'module'
+        module.mkdir()
+        for declaration in ('', 'version = mod_version\n', "version = '1.0'\nversion = other\n",
+                            "version = '../1.0'\n", 'version = "${releaseVersion}"\n'):
+            with self.subTest(declaration=declaration), patch.object(build, 'ROOT', self.root):
+                (module / 'build.gradle').write_text(declaration)
+                with self.assertRaises(ValueError):
+                    build.version('module')
+
+    def test_configured_jar_uses_exact_declared_computer_version_and_metadata(self):
+        module = self.root / 'piq-computer'
+        libs = module / 'build/libs'
+        libs.mkdir(parents=True)
+        (module / 'build.gradle').write_text("version = '0.1.0-prototype.13'\n")
+        path = libs / 'game_console_computer-0.1.0-prototype.13.jar'
+        jar(path, {build.META: metadata('piq_computer', '0.1.0-prototype.13')})
+        with patch.object(build, 'ROOT', self.root):
+            self.assertEqual(path, build.configured_jar('piq-computer', 'game_console_computer', 'piq_computer'))
+            jar(libs / 'game_console_computer-0.1.0-prototype.12.jar', {build.META: metadata('piq_computer')})
+            with self.assertRaisesRegex(ValueError, 'exactly the configured JAR'):
+                build.configured_jar('piq-computer', 'game_console_computer', 'piq_computer')
+
+    def test_configured_jar_rejects_missing_old_wrong_id_or_wrong_metadata_version(self):
+        for index, (filename, ident, declared) in enumerate((
+                (None, 'piq_computer', '0.1.0-prototype.13'),
+                ('game_console_computer-0.1.0-prototype.12.jar', 'piq_computer', '0.1.0-prototype.12'),
+                ('game_console_computer-0.1.0-prototype.13.jar', 'piq_pvz', '0.1.0-prototype.13'),
+                ('game_console_computer-0.1.0-prototype.13.jar', 'piq_computer', '0.1.0-prototype.12'))):
+            module = self.root / ('case-' + str(index))
+            libs = module / 'build/libs'
+            libs.mkdir(parents=True)
+            (module / 'build.gradle').write_text("version = '0.1.0-prototype.13'\n")
+            if filename:
+                jar(libs / filename, {build.META: metadata(ident, declared)})
+            with self.subTest(filename=filename, ident=ident, version=declared), patch.object(build, 'ROOT', self.root):
+                with self.assertRaisesRegex(ValueError, 'configured JAR|identity/version mismatch'):
+                    build.configured_jar(module.name, 'game_console_computer', 'piq_computer')
+
     def test_build_rejects_old_unknown_duplicate_or_case_aliased_bootstrap(self):
         approved = [dict(id=ident, path='bootstrap/' + ident + '.jar', bytes=1, sha256=digest)
                     for ident, digest in build.BOOTSTRAP.items()]

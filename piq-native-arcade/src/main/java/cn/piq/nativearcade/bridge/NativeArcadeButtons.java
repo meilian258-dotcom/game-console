@@ -1,4 +1,3 @@
-// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.nativearcade.bridge;
 
 /** Host numbered buttons 1..6 use bits 0,1,8,9,10,11.
@@ -12,3 +11,4 @@ public final class NativeArcadeButtons {
         return (mask&~((1<<1)|(1<<8)))|((mask&(1<<1))<<7)|((mask&(1<<8))>>>7);
     }
 }
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.

@@ -263,14 +263,36 @@ def merge_sfc(core: Path, home: Path, output: Path) -> Path:
 
 
 def version(module: str) -> str:
-    values = (ROOT / module / 'gradle.properties').read_text(encoding='utf-8-sig')
-    match = re.search(r'^mod_version=(.+)$', values, re.M)
-    if not match:
-        raise ValueError('Module has no explicit mod_version: ' + module)
-    result = match.group(1).strip()
+    properties = ROOT / module / 'gradle.properties'
+    matches = []
+    if properties.is_file():
+        matches = re.findall(r'^mod_version[ \t]*=[ \t]*(.*)$', properties.read_text(encoding='utf-8-sig'), re.M)
+    if not matches:
+        # Computer/PvZ declare a literal project version, not gradle.properties.
+        # Do not evaluate Gradle expressions or guess from old build artifacts.
+        script = (ROOT / module / 'build.gradle').read_text(encoding='utf-8-sig')
+        declarations = re.findall(r'^version[ \t]*=[ \t]*(.+)$', script, re.M)
+        literal = re.fullmatch(r"(['\"])([^'\"]+)\1", declarations[0].strip()) if len(declarations) == 1 else None
+        matches = [literal.group(2)] if literal else []
+    if len(matches) != 1:
+        raise ValueError('Module needs one explicit source version: ' + module)
+    result = matches[0].strip()
     if not re.fullmatch(r'[0-9][A-Za-z0-9.+_-]{0,95}', result):
         raise ValueError('Unsafe module version')
     return result
+
+
+def configured_jar(module: str, archive_prefix: str, mod_id: str) -> Path:
+    """Select the configured artifact, never a latest/stale directory guess."""
+    declared = version(module)
+    expected = ROOT / module / 'build/libs' / (archive_prefix + '-' + declared + '.jar')
+    no_links(expected)
+    candidates = list(expected.parent.glob('*.jar'))
+    if len(candidates) != 1 or candidates[0].name != expected.name or not expected.is_file():
+        raise ValueError('Expected exactly the configured JAR: ' + expected.name)
+    if inspect(expected)['versions'] != {mod_id: declared}:
+        raise ValueError('Configured JAR MOD identity/version mismatch: ' + module)
+    return expected
 
 
 def stage_outputs(paths: list[Path], output: Path, manifest: dict) -> dict:
@@ -486,9 +508,9 @@ def build(work: Path, output: Path) -> dict:
     gradle('piq-native-arcade', ['clean', 'check', 'jar'], arcade_gradle_properties(fc, inputs), 'arcade')
     arcade = ROOT / 'piq-native-arcade/build/libs' / ('piq_native_arcade-' + version('piq-native-arcade') + '.jar')
     gradle('piq-pvz-addon', ['clean', 'check', 'jar'], common, 'pvz')
-    pvz = ROOT / 'piq-pvz-addon/build/libs/game_console_pvz-0.1.0-prototype.12.jar'
+    pvz = configured_jar('piq-pvz-addon', 'game_console_pvz', 'piq_pvz')
     gradle('piq-computer', ['clean', 'check', 'jar'], dict(common, pvzJar=str(pvz)))
-    computer = ROOT / 'piq-computer/build/libs/game_console_computer-0.1.0-prototype.12.jar'
+    computer = configured_jar('piq-computer', 'game_console_computer', 'piq_computer')
     run('piq-gba', [sys.executable, str(ROOT / 'piq-gba/tools/build_current.py'), '--fc', str(fc),
                     '--runtime-base', str(runtime_base), '--dependencies', str(deps),
                     '--jdk', str(jdk), '--output', str(work / 'gba')])
