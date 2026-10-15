@@ -11,3 +11,10 @@
 *.ttf binary
 *.woff2 binary
 *.jar binary
+
+# Verbatim upstream notices: keep the checksum-verified original whitespace.
+piq-fc-arcade/native/libretro-jni/licenses/MinGW-w64-v14.0.0-COPYING -whitespace
+piq-fc-arcade/native/libretro-jni/licenses/MinGW-w64-v14.0.0-runtime-notices.txt -whitespace
+piq-sfc-arcade/third-party/wasm-runtime/crates/unty-0.0.4/LICENSE-APACHE -whitespace
+piq-sfc-arcade/third-party/wasm-runtime/crates/unty-0.0.4/LICENSE-MIT -whitespace
+piq-sfc-arcade/third-party/wasm-runtime/rust-1.97.1/COPYRIGHT-library.html -whitespace

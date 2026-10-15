@@ -128,6 +128,7 @@ def prepareMameLifecycle = tasks.register('prepareMameLifecycleRuntime', Exec) {
             '--core', mameLifecycleCore.absolutePath, '--output', mameLifecycleRuntime.get().asFile.absolutePath
 }
 jar {
+    from('../piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
     dependsOn prepareFbneoStock
     from(fbneoStockRuntime)
     if (providers.gradleProperty('snapshotResourcesDir').isPresent()) {

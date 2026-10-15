@@ -52,6 +52,8 @@ tasks.named('processResources', ProcessResources) {
     }
 }
 jar {
+    from('../piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
+    from('../piq-fc-arcade/src/main/resources/META-INF/licenses/GPL-3.0.txt') { into 'META-INF/licenses' }
     exclude '**/blastem_libretro.dll'
     manifest { attributes 'Implementation-Title': 'Game Console MD', 'Implementation-Version': project.version }
 }

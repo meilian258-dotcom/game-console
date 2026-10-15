@@ -1,0 +1,165 @@
+Game Console Fixed MD and Arcade Linking Permission, version 1
+Additional permission under GNU GPL version 3 section 7
+Effective date: 2026-10-15
+
+Grantor: the copyright owner of PIQ-authored Game Console program code.
+
+1. Covered code
+
+This permission applies only to the Grantor's copyright interests in the
+PIQ-authored GPL-3.0-or-later program code in these repository locations:
+
+  piq-fc-arcade/src/main/java/
+  piq-retro-platform/src/main/java/
+  piq-md-home/src/main/java/
+  piq-native-arcade/src/main/java/
+  piq-fc-arcade/native/libretro-jni/piq_libretro_jni.cpp
+  piq-fc-arcade/native/libretro-jni/runtime_dependencies.h
+  piq-fc-arcade/libretro-generic-helper/src/main/java/cn/piq/retro/worker/GenericLibretroWorker.java
+  piq-fc-arcade/libretro-generic-helper/src/main/java/cn/piq/retro/worker/WorkerProtocol.java
+
+The source baseline is Game Console commit
+82be03f99265c51e064594949bfd0559789caff3. This grant also applies, from the
+effective date, to existing copies of that covered code and its compiled
+forms, including the PIQ-authored parts of FC76.54, MD16 and Arcade 0.1.5.12.
+It does not relicense an entire JAR, alter an upstream license, or grant
+rights in code owned by anyone else. Modified versions may retain this
+permission for the Grantor's covered material; other contributors must
+separately authorize any extension to their own copyright interests.
+
+2. Specified libraries
+
+Only the following fixed, independently identified versions in these two
+core families are specified libraries under this permission. Each source
+identity refers to the source tree represented by the identified archive,
+not a claim that every build from that tree produces byte-identical object
+code. The ordinary GX and PIQ Netplay GX versions are separate identities
+used by the same MD16 release; they are not interchangeable binaries.
+
+A. Genesis Plus GX
+
+A.1. Unmodified Genesis Plus GX v1.7.4 c2838c7
+
+Fixed upstream source:
+https://github.com/libretro/Genesis-Plus-GX/tree/c2838c7dc4236fc2fe94e5dbd08b41486067918e
+represented by the complete original source archive supplied as:
+
+  Genesis-Plus-GX-c2838c7dc4236fc2fe94e5dbd08b41486067918e-source.zip
+  17,453,267 bytes
+  SHA-256 dd4f5ef7ad3bae410854da8d0d7b99c99f13caa1df77f4ef1f2b8f59be3b6977
+
+The specified library includes this unmodified source tree and object code
+built from it. It expressly includes the unmodified Windows x64 DLL used
+by MD16's ordinary private/streaming runtime paths:
+
+  genesis_plus_gx_libretro.dll
+  8,940,475 bytes
+  SHA-256 9ffa10a115b20e1b49e9caf0b53f287c640ed4e5bb93f7ed9a23b416a4ccfdf7
+
+The covered PIQ code may use this specified version through its JNI bridge
+or the two expressly listed generic-worker files using JNA. This does not
+extend the permission to a third-party frontend. The archive's original
+source, build files and component notices remain unchanged.
+
+A.2. Genesis Plus GX PIQ Netplay v1.7.4c2838c7-piqnp1
+
+Upstream source baseline:
+https://github.com/libretro/Genesis-Plus-GX/tree/c2838c7dc4236fc2fe94e5dbd08b41486067918e
+with the fixed PIQ Netplay piqnp1 modifications represented by:
+
+  genesis-plus-gx-piqnp1-source.zip
+  16,597,834 bytes
+  SHA-256 adeb3901c851c941fbeb07080aac3c49f64f4c3be5faf4d315cb1f015ea0b3fb
+
+The specified library includes this fixed modified source tree and object
+code built from it. It expressly includes the Windows x64 DLL used in MD16:
+
+  genesis_plus_gx_piq_netplay_libretro.dll
+  9,284,608 bytes
+  SHA-256 8200a6d5e7c39f60afefd8e87e369d253f737de6a73bf8d920d2ab81888a5fb5
+
+The archive retains the modified source, original component notices and
+piq-patch build instructions and generators. Apart from the exact ordinary
+GX version in A.1 and the exact piqnp1 version in A.2, other GX versions,
+other historical variants and later piqnp changes are not specified by
+this permission.
+
+B. FBNeo a251c76 JNI state-v3
+
+Upstream source baseline:
+https://github.com/libretro/FBNeo/tree/a251c76229f1637e433b93e29845039752771b6d
+with the fixed JNI state-v3 modifications represented by:
+
+  FBNeo-a251c76-jni-state-v3-source.zip
+  29,615,611 bytes
+  SHA-256 3c8a61cf1519e1f27df3776822a1be54573d640b671e6885088bbd60f41100dc
+
+The specified library includes this fixed modified source tree and object
+code built from it. It expressly includes the Windows x64 DLL used in
+Arcade 0.1.5.12:
+
+  fbneo_libretro.dll, JNI state-v3 variant
+  61,380,608 bytes
+  SHA-256 3e0ab5db5898e9e75e1704caa703d6f4e4cb269c4f971ab498b434f22d18f885
+
+The archive retains the modified source, original component notices and
+GAME-CONSOLE-MODIFICATIONS.patch. Its associated build instructions and
+script are in piq-native-arcade/design/fbneo-study/jni-state-v3/ and
+tools/build_fbneo_state_v3.py in the accompanying Game Console source.
+The ordinary upstream FBNeo core, other historical FBNeo variants and later
+state-v3 changes are not specified by this permission.
+
+This permission does not extend to other emulator cores, unspecified
+nightly builds, later revisions or further modifications of any specified
+library. In particular, ordinary/stock FBNeo is not a specified library.
+The exact DLL
+identities above do not assert that byte-for-byte reproduction has been
+performed or make such reproduction a condition of this permission.
+
+3. Additional permission
+
+As an additional permission under GNU GPL version 3 section 7, the Grantor
+permits you to link or combine the covered code with one or more of the
+specified libraries through the libretro interface and to convey the
+resulting combination, provided that you comply with the GNU GPL for the
+covered code and with the licenses applicable to each specified library
+and all other components. A specified library need not be relicensed under
+the GNU GPL solely because of this combination with the Grantor's covered
+code.
+
+When conveying a resulting combination in object-code form under this
+permission, provide the complete corresponding source for the covered code
+and each specified library included in that combination, including
+applicable build/link scripts, modifications, copyright notices and license
+texts, using the source delivery requirements of GNU GPL version 3 section
+6. Applicable LGPL source and relinking requirements remain in force.
+
+4. Limits and retained terms
+
+The covered code remains GPL-3.0-or-later. This permission does not impose
+a non-commercial restriction on that code by itself. Genesis Plus GX and
+FBNeo retain their own non-commercial, source-distribution and other
+conditions, including any applicable restrictions on sale or fundraising.
+This permission grants no commercial rights to either core and waives none
+of its terms. Independently licensed subcomponents retain their own terms;
+in particular, LGPL components are not relabeled as non-commercial code.
+
+No permission is granted on behalf of Genesis Plus GX, FBNeo, RetroArch,
+MAME, Snes9x, or any other third-party rights holder. Third-party code,
+bundled libraries, libretro headers, artwork, models, textures, audio,
+trademarks, ROMs, BIOS files and game data are excluded from the covered
+code, wherever they are stored or packaged. In particular, this permission
+does not grant an exception for RetroArch to link to either core.
+
+The separate SNES9X-LINKING-EXCEPTION.txt remains unchanged and governs
+only its own stated scope. Neither permission expands the other.
+
+Apart from this limited additional permission, the GNU GPL and its
+disclaimer of warranty remain unchanged. You may remove this additional
+permission as allowed by GNU GPL version 3 section 7; a copy without it must
+not be represented as granting this permission.
+
+Include this notice with copies that rely on this permission. This grant
+is not a certification that a particular binary distribution satisfies
+every third-party obligation, and does not state that an existing JAR
+already contains this notice or its required accompanying materials.

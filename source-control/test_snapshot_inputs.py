@@ -114,16 +114,98 @@ class InputTests(unittest.TestCase):
         self.assertEqual(subject.FC_RESOURCES['libcxx-windows'],
                          'core/libretro-jni/windows-x64/libc++.dll')
 
+    def test_public_bootstrap_catalog_retains_exact_artifacts_and_release_tags(self):
+        expected = {
+            'fc': ('game-console-0.31.0-alpha.76.54.jar', 39954627, '3632de31cc6658f32f9e7c498c916c1680218fe58ae160f58e9fa0f0551d0549'),
+            'sfc': ('game-console-sfc-0.1.0-alpha.51.jar', 3087373, 'a9c8bdd2ae068383310ac57efcfb18df29eca67238218b12bc6da38b47cf1816'),
+            'md': ('game-console-md-0.1.0-alpha.15.jar', 2371782, '9ea8727a77e2cc10fc59a2e34bb1b16466be2fcb1d23e941216b79921fc4b6df'),
+            'gba': ('game-console-gba-0.1.0-alpha.15.jar', 2670862, '7e991d3151c140c01a4acc094d68f9ccaf2e285b6a0fadf6abb15cb345d40f0a'),
+            'arcade': ('game-console-arcade-0.1.5.12.jar', 246392457, '32ffbf3e2245495dd35dbfed9704595a534a40690dedaec709771e3c07d62b3c'),
+            'pvz': ('game-console-pvz-0.1.0-prototype.12.jar', 5004879, 'e010b4185c8a9e51edcba3ef40718a81781068320681892cf869d68c3046f04a'),
+        }
+        self.assertEqual(expected, subject.BOOTSTRAP)
+        self.assertEqual(set(expected), set(subject.BOOTSTRAP_RELEASES))
+        for ident, (filename, _, _) in expected.items():
+            tag = 'device-polish-fc7654-20261012-r1' if ident in ('fc', 'arcade') else 'full-test-20261007-r1'
+            base = 'https://github.com/meilian258-dotcom/game-console/releases/download/' + tag + '/'
+            self.assertEqual(base, subject.BOOTSTRAP_RELEASES[ident])
+            self.assertEqual(filename, Path(filename).name)
+            self.assertEqual(filename, subject.relative(filename).as_posix())
+            self.assertEqual(base + filename, subject.checked_url(base + filename))
+        filenames = [entry[0].casefold() for entry in expected.values()]
+        self.assertEqual(len(filenames), len(set(filenames)))
+
+    def test_prepare_fetches_each_exact_release_url_with_its_pin(self):
+        class ReachedDownload(Exception):
+            pass
+
+        for ident, entry in subject.BOOTSTRAP.items():
+            # Put this artifact first without altering any production pin or the
+            # real JNI guard. Fixed pairs are unrelated fixtures in this test.
+            ordered = {ident: entry, **subject.BOOTSTRAP}
+            output = self.root / ident
+            tag = 'device-polish-fc7654-20261012-r1' if ident in ('fc', 'arcade') else 'full-test-20261007-r1'
+            url = 'https://github.com/meilian258-dotcom/game-console/releases/download/' + tag + '/' + entry[0]
+            with self.subTest(ident=ident), patch.object(subject, 'BOOTSTRAP', ordered), \
+                    patch.object(subject.snapshot_stock, 'inspect_pair', return_value={}), \
+                    patch.object(subject.sfc_stock, 'inspect_pair', return_value={}), \
+                    patch.object(subject.snapshot_stock, 'import_pair'), \
+                    patch.object(subject.sfc_stock, 'import_pair'), \
+                    patch.object(subject, 'fetch', side_effect=ReachedDownload) as fetch:
+                with self.assertRaises(ReachedDownload):
+                    subject.prepare(output)
+                fetch.assert_called_once_with(url, output / 'bootstrap' / entry[0], entry[1],
+                                              dict(bytes=entry[1], sha256=entry[2]))
+
+    def test_current_public_fc_bundle_matches_exact_locked_pair(self):
+        lock = subject.load_lock()
+        subject.require_published_jni_bundle(lock)
+        expected = {
+            'libretro-jni-abi2': (1320960, 'fc731f3b83b0b23f473b48bb9f399582ace264c0646eec45fbffafaf0fb36923'),
+            'libcxx-windows': (1659392, '7344daed05388589e9bd691ed1d30c568c374da4b8b6a12e1502185948c03cd4'),
+        }
+        self.assertEqual(expected, subject.PUBLISHED_JNI_BUNDLES[subject.BOOTSTRAP['fc'][2]])
+        self.assertEqual(expected, {ident: (lock[ident]['bytes'], lock[ident]['sha256'])
+                                    for ident in subject.JNI_BUNDLE_INPUTS})
+
     def test_unpublished_bundle_fails_before_network_and_offline_copy(self):
         for offline in (None, self.root / 'missing-offline-bootstrap'):
             output = self.root / 'unprepared'
             with self.subTest(offline=offline), patch.object(subject, 'fetch') as fetch, \
-                    patch.object(subject, 'verify') as verify:
+                    patch.object(subject, 'verify') as verify, \
+                    patch.dict(subject.PUBLISHED_JNI_BUNDLES, {}, clear=True):
                 with self.assertRaisesRegex(ValueError, '^JNI dependency bundle requires a matching published bootstrap$'):
                     subject.prepare(output, bootstrap_dir=offline)
                 fetch.assert_not_called()
                 verify.assert_not_called()
                 self.assertFalse(output.exists())
+
+    def test_wrong_bundle_fails_before_network_or_fixed_input_import(self):
+        lock = subject.load_lock()
+        cases = [('old-fc', ('game-console-0.31.0-alpha.76.44.jar', 39308439,
+                            '7d4db04cc8bafb3f7dc426e3e8412459ba1308dac9d33c434f99c1fcf5eac716'), lock),
+                 ('unknown-fc', subject.BOOTSTRAP['fc'][:2] + ('0' * 64,), lock),
+                 ('missing-runtime', subject.BOOTSTRAP['fc'],
+                  {key: value for key, value in lock.items() if key != 'libcxx-windows'})]
+        for ident in subject.JNI_BUNDLE_INPUTS:
+            for field, value in (('bytes', lock[ident]['bytes'] + 1), ('sha256', '0' * 64)):
+                cases.append((ident + '-' + field, subject.BOOTSTRAP['fc'],
+                              {**lock, ident: {**lock[ident], field: value}}))
+        for label, pin, candidate in cases:
+            for offline in (None, self.root / 'offline'):
+                output = self.root / ('reject-' + label)
+                with self.subTest(case=label, offline=offline), \
+                        patch.dict(subject.BOOTSTRAP, {'fc': pin}), \
+                        patch.object(subject, 'load_lock', return_value=candidate), \
+                        patch.object(subject, 'fetch') as fetch, \
+                        patch.object(subject, 'verify') as verify, \
+                        patch.object(subject.snapshot_stock, 'inspect_pair') as fixed:
+                    with self.assertRaisesRegex(ValueError, 'matching published bootstrap'):
+                        subject.prepare(output, bootstrap_dir=offline)
+                    fetch.assert_not_called()
+                    verify.assert_not_called()
+                    fixed.assert_not_called()
+                    self.assertFalse(output.exists())
 
     def test_bundle_guard_requires_exact_published_hash_and_size(self):
         lock = subject.load_lock()

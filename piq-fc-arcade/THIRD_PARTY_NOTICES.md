@@ -29,6 +29,13 @@ revision. The same text is packaged as
 apply to the RetroArch frontend or relicense any core; original Snes9x
 non-commercial terms and all applicable source obligations still apply.
 
+`MD-ARCADE-LINKING-EXCEPTION.txt` separately identifies a limited permission
+for PIQ-authored code to combine with the specified ordinary GX, GX piqnp1 and FBNeo state-v3
+cores. New FC, internal platform, MD and Arcade builds carry this canonical
+text under `META-INF/licenses/`; the FC JNI material also carries it under
+`core/libretro-jni/licenses/`. Neither this nor the Snes9x permission grants
+rights for RetroArch or waives any third-party source or notice obligations.
+
 FC76.22's RetroArch 1.22.2 PNP7 frontend additionally gates input polling and save
 capture to outer core runs (not recursive rollback replay). The matching modified
 frontend source and minimal patch accompany this candidate; CRC/protocol checks

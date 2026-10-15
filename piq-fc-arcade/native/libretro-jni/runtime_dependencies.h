@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // PIQ-authored code: additional permission in ../../SNES9X-LINKING-EXCEPTION.txt.
+// PIQ-authored code: additional permission in ../../MD-ARCADE-LINKING-EXCEPTION.txt.
 // Private implementation included inside the bridge's anonymous namespace.
 // Fixed trusted Java manifests supply hashes. This is not a native-code sandbox.
 namespace RuntimeDependencies {

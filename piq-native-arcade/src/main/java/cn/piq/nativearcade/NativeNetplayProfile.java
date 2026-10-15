@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.nativearcade;
 
 import cn.piq.fcarcade.cabinet.CabinetGameManifest;

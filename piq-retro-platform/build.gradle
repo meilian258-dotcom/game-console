@@ -26,6 +26,7 @@ tasks.named('test', Test) {
 }
 jar {
     from('../piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
+    from('../piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
     from('../piq-fc-arcade/src/main/resources/META-INF/licenses/GPL-3.0.txt') { into 'META-INF/licenses' }
     manifest { attributes 'Implementation-Title': 'Game Console Internal Library (not a mod)', 'Implementation-Version': project.version }
 }

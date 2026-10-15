@@ -20,7 +20,7 @@
 
 分支验证仅接受本仓库的 `workflow_dispatch` 和 `refs/heads/*`，不接受标签、拉取请求或 fork 身份；检出的提交必须等于触发 SHA，源码必须干净。`snapshot_release.py --validate-only` 仍执行原有九文件白名单、全部 JAR 的内部提交/核心身份及 SHA 校验，不通过伪造本地运行环境绕过限制。真正发布仍仅限 `main`，且明确拒绝验证模式。`main` 上的手动运行若关闭 `validation_only`，以及 `main` 的 push，仍进入原发布路径；未完成发行许可核对时不要使用这些路径。
 
-这里验证的是当前源码的 **自动快照构建链**，不是已实测 FC76.54 配套 JAR 的字节复现或玩家升级。整合后的 SFC 使用固定的旧 Mesen-S 和新增 Snes9x 输入，不再用 SFC nightly 补位；普通 nightly、定制 bootstrap 和最终合包身份均按下文规则处理。验证模式不放宽任何核心约束，当前仍会在旧 bootstrap 与新 JNI 身份不匹配处停止，不能将预期拒绝说成完整构建成功。
+这里验证的是当前源码的 **自动快照构建链**，不是已实测 FC76.54 配套 JAR 的字节复现或玩家升级。整合后的 SFC 使用固定的旧 Mesen-S 和新增 Snes9x 输入，不再用 SFC nightly 补位；普通 nightly、定制 bootstrap 和最终合包身份均按下文规则处理。验证模式不放宽任何核心约束。固定 bootstrap 已改为提供当前 JNI 配对和 MAME 修复资源的公开成品；工作流仍未提供下述 FBNeo／Snes9x 固定输入，不能把 bootstrap 检查通过说成完整云端构建成功。
 
 Snes9x 已有明确的公开快照拒绝门禁，但快照脚本的身份与哈希检查**不是所有组件的通用发行许可批准清单**。分支验证不会补授许可；恢复任何待批准成品的自动分发前，应另行完成精确输入、对应来源/源码、许可材料及组合批准清单，并在二进制附件上传和发布前失败关闭。不能用“来自官方 nightly”、旧包已公开或单个 `license` 字段代替该批准。本节仅提供无二进制分发的验证路径，不声称通用许可清单已经实现。
 
@@ -28,13 +28,17 @@ Snes9x 已有明确的公开快照拒绝门禁，但快照脚本的身份与哈�
 
 ### 构建范围与核心来源
 
-当前街机修复开发分支的主包已改用依赖 API 1 公共桥及固定 libc++。
-旧 `full-test-20261007-r1` 不包含这套输入，快照准备会在下载前明确拒绝，
-不能回退旧桥或用 nightly 覆盖它。此分支暂不能合入自动发布的 `main`。
-FC76.54 与街机 0.1.5.12 固定候选及源码配套已按独立分批发行提供；
-但 `snapshot_inputs.py` 的旧 bootstrap 固定表及它与 `snapshot_build.py` 的
-身份尚未完成审核更新，仍在下载前拒绝；分批发行不解除自动快照门槛。普通本地开发可按锁表导入
-审核过的新桥和官方运行库后构建。街机修复还使用独立固定的 MAME 核心，不能用普通 nightly 补位。
+当前主包使用依赖 API 1 公共桥及固定 libc++。`snapshot_inputs.py` 和
+`snapshot_build.py` 使用相同的六件固定成品清单：
+
+- FC76.54 和街机 0.1.5.12 来自 `device-polish-fc7654-20261012-r1`。
+- SFC51、MD15、GBA15、PvZ12 的历史原生资源仍来自 `full-test-20261007-r1`。
+
+这些文件只提供白名单内的原生输入，不复用旧模组 Java 类。FC54 内公共桥与
+`libc++.dll` 必须同时符合当前锁表；街机12内的固定 MAME 修复 DLL 与 NOTICE
+必须同时符合来源、补丁及核心身份清单。旧 FC44 不包含所需配对，不能回退旧桥、
+拼接任意运行库或用 nightly 补位。每件 JAR 的下载地址、大小和 SHA-256 均固定；
+允许离线复用相同原件，但不是“任意最新版”。固定输入登记不解除发行许可门槛。
 
 街机从 `0.1.5.8` 起（当前 `0.1.5.12`）的普通构建需显式传入 `-PmameLifecycleCore=<已核验 core.dll 的路径>`；
 默认查找该组件的 `build/verified-mame-lifecycle/core.dll`，没有文件就停止，不自动下载。
@@ -49,8 +53,8 @@ FC76.54 与街机 0.1.5.12 固定候选及源码配套已按独立分批发行�
 `--fbneo-stock-core <原版 DLL>`、`--fbneo-stock-source <固定源码 ZIP>`，按
 `snapshot_stock.py` 的固定大小与 SHA 导入同一回执；构建与临时源码复制后会复验，并将
 回执中的路径显式传给街机 Gradle。缺件或身份不符即停止，不读取私有 vendor 缓存、
-下载最新核心或跳过 stock 资源。固定候选单独公开不等于旧 bootstrap 固定表已更新，现有 JNI bootstrap
-下载前阻断仍保留；本分支自动 CI 尚未通过，不能据本地候选成功声称云端已就绪。
+下载最新核心或跳过 stock 资源。现有 Actions 没有为此固定对配置输入来源，默认调用仍会拒绝缺件；
+本地可按上述参数验证完整构建，但不能据本地候选成功声称云端已就绪。
 
 SFC54 沿用 SFC53 的固定输入，额外需要 [sfc-stock-inputs.json](sfc-stock-inputs.json) 固定的 Snes9x DLL 与参考源码 ZIP。
 快照准备支持成对传入 `--sfc-snes9x-core`／`--sfc-snes9x-source`，或从仓库根
@@ -64,9 +68,9 @@ SFC54 沿用 SFC53 的固定输入，额外需要 [sfc-stock-inputs.json](sfc-st
 
 快照准备和 Gradle 前置检查都要求新 MAME DLL 与公开 NOTICE 同时存在，且与固定清单完全一致。
 即使修改输入回执，也不能跳过清单中的核心和补丁校验；两项资源缺失、替换或不配套都失败。
-尚未审核更新匹配 bootstrap 固定表时，保持原下载前阻断，不使用旧公开包假装包含这次修复。
+当前固定街机12提供这两项资源；改用缺少任一项的旧包仍会失败。
 
-只有七个成品全部编译、检查、打包且发布校验通过，才可能创建独立预发行。当前上述 bootstrap 与 Snes9x 候选门禁均未解除，不能把此流程当作本批已可自动发布。
+只有七个成品全部编译、检查、打包且发布校验通过，才可能创建独立预发行。当前云端固定输入尚未配齐，Snes9x 候选发布门禁仍保留，不能把此流程当作本批已可自动发布。
 
 构建使用 GitHub 的 Windows 2022 runner、Java 21 和 Python 3.12，依次完成主模组、完整 SFC、MD、GBA、街机、电脑和 PvZ 七个玩家 JAR。SFC 由本次编译的两个内部组件合成一个完整玩家包；PvZ 仍是可选开发验证组件，不因自动打包变成稳定机型。
 
@@ -78,7 +82,7 @@ SFC54 沿用 SFC53 的固定输入，额外需要 [sfc-stock-inputs.json](sfc-st
 | MD 普通 Genesis Plus GX | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/genesis_plus_gx_libretro.dll.zip) |
 | GBA mGBA | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/mgba_libretro.dll.zip) |
 
-定制 FC 和 MD Netplay 核心、公共 JNI 桥、街机定制运行库、PvZ 原生组件、旧 SFC Mesen-S 及保留的 WASM 不用同名 nightly 文件替换。历史 bootstrap 提取路线由 `snapshot_inputs.py` 按固定摘要读取 `full-test-20261007-r1`，只取白名单内的原生资源，不把旧模组 Java 类当成本次构建结果；它仍不能提供本分支新增的 JNI 依赖，必须先解决前述公开输入阻碍。新 SFC Snes9x 与原版 FBNeo 使用各自独立的固定核心／源码对，不从该旧包冒领。当前 GBA helper、街机 helper 和公共 worker 仍从源码编译。
+定制 FC 和 MD Netplay 核心、公共 JNI 桥、街机定制运行库、PvZ 原生组件、旧 SFC Mesen-S 及保留的 WASM 不用同名 nightly 文件替换。bootstrap 按前述两个发行标签及六件固定摘要提取，只取白名单内的原生资源，不把旧模组 Java 类当成本次构建结果。新 SFC Snes9x 与原版 FBNeo 使用各自独立的固定核心／源码对，不从历史 SFC 包冒领。当前 GBA helper、街机 helper 和公共 worker 仍从源码编译。
 
 这些定制或历史运行库仍受固定接口和摘要约束。修改街机 helper 等相关源码时，若新产物与运行器目录的身份不一致，构建会停止，需要同时审核并更新对应构建约束；不会仅因 `main` 有新提交就跳过兼容校验。旧离线运行库的校验表单独保留，不重新解释为 nightly 包。
 

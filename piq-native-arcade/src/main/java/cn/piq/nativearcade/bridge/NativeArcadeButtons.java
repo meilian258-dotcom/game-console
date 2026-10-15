@@ -1,3 +1,4 @@
+// PIQ-authored code: additional permission in piq-fc-arcade/MD-ARCADE-LINKING-EXCEPTION.txt.
 package cn.piq.nativearcade.bridge;
 
 /** Host numbered buttons 1..6 use bits 0,1,8,9,10,11.

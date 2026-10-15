@@ -260,3 +260,12 @@ This copy normalizes CRLF to LF via a reviewed patch; SHA256:
 Upstream project: <https://github.com/libretro/libretro-common> (`include/libretro.h`).
 The original vendored snapshot has no supplied upstream commit identifier; do
 not invent one or imply all original core binaries were reproducibly built.
+
+The PIQ-authored bridge files identified in
+`../../MD-ARCADE-LINKING-EXCEPTION.txt` also have the limited permission
+specified there for the fixed MD/Arcade libraries. This is independent of
+`../../SNES9X-LINKING-EXCEPTION.txt` and grants no exception for RetroArch
+or any third-party GPL code. New FC builds package both canonical texts
+with the JNI notices. Original compiler/runtime notices and their exact
+scope are described in `licenses/NOTICE.md`; these notices do not modify
+the compiled bridge or any core.

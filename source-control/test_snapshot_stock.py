@@ -92,6 +92,7 @@ class StockInputTests(unittest.TestCase):
     def test_valid_stock_pair_does_not_bypass_original_unpublished_jni_blocker(self):
         output = self.root / 'blocked'
         with patch.object(inputs, 'fetch') as fetch, patch.object(stock, 'import_pair') as copy, \
+                patch.dict(inputs.PUBLISHED_JNI_BUNDLES, {}, clear=True), \
                 self.assertRaisesRegex(ValueError, 'JNI dependency bundle requires a matching published bootstrap'):
             inputs.prepare(output, fbneo_stock_core=self.origins['core'],
                            fbneo_stock_source=self.origins['source'])

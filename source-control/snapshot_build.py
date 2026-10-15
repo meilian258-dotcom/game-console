@@ -34,11 +34,11 @@ HELPER = 'native-runtime/win-x64-v1/piq-native-arcade/runtime/piq-native-helper-
 HELPER_BYTES = 18858
 HELPER_SHA256 = '51a1a6a0a326e5e855647a414dbb78894ca01e9d766627ef272ce59bc809a304'
 BOOTSTRAP = {
-    'fc': '7d4db04cc8bafb3f7dc426e3e8412459ba1308dac9d33c434f99c1fcf5eac716',
+    'fc': '3632de31cc6658f32f9e7c498c916c1680218fe58ae160f58e9fa0f0551d0549',
     'sfc': 'a9c8bdd2ae068383310ac57efcfb18df29eca67238218b12bc6da38b47cf1816',
     'md': '9ea8727a77e2cc10fc59a2e34bb1b16466be2fcb1d23e941216b79921fc4b6df',
     'gba': '7e991d3151c140c01a4acc094d68f9ccaf2e285b6a0fadf6abb15cb345d40f0a',
-    'arcade': '575f16d2123f1e91cadba12d8ace9dead63936770fcdec4476c260c13ce5d925',
+    'arcade': '32ffbf3e2245495dd35dbfed9704595a534a40690dedaec709771e3c07d62b3c',
     'pvz': 'e010b4185c8a9e51edcba3ef40718a81781068320681892cf869d68c3046f04a',
 }
 MAME_LIFECYCLE_RESOURCES = (

@@ -35,6 +35,33 @@ class SnapshotBuildTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
 
+    def test_preparation_and_build_require_identical_bootstrap_pins(self):
+        import snapshot_inputs
+        self.assertEqual({ident: entry[2] for ident, entry in snapshot_inputs.BOOTSTRAP.items()},
+                         build.BOOTSTRAP)
+
+    def test_build_rejects_old_unknown_duplicate_or_case_aliased_bootstrap(self):
+        approved = [dict(id=ident, path='bootstrap/' + ident + '.jar', bytes=1, sha256=digest)
+                    for ident, digest in build.BOOTSTRAP.items()]
+        cases = []
+        for ident, digest in (('fc', '7d4db04cc8bafb3f7dc426e3e8412459ba1308dac9d33c434f99c1fcf5eac716'),
+                              ('arcade', '575f16d2123f1e91cadba12d8ace9dead63936770fcdec4476c260c13ce5d925')):
+            cases.append([dict(entry, sha256=digest) if entry['id'] == ident else entry for entry in approved])
+        cases.extend(([dict(approved[0], id='FC'), *approved[1:]],
+                      [dict(approved[0], id='unknown'), *approved[1:]],
+                      [*approved, approved[0]], approved[1:]))
+        for entries in cases:
+            records = {entry['path']: entry for entry in entries}
+            with self.subTest(entries=[(entry['id'], entry['sha256']) for entry in entries]), \
+                    patch.object(build, 'load_receipt', return_value=(dict(bootstrap=entries), records)), \
+                    patch.object(build, 'verify_file'), \
+                    patch.object(build.snapshot_stock, 'verify_receipt'), \
+                    patch.object(build.sfc_stock, 'verify_receipt'), \
+                    patch.object(build, 'verify_resources') as resources:
+                with self.assertRaisesRegex(ValueError, 'bootstrap|six approved'):
+                    build.verify_inputs(self.root)
+                resources.assert_not_called()
+
     def resources(self, resource='core/windows-x64/genesis_plus_gx_libretro.dll', data=b'fixture'):
         relative = 'resources/md/' + resource
         path = self.root / relative

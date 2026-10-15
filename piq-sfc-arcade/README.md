@@ -17,7 +17,7 @@
 
 旧世界可能已经放置本组件的独立机柜，也有代码使用它的核心接口和资源。保留这些内容是为了兼容，不把旧方块直接删除，也不把旧存档当作新核心的存档读取。
 
-这条历史链使用 jgenesis/WASM；当前家用 SFC 使用 Mesen-S，通用机柜的 SFC 后端由 `piq-sfc-home` 提供。三者不是同一个玩家入口。
+这条历史链使用 jgenesis/WASM；当前家用 SFC 的新 JNI 联机使用固定 Snes9x，Mesen-S 旧核心和旧进度路线仍保留；通用机柜的 SFC 后端由 `piq-sfc-home` 提供。它们不是同一个运行身份，也不跨核迁移旧档。
 
 ## 旧独立机柜怎样使用
 
@@ -52,3 +52,5 @@
 ## 许可
 
 本组件及嵌入的 jgenesis 代码采用 GPLv3，分发二进制须履行对应源码和许可证义务。项目不附带商业 ROM，也不附带 DSP、ST01x 等原厂固件。
+
+保留的 WASM 对应源码在 `native/` 和 `third_party/jgenesis/`；[WASM 运行依赖通知](third-party/wasm-runtime/README.md)补齐实际构建使用的 25 个 crate 原通知、Rust 1.97.1 标准库通知和历史构建锁。新构建会把此材料目录写入 `META-INF/licenses/sfc-wasm-runtime/`，不改 WASM 字节；旧冻结 JAR 仍需随独立材料包一起提供这些补充文件，不能声称旧包已含新增通知。

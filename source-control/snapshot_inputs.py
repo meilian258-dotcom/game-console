@@ -2,7 +2,7 @@
 
 Only ordinary supported libretro cores come from the two official nightly
 directories. Project-specific Netplay/bridge libraries and legacy runtimes are
-extracted from a SHA-pinned public release, never from a developer's machine.
+extracted from SHA-pinned public releases, never from a developer's machine.
 The fixed FBNeo stock core/source pair is an explicit, verified local input;
 it has no implicit vendor cache or download fallback.
 No downloaded native library is executed by this preparation command.
@@ -30,21 +30,30 @@ import sfc_stock
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = 'https://github.com/meilian258-dotcom/game-console/releases/download/full-test-20261007-r1/'
+BUNDLE_RELEASE = 'https://github.com/meilian258-dotcom/game-console/releases/download/device-polish-fc7654-20261012-r1/'
+BOOTSTRAP_RELEASES = {
+    'fc': BUNDLE_RELEASE, 'sfc': RELEASE, 'md': RELEASE,
+    'gba': RELEASE, 'arcade': BUNDLE_RELEASE, 'pvz': RELEASE,
+}
 BOOTSTRAP = {
-    'fc': ('game-console-0.31.0-alpha.76.44.jar', 39308439, '7d4db04cc8bafb3f7dc426e3e8412459ba1308dac9d33c434f99c1fcf5eac716'),
+    'fc': ('game-console-0.31.0-alpha.76.54.jar', 39954627, '3632de31cc6658f32f9e7c498c916c1680218fe58ae160f58e9fa0f0551d0549'),
     'sfc': ('game-console-sfc-0.1.0-alpha.51.jar', 3087373, 'a9c8bdd2ae068383310ac57efcfb18df29eca67238218b12bc6da38b47cf1816'),
     'md': ('game-console-md-0.1.0-alpha.15.jar', 2371782, '9ea8727a77e2cc10fc59a2e34bb1b16466be2fcb1d23e941216b79921fc4b6df'),
     'gba': ('game-console-gba-0.1.0-alpha.15.jar', 2670862, '7e991d3151c140c01a4acc094d68f9ccaf2e285b6a0fadf6abb15cb345d40f0a'),
-    'arcade': ('game-console-arcade-0.1.5.7.jar', 141792262, '575f16d2123f1e91cadba12d8ace9dead63936770fcdec4476c260c13ce5d925'),
+    'arcade': ('game-console-arcade-0.1.5.12.jar', 246392457, '32ffbf3e2245495dd35dbfed9704595a534a40690dedaec709771e3c07d62b3c'),
     'pvz': ('game-console-pvz-0.1.0-prototype.12.jar', 5004879, 'e010b4185c8a9e51edcba3ef40718a81781068320681892cf869d68c3046f04a'),
 }
-# This repair branch is not merge/release-ready. FC76.44 has no dependency
-# bundle. Review a published replacement, both snapshot bootstrap pins, and this
-# inventory only after full MAME validation and explicit publication approval.
+# Published input identities, not permission to publish a newly built snapshot.
+# FC76.44 lacks the shared dependency bundle; FC76.54 carries the exact locked
+# bridge/runtime pair. Keep this inventory and both bootstrap pin tables aligned.
 JNI_BUNDLE_INPUTS = ('libretro-jni-abi2', 'libcxx-windows')
 PUBLISHED_JNI_BUNDLES = {
     '7d4db04cc8bafb3f7dc426e3e8412459ba1308dac9d33c434f99c1fcf5eac716': {
         'libretro-jni-abi2': (1375744, 'aec72d00384d89de94c214e12fe32a19c1c54c93ea80c9bc82727895be509a36'),
+    },
+    '3632de31cc6658f32f9e7c498c916c1680218fe58ae160f58e9fa0f0551d0549': {
+        'libretro-jni-abi2': (1320960, 'fc731f3b83b0b23f473b48bb9f399582ace264c0646eec45fbffafaf0fb36923'),
+        'libcxx-windows': (1659392, '7344daed05388589e9bd691ed1d30c568c374da4b8b6a12e1502185948c03cd4'),
     },
 }
 NIGHTLY_BASE = {
@@ -285,15 +294,16 @@ def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = N
     sfc_stock.import_pair(output, sfc_sources)
     pins, boot_records, sources = {}, [], []
     for ident, (filename, size, sha) in BOOTSTRAP.items():
+        url = BOOTSTRAP_RELEASES[ident] + filename
         destination = output / 'bootstrap' / filename
         expected = dict(bytes=size, sha256=sha)
         if bootstrap_dir is not None:
             origin = no_links(bootstrap_dir.absolute() / filename)
             verify(origin, expected)
             put(destination, origin.read_bytes())
-            sources.append(dict(id=ident, url=RELEASE+filename, reused=True))
+            sources.append(dict(id=ident, url=url, reused=True))
         else:
-            sources.append(dict(id=ident, **fetch(RELEASE+filename, destination, size, expected)))
+            sources.append(dict(id=ident, **fetch(url, destination, size, expected)))
         pins[ident] = destination
         boot_records.append(dict(id=ident, **record(destination, output)))
     extract_bootstrap(pins, output, source)

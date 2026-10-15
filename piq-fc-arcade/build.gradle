@@ -133,13 +133,17 @@ def prepareJniRuntime = tasks.register('prepareJniRuntime', Sync) {
     from('native/libretro-jni/README.md')
     from('native/libretro-jni/licenses') { into 'licenses' }
     from('SNES9X-LINKING-EXCEPTION.txt') { into 'licenses' }
+    from('MD-ARCADE-LINKING-EXCEPTION.txt') { into 'licenses' }
     into layout.buildDirectory.dir('generated/jni-resources/core/libretro-jni')
     doLast {
         def dll = new File(destinationDir, 'windows-x64/piq-libretro-jni.dll')
         def runtime = new File(destinationDir, 'windows-x64/libc++.dll')
         if (!dll.isFile()) throw new GradleException('Build native/libretro-jni into dist first; see its README')
         if (!runtime.isFile()) throw new GradleException('Missing reviewed JNI runtime dependency')
-        ['libcxx-LICENSE.txt', 'libcxxabi-LICENSE.txt', 'libunwind-LICENSE.txt', 'NOTICE.md', 'SNES9X-LINKING-EXCEPTION.txt'].each { name ->
+        ['libcxx-LICENSE.txt', 'libcxxabi-LICENSE.txt', 'libunwind-LICENSE.txt',
+         'compiler-rt-LICENSE.txt', 'MinGW-w64-v14.0.0-COPYING',
+         'MinGW-w64-v14.0.0-project-notices.txt', 'MinGW-w64-v14.0.0-runtime-notices.txt',
+         'NOTICE.md', 'SNES9X-LINKING-EXCEPTION.txt', 'MD-ARCADE-LINKING-EXCEPTION.txt'].each { name ->
             def license = new File(destinationDir, 'licenses/' + name)
             if (!license.isFile() || license.length() == 0) {
                 throw new GradleException('Missing JNI runtime license/notice: ' + name)
@@ -283,6 +287,7 @@ jar {
     from('THIRD_PARTY_NOTICES.md')
     from('LICENSE.md')
     from('SNES9X-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
+    from('MD-ARCADE-LINKING-EXCEPTION.txt') { into 'META-INF/licenses' }
     from {
         configurations.wasmtimeBundle.collect { zipTree(it) }
     }
