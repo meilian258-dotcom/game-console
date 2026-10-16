@@ -23,15 +23,15 @@ Retro Platform 是主模组与附属共用的 Java 源码库，负责核心运�
 
 FC76.53 的回放公共合同是明确版本化的局部接口，不把整个内部库升级成稳定 SDK。世界渲染部分留在主包客户端 `ReplayPresentation`，纯保护与音频入口留在本库；可选 Replay 补丁注册服务，设备无需引用补丁实现。迁移范围、调用顺序和破坏性变更规则见[回放公共接口](../piq-replay-compat/API.md)。
 
-## 统一 RetroArch 后端与兼容边界
+## JNI 与 RetroArch 共存边界
 
 FC76.49／街机1.5.11 后续新增公共机柜的 `NetplayVariant`／`NetplayLaunchSpec` 与 RetroArch 文件内容适配，由原版 FBNeo 首批试验；这些 Minecraft 选择／房间接口仍留在主包，不反向放进本库。完整状态一致性尚未通过、旧 JNI 保持，见[试验接口与边界](../piq-fc-arcade/design/RetroArch-Netplay-街机试验接入.md)。下文 LOCAL 首批不等于此 Netplay 试验。
 
-后续方向是整个模组统一公共 RetroArch 后端，JNI 暂时保留兼容；不是把所有现有运行器改成同名枚举就已迁移。FC76.47 的主包入口 `cn.piq.fcarcade.retroarch.RetroArchSession` 复用 `NetplayProcess.Role.LOCAL`，由 RetroArch 自主计时，提供输入、音画、检查点及异步关闭；LOCAL 不启用 Netplay 网络。它不是 `LibretroRuntime` 实现，不提供逐帧 STEP、暂停、RESET 或运行中恢复。
+现行方向是 JNI 与独立 RetroArch 共存，复用公共会话边界并逐机型适配；不是把所有运行器改成同名枚举，也不要求删除现有 JNI。FC 双后端独立候选尚未通过真实核心同步／恢复验收，不能据接口存在推定本源码已包含该候选。FC76.47 的主包入口 `cn.piq.fcarcade.retroarch.RetroArchSession` 复用 `NetplayProcess.Role.LOCAL`，由 RetroArch 自主计时，提供输入、音画、检查点及异步关闭；LOCAL 不启用 Netplay 网络。它不是 `LibretroRuntime` 实现，不提供逐帧 STEP、暂停、RESET 或运行中恢复。
 
 纯基础类型、可信资源描述和 `LibretroContentFiles` 继续留在本库；与现有进程协议、主包服务有关的会话留在主包，不为调用它引入本库到主包的反向依赖。`LibretroRuntimes` 的现行逐帧 JNI／旧进程路线保持兼容；需要逐帧内存读取、状态封装、准备后激活或特殊外设的调用者须分别适配，不能直接替换工厂。
 
-首个调用者仅为原生街机公共机柜的客户端 MEDIA，通过本机属性 `-Dpiq.arcade.mediaBackend=retroarch` 显式试用，默认 JNI 不变。LOCAL 使用独立保存身份，街机适配器尚未接入进度持久化；不会读取或迁移旧 JNI／Netplay 档。固定 MAME 的隔离音画／输入／回收首验通过，但 FC、SFC、MD、GBA、服务端托管、其他同步／旁观路线仍待迁移，MC 与长局仍待验，不据此宣布已统一或稳定。详见[制作记录与能力声明](../piq-fc-arcade/design/统一RetroArch后端-20261009.md)。
+LOCAL 首个调用者仅为原生街机公共机柜的客户端 MEDIA，通过本机属性 `-Dpiq.arcade.mediaBackend=retroarch` 显式试用，默认 JNI 不变。LOCAL 使用独立保存身份，街机适配器尚未接入进度持久化；不会读取或迁移旧 JNI／Netplay 档。固定 MAME 的隔离音画／输入／回收首验通过，但 FC、SFC、MD、GBA、服务端托管、其他同步／旁观路线仍需分别适配，MC 与长局仍待验，不据此宣布完整共存或稳定。详见[历史制作记录与能力声明](../piq-fc-arcade/design/统一RetroArch后端-20261009.md)。
 
 ## 附属如何接入
 
