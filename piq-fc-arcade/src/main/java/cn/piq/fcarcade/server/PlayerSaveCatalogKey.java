@@ -29,10 +29,8 @@ final class PlayerSaveCatalogKey {
         else if (player.startsWith(MAPPER19)) player = player.substring(MAPPER19.length());
         else if (player.startsWith(LIBRETRO)) player = player.substring(LIBRETRO.length());
         else if (player.startsWith(LIBRETRO_ZAPPER)) player = player.substring(LIBRETRO_ZAPPER.length());
-        else if(player.startsWith(cn.piq.fcarcade.netplay.FcNetplaySaves.prefix(false)))player=player.substring(cn.piq.fcarcade.netplay.FcNetplaySaves.prefix(false).length());
-        else if(player.startsWith(cn.piq.fcarcade.netplay.FcNetplaySaves.prefix(true)))player=player.substring(cn.piq.fcarcade.netplay.FcNetplaySaves.prefix(true).length());
-        else if(player.startsWith(cn.piq.fcarcade.netplay.FcNetplaySaves.jniPrefix()))player=player.substring(cn.piq.fcarcade.netplay.FcNetplaySaves.jniPrefix().length());
-        else if(player.startsWith(cn.piq.fcarcade.netplay.FcNetplaySaves.jniPrefix(true)))player=player.substring(cn.piq.fcarcade.netplay.FcNetplaySaves.jniPrefix(true).length());
+        else for(String prefix:cn.piq.fcarcade.netplay.FcNetplaySaves.allPrefixes())
+            if(player.startsWith(prefix)){player=player.substring(prefix.length());break;}
 
         String[] parts = player.split("\\|", -1);
         if (parts.length < 2 || !parts[0].equals("player") || !canonicalUuid(parts[1])) return "";

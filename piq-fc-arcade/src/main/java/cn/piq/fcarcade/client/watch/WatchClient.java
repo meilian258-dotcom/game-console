@@ -76,6 +76,7 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         final WatchNetwork.NetplayStart grant;
         final Connection connection;
         final Source source;
+        final NetplayWatchContent.Execution execution;
         final long managementEpoch;
         long expiresAt=System.nanoTime()+TIMEOUT;
         WatchMediaStream media;
@@ -93,9 +94,12 @@ public final class WatchClient implements WatchNetwork.ClientSink {
         final WatchMonoResampler mono=new WatchMonoResampler();
         Receiver(WatchNetwork.Start start,WatchNetwork.NetplayStart grant,Connection connection){
             this.start=start;this.grant=grant;this.connection=connection;source=Source.of(start.descriptor());managementEpoch=MANAGEMENT.epoch();
+            execution=grant==null?NetplayWatchContent.Execution.UNDECLARED:NetplayWatchContent.execution(source.provider());
+            nativeMode=execution.nativeMode();
         }
         boolean released(){return WatchManagementState.released(task==null||task.done(),netplay==null||netplay.terminated().isDone(),netplay!=null&&netplay.nativeSlotHeld());}
         boolean nativeClaim(){return grant!=null&&!Boolean.FALSE.equals(nativeMode);}
+        WatchAdmissionPolicy.Claim claim(){return new WatchAdmissionPolicy.Claim(grant!=null,nativeMode);}
     }
     private WatchClient() {}
 
@@ -155,9 +159,11 @@ public final class WatchClient implements WatchNetwork.ClientSink {
             PAUSED_DISPLAYS.put(WatchPreferenceState.Source.of(start.descriptor()),new PausedDisplay(start.descriptor(),mode(r)));
             HISTORY.retire(start.lease());return null; // Preference authenticates this lease before releasing it.
         }
-        // MEDIA and historical process Netplay keep their single-source policy; never silently downgrade JNI.
-        boolean incompatible=grant==null?!RECEIVERS.isEmpty():RECEIVERS.values().stream().anyMatch(v->v.grant==null||Boolean.FALSE.equals(v.nativeMode));
-        if(incompatible||grant!=null&&RECEIVERS.size()>=capacity()){
+        // Fixed process providers are known before prepare() can request/download any ROM.
+        // Keep the first admitted source, silently release incompatible offers, never downgrade JNI.
+        int capacity=grant==null?0:capacity();
+        boolean processClosing=CLOSING.stream().anyMatch(v->Boolean.FALSE.equals(v.nativeMode)&&!v.released());
+        if(!WatchAdmissionPolicy.allows(r.claim(),RECEIVERS.values().stream().map(Receiver::claim).toList(),capacity,operating(),processClosing)){
             HISTORY.retire(start.lease());release(r);return null;
         }
         RECEIVERS.put(start.lease(),r);
@@ -188,7 +194,9 @@ public final class WatchClient implements WatchNetwork.ClientSink {
                     try{
                         int rate=content.profile().sampleRate();
                         if(rate!=48000&&!(rate==44100&&captured.factory()!=null))throw new IllegalArgumentException("Unsupported observer audio rate");
-                        r.nativeMode=content.profile().jni()!=null;
+                        boolean actualJni=content.profile().jni()!=null;
+                        r.execution.verify(actualJni);
+                        r.nativeMode=actualJni;
                         if(!r.nativeMode&&(RECEIVERS.size()!=1||operating()))throw new IllegalStateException("Process Netplay supports one idle observer only");
                         var grant=r.grant;
                         WatchStartConsent.requireAllowed(r.nativeMode,cn.piq.fcarcade.client.JniNetplayConsent::allowed);

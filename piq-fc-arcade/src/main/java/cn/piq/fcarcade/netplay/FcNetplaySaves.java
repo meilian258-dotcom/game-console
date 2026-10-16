@@ -2,16 +2,34 @@
 // PIQ-authored code: additional permission in piq-fc-arcade/SNES9X-LINKING-EXCEPTION.txt.
 package cn.piq.fcarcade.netplay;
 
+import java.util.List;
 import java.util.Map;
 
 /** Isolated FC Netplay ABI; ownership stays with the existing personal slot or cartridge. */
 public final class FcNetplaySaves {
+    private static final List<String> PREFIXES=List.of(prefix(false),prefix(true),jniPrefix(false),jniPrefix(true),officialPadPrefix());
     private FcNetplaySaves(){}
     public static String prefix(boolean gun){return gun?"core|nes-netplay-zapper-v1|":"core|nes-netplay-v1|";}
     public static String key(boolean gun,String owner){return prefix(gun)+owner;}
     public static String jniPrefix(){return "core|nes-jni-netplay-v2|";}
     public static String jniPrefix(boolean gun){return gun?"core|nes-jni-netplay-zapper-v1|":jniPrefix();}
     public static String key(boolean gun,boolean jni,String owner){return jni?jniPrefix(gun)+owner:key(gun,owner);}
+    public static String officialPadPrefix(){return "core|nes-netplay-fceumm-v1|";}
+    public static String key(boolean gun,boolean jni,String padVariant,String owner){
+        FcNetplayBackend.validateSelection(gun,jni,padVariant);
+        return padVariant.isEmpty()?key(gun,jni,owner):officialPadPrefix()+owner;
+    }
+    public static NetplaySaveState.Identity identity(boolean gun,boolean jni,String padVariant,String rom){
+        FcNetplayBackend.validateSelection(gun,jni,padVariant);
+        return padVariant.isEmpty()?identity(gun,jni,rom):NetplaySaveState.identity(FcRetroarchPad.profile(),rom,Map.of());
+    }
+    public static boolean accepts(boolean gun,boolean jni,String padVariant,String rom,byte[] state){
+        try{NetplaySaveState.decode(state,identity(gun,jni,padVariant,rom));return true;}catch(IllegalArgumentException bad){return false;}
+    }
+    /** Known persistent domains, including historical routes; recognition never selects or migrates a backend. */
+    public static List<String> allPrefixes(){return PREFIXES;}
+    /** Exact keys for one owner, used by ownership, active-write and saved-progress checks. */
+    public static List<String> ownerKeys(String owner){return PREFIXES.stream().map(prefix->prefix+owner).toList();}
     public static NetplaySaveState.Identity jniIdentity(String rom){
         return jniIdentity(false,rom);
     }

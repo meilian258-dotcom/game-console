@@ -257,7 +257,8 @@ final class ArcadeSaveStore {
         }
         Path destination = path(machineKey, romSha256);
         Path temporary = null;
-        boolean netplay=machineKey.startsWith("core|nes-netplay-");
+        boolean netplay=machineKey.startsWith("core|nes-netplay-")
+                ||cn.piq.fcarcade.netplay.FcNetplaySaves.allPrefixes().stream().anyMatch(machineKey::startsWith);
         try {
             if(netplay)cn.piq.fcarcade.netplay.NetplaySaveStore.safeDirectory(root);
             Files.createDirectories(root);

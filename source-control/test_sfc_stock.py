@@ -129,6 +129,7 @@ class SfcStockTests(unittest.TestCase):
     def test_snapshot_import_and_gradle_properties_use_fixed_pair(self):
         output = self.root / 'inputs'
         with patch.object(inputs, 'require_published_jni_bundle'), patch.object(inputs, 'extract_bootstrap'), \
+                patch.object(inputs, 'fixed_fc_inputs', return_value={}), \
                 patch.object(inputs.snapshot_stock, 'inspect_pair', return_value={}), \
                 patch.object(inputs.snapshot_stock, 'import_pair'), patch.object(inputs.snapshot_stock, 'verify_receipt'), \
                 patch.dict(inputs.BOOTSTRAP, {}, clear=True), patch.dict(inputs.NIGHTLY, {}, clear=True), \

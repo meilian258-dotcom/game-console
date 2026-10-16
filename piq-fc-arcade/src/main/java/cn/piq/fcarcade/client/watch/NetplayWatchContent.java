@@ -14,6 +14,15 @@ import cn.piq.fcarcade.netplay.NetplayChunk;
 
 /** Main-thread capture, bounded worker IO, explicit cancellation; no input or save ownership. */
 public final class NetplayWatchContent {
+    /** Local, trusted provider declaration; never supplied by a server packet. */
+    public enum Execution {
+        UNDECLARED, JNI, PROCESS;
+        Boolean nativeMode(){return this==UNDECLARED?null:this==JNI;}
+        void verify(boolean actualJni){
+            if(this!=UNDECLARED&&(this==JNI)!=actualJni)
+                throw new IllegalStateException("Observer profile differs from its registered execution mode");
+        }
+    }
     /** Trusted adapter code only: preserves special legacy handshake/input profiles, never read from a packet. */
     @FunctionalInterface public interface ProcessFactory {
         NetplayProcess open(NetplayProcess.Grant grant,CabinetBackend.NetplayContent content,Consumer<NetplayChunk> sender);
@@ -32,14 +41,25 @@ public final class NetplayWatchContent {
         }
     }
     @FunctionalInterface public interface Provider {Preparation prepare(WatchNetwork.NetplayStart start,Connection connection)throws Exception;}
-    private static final Map<ResourceLocation,Provider> PROVIDERS=new HashMap<>();
+    private record Registration(Execution execution,Provider factory) {}
+    private static final Map<ResourceLocation,Registration> PROVIDERS=new HashMap<>();
     private NetplayWatchContent(){}
+    /** Binary-compatible legacy entry point: the loaded profile still decides its execution mode. */
     public static synchronized void register(ResourceLocation provider,Provider factory){
-        if(PROVIDERS.size()>=8||PROVIDERS.putIfAbsent(Objects.requireNonNull(provider),Objects.requireNonNull(factory))!=null)throw new IllegalArgumentException("Duplicate observer provider");
+        register(provider,Execution.UNDECLARED,factory);
+    }
+    /** Declare a fixed mode so admission can reject incompatible sources before downloading content. */
+    public static synchronized void register(ResourceLocation provider,Execution execution,Provider factory){
+        var registration=new Registration(Objects.requireNonNull(execution),Objects.requireNonNull(factory));
+        if(PROVIDERS.size()>=8||PROVIDERS.putIfAbsent(Objects.requireNonNull(provider),registration)!=null)throw new IllegalArgumentException("Duplicate observer provider");
+    }
+    static synchronized Execution execution(ResourceLocation provider){
+        var registration=PROVIDERS.get(provider);
+        return registration==null?Execution.UNDECLARED:registration.execution();
     }
     static Preparation prepare(WatchNetwork.NetplayStart start,Connection connection)throws Exception{
         var provider=PROVIDERS.get(start.watch().descriptor().provider());
         if(provider==null)throw new IllegalStateException("未安装此旁观设备的配套附属");
-        return provider.prepare(start,connection);
+        return provider.factory().prepare(start,connection);
     }
 }

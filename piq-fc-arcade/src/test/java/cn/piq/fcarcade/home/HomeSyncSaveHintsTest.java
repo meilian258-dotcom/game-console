@@ -42,7 +42,7 @@ class HomeSyncSaveHintsTest {
     }
     @Test void unknownModeStaysNeutralAndSystemMatchingIsCaseInsensitive() {
         for (String system : new String[] {"FC","SFC"})
-            for (int mode : new int[] {-1,5,Integer.MAX_VALUE}) {
+            for (int mode : new int[] {-1,6,Integer.MAX_VALUE}) {
                 assertTrue(HomeSyncSaveHints.modeSaved(system,mode).contains("对应机型说明"));
                 assertTrue(HomeSyncSaveHints.footer(system,mode).contains("对应主机说明"));
             }
@@ -64,7 +64,15 @@ class HomeSyncSaveHintsTest {
         assertTrue(screen.contains("HomeSyncSaveHints.footer(setting.system(),setting.mode())"));
         assertFalse(screen.contains("存档仍在卡带菜单"));
         assertTrue(screen.contains("setting=value;pending=false"));
-        assertTrue(source("home/HomeSyncNetwork").contains("TrafficPayloadRegistrar.create(event,\"home-sync-6\")"));
+        assertTrue(source("home/HomeSyncNetwork").contains("TrafficPayloadRegistrar.create(event,\"home-sync-7\")"));
+    }
+    @Test void officialFcRoutePromisesOnlySeparatePadSaves(){
+        for(String system:new String[]{"FC","小霸王学习机（SB-926）"}){
+            assertTrue(HomeSyncSaveHints.modeSaved(system,5).contains("不转换 JNI 或旧 RetroArch 存档"));
+            assertTrue(HomeSyncSaveHints.modeSaved(system,5).contains("不支持光枪"));
+            assertTrue(HomeSyncSaveHints.footer(system,5).contains("仅双手柄"));
+        }
+        assertTrue(HomeSyncSaveHints.modeSaved("SFC",5).contains("对应机型说明"));
     }
     @Test void sharedTvRemoteDoesNotPromiseEveryMachineACartridgeMenu() throws Exception {
         String remote=source("home/TvRemoteService");

@@ -37,7 +37,9 @@ class HomeLegacySyncRetirementSourceTest {
         assertTrue(deny<settings.indexOf("if(request.mode()>=0){"));
         assertTrue(settings.contains("if(selected==1)return HomeSyncPolicy.legacyUnavailable()"));
         String screen=source("client/HomeSyncSettingsScreen");
-        assertTrue(screen.contains("!HomeSyncMenuPolicy.showMode(mode,external,privateOnly,setting.supported())&&setting.mode()!=mode"));
+        assertTrue(screen.contains("HomeSyncMenuPolicy.visibleModes(setting.mode(),external,privateOnly,setting.supported())"));
+        assertFalse(HomeSyncMenuPolicy.visibleModes(4,false,false,63).contains(1));
+        assertTrue(HomeSyncMenuPolicy.visibleModes(1,false,false,63).contains(1));
         assertTrue(screen.contains("HomeSyncMenuPolicy.supported(setting.supported(),mode)"));
         assertTrue(screen.contains("else if(mode==1)label+=\"（已退役）\""));
         assertTrue(screen.contains("PrivateHomeClient.open()"),"Private mode keeps its separate client-only entry");

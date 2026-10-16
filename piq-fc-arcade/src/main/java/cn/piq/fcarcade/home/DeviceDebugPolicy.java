@@ -17,7 +17,7 @@ public final class DeviceDebugPolicy {
         return validRequest(revision,mode,occupancy,approval,-1);
     }
     public static boolean validRequest(int revision,int mode,int occupancy,int approval,int secondPort) {
-        return revision >= 0 && mode >= -1 && mode <= 4 && occupancy >= -1 && occupancy <= 1
+        return revision >= 0 && mode >= -1 && mode <= 5 && occupancy >= -1 && occupancy <= 1
                 && approval >= -1 && approval <= 1 && secondPort >= -1 && secondPort <= 1
                 && (mode >= 0 ? 1 : 0) + (occupancy >= 0 ? 1 : 0) + (approval >= 0 ? 1 : 0) + (secondPort >= 0 ? 1 : 0) <= 1;
     }

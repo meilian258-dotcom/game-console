@@ -100,7 +100,7 @@ public final class HomeSyncSettings {
         var hit = new BlockHitResult(Vec3.atCenterOf(intent.clicked),Direction.UP,intent.clicked,false);
         if (!authorized(player,intent,hit)) { INTENTS.remove(player);feedback(player,"设置授权已过期或硬件/权限发生变化，请重新打开。");return; }
         var old=intent.lastSetting;var c=intent.console;
-        if(old!=null&&(old.mode()!=displayMode(c)||old.occupancy()!=c.occupancyVisible()||old.approval()!=c.joinApprovalRequired()||old.secondPortAllowed()!=c.secondPortAllowed())){
+        if(old!=null&&(old.mode()!=displayMode(c)||!old.netplayPadVariant().equals(variant(c))||old.occupancy()!=c.occupancyVisible()||old.approval()!=c.joinApprovalRequired()||old.secondPortAllowed()!=c.secondPortAllowed())){
             intent.revision++;reply(player,intent,false,"设置已被其他操作更新，请核对后再调整。");return;
         }
         if(request.revision()!=intent.revision){reply(player,intent,false,"状态已更新，请核对后再调整。");return;}
@@ -122,7 +122,8 @@ public final class HomeSyncSettings {
                 if(!DeviceDebugPolicy.mayEdit(player.hasPermissions(2),stillBusy,HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos()),secondPortSupported(c),
                         request.mode(),request.occupancy(),request.approval(),request.secondPort(),modes)||!basic(player,intent)||!player.hasPermissions(2)||!identity(player,intent))return;
                 if(request.mode()>=0){
-                    if(c instanceof HomeConsoleBlockEntity fc){fc.netplayExperimental(request.mode()>=3);fc.netplayJniTrial(request.mode()==4);}
+                    if(c instanceof HomeConsoleBlockEntity fc){fc.netplayExperimental(request.mode()>=3);fc.netplayJniTrial(request.mode()==4);
+                        fc.netplayPadVariant(request.mode()==5?cn.piq.fcarcade.netplay.FcNetplayBackend.OFFICIAL_PAD:"");}
                     if(c instanceof ExternalHomeConsoleBlockEntity external){external.netplayExperimental(request.mode()==3);external.netplayJniTrial(request.mode()==4);}
                     c.synchronizationMode(request.mode()>=3?CabinetSyncMode.LOCAL_SYNC:CabinetSyncMode.checked(request.mode()));
                 }
@@ -141,8 +142,8 @@ public final class HomeSyncSettings {
         String system = system(c);
         int modes=supported(player,c);
         var access=DeviceSettingAccess.resolve(true,diagnosticsOnly(c),player.hasPermissions(2),busy(player,c));
-        var modeReasons=new ArrayList<String>(5);
-        for(int mode=0;mode<5;mode++)modeReasons.add(HomeSyncMenuPolicy.supported(modes,mode)?(access.editable()?"":access.reason()):bounded(unavailableMode(player,c,mode)));
+        var modeReasons=new ArrayList<String>(6);
+        for(int mode=0;mode<6;mode++)modeReasons.add(HomeSyncMenuPolicy.supported(modes,mode)?(access.editable()?"":access.reason()):bounded(unavailableMode(player,c,mode)));
         if(reason.equals("联机设置下次开机生效。")&&!diagnosticsOnly(c)) {
             if(!player.hasPermissions(2))reason="仅管理员可修改设备设置。";
             else if(busy(player,c))reason="关机并关闭加入、存档窗口后可修改设置。";
@@ -152,11 +153,13 @@ public final class HomeSyncSettings {
             catch(RuntimeException|LinkageError failure){reason="读取设备状态失败，请刷新或查看日志。";}
         } else {
             reason=HomeSyncMenuPolicy.selectedStatus(reason,displayMode(c),modes,modeReasons.get(displayMode(c)));
+            if(displayMode(c)==5&&!cn.piq.fcarcade.netplay.FcNetplayBackend.OFFICIAL_PAD.equals(variant(c)))
+                reason+=" 当前保存的 FC 后端变体未知，不能开机；请明确重新选择运行方式，旧进度保留。";
         }
         if(reason.length()>256)reason=reason.substring(0,255)+"…";
         var setting=new HomeSyncNetwork.Setting(intent.token,intent.revision,player.serverLevel().dimension().location(),
                 c.getBlockPos(),c.hardwareId(),system,displayMode(c),modes,
-                access.editable(),reason,open,c.occupancyVisible(),c.joinApprovalRequired(),HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos()),intent.tool!=null,modeReasons,c.secondPortAllowed(),secondPortSupported(c));
+                access.editable(),reason,open,c.occupancyVisible(),c.joinApprovalRequired(),HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos()),intent.tool!=null,modeReasons,c.secondPortAllowed(),secondPortSupported(c),variant(c));
         if(!identity(player,intent))return;
         intent.lastSetting=setting;HomeSyncNetwork.send(player,setting);
     }
@@ -164,12 +167,20 @@ public final class HomeSyncSettings {
         return console instanceof ExternalHomeConsoleBlockEntity external ? external.systemId().getPath().toUpperCase(java.util.Locale.ROOT)
                 : console.getBlockState().getBlock() instanceof SuborConsoleBlock ? "小霸王学习机（SB-926）" : "FC";
     }
-    private static int displayMode(HomeEndpointBlockEntity c){if(c instanceof HomeConsoleBlockEntity fc&&fc.netplayJniTrial()||c instanceof ExternalHomeConsoleBlockEntity external&&external.netplayJniTrial())return 4;return c instanceof HomeConsoleBlockEntity fc&&fc.netplayExperimental()||c instanceof ExternalHomeConsoleBlockEntity external&&external.netplayExperimental()?3:c.synchronizationMode().ordinal();}
+    private static int displayMode(HomeEndpointBlockEntity c){
+        if(c instanceof HomeConsoleBlockEntity fc)return HomeSyncMenuPolicy.fcMode(fc.netplayExperimental(),fc.netplayJniTrial(),fc.netplayPadVariant(),c.synchronizationMode().ordinal());
+        if(c instanceof ExternalHomeConsoleBlockEntity external)return external.netplayJniTrial()?4:external.netplayExperimental()?3:c.synchronizationMode().ordinal();
+        return c.synchronizationMode().ordinal();
+    }
+    private static String variant(HomeEndpointBlockEntity c){
+        String value=c instanceof HomeConsoleBlockEntity fc?fc.netplayPadVariant():"";
+        return value.length()>128?value.substring(0,128):value;
+    }
     /** A rate-limit rejection must not invoke shapes, addon hooks or protection callbacks again. */
     private static void cachedReply(ServerPlayer player,Intent intent,String reason) {
         var s=intent.lastSetting;if(s==null)return;
         HomeSyncNetwork.send(player,new HomeSyncNetwork.Setting(s.token(),s.revision(),s.dimension(),s.console(),s.hardware(),s.system(),s.mode(),s.supported(),
-                s.editable(),reason,false,s.occupancy(),s.approval(),s.occupancySupported(),s.debugTool(),s.modeReasons(),s.secondPortAllowed(),s.secondPortSupported()));
+                s.editable(),reason,false,s.occupancy(),s.approval(),s.occupancySupported(),s.debugTool(),s.modeReasons(),s.secondPortAllowed(),s.secondPortSupported(),s.netplayPadVariant()));
     }
     private static boolean secondPortSupported(HomeEndpointBlockEntity console) {
         if(console instanceof HomeConsoleBlockEntity)return true;
@@ -198,7 +209,7 @@ public final class HomeSyncSettings {
             try{return hooks==null||!hooks.synchronizationSettingsAvailable()?0:HomeSyncMenuPolicy.externalModes(hooks.synchronizationSupportedModes(level,external),policyMask,
                     cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed(),hooks.jniNetplaySettingsAvailable());}catch(RuntimeException|LinkageError failure){return 0;}}
         if(!cn.piq.fcarcade.cabinet.CabinetHostingConfig.enabled()||cn.piq.fcarcade.core.libretro.LibretroNesCore.unavailableReason()!=null)policyMask&=~4;
-        return (HomeSyncPolicy.supportedMask()&policyMask)|(cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed()?24:0);
+        return (HomeSyncPolicy.supportedMask()&policyMask)|(cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed()?56:0);
     }
     static CabinetSyncMode placementMode(net.minecraft.server.level.ServerLevel level, HomeEndpointBlockEntity console, CabinetSyncMode fallback) {
         int desired=cn.piq.fcarcade.config.GameConsoleAdminSettings.defaultMode(level.getServer());
@@ -236,6 +247,7 @@ public final class HomeSyncSettings {
     private static String bounded(String reason){return reason==null||reason.isBlank()?"此机型尚未提供该运行方式。":reason.length()>256?reason.substring(0,255)+"…":reason;}
     private static String unavailableMode(ServerPlayer player,HomeEndpointBlockEntity console,int selected){
         if(selected==1)return HomeSyncPolicy.legacyUnavailable();
+        if(selected==5&&!(console instanceof HomeConsoleBlockEntity))return "此机型未声明 FC 官方双手柄路线。";
         if(console instanceof ExternalHomeConsoleBlockEntity external){
             var hooks=HomeSystems.applianceHooks(external.systemId());
             try {

@@ -13,6 +13,8 @@ class HomeSyncSettingsLayoutTest {
                 assertTrue(layout.left()+layout.width()<=width);
                 assertTrue(layout.top()+HomeSyncSettingsLayout.HEIGHT<=height);
                 assertTrue(HomeSyncSettingsLayout.MODE_ROW+4*HomeSyncSettingsLayout.MODE_STEP+16<=HomeSyncSettingsLayout.ADVANCED_ROW);
+                for(int rows:new int[]{4,5,6})assertTrue(HomeSyncSettingsLayout.MODE_ROW+(rows-1)*HomeSyncSettingsLayout.modeStep(rows)
+                        +HomeSyncSettingsLayout.modeHeight(rows)<=HomeSyncSettingsLayout.ADVANCED_ROW);
                 assertTrue(HomeSyncSettingsLayout.ADVANCED_ROW+20<=HomeSyncSettingsLayout.STATUS_ROW);
                 assertTrue(HomeSyncSettingsLayout.STATUS_ROW+3*10<=HomeSyncSettingsLayout.HINT_ROW);
                 assertTrue(HomeSyncSettingsLayout.HINT_ROW+2*9<=HomeSyncSettingsLayout.FOOTER_ROW);

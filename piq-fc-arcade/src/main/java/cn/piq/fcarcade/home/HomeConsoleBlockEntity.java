@@ -16,6 +16,14 @@ public final class HomeConsoleBlockEntity extends HomeEndpointBlockEntity {
     private boolean suborStructureInstalled;
     private boolean netplayExperimental;
     private boolean netplayJniTrial;
+    // Empty is the historical Mesen route. Preserve unknown future variants for explicit refusal.
+    private String netplayPadVariant = "";
+    public String netplayPadVariant(){return netplayPadVariant;}
+    public void netplayPadVariant(String value){netplayPadVariant=java.util.Objects.requireNonNull(value);changed();}
+    static final class VariantData {
+        static String read(CompoundTag tag){return tag.getString("NetplayPadVariant");}
+        static void write(CompoundTag tag,String value){tag.putString("NetplayPadVariant",value);}
+    }
     public boolean netplayJniTrial(){return netplayExperimental&&netplayJniTrial;}
     public void netplayJniTrial(boolean value){netplayJniTrial=value;changed();}
     public boolean netplayExperimental(){return netplayExperimental;}
@@ -91,6 +99,7 @@ public final class HomeConsoleBlockEntity extends HomeEndpointBlockEntity {
         suborStructureInstalled = tag.getBoolean("WideSuborStructure");
         netplayExperimental = tag.getBoolean("NetplayExperimental");
         netplayJniTrial = tag.getBoolean("NetplayJniTrial");
+        netplayPadVariant = VariantData.read(tag);
     }
 
     @Override
@@ -101,6 +110,7 @@ public final class HomeConsoleBlockEntity extends HomeEndpointBlockEntity {
         tag.putBoolean("WideSuborStructure", suborStructureInstalled);
         tag.putBoolean("NetplayExperimental", netplayExperimental);
         tag.putBoolean("NetplayJniTrial", netplayJniTrial);
+        VariantData.write(tag, netplayPadVariant);
     }
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider registries){
         var tag=super.getUpdateTag(registries);

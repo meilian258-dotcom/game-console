@@ -26,6 +26,7 @@ def jniBridgeInput = piqLockedInput('libretro-jni-abi2')
 def jniLibcxxInput = piqLockedInput('libcxx-windows')
 def netplayInput = piqLockedInput('retroarch-netplay')
 def pinnedCoreInputs = [
+        'core/fc-retroarch/windows-x64/fceumm_libretro.dll': piqLockedInput('fceumm-retroarch-pad'),
         'core/nes_rust_wasm_bg.wasm': piqLockedInput('nes-wasm'),
         'core/nes_zapper_v1.wasm': piqLockedInput('nes-zapper-wasm'),
         'core/nes_mapper19_v1.wasm': piqLockedInput('nes-mapper19-wasm'),

@@ -4,11 +4,11 @@
 
 本指南适用于当前检出提交及其配套脚本、锁表和协议。开始前记录分支与提交，使用同一提交内的文档；默认克隆 `main` 不包含其他工作树或候选分支中尚未提交的改动。公开热修成品、独立开发候选和本目录源码可能处于不同版本，不能用其他分支的指南或“最新”文件替换本次固定输入。跨电脑接续还需保全本地提交及未提交内容，见 [Git 备份说明](../GIT_WORKFLOW.md#备份与历史)。
 
-当前源码的开发配套为 **FC76.57、完整 SFC55（内含原 core11）、街机 0.1.5.12、电脑 prototype.13**，沿用 MD16／GBA15／PvZ12 作为本地回归组合，可选 Replay test.7。已包含[旧同步退役与输入热修](../piq-fc-arcade/design/旧本地同步退役.md)，不包含独立 FC76.55 RetroArch 共存试验，也不重编模拟核心。公开成品仍按[下载中心](../piq-fc-arcade/docs/下载中心.md)实际列出的审核附件下载，不能从本地构建版本推断整套组合已公开或稳定。
+当前源码的开发配套为 **FC76.58、完整 SFC55（内含原 core11）、街机 0.1.5.12、电脑 prototype.13**，沿用 MD16／GBA15／PvZ12 作为本地回归组合，可选 Replay test.7。已包含[旧同步退役与输入热修](../piq-fc-arcade/design/旧本地同步退役.md)，并新增[FC 官方 FCEUmm RetroArch 双手柄候选](../piq-fc-arcade/design/FC双后端共存.md)；原 JNI 默认、旧 mode 3 Mesen、固定 PNP7 运行器及旧保存身份保留，不改动或重编模拟核心。最终 FC76.58 `check jar`、包内核心恢复、0／75 ms 有序延迟真实三端及隔离专服合装已通过；原接入差异和观测器修正保留在共存记录，MC 真人多人、长局及更多游戏待验。公开成品仍按[下载中心](../piq-fc-arcade/docs/下载中心.md)实际列出的审核附件下载，不能从本地构建版本推断整套组合已公开或稳定。
 
-启动协议沿用 `home-launch-3`，机柜协议为 `cabinet-room-12`，SFC 协议为 `15`。SFC55 因新增公共 API 最低要求 FC76.57；服务端和客户端须使用同批配套，不能只更新一端。SFC 从 53 起的新 JNI 联机进度接入固定、未修改的 Snes9x；Mesen-S 核心、旧身份和旧进度恢复路线仍保留，不跨核迁移或覆盖旧档。原 Mesen-S 回滚失配并未被改核或屏蔽校验修复。本轮没有新增公开分发授权或放宽许可／来源门禁，最终包与 Minecraft 多人验收状态见 [SFC 当前状态](../piq-sfc-home/README.md#当前状态)。
+FC76.58 使用 `netplay-6` 与 `home-sync-7`，服务端和全部客户端主包须同批升级，包括仍使用 JNI 的玩家；旧 Java 调用重载仍保留。启动协议沿用 `home-launch-3`，机柜协议为 `cabinet-room-12`，SFC 协议为 `15`。SFC55 因新增公共 API 最低要求 FC76.57；服务端和客户端须使用同批配套，不能只更新一端。SFC 从 53 起的新 JNI 联机进度接入固定、未修改的 Snes9x；Mesen-S 核心、旧身份和旧进度恢复路线仍保留，不跨核迁移或覆盖旧档。原 Mesen-S 回滚失配并未被改核或屏蔽校验修复。本轮没有新增公开分发授权或放宽许可／来源门禁，最终包与 Minecraft 多人验收状态见 [SFC 当前状态](../piq-sfc-home/README.md#当前状态)。
 
-可选择两种构建方式：**普通开发构建使用固定核心**；**快照构建仅为明确列出的四个普通核心下载官方 nightly 并生成匹配身份，其余核心保留固定输入**。SFC 的 Snes9x 与 Mesen-S 均不参与 nightly 替换。Git 不保存全部 DLL、WASM 和运行器；固定输入需要按清单导入，不能假设快照会自动下载所有依赖，也不会重编所有第三方原生核心。
+可选择两种构建方式：**普通开发构建使用固定核心**；**快照构建仅为明确列出的四个普通核心文件下载官方 nightly 并生成匹配身份，其余核心保留固定输入**。新 FC FCEUmm、SFC 的 Snes9x 与 Mesen-S 均不参与 nightly 替换。Git 不保存全部 DLL、WASM 和运行器；固定输入需要按清单导入，不能假设快照会自动下载所有依赖，也不会重编所有第三方原生核心。
 
 ## 自动快照
 
@@ -41,6 +41,8 @@ Snes9x 已有明确的公开快照拒绝门禁，但快照脚本的身份与哈�
 必须同时符合来源、补丁及核心身份清单。旧 FC44 不包含所需配对，不能回退旧桥、
 拼接任意运行库或用 nightly 补位。每件 JAR 的下载地址、大小和 SHA-256 均固定；
 允许离线复用相同原件，但不是“任意最新版”。固定输入登记不解除发行许可门槛。
+
+FC76.58 新增的 `fceumm-retroarch-pad` 不在这些历史 bootstrap JAR 中。快照准备从当前源码根 `.build-inputs/` 读取已按下文导入的固定项，核对大小与 SHA 后纳入回执及临时构建输入；缺件或摘要不符即停止，不从旧 FC 成品猜取、不追 `latest`、不改写 `FcRetroarchPad` 固定身份。需在同一源码根先完成显式导入；没有该缓存的云端工作流不能宣称完整构建已就绪。既有 FBNeo／Snes9x 输入和 Snes9x 发布拒绝门禁继续生效。
 
 街机从 `0.1.5.8` 起（当前 `0.1.5.12`）的普通构建需显式传入 `-PmameLifecycleCore=<已核验 core.dll 的路径>`；
 默认查找该组件的 `build/verified-mame-lifecycle/core.dll`，没有文件就停止，不自动下载。
@@ -84,7 +86,7 @@ SFC55 沿用 SFC54／SFC53 的固定输入，额外需要 [sfc-stock-inputs.json
 | MD 普通 Genesis Plus GX | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/genesis_plus_gx_libretro.dll.zip) |
 | GBA mGBA | [Windows x64](https://buildbot.libretro.com/nightly/windows/x86_64/latest/mgba_libretro.dll.zip) |
 
-定制 FC 和 MD Netplay 核心、公共 JNI 桥、街机定制运行库、PvZ 原生组件、旧 SFC Mesen-S 及保留的 WASM 不用同名 nightly 文件替换。bootstrap 按前述两个发行标签及六件固定摘要提取，只取白名单内的原生资源，不把旧模组 Java 类当成本次构建结果。新 SFC Snes9x 与原版 FBNeo 使用各自独立的固定核心／源码对，不从历史 SFC 包冒领。当前 GBA helper、街机 helper 和公共 worker 仍从源码编译。
+定制 FC 和 MD Netplay 核心、固定 FC FCEUmm、公共 JNI 桥、街机定制运行库、PvZ 原生组件、旧 SFC Mesen-S 及保留的 WASM 不用同名 nightly 文件替换。bootstrap 按前述两个发行标签及六件固定摘要提取，只取白名单内的原生资源，不把旧模组 Java 类当成本次构建结果。新 SFC Snes9x 与原版 FBNeo 使用各自独立的固定核心／源码对，不从历史 SFC 包冒领。当前 GBA helper、街机 helper 和公共 worker 仍从源码编译。
 
 这些定制或历史运行库仍受固定接口和摘要约束。修改街机 helper 等相关源码时，若新产物与运行器目录的身份不一致，构建会停止，需要同时审核并更新对应构建约束；不会仅因 `main` 有新提交就跳过兼容校验。旧离线运行库的校验表单独保留，不重新解释为 nightly 包。
 
@@ -149,7 +151,9 @@ $env:PIQ_BUILD_WORK_DIR = 'D:/game-console-build'
 
 ## 准备主模组的固定输入
 
-[build-inputs.json](build-inputs.json) 列出 FC 构建所需的文件、大小和 SHA-256，必须使用与本次源码同一提交的锁表。当前锁表包含 10 项 FC 输入；`build_inputs.py check` 只检查这份清单，不检查所有附属或整套快照输入。哈希用于确认构建用的是预期文件，不代表该文件已经通过所有游戏或联机测试。
+[build-inputs.json](build-inputs.json) 列出 FC 构建所需的文件、大小和 SHA-256，必须使用与本次源码同一提交的锁表。当前锁表包含 **11 项 FC 输入**，原 10 项保留，新增 `fceumm-retroarch-pad`；`build_inputs.py check` 只检查这份清单，不检查所有附属或整套快照输入。哈希用于确认构建用的是预期文件，不代表该文件已经通过所有游戏或联机测试。
+
+新项来自未经修改的官方 Libretro Windows x64 FCEUmm，运行报告 `(SVN) ac0d00a`：DLL 4,162,048 字节，SHA-256 `a04f7fa28bdd46f602bb62750ab9b5e360d8e8d8ece97de8ad3ef1b669257ffd`，打包位置为 `core/fc-retroarch/windows-x64/fceumm_libretro.dll`。[官方下载地址](https://buildbot.libretro.com/nightly/windows/x86_64/latest/fceumm_libretro.dll.zip)会变化，若已不提供该字节，只能准备相同已核验输入，不替换为新 nightly。对应 [参考源码 ac0d00a7fc01166f84c7bac01d1084ebfd2b865e](https://github.com/libretro/libretro-fceumm/tree/ac0d00a7fc01166f84c7bac01d1084ebfd2b865e)、源码包摘要和许可见[包内来源说明](../piq-fc-arcade/src/main/resources/core/fc-retroarch/README.md)；短提交一致不是精确重编证明。此构建只复制核验过的 DLL，不重编核心或原 RetroArch 运行器。
 
 从与当前锁表相匹配的发行附件或已审核固定材料准备输入。FC 锁定的二进制位于玩家主 JAR 内的 `core/` 子目录；按锁表 ID、大小与摘要核对后导入，不将整个 JAR 当成 DLL。包内名与缓存名可能不同：`libcxx-windows` 在 JAR 中为 `libc++.dll`，导入工具按锁表存为 `libcxx.dll`；不能只凭文件名判断配套。[2026-10-07 整套测试版](../piq-fc-arcade/docs/整套测试版-20261007.md)只提供历史输入，不能满足当前新增的全部 JNI 依赖，也不能当作快照 bootstrap 门禁已解除。项目源码见对应发行标签，其他原生组件按各自源码说明准备；不要用任意同名文件凑齐输入或关闭校验。附属仍需按自己的入口准备文件，不代表全部构建依赖已自动下载。
 
@@ -157,6 +161,7 @@ $env:PIQ_BUILD_WORK_DIR = 'D:/game-console-build'
 
 ```powershell
 python source-control/build_inputs.py import --id libretro-jni-abi2 --file "./approved/piq-libretro-jni.dll"
+python source-control/build_inputs.py import --id fceumm-retroarch-pad --file "./approved/fceumm_libretro.dll"
 python source-control/build_inputs.py check
 ```
 

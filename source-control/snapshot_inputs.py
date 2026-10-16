@@ -3,8 +3,8 @@
 Only ordinary supported libretro cores come from the two official nightly
 directories. Project-specific Netplay/bridge libraries and legacy runtimes are
 extracted from SHA-pinned public releases, never from a developer's machine.
-The fixed FBNeo stock core/source pair is an explicit, verified local input;
-it has no implicit vendor cache or download fallback.
+Fixed FC pad and FBNeo stock inputs are explicit, verified local inputs;
+they have no implicit vendor cache or download fallback.
 No downloaded native library is executed by this preparation command.
 """
 from __future__ import annotations
@@ -67,6 +67,7 @@ NIGHTLY = {
     'mgba-windows': ('windows-x64', 'mgba_libretro.dll'),
 }
 FC_RESOURCES = {
+    'fceumm-retroarch-pad': 'core/fc-retroarch/windows-x64/fceumm_libretro.dll',
     'jna-5-14-0': 'core/libretro/jna-5.14.0.jar',
     'mesen-windows': 'core/libretro/windows-x64/mesen_libretro.dll',
     'mesen-linux': 'core/libretro/linux-x64/mesen_libretro.so',
@@ -78,6 +79,9 @@ FC_RESOURCES = {
     'nes-wasm': 'core/nes_rust_wasm_bg.wasm',
     'nes-mapper19-wasm': 'core/nes_mapper19_v1.wasm',
 }
+# These newer fixed inputs are absent from the historical public bootstrap JAR.
+# They must not be replaced by an arbitrary future nightly or a legacy core.
+FC_LOCAL_INPUTS = frozenset({'fceumm-retroarch-pad'})
 BUCKETS = {
     'sfc-core': ('sfc', 'piq-sfc-arcade', ('assets/piq_sfc_arcade/core/piq_sfc_wasm.wasm', 'META-INF/piq-sfc-wasm-privacy.json')),
     'sfc-home': ('sfc', 'piq-sfc-home', ('core/sfc-libretro/',)),
@@ -235,18 +239,28 @@ def require_published_jni_bundle(lock: dict) -> None:
         raise ValueError('JNI dependency bundle requires a matching published bootstrap')
 
 
+def fixed_fc_inputs(lock: dict, source: Path) -> dict[str, Path]:
+    result = {}
+    for ident in FC_LOCAL_INPUTS.intersection(lock):
+        path = cache_path(source / '.build-inputs', lock[ident])
+        verify(path, lock[ident])
+        result[ident] = path
+    return result
+
+
 def extract_bootstrap(pins: dict[str, Path], output: Path, source: Path) -> None:
     lock = load_lock(source / 'source-control/build-inputs.json')
     require_published_jni_bundle(lock)
     if set(lock) != set(FC_RESOURCES):
         raise ValueError('FC build-input inventory changed; review snapshot resource mapping')
+    local = fixed_fc_inputs(lock, source)
     with zipfile.ZipFile(pins['fc']) as jar:
         index = members(jar)
         for ident, resource in FC_RESOURCES.items():
-            data = jar.read(index[resource])
+            data = local[ident].read_bytes() if ident in local else jar.read(index[resource])
             entry = lock[ident]
             if len(data) != entry['bytes'] or hashlib.sha256(data).hexdigest() != entry['sha256']:
-                raise ValueError('Pinned bootstrap does not match FC build lock: ' + ident)
+                raise ValueError('Pinned input does not match FC build lock: ' + ident)
             put(cache_path(output / 'fc-cache', entry), data)
     for bucket, (ident, module, prefixes) in BUCKETS.items():
         count = 0
@@ -289,6 +303,7 @@ def prepare(output: Path, *, source: Path = ROOT, bootstrap_dir: Path | None = N
     require_published_jni_bundle(load_lock(source / 'source-control/build-inputs.json'))
     stock_sources = snapshot_stock.inspect_pair(fbneo_stock_core, fbneo_stock_source)
     sfc_sources = sfc_stock.inspect_pair(sfc_snes9x_core, sfc_snes9x_source, source / '.build-inputs')
+    fixed_fc_inputs(load_lock(source / 'source-control/build-inputs.json'), source)
     output.mkdir(parents=True, exist_ok=True)
     snapshot_stock.import_pair(output, stock_sources)
     sfc_stock.import_pair(output, sfc_sources)

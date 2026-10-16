@@ -55,6 +55,6 @@ class NetplayFourSeatTest {
         assertTrue(Files.readString(Path.of(root+"cabinet/CabinetRooms.java")).contains("netplay?CabinetNetplay.maxPlayers(backend):CabinetBackends.syncMaxPlayers(backend)"));
         assertTrue(Files.readString(Path.of(root+"cabinet/CabinetNetplay.java")).contains("member.port!=a.port()"));
         assertTrue(Files.readString(Path.of(root+"client/cabinet/CabinetNetplayEmulator.java")).contains("port==0,true,port"));
-        assertTrue(Files.readString(Path.of(root+"netplay/NetplayNetwork.java")).contains("netplay-5"));
+        assertTrue(Files.readString(Path.of(root+"netplay/NetplayNetwork.java")).contains("netplay-6"));
     }
 }

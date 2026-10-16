@@ -41,6 +41,8 @@ class InputTests(unittest.TestCase):
     def test_official_directories_and_no_custom_core_download(self):
         self.assertEqual(set(subject.NIGHTLY_BASE), {'windows-x64', 'linux-x64'})
         self.assertEqual(len(subject.NIGHTLY), 4)
+        self.assertNotIn('fceumm-retroarch-pad', subject.NIGHTLY)
+        self.assertEqual(subject.FC_LOCAL_INPUTS, {'fceumm-retroarch-pad'})
         self.assertNotIn('mesen-s-windows', subject.NIGHTLY)
         self.assertFalse(any('snes9x' in member for _, member in subject.NIGHTLY.values()))
         self.assertFalse(any('netplay' in member or 'blastem' in member for _, member in subject.NIGHTLY.values()))
@@ -114,6 +116,25 @@ class InputTests(unittest.TestCase):
         self.assertEqual(subject.FC_RESOURCES['libcxx-windows'],
                          'core/libretro-jni/windows-x64/libc++.dll')
 
+    def test_fixed_fc_core_requires_exact_import_without_download_or_legacy_fallback(self):
+        data=self.pe()
+        entry=dict(filename='fceumm_libretro.dll',bytes=len(data),sha256=hashlib.sha256(data).hexdigest())
+        lock={'fceumm-retroarch-pad':entry}
+        with patch.object(subject,'fetch',side_effect=AssertionError('must not fetch nightly')):
+            with self.assertRaisesRegex(ValueError,'Missing input'):
+                subject.fixed_fc_inputs(lock,self.root)
+            path=subject.cache_path(self.root/'.build-inputs',entry)
+            path.parent.mkdir(parents=True)
+            path.write_bytes(data[:-1])
+            with self.assertRaisesRegex(ValueError,'Wrong size'):
+                subject.fixed_fc_inputs(lock,self.root)
+            path.write_bytes(data[:-1]+b'X')
+            with self.assertRaisesRegex(ValueError,'SHA256 mismatch'):
+                subject.fixed_fc_inputs(lock,self.root)
+            path.write_bytes(data)
+            self.assertEqual(subject.fixed_fc_inputs(lock,self.root),{'fceumm-retroarch-pad':path})
+            self.assertEqual(subject.fixed_fc_inputs({},self.root),{})
+
     def test_public_bootstrap_catalog_retains_exact_artifacts_and_release_tags(self):
         expected = {
             'fc': ('game-console-0.31.0-alpha.76.54.jar', 39954627, '3632de31cc6658f32f9e7c498c916c1680218fe58ae160f58e9fa0f0551d0549'),
@@ -149,6 +170,7 @@ class InputTests(unittest.TestCase):
             with self.subTest(ident=ident), patch.object(subject, 'BOOTSTRAP', ordered), \
                     patch.object(subject.snapshot_stock, 'inspect_pair', return_value={}), \
                     patch.object(subject.sfc_stock, 'inspect_pair', return_value={}), \
+                    patch.object(subject, 'fixed_fc_inputs', return_value={}), \
                     patch.object(subject.snapshot_stock, 'import_pair'), \
                     patch.object(subject.sfc_stock, 'import_pair'), \
                     patch.object(subject, 'fetch', side_effect=ReachedDownload) as fetch:
@@ -156,6 +178,17 @@ class InputTests(unittest.TestCase):
                     subject.prepare(output)
                 fetch.assert_called_once_with(url, output / 'bootstrap' / entry[0], entry[1],
                                               dict(bytes=entry[1], sha256=entry[2]))
+
+    def test_missing_fixed_fc_core_fails_before_any_download_or_output(self):
+        lock=subject.load_lock()
+        with patch.object(subject.snapshot_stock,'inspect_pair',return_value={}), \
+                patch.object(subject.sfc_stock,'inspect_pair',return_value={}), \
+                patch.object(subject,'load_lock',return_value=lock), \
+                patch.object(subject,'fetch') as fetch:
+            with self.assertRaisesRegex(ValueError,'Missing input'):
+                subject.prepare(self.root/'output',source=self.root/'source')
+            fetch.assert_not_called()
+            self.assertFalse((self.root/'output').exists())
 
     def test_current_public_fc_bundle_matches_exact_locked_pair(self):
         lock = subject.load_lock()

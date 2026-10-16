@@ -4,6 +4,8 @@
 
 更新日期：2026-10-15。本发行准备分支整合 FC76.54 候选 `adb1e37` 与主线 `6c535708` 的许可、隐私清理和快速回放源码；整合源码不等于修改或重新验证既有玩家 JAR。Release 的附件、对应源码与本分支可能不完全相同；再分发时以实际 JAR、运行库及其固定版本为单位核对，不能仅使用本表推断安装包内容。
 
+2026-10-17 补充：FC76.58 开发候选新增独立 FCEUmm 双手柄资源，原核心和前端保留。固定二进制、参考源码及包内原文入口见下表；功能验收见[共存记录](piq-fc-arcade/design/FC双后端共存.md)，不由本许可导航推断候选已可采用或公开发行。
+
 ## 本项目代码与素材不是同一授权
 
 - 主模组自有程序源码及公共 JNI 桥采用 [GPL-3.0-or-later](piq-fc-arcade/LICENSE.md)，完整文本见 [GPLv3](piq-fc-arcade/src/main/resources/META-INF/licenses/GPL-3.0.txt)。内部公共库随主包提供，不是要求玩家额外安装的模拟核心。
@@ -22,6 +24,7 @@
 | --- | --- | --- | --- |
 | 公共桥 | libretro API 头文件 | JNI/JNA 适配接口；API 不是模拟核心 | MIT，保留头文件原署名。桥实现仍按本项目 GPL；见[主包第三方说明](piq-fc-arcade/THIRD_PARTY_NOTICES.md) |
 | FC | Mesen，源参考 `0102910c39ad1a62bc3f784466f3f67ca9eae335` | 内置固定 Windows/Linux libretro 二进制；另有历史 JNI r2 独立修改版 | [固定 GPLv3 原文](https://github.com/libretro/Mesen/blob/0102910c39ad1a62bc3f784466f3f67ca9eae335/LICENSE)；修改版必须对应自己的完整源包，不使用普通源包冒充 |
+| FC 显式 RetroArch 双手柄候选 | FCEUmm `(SVN) ac0d00a`，参考源码 `ac0d00a7fc01166f84c7bac01d1084ebfd2b865e` | 未修改的官方 Windows x64 DLL，SHA `a04f7fa28bdd46f602bb62750ab9b5e360d8e8d8ece97de8ad3ef1b669257ffd`；独立资源和保存身份 | [来源、完整源包摘要及许可入口](piq-fc-arcade/src/main/resources/core/fc-retroarch/README.md)；原 GPLv2 与 nes_ntsc 许可随新 JAR 保留，完整参考源包另附。运行短提交一致不等于字节可复现构建证明，也不取代其他源文件的声明 |
 | FC | RetroArch 1.22.2 / PNP7 | 内置经过音画、输入及进程通信适配的 Windows 前端；不是仅引用 RetroArch 名称 | [GPLv3](https://github.com/libretro/RetroArch/blob/v1.22.2/COPYING)，项目按 GPL-3.0-or-later 分发；完整修改源码为 `retroarch-piq-pnp7-corresponding-source.zip`，入口见对应 Release 源码附件 |
 | FC 旧 WASM | nes-rust 0.1.2 及适配 | 普通 NES、光枪和 mapper19 等保留的 WASM 资源 | [MIT 原文](piq-fc-arcade/src/main/resources/META-INF/licenses/nes-rust-LICENSE.txt)；源码在 `piq-fc-arcade/native/nes-rust` 及相应适配目录，修改和打包资源须一一对应 |
 | 公共独立 worker / 部分附属 helper | JNA 5.14.0 | 独立 Java/native 调用库；主包 worker 不将它合并到 Minecraft classpath | 上游 LGPL / Apache 双许可，本发行选择 Apache-2.0；[原双许可说明](https://github.com/java-native-access/jna/blob/5.14.0/LICENSE)、[本包 Apache 全文](piq-fc-arcade/src/main/resources/META-INF/licenses/wasmtime4j-LICENSE.txt)。JNA 所含 libffi 仍须保留自己的 MIT 声明 |

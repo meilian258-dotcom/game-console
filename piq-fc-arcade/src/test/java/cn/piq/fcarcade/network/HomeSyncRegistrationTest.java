@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ResourceLock("NeoForge-PAYLOAD_REGISTRATIONS")
 class HomeSyncRegistrationTest {
-    @Test @SuppressWarnings("unchecked") void versionSixRegistersExactlyTwoMandatoryDirectionsAndRealCodecs() throws Exception {
+    @Test @SuppressWarnings("unchecked") void versionSevenRegistersExactlyTwoMandatoryDirectionsAndRealCodecs() throws Exception {
         if(net.neoforged.fml.loading.LoadingModList.get()==null)
             net.neoforged.fml.loading.LoadingModList.of(List.of(),List.of(),List.of(),List.of(),Map.of());
         SharedConstants.tryDetectVersion();Bootstrap.bootStrap();
@@ -30,7 +30,7 @@ class HomeSyncRegistrationTest {
         var oldRequest=play.remove(requestId);var oldSetting=play.remove(settingId);int size=play.size();
         try{
             HomeSyncNetwork.register(new RegisterPayloadHandlersEvent());assertEquals(size+2,play.size());
-            for(var id:List.of(requestId,settingId)){assertEquals("home-sync-6",play.get(id).version());assertFalse(play.get(id).optional());}
+            for(var id:List.of(requestId,settingId)){assertEquals("home-sync-7",play.get(id).version());assertFalse(play.get(id).optional());}
             assertEquals(PacketFlow.SERVERBOUND,play.get(requestId).flow().orElseThrow());
             assertEquals(PacketFlow.CLIENTBOUND,play.get(settingId).flow().orElseThrow());
             var request=new HomeSyncNetwork.Request(UUID.randomUUID(),3,-1,-1,-1,0);

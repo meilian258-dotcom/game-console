@@ -65,7 +65,7 @@ class BuildInputsTests(unittest.TestCase):
         result=subprocess.run([sys.executable,str(script),'check','--cache',str(self.cache)],capture_output=True)
         self.assertEqual(result.returncode,1)
         report=json.loads(result.stdout)
-        self.assertFalse(report['ok']); self.assertEqual(len(report['errors']),10)
+        self.assertFalse(report['ok']); self.assertEqual(len(report['errors']),len(load_lock()))
         self.assertFalse(self.cache.exists())
         unknown=subprocess.run([sys.executable,str(script),'check','--id','unknown'],capture_output=True)
         self.assertEqual(unknown.returncode,1)
