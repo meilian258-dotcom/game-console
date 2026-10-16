@@ -4,6 +4,7 @@ package cn.piq.fcarcade.config;
 
 import cn.piq.fcarcade.access.PlayerContentAccess;
 import cn.piq.fcarcade.cabinet.CabinetHostingConfig;
+import cn.piq.fcarcade.cabinet.LegacyLocalSyncPolicy;
 import cn.piq.fcarcade.registry.ModItems;
 import java.util.Collections;
 import java.util.Map;
@@ -27,7 +28,7 @@ public final class AdminTerminalService {
         return(o.allPlayers()?1:0)|(o.serverRomUse()?2:0)|(o.serverCoverUse()?4:0)|(o.romUploads()?8:0)|(o.coverUploads()?16:0);
     }
     static PlayerContentAccess.Options options(int mask){return new PlayerContentAccess.Options((mask&1)!=0,(mask&2)!=0,(mask&4)!=0,(mask&8)!=0,(mask&16)!=0);}
-    private static int supported(){return(CabinetHostingConfig.playerAllowed()?1:0)|(CabinetHostingConfig.localAllowed()?2:0)|(CabinetHostingConfig.enabled()?4:0);}
+    private static int supported(){return(CabinetHostingConfig.playerAllowed()?1:0)|(CabinetHostingConfig.enabled()?4:0);}
     static void handle(ServerPlayer player,AdminTerminalNetwork.Request request){
         if(!current(player))return;
         long now=System.nanoTime();Long last=LAST.get(player);
@@ -39,7 +40,7 @@ public final class AdminTerminalService {
         }
         var server=player.getServer();var before=PlayerContentAccess.options();
         int mode=GameConsoleAdminSettings.defaultMode(server),range=GameConsoleAdminSettings.defaultRange(server);
-        String message="";
+        String message=LegacyLocalSyncPolicy.retiredSelection(mode)?"旧本地同步默认值已停用，请明确重新选择；现有设备和存档未改动。":"";
         if(request.action()!=AdminTerminalPolicy.READ){
             if(!AdminTerminalPolicy.same(request.expectedOptions(),request.expectedMode(),request.expectedRange(),mask(before),mode,range)){
                 message="设置已被修改，已刷新；请重新选择。";
@@ -47,7 +48,8 @@ public final class AdminTerminalService {
             else switch(request.action()){
                 case AdminTerminalPolicy.ACCESS -> message=PlayerContentAccess.updateOptions(player,before,options(request.value()))?"玩家权限已保存。":"保存失败或权限已变化，请刷新。";
                 case AdminTerminalPolicy.MODE -> {
-                    if(request.value()>=0&&(supported()&(1<<request.value()))==0)message="服务器未开放此运行方式。";
+                    if(LegacyLocalSyncPolicy.retiredSelection(request.value()))message=LegacyLocalSyncPolicy.RETIRED;
+                    else if(request.value()>=0&&(supported()&(1<<request.value()))==0)message="服务器未开放此运行方式。";
                     else {GameConsoleAdminSettings.setDefaults(server,request.value(),range);message="已保存，仅新放置机器采用。";}
                 }
                 case AdminTerminalPolicy.RANGE -> {GameConsoleAdminSettings.setDefaults(server,mode,request.value());message="已保存，仅新家庭机采用；街机另用全服规则。";}

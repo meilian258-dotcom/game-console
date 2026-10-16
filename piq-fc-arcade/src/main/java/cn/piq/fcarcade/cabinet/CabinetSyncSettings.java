@@ -96,14 +96,9 @@ public final class CabinetSyncSettings extends SavedData {
                     CabinetHostingConfig.localAllowed(),CabinetNetplay.supported(b),
                     variant!=null&&variant.template().jni()!=null);
             if(defaultJni) return data(s).rememberDefault(key(t,b),CabinetSyncMode.LOCAL_SYNC,true,variantId);
-            var secondary=CabinetLinks.peer(s,t);
-            boolean local=CabinetHostingConfig.localAllowed()&&CabinetBackends.supportsSync(b)
-                    &&CabinetSeats.capacity(CabinetBackends.syncMaxPlayers(b),secondary!=null,t.dual(),secondary!=null&&secondary.dual())>0;
             if(desired>=0||placed.placedJniDefault()) {
                 boolean hosted=CabinetHostedSessions.unavailable(s,t,b)==null;
-                int fallback=hosted?2:b.toString().equals("piq_sfc_home:sfc")&&local?1:0;
-                int supported=(CabinetHostingConfig.playerAllowed()?1:0)|(local?2:0)|(hosted?4:0);
-                var selected=CabinetSyncMode.checked(cn.piq.fcarcade.config.GameConsoleAdminPolicy.selectNewMode(desired,supported,fallback));
+                var selected=CabinetPlacementDefaults.mediaMode(desired,CabinetHostingConfig.playerAllowed(),hosted);
                 // Resolve once per backend. Later policy/runtime changes must not silently activate a formerly unavailable default.
                 return data(s).rememberDefault(key(t,b),selected,false,null);
             }
@@ -111,6 +106,10 @@ public final class CabinetSyncSettings extends SavedData {
         // Never rewrite explicit preferences. Unconfigured public cabinets prefer server hosting
         // only after the administrator opted in and that backend is available on this server.
         if(CabinetHostedSessions.unavailable(s,t,b)==null)return CabinetSyncMode.SERVER_MEDIA;
+        // Old unconfigured SFC hardware used this implicit choice. Preserve its identity so
+        // the launch gate asks for reselection, rather than silently adopting MEDIA saves.
+        // New placements have already frozen their resolved choice above; explicit old
+        // mode 1 remains disabled rather than silently switching to another save identity.
         if(b.toString().equals("piq_sfc_home:sfc")&&CabinetHostingConfig.localAllowed()&&CabinetBackends.supportsSync(b))return CabinetSyncMode.LOCAL_SYNC;
         return CabinetSyncMode.MEDIA;
     }
@@ -168,15 +167,13 @@ public final class CabinetSyncSettings extends SavedData {
         if(debug!=null&&!debugValid(p,debug)){debug.invalid=true;return;}
         var primary=CabinetLinks.master(server,target);var secondary=CabinetLinks.peer(server,primary);
         if(!primary.matches(p.serverLevel())||!(p.serverLevel().getBlockEntity(primary.anchor()) instanceof cn.piq.fcarcade.world.LegacyFcArcadeBlockEntity block)||!block.cabinetBackend().equals(packet.backend()))return;
-        boolean registered=CabinetBackends.supportsSync(packet.backend());
-        int syncPlayers=CabinetBackends.syncMaxPlayers(packet.backend());
-        boolean supported=CabinetHostingConfig.localAllowed()&&registered&&CabinetSeats.capacity(syncPlayers,secondary!=null,primary.dual(),secondary!=null&&secondary.dual())>0;
+        // This existing wire flag describes only the retired mode-1 button, never Netplay capability.
+        boolean supported=false;
         boolean netplaySupported=CabinetHostingConfig.localAllowed()&&CabinetSeats.capacity(CabinetNetplay.maxPlayers(packet.backend()),secondary!=null,primary.dual(),secondary!=null&&secondary.dual())>0;
         String hostedReason=CabinetHostedSessions.unavailable(server,primary,packet.backend());
         boolean hosted=hostedReason==null;
         boolean editable=p.hasPermissions(2)&&!ServerCabinets.isCabinetBusy(server,primary)&&(secondary==null||!ServerCabinets.isCabinetBusy(server,secondary));
-        String unavailable=!CabinetHostingConfig.localAllowed()?"服主已禁用本地输入同步":registered?"此核心本地同步最多支持 "+syncPlayers+" 席，当前通讯线席位超限；请先断开通讯线或使用音画串流。":packet.backend().toString().equals("piq_native_arcade:mame")?"当前附属未注册匹配的本地同步核心，请更新配套模组或使用音画串流。":"该核心尚未通过本地确定性同步验证，请使用音画串流";
-        String reason=supported?(CabinetBackends.hostSnapshotSync(packet.backend())?"本地输入同步仅限已核验的游戏版本；最多 "+syncPlayers+" 席，下次启动生效":"同步方式只对下次启动生效"):unavailable;
+        String reason="同步方式只对下次启动生效；旧本地输入同步入口已停用。";
         if(!editable)reason=p.hasPermissions(2)?"整组街机仍在运行或退出收尾中；请等待释放后刷新，不要强制切换":"只有管理员可以更改同步方式";
         String selectedVariant=netplayVariant(server,primary,packet.backend());
         if(!packet.variant().isEmpty()){
@@ -204,8 +201,8 @@ public final class CabinetSyncSettings extends SavedData {
         }else if(packet.mode()>=0){
             if(packet.backend().equals(CabinetBackends.NES))reason="FC 街机仍使用原有本地输入同步；家用游戏机可另选服务端托管";
             else if(!editable)reason="请先结束两端游戏；只有管理员可更改同步方式";
-            else if(packet.mode()==1&&!supported)reason=unavailable;
-            else if(packet.mode()==3&&!netplaySupported)reason="Netplay 实验需允许本地同步及配套附属，席位数不能超过附属声明上限";
+            else if(LegacyLocalSyncPolicy.retiredSelection(packet.mode()))reason=LegacyLocalSyncPolicy.RETIRED;
+            else if(packet.mode()==3&&!netplaySupported)reason="Netplay 需服务端允许该路线并安装配套附属，席位数不能超过附属声明上限";
             else if(packet.mode()==3&&!CabinetNetplay.variants(packet.backend()).isEmpty()&&CabinetNetplay.variant(packet.backend(),selectedVariant)==null)reason="已选 Netplay 后端在服务器不可用，请明确重新选择；不会自动切换";
             else if(packet.mode()==2&&!hosted)reason=hostedReason;
             else if(packet.mode()==0&&!CabinetHostingConfig.playerAllowed())reason="服主已禁用玩家托管";
@@ -247,6 +244,8 @@ public final class CabinetSyncSettings extends SavedData {
             }
         }
         if(packet.autoPowerOff()>=0)reason="街机关机与显示范围由全服统一管理，请使用管理终端 → 街机全服。";
+        if(!LegacyLocalSyncPolicy.mayStart(get(server,primary,packet.backend()),netplay(server,primary,packet.backend()),packet.backend().equals(CabinetBackends.NES)))
+            reason=LegacyLocalSyncPolicy.RETIRED+" "+reason;
         if(debug!=null){
             if(!debugValid(p,debug)){debug.invalid=true;return;}
             reason="点中 "+target.anchor().toShortString()+"；"+(secondary==null?"仅此机柜。":"数据线两台共用主机 "+primary.anchor().toShortString()+" 的同步模式。")+reason;

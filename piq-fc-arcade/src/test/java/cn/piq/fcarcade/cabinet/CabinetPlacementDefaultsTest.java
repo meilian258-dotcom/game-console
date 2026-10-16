@@ -64,6 +64,34 @@ class CabinetPlacementDefaultsTest {
         reload.rememberDefault("new|native",CabinetSyncMode.LOCAL_SYNC,true,"legacy");
         assertEquals(2,reload.save(new CompoundTag(),null).getList("Modes",10).size());
     }
+    @Test void retiredSavedChoiceSurvivesReloadButCannotAdmitNewNonNetplayRoom() {
+        for(boolean netplay:new boolean[]{false,true}) {
+            var row=new CompoundTag();row.putString("Key","old|native");row.putInt("Mode",1);
+            row.putInt("SaveMode",2);row.putBoolean("Netplay",netplay);row.putString("NetplayVariant","legacy");
+            var rows=new ListTag();rows.add(row);var before=new CompoundTag();before.put("Modes",rows);
+            var loaded=CabinetSyncSettings.load(before,null);
+            assertEquals(CabinetSyncMode.LOCAL_SYNC,loaded.rememberDefault("old|native",CabinetSyncMode.MEDIA,false,null));
+            var after=loaded.save(new CompoundTag(),null);
+            assertEquals(before,after,"retirement must not rewrite saved mode, save choice or variant");
+            var persisted=after.getList("Modes",10).getCompound(0);
+            assertEquals(netplay,LegacyLocalSyncPolicy.mayStart(CabinetSyncMode.checked(persisted.getInt("Mode")),persisted.getBoolean("Netplay"),false));
+        }
+    }
+    @Test void explicitRetiredGlobalPreferenceIsFrozenWithoutOptingIntoNetplay() {
+        for(boolean player:new boolean[]{false,true})for(boolean hosted:new boolean[]{false,true}) {
+            var store=new CabinetSyncSettings();
+            var selected=CabinetPlacementDefaults.mediaMode(1,player,hosted);
+            assertEquals(CabinetSyncMode.LOCAL_SYNC,store.rememberDefault("new|old-global",selected,false,null));
+            var before=store.save(new CompoundTag(),null);
+            var row=before.getList("Modes",10).getCompound(0);
+            assertEquals(1,row.getInt("Mode"));assertFalse(row.getBoolean("Netplay"));
+            assertFalse(row.contains("NetplayVariant"));
+            assertFalse(LegacyLocalSyncPolicy.mayStart(CabinetSyncMode.checked(row.getInt("Mode")),row.getBoolean("Netplay"),false));
+            var reloaded=CabinetSyncSettings.load(before,null);
+            reloaded.rememberDefault("new|old-global",CabinetSyncMode.MEDIA,false,null);
+            assertEquals(before,reloaded.save(new CompoundTag(),null));
+        }
+    }
     @Test void capacityFailureCannotPretendThatTheDefaultWasSaved() {
         var store=new CabinetSyncSettings();for(int i=0;i<4096;i++)store.rememberDefault("cabinet"+i,CabinetSyncMode.MEDIA,false,null);
         assertThrows(IllegalStateException.class,()->store.rememberDefault("overflow",CabinetSyncMode.LOCAL_SYNC,true,"legacy"));

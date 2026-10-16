@@ -31,19 +31,18 @@ final class CabinetSyncSettingsScreen extends DeviceScreen {
         DeviceUi.prepare();w=Math.min(400,width-24);h=Math.min(224,height-24);x=(width-w)/2;y=(height-h)/2;
         CabinetSyncNetwork.setSettingsSink(this::receive);
         if(width<320||height<240){addRenderableWidget(DeviceUi.button(font,"返回",x+10,y+h-30,w-20,20,this::onClose,true,DeviceUi.Tone.NORMAL));return;}
-        if(!requested){requested=true;pending=true;waiting=0;if(backend.equals(CabinetBackends.NES)){pending=false;status="FC 街机仅支持本地输入同步。";}else CabinetSyncNetwork.requestMode(target,backend,-1,debugToken);}
+        if(!requested){requested=true;pending=true;waiting=0;if(backend.equals(CabinetBackends.NES)){pending=false;status="本柜选择 FC / NES 时保留原有唯一运行路线；不是另一种机柜，也不会自动换成 JNI。";}else CabinetSyncNetwork.requestMode(target,backend,-1,debugToken);}
         if(diagnostics){
             addRenderableWidget(DeviceUi.button(font,"返回同步设置",x+10,y+h-30,w-20,20,()->{diagnostics=false;rebuildWidgets();},true,DeviceUi.Tone.NORMAL));return;
         }
         if(powerPage){initPowerPage();return;}
         if(netplayPage){initNetplayPage();return;}
-        int third=(w-28)/3;
+        int modeWidth=(w-26)/2;
         boolean editable=!pending&&!timedOut&&cooldown==0&&setting!=null&&setting.editable()&&!backend.equals(CabinetBackends.NES);
         int current=backend.equals(CabinetBackends.NES)?1:setting==null?-1:setting.mode();
-        var playerMediaButton=addRenderableWidget(DeviceUi.button(font,(current==0?"✓ ":"")+"玩家音画串流",x+10,y+44,third,20,()->apply(0),editable&&setting.playerMedia()&&current!=0,DeviceUi.Tone.NORMAL));
+        var playerMediaButton=addRenderableWidget(DeviceUi.button(font,(current==0?"✓ ":"")+"玩家音画串流",x+10,y+44,modeWidth,20,()->apply(0),editable&&setting.playerMedia()&&current!=0,DeviceUi.Tone.NORMAL));
         playerMediaButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal("原“玩家托管”：一位玩家运行游戏，其他玩家接收音画；实际运行器见音画诊断，不等同 Netplay。")));
-        addRenderableWidget(DeviceUi.button(font,(current==1?"✓ ":"")+"本地同步",x+14+third,y+44,third,20,()->apply(1),editable&&setting.supported()&&current!=1,DeviceUi.Tone.NORMAL));
-        var hostedButton=addRenderableWidget(DeviceUi.button(font,(current==2?"✓ ":"")+"服务器托管",x+18+third*2,y+44,third,20,()->apply(2),editable&&setting.hosted()&&current!=2,DeviceUi.Tone.NORMAL));
+        var hostedButton=addRenderableWidget(DeviceUi.button(font,(current==2?"✓ ":"")+"服务器托管",x+16+modeWidth,y+44,modeWidth,20,()->apply(2),editable&&setting.hosted()&&current!=2,DeviceUi.Tone.NORMAL));
         if(setting!=null)hostedButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal(setting.hostedReason())));
         if(CabinetNetplay.supported(backend)){
             int col=(w-26)/2;
@@ -131,15 +130,16 @@ final class CabinetSyncSettingsScreen extends DeviceScreen {
             DeviceUi.text(g,font,"核心为近 1 秒墙钟耗时；音画流为创建以来平均",x+10,y+h-56,w-20,DeviceUi.MUTED);
             DeviceUi.text(g,font,"合并不丢按键边沿；核心过慢仍会延迟，网络另计",x+10,y+h-44,w-20,DeviceUi.MUTED);
         }else{
-            if(CabinetNetplay.supported(backend)){
+            if(backend.equals(CabinetBackends.NES)){
+                DeviceUi.text(g,font,"本柜 FC / NES：保留原有运行方式。",x+10,y+72,w-20,DeviceUi.MUTED);
+                DeviceUi.text(g,font,"尚无同机柜替代路线，不自动更换核心或存档。",x+10,y+84,w-20,DeviceUi.MUTED);
+            }else if(setting!=null&&setting.mode()==1){
+                DeviceUi.text(g,font,"当前旧本地同步已停用；请明确重选。",x+10,y+96,w-20,DeviceUi.TEXT);
+            }else if(CabinetNetplay.supported(backend)){
                 DeviceUi.text(g,font,"Netplay：最多 "+CabinetNetplay.maxPlayers(backend)+" 席；固定后端与试验说明见设置。",x+10,y+96,w-20,DeviceUi.MUTED);
-            }else if(CabinetBackends.hostSnapshotSync(backend)&&setting!=null&&setting.mode()==1){
-                DeviceUi.text(g,font,"本地输入同步：kof97 / mslug2，最多两席。",x+10,y+72,w-20,DeviceUi.MUTED);
-                DeviceUi.text(g,font,"同步完成后即可操作；旁观接收音画。",x+10,y+84,w-20,DeviceUi.MUTED);
-                DeviceUi.text(g,font,"切换模式需管理员权限，且机器空闲。",x+10,y+96,w-20,DeviceUi.MUTED);
             }else{
                 DeviceUi.text(g,font,"玩家托管：主持电脑运行，其他玩家接收音画。",x+10,y+72,w-20,DeviceUi.MUTED);
-                DeviceUi.text(g,font,"本地同步：玩家各自在本机运行；旁观接收音画。",x+10,y+84,w-20,DeviceUi.MUTED);
+                DeviceUi.text(g,font,"旧本地同步入口已停用，历史档案保留。",x+10,y+84,w-20,DeviceUi.MUTED);
                 DeviceUi.text(g,font,"服务器托管：服务器运行，玩家只接收音画。",x+10,y+96,w-20,DeviceUi.MUTED);
             }
             CabinetUi.paragraph(g,font,status,x+10,y+110,w-20,CabinetCoinPolicy.supported(backend.toString())?1:Math.max(1,(h-190)/10),pending?DeviceUi.MUTED:DeviceUi.TEXT);

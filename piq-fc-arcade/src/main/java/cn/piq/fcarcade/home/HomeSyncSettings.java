@@ -110,6 +110,7 @@ public final class HomeSyncSettings {
             if (!player.hasPermissions(2)) reason = "只有管理员可更改主机高级设置。";
             else if (diagnosticsOnly(c)) reason = "此设备仅提供诊断；没有可修改的公共联机设置。";
             else if (busy) reason = "请先关机并关闭加入、存档选择窗口；已借手柄无需归还。";
+            else if (request.mode() == 1) reason = HomeSyncPolicy.legacyUnavailable();
             else if (request.occupancy() >= 0 && !HomePresentationSettings.occupancySupported(c.getLevel(),c.getBlockPos())) reason="此机型不支持使用者标牌。";
             else if (request.secondPort() >= 0 && !secondPortSupported(c)) reason="此机型尚未接入设备 2P 许可。";
             else if (request.mode() >= 0 && (supported(player,intent.console)&(1<<request.mode()))==0)
@@ -207,7 +208,7 @@ public final class HomeSyncSettings {
             else if(console instanceof ExternalHomeConsoleBlockEntity external){external.netplayExperimental(false);external.netplayJniTrial(true);}
             return CabinetSyncMode.LOCAL_SYNC;
         }
-        return CabinetSyncMode.checked(cn.piq.fcarcade.config.GameConsoleAdminPolicy.selectNewMode(desired,modes,fallback.ordinal()));
+        return HomeSyncPolicy.placementMode(desired,modes,fallback);
     }
     /** OP command convenience; uses the same identity, protection, provider and idle gates as the GUI. */
     public static boolean adminCommand(ServerPlayer player, BlockHitResult hit, int mode, Integer range) {
@@ -234,6 +235,7 @@ public final class HomeSyncSettings {
     }
     private static String bounded(String reason){return reason==null||reason.isBlank()?"此机型尚未提供该运行方式。":reason.length()>256?reason.substring(0,255)+"…":reason;}
     private static String unavailableMode(ServerPlayer player,HomeEndpointBlockEntity console,int selected){
+        if(selected==1)return HomeSyncPolicy.legacyUnavailable();
         if(console instanceof ExternalHomeConsoleBlockEntity external){
             var hooks=HomeSystems.applianceHooks(external.systemId());
             try {

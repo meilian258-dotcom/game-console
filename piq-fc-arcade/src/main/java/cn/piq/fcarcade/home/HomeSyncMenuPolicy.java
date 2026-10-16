@@ -6,7 +6,7 @@ package cn.piq.fcarcade.home;
 public final class HomeSyncMenuPolicy {
     /** A mask alone cannot opt an older addon into a new JNI room implementation. */
     public static int externalModes(int declared,int policyMask,boolean localAllowed,boolean jniDeclared) {
-        return declared & ((policyMask & (localAllowed ? 7 : 5)) | (localAllowed ? (jniDeclared ? 24 : 8) : 0)) & 31;
+        return declared & ((policyMask & 5) | (localAllowed ? (jniDeclared ? 24 : 8) : 0)) & 29;
     }
     private HomeSyncMenuPolicy() {}
     // Existing addon hooks may already filter policy from their supported mask.
@@ -18,15 +18,15 @@ public final class HomeSyncMenuPolicy {
         return mode==3?"Netplay 不可用："+detail:detail;
     }
     public static boolean supported(int mask, int mode) {
-        return mode >= 0 && mode < 5 && (mask & (1 << mode)) != 0;
+        return mode >= 0 && mode < 5 && mode != 1 && (mask & (1 << mode)) != 0;
     }
     public static String selectedStatus(String operation, int selected, int mask, String unavailable) {
         return supported(mask, selected) ? operation
                 : operation + " 当前所选模式不可用：" + unavailable;
     }
     public static boolean showMode(int mode, boolean external, boolean diagnosticsOnly, int mask) {
-        // Stable positions across devices; unsupported lanes remain disabled with their real reason.
-        return mode >= 0 && mode < 5;
+        // The screen retains a selected legacy row only to explain refusal, never as a new option.
+        return mode >= 0 && mode < 5 && mode != 1;
     }
     public static String buttonState(int mode, int selected, int mask, boolean editable, String unavailable) {
         if (!supported(mask, mode)) return unavailable;

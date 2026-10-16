@@ -44,9 +44,12 @@ class DeviceCopyContractTest {
         assertTrue(home.contains("HomeSyncMenuPolicy.buttonState("));
         assertTrue(source("home/HomeSyncMenuPolicy").contains("已借手柄无需归还"));
         String cabinet = source("client/cabinet/CabinetSyncSettingsScreen");
-        assertTrue(cabinet.contains("FC 街机仅支持本地输入同步。"));
-        assertTrue(cabinet.contains("本地输入同步：kof97 / mslug2，最多两席。"));
-        assertTrue(cabinet.contains("切换模式需管理员权限，且机器空闲。"));
+        assertTrue(cabinet.contains("本柜选择 FC / NES 时保留原有唯一运行路线；不是另一种机柜，也不会自动换成 JNI。"));
+        assertTrue(cabinet.contains("尚无同机柜替代路线，不自动更换核心或存档。"));
+        assertTrue(cabinet.contains("当前旧本地同步已停用；请明确重选。"));
+        assertTrue(cabinet.contains("旧本地同步入口已停用，历史档案保留。"));
+        assertFalse(cabinet.contains("本地输入同步：kof97 / mslug2，最多两席。"));
+        assertTrue(cabinet.contains("仅空闲时可改，需管理员；选后端不会自动启用。"));
         assertTrue(cabinet.contains("设置未确认，请关闭后重开。"));
     }
 

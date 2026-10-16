@@ -185,6 +185,7 @@ public final class CabinetRooms {
         var mode=room==null?CabinetSyncSettings.get(server,primary,backend):room.mode;
         boolean netplay=room==null?CabinetSyncSettings.netplay(server,primary,backend):CabinetNetplay.active(room.id);
         if(room==null){
+            if(!LegacyLocalSyncPolicy.mayStart(mode,netplay,backend.equals(CabinetBackends.NES))){notice(player,LegacyLocalSyncPolicy.RETIRED);return;}
             if(CabinetHostedSessions.isTargetBusy(server,primary)||secondary!=null&&CabinetHostedSessions.isTargetBusy(server,secondary)){notice(player,"上一局仍在关闭或保存，请稍后再开机。");return;}
             String denied=mode==CabinetSyncMode.SERVER_MEDIA?CabinetHostedSessions.unavailable(server,primary,backend):
                 mode==CabinetSyncMode.LOCAL_SYNC&&!CabinetHostingConfig.localAllowed()?"服主已禁用本地同步":
@@ -400,7 +401,7 @@ public final class CabinetRooms {
             boolean granted=member.port==0&&member==r.host()&&player.hasPermissions(2)&&now(player.getServer())<expiry;
             mask=PgmServicePolicy.filterInput(mask,granted);
         }
-        var change=state.ledger.input(player.getUUID(),packet.room(),packet.member(),packet.seq(),mask,now(player.getServer()));
+        var change=state.ledger.input(player.getUUID(),packet.room(),packet.member(),packet.seq(),mask,now(player.getServer()),paidNetplay(r));
         if(change==null&&paidNetplay(r)&&previous<packet.seq()&&member.sequence==packet.seq())change=new CabinetRoomLedger.Change(r.id,member.id,member.port,++member.forwardSequence,member.mask,false);
         if(member.rateLimited){close(player.getServer(),state,member,"输入发送过快，已退出本玩家席位");return;}
         // P1 already feeds its local core. Forced resets still return to P1.
@@ -410,9 +411,11 @@ public final class CabinetRooms {
         var r=syncRoom(player.getServer(),packet.room());if(r!=null&&r.mode==CabinetSyncMode.LOCAL_SYNC&&!paidNetplay(r))return;
         var member=authorized(player,packet.room(),packet.member());if(member==null)return;
         var state=STATES.get(player.getServer());
-        var change=state.ledger.resetInput(player.getUUID(),packet.room(),packet.member(),packet.seq(),now(player.getServer()));
-        if(member.rateLimited){close(player.getServer(),state,member,"输入发送过快，已退出本玩家席位");return;}
+        var change=state.ledger.resetInput(player.getUUID(),packet.room(),packet.member(),packet.seq(),now(player.getServer()),paidNetplay(r));
+        // A valid release must reach the host even when repeated packets exhaust
+        // the transport allowance. Closing a flooder happens after safe release.
         forward(player.getServer(),state,change);
+        if(member.rateLimited){close(player.getServer(),state,member,"输入发送过快，已退出本玩家席位");return;}
     }
     static void media(ServerPlayer player,CabinetRoomNetwork.Media packet){
         var live=syncRoom(player.getServer(),packet.room());if(live!=null&&live.mode==CabinetSyncMode.SERVER_MEDIA)return;

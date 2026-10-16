@@ -30,9 +30,10 @@ class CabinetSnapshotSyncSourceTest {
         assertTrue(s.contains("room.mode=mode"));assertTrue(s.contains("room.capacity==CabinetSeats.capacity(CabinetNetplay.active(room.id)?"));
         assertTrue(s.contains("ServerCabinets.valid(host,hostBinding,true)"));assertTrue(s.contains("ServerCabinets.valid(applicant,binding,true)"));
     }
-    @Test void settingsRejectOverCapacityWithoutAffectingMediaChoice()throws Exception{
-        var s=read("CabinetSyncSettings");assertTrue(s.contains("CabinetSeats.capacity(syncPlayers,secondary!=null"));
-        assertTrue(s.contains("packet.mode()==1&&!supported"));assertTrue(s.contains("!ServerCabinets.isCabinetBusy(server,primary)"));
+    @Test void settingsRetireOldSyncButKeepNetplayCapacityAndMediaChoice()throws Exception{
+        var s=read("CabinetSyncSettings");assertTrue(s.contains("CabinetSeats.capacity(CabinetNetplay.maxPlayers(packet.backend()),secondary!=null"));
+        assertTrue(s.contains("LegacyLocalSyncPolicy.retiredSelection(packet.mode())"));
+        assertTrue(s.contains("packet.mode()==3&&!netplaySupported"));assertTrue(s.contains("!ServerCabinets.isCabinetBusy(server,primary)"));
         assertTrue(s.contains("!Objects.equals(secondary,CabinetLinks.peer(server,primary))"));
     }
     @Test void staleCacheRejectsOnlyGuestAndKeepsHostRefreshRoom()throws Exception{

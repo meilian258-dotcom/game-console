@@ -118,8 +118,8 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
 
     def test_game_dependency_floors_match_required_public_api_generations(self):
         expected = {
-            # SFC54 uses FC76.54's shared read-only save-library presentation.
-            'piq-sfc-home': '[0.31.0-alpha.76.54,0.31.0-alpha.77)',
+            # SFC55 additionally calls FC76.57's HomeSyncPolicy.publicRunnable API.
+            'piq-sfc-home': '[0.31.0-alpha.76.57,0.31.0-alpha.77)',
             # Unified content paths / file-backed JNI content require FC 76.40.
             'piq-sfc-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
             # MD16 uses FC76.50's shared device-level second-port policy.

@@ -27,7 +27,12 @@ class CabinetCoinSourceTest {
     }
     @Test void ordinaryReleaseUsesPreservingCapabilityButSeatDestructionStillHardReleases()throws Exception{
         var sync=source("cabinet/CabinetSynchronizer");
-        assertTrue(sync.contains("if(p.reset())s.timeline.releaseGameplay(m.port)"));
+        var input=sync.substring(sync.indexOf("static void input("),sync.indexOf("static boolean coin("));
+        int admittedReset=input.indexOf("if(change!=null&&p.reset())s.timeline.releaseGameplay(m.port)");
+        assertTrue(admittedReset>=0,"Only an identity/sequence-admitted Reset may release held gameplay input");
+        assertTrue(input.indexOf("if(m.rateLimited)",admittedReset)>admittedReset,
+                "An admitted Reset must release gameplay before a flood closes the seat; coins remain preserved");
+        assertTrue(input.contains("if(change!=null&&!p.reset())s.timeline.input(m.port,change.mask())"));
         assertTrue(sync.substring(sync.indexOf("static void removed")).contains("s.timeline.release(port)"));
         var worker=source("cabinet/HostedCabinetWorker");
         assertTrue(worker.contains("core.supportsCoinPreservingRelease()&&inputs.coin(port)"));

@@ -9,7 +9,7 @@ public final class CabinetHostingConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
     public static final ModConfigSpec.BooleanValue ENABLED = BUILDER.comment("Opt in to server-side emulation. Requires installed server runtimes; never downloads executable files.").define("serverHosting", false);
     public static final ModConfigSpec.BooleanValue PLAYER_MEDIA = BUILDER.comment("Allow a player to host cabinet audio/video.").define("allowPlayerHosting", true);
-    public static final ModConfigSpec.BooleanValue LOCAL_SYNC = BUILDER.comment("Allow verified cabinet input synchronization.").define("allowLocalSync", true);
+    public static final ModConfigSpec.BooleanValue LOCAL_SYNC = BUILDER.comment("Allow Netplay and the preserved original FC/NES cabinet route. Does not restore retired selectable local synchronization.").define("allowLocalSync", true);
     public static final ModConfigSpec.IntValue MAX_ROOMS = BUILDER.comment("Maximum active server-hosted sessions, including closing workers.").defineInRange("maxHostedRooms", 2, 1, 4);
     public static final ModConfigSpec.IntValue BYTES_PER_SECOND = BUILDER.comment("Hosted participant audio/video upload budget in bytes per second, including each recipient copy. Spectators also retain the separate watch budget.").defineInRange("hostedBytesPerSecond", 2 * 1024 * 1024, 256 * 1024, 16 * 1024 * 1024);
     public static final ModConfigSpec.ConfigValue<Integer> VIDEO_FPS = BUILDER.comment("Server-hosted VIDEO delivery cap: 20, 30 or 60. Default 20. Does not change emulation speed or audio; bandwidth/CPU limits still apply. Shared by FC, SFC and cabinets.").define("hostedVideoFps", 20,

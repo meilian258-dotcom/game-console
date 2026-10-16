@@ -37,7 +37,7 @@ public final class RuntimeCatalog {
             file("piq-native-arcade/runtime", "mame_libretro.dll", 372431360, "6172A988AB67FE68F4177A6FC8FBB82619EB2044C330930F0F572F7B1EDC2301"),
             file("piq-native-arcade/runtime", "piq-native-helper-v4.jar", 18858, "51A1A6A0A326E5E855647A414DBB78894CA01E9D766627EF272CE59BC809A304"),
             jna("piq-native-arcade/runtime"))),
-        new Component(RuntimeId.NEOGEO_SNAPSHOT, "街机 · 本地输入同步", List.of(
+        new Component(RuntimeId.NEOGEO_SNAPSHOT, "街机 · 旧本地同步组件（入口已停用）", List.of(
             file("piq-native-arcade/runtime-snapshot-v1", "piqneogeo_libretro.dll", 56494080, "E8F435903332AC80468769604779295A6965046DC25D4706A583D14D91C35201"),
             file("piq-native-arcade/runtime-snapshot-v1", "piq-snapshot-helper.jar", 43610, "F175B7CB60B37A95E1F5B2ED5FB48CE066FC1B6AE1ECD8089B8E6F957EF76C97"),
             jna("piq-native-arcade/runtime-snapshot-v1"))),

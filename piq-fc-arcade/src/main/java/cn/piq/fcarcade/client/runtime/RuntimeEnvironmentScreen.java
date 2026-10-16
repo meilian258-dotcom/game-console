@@ -126,7 +126,7 @@ public final class RuntimeEnvironmentScreen extends DeviceScreen {
         if(box.supported()) {
             line(g,"FC / SFC：核心随各自模组内置",0,mx,my);
             line(g,"街机媒体模式："+status(RuntimeCatalog.RuntimeId.MAME),1,mx,my);
-            line(g,"街机本地输入同步："+status(RuntimeCatalog.RuntimeId.NEOGEO_SNAPSHOT),2,mx,my);
+            line(g,"旧街机同步组件（入口已停用，文件保留）："+status(RuntimeCatalog.RuntimeId.NEOGEO_SNAPSHOT),2,mx,my);
             line(g,"GBA："+status(RuntimeCatalog.RuntimeId.GBA),3,mx,my);
             line(g,packStatus(),4,mx,my);line(g,summary(),5,mx,my);
             var error=DeviceNotices.last();
@@ -143,6 +143,7 @@ public final class RuntimeEnvironmentScreen extends DeviceScreen {
         text.append("离线包：game-console/piq-runtime-packs/piq-runtime-pack-v1.zip\n");
         text.append("组件相对路径基准：游戏目录/game-console\n");
         text.append("街机 v4 helper：仅从 Native 0.1.1 内置来源补缺；原离线包继续用于原库/GBA，不提供新 helper。\n");
+        text.append("旧街机本地同步入口已停用；NEOGEO_SNAPSHOT 仅保留历史组件检查，不代表可开局，也不代表 Netplay 资源状态。\n");
         text.append("JAR 内置组件：").append(RuntimeInstaller.bundledRuntimeIds()).append('\n');
         cn.piq.fcarcade.runtime.RuntimeStartupState.report(minecraft.gameDirectory.toPath()).ifPresent(startup->{
             text.append("最近启动/安装结果：").append(startup.summary()).append('\n');
