@@ -62,6 +62,7 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         DeviceUi.prepare();
         layout=HomeSyncSettingsLayout.fit(width,height);panelWidth=layout.width();left=layout.left();top=layout.top();
         if(layout.compact()){addRenderableWidget(Button.builder(Component.literal("关闭"),b->onClose()).bounds(left,Math.max(35,height-32),panelWidth,20).build());return;}
+        int row=0;
         for(int mode=0;mode<5;mode++) {
             final int selected=mode;
             boolean privateOnly=diagnosticsOnly();
@@ -70,6 +71,7 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
             String label=(setting.mode()==mode&&!privateOnly?"✓ ":"")+LABELS[mode];
             if(privateOnly&&mode==4)label="私人单人 · 本机设置…";
             else if(privateOnly)label+="（尚未接入）";
+            else if(mode==1)label+="（已退役）";
             else if((setting.supported()&(1<<mode))==0)label+="（不可用）";
             else if(setting.mode()==mode)label+="（当前）";
             var button=Button.builder(Component.literal(label),b->{
@@ -77,8 +79,8 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
                 else if(selected==4)JniNetplayConsent.confirm(this,()->{if(current()&&setting.mode()!=4)apply(4,-1,-1);});
                 else apply(selected,-1,-1);
             })
-                .bounds(left+10,top+HomeSyncSettingsLayout.MODE_ROW+mode*HomeSyncSettingsLayout.MODE_STEP,panelWidth-20,16).build();
-            button.active=ready()&&(privateOnly&&mode==4||(setting.supported()&(1<<mode))!=0
+                .bounds(left+10,top+HomeSyncSettingsLayout.MODE_ROW+row++*HomeSyncSettingsLayout.MODE_STEP,panelWidth-20,16).build();
+            button.active=ready()&&(privateOnly&&mode==4||HomeSyncMenuPolicy.supported(setting.supported(),mode)
                     &&(setting.editable()&&setting.mode()!=mode||mode==4&&setting.mode()==4&&!JniNetplayConsent.allowed()));
             button.setTooltip(Tooltip.create(Component.literal(privateOnly
                 ?(mode==4?"打开已可用的本机控制、运行环境与运行器设置；不会开关机或切换公共模式。"

@@ -52,7 +52,7 @@ public final class SfcHomeServer {
         try{return factory.unavailableReason(new cn.piq.fcarcade.server.hosted.ServerCoreContext(server.getServerDirectory(),cn.piq.retro.storage.ConsoleStorage.root(world).resolve("piq-sfc-home/hosted-saves"),c.hardwareId(),c.hardwareId()));}
         catch(RuntimeException|LinkageError unavailable){return "SFC 服务端核心能力检查失败。";}
     }
-    private static boolean modeSupported(SfcHomeConsoleBlockEntity c){return c.synchronizationMode()==cn.piq.fcarcade.cabinet.CabinetSyncMode.MEDIA&&cn.piq.fcarcade.cabinet.CabinetHostingConfig.playerAllowed()||c.synchronizationMode()==cn.piq.fcarcade.cabinet.CabinetSyncMode.LOCAL_SYNC&&cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed()||hostedMode(c)&&hostedUnavailable((ServerLevel)c.getLevel(),c)==null;}
+    private static boolean modeSupported(SfcHomeConsoleBlockEntity c){return HomeSyncPolicy.publicRunnable(c.synchronizationMode(),c.netplayJniTrial())&&(c.synchronizationMode()==cn.piq.fcarcade.cabinet.CabinetSyncMode.MEDIA&&cn.piq.fcarcade.cabinet.CabinetHostingConfig.playerAllowed()||c.synchronizationMode()==cn.piq.fcarcade.cabinet.CabinetSyncMode.LOCAL_SYNC&&cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed()||hostedMode(c)&&hostedUnavailable((ServerLevel)c.getLevel(),c)==null);}
     private static SfcHostedWorker openHosted(Session s,AutoCloseable capacity){
         var server=s.connection.level().getServer();var world=server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toAbsolutePath().normalize();
         var context=new cn.piq.fcarcade.server.hosted.ServerCoreContext(server.getServerDirectory(),cn.piq.retro.storage.ConsoleStorage.root(world).resolve("piq-sfc-home/hosted-saves"),s.host.player,s.connection.consoleId());
@@ -179,6 +179,7 @@ public final class SfcHomeServer {
             @Override public boolean secondPortSettingsAvailable(){return true;}
             @Override public int synchronizationSupportedModes(ServerLevel l,ExternalHomeConsoleBlockEntity c){return cn.piq.sfchome.world.SfcNetplaySettings.supportedModes(cn.piq.fcarcade.cabinet.CabinetHostingConfig.playerAllowed(),cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed(),hostedUnavailable(l,c)==null);}
             @Override public String synchronizationUnavailableReason(ServerLevel l,ExternalHomeConsoleBlockEntity c,int mode){
+                if(mode==1)return HomeSyncPolicy.legacyUnavailable();
                 if(mode==3)return "SFC 的此联机路线实际使用 JNI，不提供 RetroArch Netplay；请选择 JNI Netplay。";
                 if(mode==4)return cn.piq.fcarcade.cabinet.CabinetHostingConfig.localAllowed()?"SFC JNI Netplay：新进度使用 Snes9x；旧 Mesen-S 进度独立保留，仍有回滚风险。":"服主已禁用本地输入同步及 Netplay。";
                 return HomeSystems.ServerHooks.super.synchronizationUnavailableReason(l,c,mode);
@@ -381,6 +382,7 @@ public final class SfcHomeServer {
     }
     private static boolean powerOn(ServerPlayer p,HomeSystems.Connection connection){
         if(!(connection.console() instanceof SfcHomeConsoleBlockEntity c)||preflight(p,c,true)==null)return false;
+        if(!HomeSyncPolicy.publicRunnable(c.synchronizationMode(),c.netplayJniTrial())){feedback(p,HomeSyncPolicy.legacyUnavailable());return false;}
         var server=p.getServer();var st=state(server);var key=launchKey(c);
         if(HomeLaunchServer.busy(server,key)||st.sessions.containsKey(c.hardwareId())||st.stopping.containsKey(c.hardwareId()))return false;
         final ItemStack snapshot=c.insertedCartridge();final var mode=c.synchronizationMode();final boolean netplay=c.netplayJniTrial();
@@ -423,6 +425,7 @@ public final class SfcHomeServer {
     }
     private static boolean beginRuntime(ServerPlayer p,HomeSystems.Connection connection,StartSave save,HomeLaunchServer.Handle flow,boolean allowSecond){
         if(!(connection.console() instanceof SfcHomeConsoleBlockEntity c))return false;State st=state(p.getServer());
+        if(!HomeSyncPolicy.publicRunnable(c.synchronizationMode(),c.netplayJniTrial())){feedback(p,HomeSyncPolicy.legacyUnavailable());return false;}
         final boolean requestedNetplay=save.variant()!=null;
         if(c.netplayJniTrial()!=requestedNetplay)return false;
         if(!modeSupported(c)){feedback(p,hostedMode(c)?Objects.requireNonNullElse(hostedUnavailable(p.serverLevel(),c),"服务端托管不可用"):HomeSyncPolicy.unavailable(c.synchronizationMode()));return false;}

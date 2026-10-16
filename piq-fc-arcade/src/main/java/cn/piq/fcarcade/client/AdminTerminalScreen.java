@@ -34,7 +34,7 @@ public final class AdminTerminalScreen extends DeviceScreen {
     private static final int HEIGHT=244;
     private static final String[] TABS={"玩家权限","新机默认","管理工具","FC个人存档","街机全服"};
     private static final String[] OPTIONS={"可自定义玩家","选用服务器游戏","选用服务器封面","上传本机游戏","上传本机封面"};
-    private static final String[] MODES={"自动（FC JNI优先）","玩家串流","本地同步","服务器托管"};
+    private static final String[] MODES={"自动（FC JNI优先）","玩家串流","旧本地同步（已停用）","服务器托管"};
     private AdminTerminalScreen(Connection connection,InteractionHand hand){super(Component.literal("管理终端"));this.connection=connection;this.hand=hand;}
     public static void open(InteractionHand hand){
         var mc=Minecraft.getInstance();if(mc.getConnection()==null||mc.level==null||mc.player==null)return;
@@ -87,10 +87,13 @@ public final class AdminTerminalScreen extends DeviceScreen {
             }
         }else if(tab==1){
             int half=(w-24)/2;
+            int slotIndex=0;
             for(int i=0;i<4;i++){
+                if(cn.piq.fcarcade.cabinet.LegacyLocalSyncPolicy.retiredSelection(i-1))continue;
                 int mode=i-1;String title=(state!=null&&state.mode()==mode?"✓ ":"")+MODES[i];
-                button(title,left+10+(i%2)*(half+4),top+92+(i/2)*24,half,()->request(AdminTerminalPolicy.MODE,mode),
+                button(title,left+10+(slotIndex%2)*(half+4),top+92+(slotIndex/2)*24,half,()->request(AdminTerminalPolicy.MODE,mode),
                     editable()&&(mode<0||(state.supported()&(1<<mode))!=0),"仅新机器采用；自动时FC优先JNI Netplay（普通双手柄），其他机型保持原模式。旧机器及其存档不迁移。");
+                slotIndex++;
             }
             int slot=(w-32)/4;int[] ranges={8,16,32,64};
             for(int i=0;i<ranges.length;i++){int range=ranges[i];button((state!=null&&state.range()==range?"✓ ":"")+range+" 格",left+10+i*(slot+4),top+164,slot,
@@ -123,7 +126,7 @@ public final class AdminTerminalScreen extends DeviceScreen {
         if(width<320||height<260)DeviceUi.text(g,font,"请放大窗口或降低 GUI 缩放",left+10,top+50,w-20,DeviceUi.TEXT);
         else{
             if(tab==1){
-                DeviceUi.text(g,font,"运行方式",left+10,top+76,w-20,DeviceUi.MUTED);
+                DeviceUi.text(g,font,state!=null&&state.mode()==1?"原默认是旧本地同步，已停用；请重选。":"运行方式（旧本地同步入口已停用）",left+10,top+76,w-20,DeviceUi.MUTED);
                 DeviceUi.text(g,font,"新家庭机旁观范围"+(state==null?"":"："+state.range()+" 格"),left+10,top+150,w-20,DeviceUi.MUTED);
             }
             if(tab==3){

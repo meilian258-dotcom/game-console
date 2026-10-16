@@ -17,7 +17,7 @@ class SfcPlayerMediaSourceTest {
         for(int flags=0;flags<8;flags++){
             boolean media=(flags&1)!=0,local=(flags&2)!=0,hosted=(flags&4)!=0;
             int supported=cn.piq.sfchome.world.SfcNetplaySettings.supportedModes(media,local,hosted);
-            assertEquals(media,(supported&1)!=0);assertEquals(local,(supported&2)!=0);
+            assertEquals(media,(supported&1)!=0);assertEquals(0,supported&2);
             assertEquals(hosted,(supported&4)!=0);assertEquals(local,(supported&16)!=0);
             assertEquals(0,supported&8,"SFC does not claim a RetroArch mode");
         }

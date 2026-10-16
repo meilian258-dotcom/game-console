@@ -62,8 +62,9 @@ final class CabinetSynchronizer {
         var m=authorized(player,p.room(),p.member(),p.epoch());if(m==null)return;var s=get(player.getServer(),p.room());var peer=s.peers.get(m.id);
         if(peer==null||!peer.gate.input(p.room(),p.member(),p.epoch(),player.connection.getConnection())||s.timeline==null)return;
         var change=CabinetRooms.syncInput(player,p);
+        if(change!=null&&p.reset())s.timeline.releaseGameplay(m.port);
         if(m.rateLimited){CabinetRooms.syncClose(player.getServer(),m,"同步输入发送过快，已释放本人席位");return;}
-        if(change!=null){if(p.reset())s.timeline.releaseGameplay(m.port);else s.timeline.input(m.port,change.mask());}
+        if(change!=null&&!p.reset())s.timeline.input(m.port,change.mask());
     }
     static boolean coin(ServerPlayer player,CabinetRoomLedger.Room<CabinetTarget> room,CabinetRoomLedger.Member member){
         var s=get(player.getServer(),room.id);if(s==null||s.room!=room||s.timeline==null)return false;

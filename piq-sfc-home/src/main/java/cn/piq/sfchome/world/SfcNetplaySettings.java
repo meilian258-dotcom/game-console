@@ -20,6 +20,6 @@ public final class SfcNetplaySettings {
         tag.putBoolean(LEGACY, jni);
     }
     public static int supportedModes(boolean playerMedia, boolean local, boolean hosted) {
-        return (playerMedia ? 1 : 0) | (local ? 18 : 0) | (hosted ? 4 : 0);
+        return (playerMedia ? 1 : 0) | (local ? 16 : 0) | (hosted ? 4 : 0);
     }
 }

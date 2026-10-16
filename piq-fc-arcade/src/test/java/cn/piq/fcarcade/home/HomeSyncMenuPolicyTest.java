@@ -41,22 +41,24 @@ class HomeSyncMenuPolicyTest {
         assertTrue(HomeSyncMenuPolicy.showMode(4,true,false,17));
         assertTrue(HomeSyncMenuPolicy.showMode(4,false,false,31));
         assertTrue(HomeSyncMenuPolicy.showMode(4,true,true,0));
-        for(int mode=0;mode<4;mode++)assertTrue(HomeSyncMenuPolicy.showMode(mode,true,false,1));
+        for(int mode=0;mode<4;mode++)assertEquals(mode!=1,HomeSyncMenuPolicy.showMode(mode,true,false,1));
+        assertFalse(HomeSyncMenuPolicy.showMode(1,false,false,31),"Legacy mode is not a new selection even with a stale mask");
         assertFalse(HomeSyncMenuPolicy.showMode(-1,true,false,31));
         assertFalse(HomeSyncMenuPolicy.showMode(5,true,false,31));
     }
     @Test void masksNeverGrantInvalidModes(){
         for(int mask=0;mask<32;mask++)for(int mode=-1;mode<=5;mode++)
-            assertEquals(mode>=0&&mode<5&&(mask&(1<<mode))!=0,HomeSyncMenuPolicy.supported(mask,mode));
+            assertEquals(mode>=0&&mode<5&&mode!=1&&(mask&(1<<mode))!=0,HomeSyncMenuPolicy.supported(mask,mode));
     }
     @Test void externalJniRequiresExplicitDeclarationAndServerPolicy(){
         for(int declared=0;declared<64;declared++)for(boolean local:new boolean[]{false,true})for(boolean jni:new boolean[]{false,true}){
             int policy=local?7:5;int actual=HomeSyncMenuPolicy.externalModes(declared,policy,local,jni);
-            assertEquals(declared&(policy|(local?(jni?24:8):0))&31,actual);
+            assertEquals(declared&(policy|(local?(jni?24:8):0))&29,actual);
+            assertEquals(0,actual&2);
             assertEquals(local&&jni&&(declared&16)!=0,(actual&16)!=0);
             assertEquals(local&&(declared&8)!=0,(actual&8)!=0);
         }
-        assertEquals(15,HomeSyncMenuPolicy.externalModes(15,7,true,false)); // Existing SFC.
+        assertEquals(13,HomeSyncMenuPolicy.externalModes(15,7,true,false)); // Existing addons cannot re-advertise old sync.
         assertEquals(1,HomeSyncMenuPolicy.externalModes(1,7,true,true)); // An opt-in is not a mode claim.
     }
 }

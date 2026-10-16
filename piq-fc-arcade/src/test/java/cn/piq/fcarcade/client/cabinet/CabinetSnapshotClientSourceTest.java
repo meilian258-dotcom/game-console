@@ -58,13 +58,24 @@ class CabinetSnapshotClientSourceTest {
         assertTrue(s.contains("upload.needsOffer(tick)"));assertTrue(s.contains("CabinetSyncSender.send(connection,new CabinetSyncNetwork.Upload(p),n+512)"));
         assertTrue(s.contains("outgoing.close()"));
     }
-    @Test void releasedSnapshotCopyDoesNotReplaceOrdinarySfcDescription()throws Exception{
+    @Test void retiredSnapshotCopyKeepsOriginalFcExceptionAndNetplayAuthority()throws Exception{
         String s=source("client/cabinet/CabinetSyncSettingsScreen");
-        assertTrue(s.contains("if(CabinetBackends.hostSnapshotSync(backend)&&setting!=null&&setting.mode()==1)"));
-        assertTrue(s.contains("本地输入同步：kof97 / mslug2，最多两席。"));
+        assertTrue(s.contains("else if(setting!=null&&setting.mode()==1)"));
+        assertTrue(s.contains("当前旧本地同步已停用；请明确重选。"));
         assertFalse(s.contains("实验："));
-        assertTrue(s.contains("同步完成后即可操作；旁观接收音画。"));
-        assertTrue(s.contains("本地同步：玩家各自在本机运行；旁观接收音画。"));
-        assertTrue(s.contains("editable&&setting.supported()&&current!=1"));
+        assertTrue(s.contains("旧本地同步入口已停用，历史档案保留。"));
+        assertTrue(s.contains("玩家托管：主持电脑运行，其他玩家接收音画。"));
+        assertTrue(s.contains("服务器托管：服务器运行，玩家只接收音画。"));
+        assertFalse(s.contains("()->apply(1)"),"Retired sync must not remain a selectable mode");
+        String render=s.substring(s.indexOf("@Override public void render("));
+        int originalFc=render.indexOf("if(backend.equals(CabinetBackends.NES))"),retired=render.indexOf("else if(setting!=null&&setting.mode()==1)");
+        assertTrue(originalFc>=0&&retired>originalFc,"Only the existing FC/NES route is exempt from the retired-mode message");
+        assertTrue(render.contains("本柜 FC / NES：保留原有运行方式。"));
+        assertTrue(s.contains("if(CabinetNetplay.supported(backend))"));
+        assertTrue(s.contains("()->apply(3),editable&&variantAvailable()&&setting.mode()!=3"));
+        String settings=source("cabinet/CabinetSyncSettings");
+        assertTrue(settings.contains("boolean editable=p.hasPermissions(2)&&!ServerCabinets.isCabinetBusy(server,primary)"));
+        assertTrue(settings.contains("LegacyLocalSyncPolicy.retiredSelection(packet.mode())"));
+        assertTrue(settings.contains("packet.mode()==3&&!netplaySupported"));
     }
 }

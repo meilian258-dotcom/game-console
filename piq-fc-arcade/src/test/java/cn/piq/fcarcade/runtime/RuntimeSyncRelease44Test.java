@@ -9,8 +9,8 @@ class RuntimeSyncRelease44Test {
         return RuntimeCatalog.standard().stream()
                 .filter(c -> c.id() == RuntimeCatalog.RuntimeId.NEOGEO_SNAPSHOT).findFirst().orElseThrow();
     }
-    @Test void releasedDisplayNameKeepsItsPersistentRuntimeId() {
-        assertEquals("街机 · 本地输入同步", local().title());
+    @Test void retiredDisplayNameKeepsItsPersistentRuntimeId() {
+        assertEquals("街机 · 旧本地同步组件（入口已停用）", local().title());
         assertEquals(1, local().id().ordinal());
     }
     @Test void releaseRetainsAllThreeExecutablePinsAndPaths() {

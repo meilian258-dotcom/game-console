@@ -27,7 +27,7 @@ class SfcNetplaySettingsTest {
     @Test void capabilitiesAdvertiseOnlyActualJniAndRespectTheExistingServerPolicies(){
         for(boolean media:new boolean[]{false,true})for(boolean local:new boolean[]{false,true})for(boolean hosted:new boolean[]{false,true}){
             int mask=SfcNetplaySettings.supportedModes(media,local,hosted);
-            assertEquals(media,(mask&1)!=0);assertEquals(local,(mask&2)!=0);assertEquals(hosted,(mask&4)!=0);
+            assertEquals(media,(mask&1)!=0);assertEquals(0,mask&2);assertEquals(hosted,(mask&4)!=0);
             assertEquals(0,mask&8);assertEquals(local,(mask&16)!=0);
         }
     }

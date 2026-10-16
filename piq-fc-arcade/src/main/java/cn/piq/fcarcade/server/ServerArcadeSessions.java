@@ -295,6 +295,9 @@ public final class ServerArcadeSessions {
     }
 
     public static boolean powerHomeConsole(ServerPlayer player,cn.piq.fcarcade.home.HomeConsoleBlockEntity console,boolean gun){
+        if(console!=null&&!cn.piq.fcarcade.home.HomeSyncPolicy.publicRunnable(console.synchronizationMode(),console.netplayExperimental())){
+            player.displayClientMessage(Component.literal(cn.piq.fcarcade.home.HomeSyncPolicy.legacyUnavailable()),true);return false;
+        }
         if(console!=null&&(!cn.piq.fcarcade.home.HomeSyncPolicy.runnable(console.synchronizationMode())||console.synchronizationMode()==CabinetSyncMode.LOCAL_SYNC&&!CabinetHostingConfig.localAllowed()||console.synchronizationMode()==CabinetSyncMode.MEDIA&&!CabinetHostingConfig.playerAllowed())){
             player.displayClientMessage(Component.literal(cn.piq.fcarcade.home.HomeSyncPolicy.unavailable(console.synchronizationMode())),true);return false;
         }
@@ -1027,6 +1030,9 @@ public final class ServerArcadeSessions {
          * Slot editing/storage formats remain FC-owned; merely accepting a selection never writes. */
         private void prepareHome(ServerPlayer p,cn.piq.fcarcade.home.HomeConsoleBlockEntity c,cn.piq.fcarcade.home.HomeTvBlockEntity tv,String rom,boolean gun,
                                  RomSaveMode mode,String saveKey,String name,int players,boolean resume){
+            if(!cn.piq.fcarcade.home.HomeSyncPolicy.publicRunnable(c.synchronizationMode(),c.netplayExperimental())){
+                p.displayClientMessage(Component.literal(cn.piq.fcarcade.home.HomeSyncPolicy.legacyUnavailable()),true);return;
+            }
             var server=p.getServer();var card=c.insertedCartridge().copy();var consoleId=c.hardwareId();var tvId=tv.hardwareId();var link=c.linkId();
             var syncMode=c.synchronizationMode();boolean netplay=c.netplayExperimental(),jni=c.netplayJniTrial(),secondPort=c.secondPortAllowed();
             int max=gun?2:library(server).homeMaxPlayers(rom);
@@ -1039,6 +1045,7 @@ public final class ServerArcadeSessions {
                 public HomeLaunchServer.Definition definition(){return new HomeLaunchServer.Definition("FC",title,max,0,false,"",secondPort);}
                 public boolean valid(){
                     if(!current(p)||!tv.powered()||!cn.piq.fcarcade.home.HomeZapperService.facts(p,c,tv)
+                            ||!cn.piq.fcarcade.home.HomeSyncPolicy.publicRunnable(c.synchronizationMode(),c.netplayExperimental())
                             ||!consoleId.equals(c.hardwareId())||!tvId.equals(tv.hardwareId())||!Objects.equals(link,c.linkId())
                             ||!net.minecraft.world.item.ItemStack.isSameItemSameComponents(card,c.insertedCartridge())||c.insertedCartridge().getCount()!=1
                             ||cartridgeMode(c)!=mode||c.synchronizationMode()!=syncMode||c.netplayExperimental()!=netplay||c.netplayJniTrial()!=jni||c.secondPortAllowed()!=secondPort
@@ -1061,6 +1068,7 @@ public final class ServerArcadeSessions {
         }
         private boolean createHome(ServerPlayer p,cn.piq.fcarcade.home.HomeConsoleBlockEntity c,cn.piq.fcarcade.home.HomeTvBlockEntity tv,String rom,boolean gun,
                                    RomSaveMode mode,String saveKey,String name,int players,boolean resume){
+            if(!cn.piq.fcarcade.home.HomeSyncPolicy.publicRunnable(c.synchronizationMode(),c.netplayExperimental()))return false;
             if(c.netplayExperimental()&&c.synchronizationMode()!=CabinetSyncMode.LOCAL_SYNC)return false;
             if(mode!=RomSaveMode.NONE&&cn.piq.fcarcade.netplay.NetplaySaveServer.busy(p.getServer(),saveKey)){p.displayClientMessage(Component.literal("上局仍在保存，请稍后开机。"),true);return false;}
             if(!cn.piq.fcarcade.home.HomeSyncPolicy.runnable(c.synchronizationMode())||c.synchronizationMode()==CabinetSyncMode.LOCAL_SYNC&&!CabinetHostingConfig.localAllowed()||c.synchronizationMode()==CabinetSyncMode.MEDIA&&!CabinetHostingConfig.playerAllowed())return false;

@@ -93,7 +93,7 @@ final class CabinetMenuScreen extends cn.piq.fcarcade.client.ui.DeviceScreen {
                 CabinetUi.paragraph(g,font,entry.id().toString(),d.x()+6,d.y()+24,d.width()-12,2,DeviceUi.MUTED);
                 int lines=Math.min(3,Math.max(0,(b.primary().y()-4-(d.y()+52))/10));
                 String mode=entry.localOnly()?"本机单人 · 不支持公开 LAN":entry.id().equals(CabinetBackends.NES)?"FC 联机 · 开局允许后直接加入":CabinetBackends.maxPlayers(entry.id())>=4?"两席 / 两柜连线四席 · P1 同意后加入":CabinetBackends.maxPlayers(entry.id())>=2?"两席联机 · P1 同意后加入":CabinetBackends.maxPlayers(entry.id())==1?"服务器单人 · 附近玩家可旁观，不支持通讯线":"此后端未声明多人支持";
-                if(CabinetBackends.hostSnapshotSync(entry.id()))mode="旧本地同步限两席；四席可用音画串流 / 配套 FBNeo Netplay。";
+                if(CabinetBackends.hostSnapshotSync(entry.id()))mode="旧本地同步已停用；请明确选择音画串流或配套 Netplay，旧核心和存档保留。";
                 if(lines>0)CabinetUi.paragraph(g,font,mode,d.x()+6,d.y()+52,d.width()-12,lines,DeviceUi.MUTED);
             }
             String reason=entry==null?"请选择左侧条目":unavailable(entry);

@@ -3,6 +3,7 @@
 package cn.piq.fcarcade.cabinet;
 
 import java.util.*;
+import java.util.function.LongSupplier;
 
 /** Server-thread-only fixed seats; SERVER_MEDIA retains its worker identity when players leave. */
 final class CabinetRoomLedger<K> {
@@ -10,7 +11,9 @@ final class CabinetRoomLedger<K> {
     static final class Member {
         final UUID id,player,room;final int port;
         long expires,lastInput,sequence=-1,forwardSequence,tokenTick;int mask,inputTokens=16;boolean inputSeen,rateLimited,controlling=true;Object connection;
-        Member(UUID id,UUID player,UUID room,int port,long now){this.id=id;this.player=player;this.room=room;this.port=port;expires=now+HEARTBEAT_TIMEOUT;lastInput=now;tokenTick=now;}
+        final CabinetInputBudget inputBudget;
+        Member(UUID id,UUID player,UUID room,int port,long now,long nowNanos){this.id=id;this.player=player;this.room=room;this.port=port;expires=now+HEARTBEAT_TIMEOUT;lastInput=now;tokenTick=now;inputBudget=new CabinetInputBudget(nowNanos);}
+        // Preserve the FIFO/local-sync contract: its consumer can be tick paced.
         boolean takeInput(long now){
             long elapsed=Math.max(0,now-tokenTick);
             inputTokens=elapsed>=8?16:Math.min(16,inputTokens+(int)elapsed*2);tokenTick=now;
@@ -28,10 +31,15 @@ final class CabinetRoomLedger<K> {
     record Change(UUID room,UUID member,int port,long sequence,int mask,boolean reset){}
     private final Map<UUID,Room<K>> rooms=new LinkedHashMap<>();
     private final Map<UUID,Member> members=new HashMap<>(),players=new HashMap<>();
+    // Only server-fed Netplay admission uses elapsed monotonic time. Leases,
+    // silence and legacy FIFO/local-sync admission retain their server ticks.
+    private final LongSupplier inputClock;
+    CabinetRoomLedger(){this(System::nanoTime);}
+    CabinetRoomLedger(LongSupplier inputClock){this.inputClock=Objects.requireNonNull(inputClock);}
     Room<K> open(UUID player,K target,String backend,int capacity,long now){
         Objects.requireNonNull(player);Objects.requireNonNull(target);Objects.requireNonNull(backend);
         if(capacity<1||capacity>4||rooms.size()>=MAX_ROOMS||players.containsKey(player)||target(target)!=null)return null;
-        UUID id=UUID.randomUUID();Member host=new Member(id,player,id,0,now);Room<K> room=new Room<>(id,target,backend,capacity,host);
+        UUID id=UUID.randomUUID();Member host=new Member(id,player,id,0,now,inputClock.getAsLong());Room<K> room=new Room<>(id,target,backend,capacity,host);
         rooms.put(id,room);members.put(id,host);players.put(player,host);return room;
     }
     Member join(UUID player,Room<K> room,long now){
@@ -41,7 +49,7 @@ final class CabinetRoomLedger<K> {
         Objects.requireNonNull(player);
         if(room==null||rooms.get(room.id)!=room||!room.ready||players.containsKey(player)||firstPort<(room.mode==CabinetSyncMode.SERVER_MEDIA?0:1)||endPort>room.capacity||firstPort>=endPort)return null;
         for(int port=firstPort;port<endPort;port++)if(room.members[port]==null){
-            Member member=new Member(UUID.randomUUID(),player,room.id,port,now);room.members[port]=member;members.put(member.id,member);players.put(player,member);return member;
+            Member member=new Member(UUID.randomUUID(),player,room.id,port,now,inputClock.getAsLong());room.members[port]=member;members.put(member.id,member);players.put(player,member);return member;
         }
         return null;
     }
@@ -69,16 +77,29 @@ final class CabinetRoomLedger<K> {
     }
     boolean heartbeat(UUID player,UUID id,long now){Member m=members.get(id);if(m==null||!m.player.equals(player)||now>=m.expires)return false;m.expires=now+HEARTBEAT_TIMEOUT;return true;}
     Change input(UUID player,UUID room,UUID id,long sequence,int mask,long now){
+        return input(player,room,id,sequence,mask,now,false);
+    }
+    /** canonicalNetplay is selected only by the server's active room/runner. */
+    Change input(UUID player,UUID room,UUID id,long sequence,int mask,long now,boolean canonicalNetplay){
         Member m=valid(player,room,id,now);if(m==null||!rooms.get(room).ready||sequence<0||sequence<=m.sequence||mask<0||mask>4095)return null;
-        if(!m.takeInput(now))return null;
         mask=m.controlling?CabinetCoinPolicy.filter(rooms.get(room).coinRequired,mask):0;
+        boolean admitted=canonicalNetplay?m.inputBudget.input(mask!=m.mask,inputClock.getAsLong()):m.takeInput(now);
+        if(!admitted){m.rateLimited=true;return null;}
+        // Do not advance the accepted sequence on denial: CabinetRooms uses it
+        // to distinguish admitted keepalives from invalid or rejected packets.
         m.sequence=sequence;m.lastInput=now;m.inputSeen=true;
         if(mask==m.mask)return null;
         m.mask=mask;return new Change(room,id,m.port,++m.forwardSequence,mask,false);
     }
     Change resetInput(UUID player,UUID room,UUID id,long sequence,long now){
+        return resetInput(player,room,id,sequence,now,false);
+    }
+    Change resetInput(UUID player,UUID room,UUID id,long sequence,long now,boolean canonicalNetplay){
         Member m=valid(player,room,id,now);if(m==null||!rooms.get(room).ready||sequence<0||sequence<=m.sequence)return null;
-        if(!m.takeInput(now))return null;
+        // A valid owner/sequence reset always clears that seat before any flood
+        // close. Repeated resets remain bounded by the total packet allowance.
+        boolean admitted=canonicalNetplay?m.inputBudget.reset(inputClock.getAsLong()):m.takeInput(now);
+        if(!admitted)m.rateLimited=true;
         m.sequence=sequence;m.lastInput=now;return reset(m);
     }
     Change reset(Member member){
