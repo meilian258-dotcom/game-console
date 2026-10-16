@@ -2,7 +2,7 @@
 
 方块电玩把可以游玩的游戏机、电视、街机、掌机和可组装电脑带进 Minecraft。摆放设备、接上视频线、制作卡带，再拿起手柄，在自己的房间或朋友搭建的游戏厅里游玩。
 
-**[最新公开下载](piq-fc-arcade/docs/下载中心.md#当前下载) · [各模组历史版本](piq-fc-arcade/docs/下载中心.md#历史版本) · [安装与游玩](piq-fc-arcade/docs/玩家指南.md) · [文档中心](piq-fc-arcade/docs/README.md)**
+**[各模组下载](piq-fc-arcade/docs/下载中心.md) · [历史版本](piq-fc-arcade/docs/下载历史.md) · [安装与游玩](piq-fc-arcade/docs/玩家指南.md) · [文档中心](piq-fc-arcade/docs/README.md)**
 
 主模组内置 FC/NES 和公共设备，其他机型按需添加。项目目前提供测试版，不包含 ROM、BIOS 或商业游戏数据；游戏、联机方式和光影兼容性以所用版本的说明为准。
 
@@ -37,7 +37,7 @@
 | 原生游戏运行端 | 当前以 Windows x64 为支持范围；其他平台不能照搬安装 |
 | 多人游戏 | 客户端与服务端安装配套主模组及所用设备附属；仅客户端工具不装到服务端 |
 
-1. 从[当前下载](piq-fc-arcade/docs/下载中心.md#当前下载)选择主模组和同批附属；查旧版则使用[按模组分类的历史列表](piq-fc-arcade/docs/下载中心.md#历史版本)。加入服务器时，以服主提供的配套为准。
+1. 从[下载中心](piq-fc-arcade/docs/下载中心.md)选择主模组和配套附属；查旧版则使用[按模组分类的历史列表](piq-fc-arcade/docs/下载历史.md)。加入服务器时，以服主提供的配套为准。
 2. 正常退出游戏，升级服务器先停服；备份世界、配置和 `game-console`，将玩家 JAR 放入 `mods`，移出并备份同一模组的旧版本。
 3. 自备有权使用的游戏文件和适用 BIOS，按[玩家指南](piq-fc-arcade/docs/玩家指南.md#第一次玩家用机)完成拷卡、接线与第一次开机。
 
@@ -45,8 +45,8 @@ GitHub 的 **Code → Download ZIP** 和自动生成的 **Source code** 是源�
 
 ## 可选工具与联动
 
-- **Replay 屏幕与声音兼容**：用于录像中的设备音画，下载及配套条件见[下载中心](piq-fc-arcade/docs/下载中心.md#回放兼容)。不是运行游戏设备的前置。
-- **快速回放兼容**：处理 ReForgedPlay 握手和 Sable 玩家位置，和屏幕／声音补丁用途不同；见[组件说明](piq-replay-quickmode-compat/README.md)及[公开下载状态](piq-fc-arcade/docs/下载中心.md#回放兼容)。
+- **Replay 屏幕与声音兼容**：用于录像中的设备音画，下载及配套条件见[下载中心](piq-fc-arcade/docs/下载中心.md)。不是运行游戏设备的前置。
+- **快速回放兼容**：处理 ReForgedPlay 握手和 Sable 玩家位置，和屏幕／声音补丁用途不同；见[组件说明](piq-replay-quickmode-compat/README.md)及[公开下载状态](piq-fc-arcade/docs/下载历史.md#快速模式兼容补丁)。
 - **WaterFrames**：可选显示联动，不是内置电视和机柜的必装前置。
 
 ## 遇到问题
