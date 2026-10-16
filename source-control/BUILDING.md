@@ -2,7 +2,9 @@
 
 这份指南供开发者从当前源码构建主模组和附属。玩家安装成品请看[玩家指南](../piq-fc-arcade/docs/玩家指南.md)，不要把源码 ZIP 放进 `mods`。
 
-当前源码的开发配套为 **FC76.57、完整 SFC55（内含原 core11）、街机 0.1.5.12、电脑 prototype.13**，沿用 MD16／GBA15／PvZ12 作为本地回归组合，可选 Replay test.7。这是[旧同步退役与输入热修候选](../piq-fc-arcade/design/旧本地同步退役.md)，不包含独立 FC76.55 RetroArch 共存试验，也不重编模拟核心。公开成品仍按[下载中心](../piq-fc-arcade/docs/下载中心.md)实际列出的审核附件下载，不能从本地构建版本推断已公开或稳定。
+本指南适用于当前检出提交及其配套脚本、锁表和协议。开始前记录分支与提交，使用同一提交内的文档；默认克隆 `main` 不包含其他工作树或候选分支中尚未提交的改动。公开热修成品、独立开发候选和本目录源码可能处于不同版本，不能用其他分支的指南或“最新”文件替换本次固定输入。跨电脑接续还需保全本地提交及未提交内容，见 [Git 备份说明](../GIT_WORKFLOW.md#备份与历史)。
+
+当前源码的开发配套为 **FC76.57、完整 SFC55（内含原 core11）、街机 0.1.5.12、电脑 prototype.13**，沿用 MD16／GBA15／PvZ12 作为本地回归组合，可选 Replay test.7。已包含[旧同步退役与输入热修](../piq-fc-arcade/design/旧本地同步退役.md)，不包含独立 FC76.55 RetroArch 共存试验，也不重编模拟核心。公开成品仍按[下载中心](../piq-fc-arcade/docs/下载中心.md)实际列出的审核附件下载，不能从本地构建版本推断整套组合已公开或稳定。
 
 启动协议沿用 `home-launch-3`，机柜协议为 `cabinet-room-12`，SFC 协议为 `15`。SFC55 因新增公共 API 最低要求 FC76.57；服务端和客户端须使用同批配套，不能只更新一端。SFC 从 53 起的新 JNI 联机进度接入固定、未修改的 Snes9x；Mesen-S 核心、旧身份和旧进度恢复路线仍保留，不跨核迁移或覆盖旧档。原 Mesen-S 回滚失配并未被改核或屏蔽校验修复。本轮没有新增公开分发授权或放宽许可／来源门禁，最终包与 Minecraft 多人验收状态见 [SFC 当前状态](../piq-sfc-home/README.md#当前状态)。
 
@@ -56,15 +58,15 @@ Snes9x 已有明确的公开快照拒绝门禁，但快照脚本的身份与哈�
 下载最新核心或跳过 stock 资源。现有 Actions 没有为此固定对配置输入来源，默认调用仍会拒绝缺件；
 本地可按上述参数验证完整构建，但不能据本地候选成功声称云端已就绪。
 
-SFC54 沿用 SFC53 的固定输入，额外需要 [sfc-stock-inputs.json](sfc-stock-inputs.json) 固定的 Snes9x DLL 与参考源码 ZIP。
+SFC55 沿用 SFC54／SFC53 的固定输入，额外需要 [sfc-stock-inputs.json](sfc-stock-inputs.json) 固定的 Snes9x DLL 与参考源码 ZIP。
 快照准备支持成对传入 `--sfc-snes9x-core`／`--sfc-snes9x-source`，或从仓库根
 `.build-inputs/` 读取已导入的同一固定对；不会读取任意 vendor 目录或下载新的 `latest` 补位。
 两件输入写入 `fixed/sfc-snes9x-v1/` 并纳入 `receipt.json`；构建检查、临时源码复制后再次核验，
 再将回执中的绝对路径通过 `sfcSnes9xCore`／`sfcSnes9xSource` 显式交给 SFC Gradle。
-临时源码不需要依赖原 checkout 的忽略缓存。新核心仍为本地候选：即使其余 bootstrap 障碍解决、
+临时源码不需要依赖原 checkout 的忽略缓存。本分支的自动快照仍保留 Snes9x 发布拒绝门禁：即使固定输入齐全、
 整套编译成功且源码干净，`snapshot_release.py --validate-only` 也会拒绝含
 `core/sfc-snes9x/` 的公开快照，并提示待完成的来源与许可审核。此门禁不阻止本地编译，
-也没有通过编辑成品清单、传命令行开关来跳过的路径。
+也没有通过编辑成品清单、传命令行开关来跳过的路径。独立审核后公开的固定成品不自动解除这条快照门禁，公开范围以[下载中心](../piq-fc-arcade/docs/下载中心.md)对应批次为准。
 
 快照准备和 Gradle 前置检查都要求新 MAME DLL 与公开 NOTICE 同时存在，且与固定清单完全一致。
 即使修改输入回执，也不能跳过清单中的核心和补丁校验；两项资源缺失、替换或不配套都失败。
@@ -92,7 +94,7 @@ SFC54 沿用 SFC53 的固定输入，额外需要 [sfc-stock-inputs.json](sfc-st
 
 构建任务只有只读权限；单独的发布任务使用短期 `GITHUB_TOKEN` 的 `contents: write` 权限，不需要配置个人令牌。发布先创建草稿，上传并核对所有附件后才公开。仓库或组织策略若禁止此权限，任务会失败，旧 Release 不变。参见 [GitHub workflow 权限说明](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions)。
 
-在 Windows 仓库根复现本地快照的流程如下。`D:/approved/` 仅为已获准、摘要匹配输入的示例目录；不得用其他同名 DLL 凑数。**当前分支会首先因尚未审核更新的 JNI bootstrap 固定表明确停止**；下面不是解除门禁的操作，也不表示云端已验证：
+在 Windows 仓库根复现本地快照的流程如下。`D:/approved/` 仅为已获准、摘要匹配输入的示例目录；不得用其他同名 DLL 凑数。JNI bootstrap 固定表已更新为前述公开配对；现有 Actions 仍未提供 FBNeo／Snes9x 固定输入，最终校验也保留 Snes9x 发布拒绝门禁。下面是输入齐备后的本地构建与诊断流程，不表示云端构建或自动发布已经通过：
 
 ```powershell
 python -B -m unittest discover -s source-control -p "test_*.py"
@@ -147,9 +149,9 @@ $env:PIQ_BUILD_WORK_DIR = 'D:/game-console-build'
 
 ## 准备主模组的固定输入
 
-[build-inputs.json](build-inputs.json) 列出 FC 构建所需的文件、大小和 SHA-256。哈希用于确认构建用的是预期文件，不代表该文件已经通过所有游戏或联机测试。
+[build-inputs.json](build-inputs.json) 列出 FC 构建所需的文件、大小和 SHA-256，必须使用与本次源码同一提交的锁表。当前锁表包含 10 项 FC 输入；`build_inputs.py check` 只检查这份清单，不检查所有附属或整套快照输入。哈希用于确认构建用的是预期文件，不代表该文件已经通过所有游戏或联机测试。
 
-从与当前锁表相匹配的发行附件或已审核固定材料准备输入。FC 锁定的二进制位于玩家主 JAR 内的 `core/` 子目录；按锁表的文件名与摘要提取、导入，不将整个 JAR 当成 DLL。[2026-10-07 整套测试版](../piq-fc-arcade/docs/整套测试版-20261007.md)只提供历史输入，不能满足当前新增的全部 JNI 依赖，也不能当作快照 bootstrap 门禁已解除。项目源码见对应发行标签，其他原生组件按各自源码说明准备；不要用任意同名文件凑齐输入或关闭校验。附属仍需按自己的入口准备文件，不代表全部构建依赖已自动下载。
+从与当前锁表相匹配的发行附件或已审核固定材料准备输入。FC 锁定的二进制位于玩家主 JAR 内的 `core/` 子目录；按锁表 ID、大小与摘要核对后导入，不将整个 JAR 当成 DLL。包内名与缓存名可能不同：`libcxx-windows` 在 JAR 中为 `libc++.dll`，导入工具按锁表存为 `libcxx.dll`；不能只凭文件名判断配套。[2026-10-07 整套测试版](../piq-fc-arcade/docs/整套测试版-20261007.md)只提供历史输入，不能满足当前新增的全部 JNI 依赖，也不能当作快照 bootstrap 门禁已解除。项目源码见对应发行标签，其他原生组件按各自源码说明准备；不要用任意同名文件凑齐输入或关闭校验。附属仍需按自己的入口准备文件，不代表全部构建依赖已自动下载。
 
 单项导入示例；把文件路径换成你实际取得的文件：
 
@@ -158,7 +160,7 @@ python source-control/build_inputs.py import --id libretro-jni-abi2 --file "./ap
 python source-control/build_inputs.py check
 ```
 
-其余项目按锁文件中的 ID 分别导入。只有 `check` 确认全部必需输入齐全后，才继续构建。默认缓存为仓库根 `.build-inputs/`，不提交到 Git。
+其余 FC 输入按锁文件中的 ID 分别导入。只有 `check` 确认全部必需输入齐全后，才继续构建主模组。默认缓存为仓库根 `.build-inputs/`，不提交到 Git。SFC 的固定核心／源码对、街机 FBNeo／MAME 等输入仍须按各自入口检查，复制一份通过 FC 检查的缓存不等于已准备整套附属。
 
 已有完整缓存可在构建时通过 `-PpiqInputsDir=../approved/build-inputs` 指定（相对于所构建的组件目录）。锁文件的 `legacyPath` 只用于导入历史构建材料；无需创建这些历史目录，Gradle 不会自动回退读取它们。
 
@@ -191,7 +193,7 @@ $fcJar = (Resolve-Path ".\piq-fc-arcade\build\libs\piq_fc_arcade-$fcVersion.jar"
 
 ### SFC54 的固定输入与许可配套
 
-SFC54 沿用 SFC53 的两套不同资源，不能将文件互相重命名、改写旧 SHA 或迁移旧即时档：
+SFC55 沿用 SFC54／SFC53 的两套不同资源，下面保留该输入章节的历史标题；不能将文件互相重命名、改写旧 SHA 或迁移旧即时档：
 
 - 旧 Mesen-S：`core/sfc-libretro/windows-x64/mesen-s_libretro.dll`，3896832 字节，SHA-256 `8aca17e76efbd7a70b0c247b42aaba04d0c1c90f693213bd1e76573986670b42`。继续按原组件固定资源准备方式保留；新工具不下载或重写它。
 - 新 Snes9x：`core/sfc-snes9x/windows-x64/snes9x_libretro.dll`，3840000 字节，SHA-256 `5ce01616184f255623405793e192f79aef5089fa796b29bc11ddc5e052060124`，实际版本报告为 `Snes9x 1.63 fae2fea`。参考源码 ZIP 为 `snes9x-fae2fea08f74180759ef540ee94259213f503480.zip`，760336 字节，SHA-256 `7f6dee7ab1a367da86bc86a87a204bf8fe0be389d62e7cfbd568dc2ccac32055`。
