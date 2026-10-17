@@ -4,7 +4,7 @@
 
 本指南适用于当前检出提交及其配套脚本、锁表和协议。开始前记录分支与提交，使用同一提交内的文档；默认克隆 `main` 不包含其他工作树或候选分支中尚未提交的改动。公开热修成品、独立开发候选和本目录源码可能处于不同版本，不能用其他分支的指南或“最新”文件替换本次固定输入。跨电脑接续还需保全本地提交及未提交内容，见 [Git 备份说明](../GIT_WORKFLOW.md#备份与历史)。
 
-当前源码的开发配套为 **FC76.59、完整 SFC55（内含原 core11）、街机 0.1.5.12、电脑 prototype.13**，沿用 MD16／GBA15／PvZ12 作为本地回归组合，可选 Replay test.7。已包含[旧同步退役与输入热修](../piq-fc-arcade/design/旧本地同步退役.md)，并新增[FC 官方 FCEUmm RetroArch 双手柄候选](../piq-fc-arcade/design/FC双后端共存.md)；原 JNI 默认、旧 mode 3 Mesen、固定 PNP7 运行器及旧保存身份保留，不改动或重编模拟核心。FC76.59 的创造栏事件修复与验证范围见[专项说明](../piq-fc-arcade/design/创造栏公开事件兼容修复-FC76.59.md)。上一批最终 FC76.58 `check jar`、包内核心恢复、0／75 ms 有序延迟真实三端及隔离专服合装已通过；原接入差异和观测器修正保留在共存记录，MC 真人多人、长局及更多游戏待验。公开成品仍按[下载中心](../piq-fc-arcade/docs/下载中心.md)实际列出的审核附件下载，不能从本地构建版本推断整套组合已公开或稳定。
+当前源码的开发配套为 **FC76.60、完整 SFC56（内含原 core11）、MD17、GBA16、电脑 prototype.14、PvZ prototype.13**，沿用街机 0.1.5.12，可选 Replay test.7。五个新附属均要求 FC76.60 起的兼容主包；电脑14另已验证旧 PvZ12 兼容。已包含[旧同步退役与输入热修](../piq-fc-arcade/design/旧本地同步退役.md)，并新增[FC 官方 FCEUmm RetroArch 双手柄候选](../piq-fc-arcade/design/FC双后端共存.md)；原 JNI 默认、旧 mode 3 Mesen、固定 PNP7 运行器及旧保存身份保留，不改动或重编模拟核心。FC76.60 的创造栏直接生成、附属分组接口及验证范围见[专项说明](../piq-fc-arcade/design/创造栏生成与附属分组-FC76.60.md)。前批最终 FC76.58 `check jar`、包内核心恢复、0／75 ms 有序延迟真实三端及隔离专服合装已通过；原接入差异和观测器修正保留在共存记录，MC 真人多人、长局及更多游戏待验。公开成品仍按[下载中心](../piq-fc-arcade/docs/下载中心.md)实际列出的审核附件下载，不能从本地构建版本推断整套组合已公开或稳定。
 
 FC76.58 使用 `netplay-6` 与 `home-sync-7`，服务端和全部客户端主包须同批升级，包括仍使用 JNI 的玩家；旧 Java 调用重载仍保留。启动协议沿用 `home-launch-3`，机柜协议为 `cabinet-room-12`，SFC 协议为 `15`。SFC55 因新增公共 API 最低要求 FC76.57；服务端和客户端须使用同批配套，不能只更新一端。SFC 从 53 起的新 JNI 联机进度接入固定、未修改的 Snes9x；Mesen-S 核心、旧身份和旧进度恢复路线仍保留，不跨核迁移或覆盖旧档。原 Mesen-S 回滚失配并未被改核或屏蔽校验修复。本轮没有新增公开分发授权或放宽许可／来源门禁，最终包与 Minecraft 多人验收状态见 [SFC 当前状态](../piq-sfc-home/README.md#当前状态)。
 
@@ -60,7 +60,7 @@ FC76.58 新增的 `fceumm-retroarch-pad` 不在这些历史 bootstrap JAR 中。
 下载最新核心或跳过 stock 资源。现有 Actions 没有为此固定对配置输入来源，默认调用仍会拒绝缺件；
 本地可按上述参数验证完整构建，但不能据本地候选成功声称云端已就绪。
 
-SFC55 沿用 SFC54／SFC53 的固定输入，额外需要 [sfc-stock-inputs.json](sfc-stock-inputs.json) 固定的 Snes9x DLL 与参考源码 ZIP。
+SFC56 沿用 SFC55／SFC54／SFC53 的固定输入，额外需要 [sfc-stock-inputs.json](sfc-stock-inputs.json) 固定的 Snes9x DLL 与参考源码 ZIP。
 快照准备支持成对传入 `--sfc-snes9x-core`／`--sfc-snes9x-source`，或从仓库根
 `.build-inputs/` 读取已导入的同一固定对；不会读取任意 vendor 目录或下载新的 `latest` 补位。
 两件输入写入 `fixed/sfc-snes9x-v1/` 并纳入 `receipt.json`；构建检查、临时源码复制后再次核验，
@@ -198,7 +198,7 @@ $fcJar = (Resolve-Path ".\piq-fc-arcade\build\libs\piq_fc_arcade-$fcVersion.jar"
 
 ### SFC54 的固定输入与许可配套
 
-SFC55 沿用 SFC54／SFC53 的两套不同资源，下面保留该输入章节的历史标题；不能将文件互相重命名、改写旧 SHA 或迁移旧即时档：
+SFC56 沿用 SFC55／SFC54／SFC53 的两套不同资源，下面保留该输入章节的历史标题；不能将文件互相重命名、改写旧 SHA 或迁移旧即时档：
 
 - 旧 Mesen-S：`core/sfc-libretro/windows-x64/mesen-s_libretro.dll`，3896832 字节，SHA-256 `8aca17e76efbd7a70b0c247b42aaba04d0c1c90f693213bd1e76573986670b42`。继续按原组件固定资源准备方式保留；新工具不下载或重写它。
 - 新 Snes9x：`core/sfc-snes9x/windows-x64/snes9x_libretro.dll`，3840000 字节，SHA-256 `5ce01616184f255623405793e192f79aef5089fa796b29bc11ddc5e052060124`，实际版本报告为 `Snes9x 1.63 fae2fea`。参考源码 ZIP 为 `snes9x-fae2fea08f74180759ef540ee94259213f503480.zip`，760336 字节，SHA-256 `7f6dee7ab1a367da86bc86a87a204bf8fe0be389d62e7cfbd568dc2ccac32055`。
