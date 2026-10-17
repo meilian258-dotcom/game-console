@@ -1,6 +1,6 @@
 # PvZ 第三方来源与许可
 
-适用于 `game-console-pvz` 0.1.0-prototype.12 的公开实验修订 `public-r1`。本修订只整理来源说明和补充许可资源，模组版本、Java 类、模型、原生 host、JNI 与核心均保持原件内容；不是新功能构建。它需要配套方块电玩主包，使用电脑入口时搭配 Computer prototype.12。
+适用于 `game-console-pvz` 0.1.0-prototype.13 开发候选，沿用 prototype.12 公开实验修订 `public-r1` 的原生核心、host、JNI、模型、来源及许可。prototype.13 仅调整创造页入口和配套声明，不修改或重编这些原生组件。主包最低 FC76.60，电脑入口搭配 Computer prototype.14；原公开修订仍按历史配套清单使用。
 
 本附属不含 `main.pak`、原游戏素材、玩家存档或游戏授权。使用者自行提供合法取得的数据。本附属不是 PopCap/EA、Mojang/Microsoft 的官方产品，相关名称仅用于说明兼容对象。
 

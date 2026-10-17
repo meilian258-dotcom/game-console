@@ -20,35 +20,41 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-/** Common physical FC display; MEDIA decodes frames, JNI spectators use a read-only replica. */
+/** Common physical FC display; each Netplay observer follows the host's frozen backend. */
 final class FcHomeWatchDisplay implements WatchClient.DisplayAdapter {
     static final ResourceLocation PROVIDER = ResourceLocation.fromNamespaceAndPath("piq_fc_arcade", "home_player");
     static void register() {
         WatchClient.registerDisplay(PROVIDER, new FcHomeWatchDisplay());
         WatchClient.registerHost(PROVIDER, ClientArcadeEvents::playerMediaDemand);
         WatchClient.registerDisplay(ServerArcadeSessions.JNI_WATCH_PROVIDER,new FcHomeWatchDisplay());
-        NetplayWatchContent.register(ServerArcadeSessions.JNI_WATCH_PROVIDER,(start,connection)->{
+        WatchClient.registerDisplay(ServerArcadeSessions.RETROARCH_WATCH_PROVIDER,new FcHomeWatchDisplay());
+        for(boolean jni:new boolean[]{true,false})NetplayWatchContent.register(jni?ServerArcadeSessions.JNI_WATCH_PROVIDER:ServerArcadeSessions.RETROARCH_WATCH_PROVIDER,
+                jni?NetplayWatchContent.Execution.JNI:NetplayWatchContent.Execution.PROCESS,(start,connection)->{
             var mc=Minecraft.getInstance();
             if(mc.getConnection()==null||mc.getConnection().getConnection()!=connection||!new FcHomeWatchDisplay().valid(start.watch().descriptor()))throw new IllegalStateException("FC 旁观设备或连接已失效");
-            if(!JniNetplayConsent.allowed())throw new IllegalStateException("本机已停用 FC JNI 或平台不支持");
-            boolean gun=ServerArcadeSessions.JNI_GUN_BACKEND.equals(start.backend());
-            if(!gun&&!ServerArcadeSessions.JNI_PAD_BACKEND.equals(start.backend()))throw new IllegalArgumentException("FC observer backend");
+            if(jni&&!JniNetplayConsent.allowed())throw new IllegalStateException("本机已停用 FC JNI 或平台不支持");
+            boolean gun=(jni?ServerArcadeSessions.JNI_GUN_BACKEND:ServerArcadeSessions.RETROARCH_GUN_BACKEND).equals(start.backend());
+            if(!gun&&!(jni?ServerArcadeSessions.JNI_PAD_BACKEND:ServerArcadeSessions.RETROARCH_PAD_BACKEND).equals(start.backend()))throw new IllegalArgumentException("FC observer backend");
+            FcNetplayBackend.verify(gun,jni,start.launch());
             // This declaration supplies the trusted resource/budget. The factory below preserves
             // FC's existing handshake/save namespace, including the special gun timeline.
-            var jni=JniNetplaySession.profile(false);var artifact=jni.cores().get("windows-x64");
-            var profile=new NetplayProfile(NetplayProcess.class,artifact.resource(),artifact.sha256(),"content.nes",jni.options(),257,44100,16*1024*1024,2,jni);
+            var runtime=JniNetplaySession.profile(false);var artifact=runtime.cores().get("windows-x64");
+            var profile=jni?new NetplayProfile(NetplayProcess.class,artifact.resource(),artifact.sha256(),"content.nes",runtime.options(),257,44100,16*1024*1024,2,runtime)
+                    :FcNetplayBackend.retroarchProfile(gun,start.launch());
             var loaded=new CompletableFuture<cn.piq.fcarcade.rom.RomDescriptor>();
             Runnable cancel=ClientRomTransfers.observeContent(start.romHash(),loaded::complete);
             return new NetplayWatchContent.Preparation(()->{
                 var rom=loaded.get(60,TimeUnit.SECONDS);
                 if(!start.romHash().equalsIgnoreCase(rom.sha256()))throw new IllegalStateException("FC 旁观内容校验失败");
                 return new CabinetBackend.NetplayContent(profile,rom.bytes(),Map.of());
-            },()->{cancel.run();loaded.cancel(false);},false,(grant,content,sender)->new NetplayProcess(grant,content::rom,sender,true,gun));
+            },()->{cancel.run();loaded.cancel(false);},false,(grant,content,sender)->jni
+                    ?new NetplayProcess(grant,content::rom,sender,true,gun)
+                    :new NetplayProcess(grant,content::rom,sender,content.profile(),content::auxiliary));
         });
     }
     @Override public boolean valid(WatchDescriptor d) {
         var level = Minecraft.getInstance().level;
-        if (level == null || !(PROVIDER.equals(d.provider())||ServerArcadeSessions.JNI_WATCH_PROVIDER.equals(d.provider())) || !level.dimension().location().equals(d.dimension())
+        if (level == null || !(PROVIDER.equals(d.provider())||ServerArcadeSessions.JNI_WATCH_PROVIDER.equals(d.provider())||ServerArcadeSessions.RETROARCH_WATCH_PROVIDER.equals(d.provider())) || !level.dimension().location().equals(d.dimension())
                 || d.link() == null || d.screens().size() != 1) return false;
         var screen = d.screens().getFirst();
         if (!level.hasChunkAt(d.origin().pos()) || !level.hasChunkAt(screen.pos())) return false;

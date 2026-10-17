@@ -72,7 +72,7 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
         raw = (ROOT / 'piq-gba/src/main/resources' / META).read_bytes()
         rendered = render_metadata(raw, self.policy)
         self.assertNotIn(b'${', rendered)
-        self.assertEqual('0.1.0-alpha.15', tomllib.loads(rendered.decode())['mods'][0]['version'])
+        self.assertEqual('0.1.0-alpha.16', tomllib.loads(rendered.decode())['mods'][0]['version'])
         with self.assertRaises(ValueError):
             render_metadata(raw + b'\n# ${unknown}', self.policy)
         with self.assertRaises(ValueError):
@@ -118,17 +118,17 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
 
     def test_game_dependency_floors_match_required_public_api_generations(self):
         expected = {
-            # SFC55 additionally calls FC76.57's HomeSyncPolicy.publicRunnable API.
-            'piq-sfc-home': '[0.31.0-alpha.76.57,0.31.0-alpha.77)',
+            # Current creative-tab callers require FC76.60's grouped insertion API.
+            'piq-sfc-home': '[0.31.0-alpha.76.60,0.31.0-alpha.77)',
             # Unified content paths / file-backed JNI content require FC 76.40.
             'piq-sfc-arcade': '[0.31.0-alpha.76.40,0.31.0-alpha.77)',
-            # MD16 uses FC76.50's shared device-level second-port policy.
-            'piq-md-home': '[0.31.0-alpha.76.50,0.31.0-alpha.77)',
+            'piq-md-home': '[0.31.0-alpha.76.60,0.31.0-alpha.77)',
             # Native12 registers FC76.54's trusted operating-file adapter.
             'piq-native-arcade': '[0.31.0-alpha.76.54,0.31.0-alpha.77)',
-            'piq-gba': '[0.31.0-alpha.76.31,0.31.0-alpha.77)',
-            'piq-computer': '[0.31.0-alpha.76.26,0.31.0-alpha.77)',
-            'piq-pvz-addon': '[0.31.0-alpha.76.22,0.31.0-alpha.77)',
+            'piq-gba': '[0.31.0-alpha.76.60,0.31.0-alpha.77)',
+            'piq-computer': '[0.31.0-alpha.76.60,0.31.0-alpha.77)',
+            # PvZ13 is the paired retirement of the old creative box entry.
+            'piq-pvz-addon': '[0.31.0-alpha.76.60,0.31.0-alpha.77)',
         }
         for module, required_fc in expected.items():
             template = ROOT / module / 'src/main/templates' / META
@@ -145,7 +145,7 @@ class NeoForgeCompatibilityTests(unittest.TestCase):
             self.assertEqual(required_fc, deps['piq_fc_arcade']['versionRange'])
             if owner == 'piq_computer':
                 self.assertEqual('optional', deps['piq_pvz']['type'])
-                self.assertEqual('[0.1.0-prototype.12,0.1.0-prototype.13)', deps['piq_pvz']['versionRange'])
+                self.assertEqual('[0.1.0-prototype.12,0.1.0-prototype.14)', deps['piq_pvz']['versionRange'])
             if owner == 'piq_sfc_home':
                 self.assertEqual('[0.2.0-alpha.11,0.3.0)', deps['piq_sfc_arcade']['versionRange'])
 

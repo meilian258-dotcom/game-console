@@ -13,6 +13,7 @@
 *.jar binary
 
 # Verbatim upstream notices: keep the checksum-verified original whitespace.
+piq-fc-arcade/src/main/resources/core/fc-retroarch/licenses/nes_ntsc-license.txt -whitespace
 piq-fc-arcade/native/libretro-jni/licenses/MinGW-w64-v14.0.0-COPYING -whitespace
 piq-fc-arcade/native/libretro-jni/licenses/MinGW-w64-v14.0.0-runtime-notices.txt -whitespace
 piq-sfc-arcade/third-party/wasm-runtime/crates/unty-0.0.4/LICENSE-APACHE -whitespace

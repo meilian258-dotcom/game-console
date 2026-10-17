@@ -35,10 +35,12 @@ public final class FurnitureRegistry {
         ()->BlockEntityType.Builder.of(FurnitureBlockEntity::new,BLOCKS.getEntries().stream().map(DeferredHolder::get).toArray(Block[]::new)).build(null));
     public static final DeferredHolder<EntityType<?>,EntityType<FurnitureSeat>> SEAT=SEATS.register("furniture/seat",()->EntityType.Builder.<FurnitureSeat>of(FurnitureSeat::new,MobCategory.MISC)
         .sized(.01F,.01F).clientTrackingRange(8).updateInterval(10).noSave().noSummon().fireImmune().build(FcArcadeMod.MOD_ID+":furniture/seat"));
-    /** Append furniture to the existing FC page without registering another creative tab. */
+    /** Emit benches first, then stools; no later tab-wide sorting is needed. */
     public static void addCreativeItems(CreativeModeTab.Output output) {
         for(var wood:WoodSpecies.values()) {
             output.accept(BENCHES.get(wood).get());
+        }
+        for(var wood:WoodSpecies.values()) {
             output.accept(STOOLS.get(wood).get());
         }
     }

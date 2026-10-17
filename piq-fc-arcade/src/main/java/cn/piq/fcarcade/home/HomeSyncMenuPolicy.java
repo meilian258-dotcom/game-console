@@ -18,7 +18,7 @@ public final class HomeSyncMenuPolicy {
         return mode==3?"Netplay 不可用："+detail:detail;
     }
     public static boolean supported(int mask, int mode) {
-        return mode >= 0 && mode < 5 && mode != 1 && (mask & (1 << mode)) != 0;
+        return mode >= 0 && mode < 6 && mode != 1 && (mask & (1 << mode)) != 0;
     }
     public static String selectedStatus(String operation, int selected, int mask, String unavailable) {
         return supported(mask, selected) ? operation
@@ -26,7 +26,16 @@ public final class HomeSyncMenuPolicy {
     }
     public static boolean showMode(int mode, boolean external, boolean diagnosticsOnly, int mask) {
         // The screen retains a selected legacy row only to explain refusal, never as a new option.
-        return mode >= 0 && mode < 5 && mode != 1;
+        return mode >= 0 && mode < 6 && mode != 1 && (mode != 5 || !external && !diagnosticsOnly);
+    }
+    public static java.util.List<Integer> visibleModes(int selected,boolean external,boolean diagnosticsOnly,int mask) {
+        var modes=new java.util.ArrayList<Integer>(6);
+        for(int mode=0;mode<6;mode++)if(showMode(mode,external,diagnosticsOnly,mask)||mode==1&&selected==1)modes.add(mode);
+        return java.util.List.copyOf(modes);
+    }
+    /** Unknown variants remain visibly distinct from the historical empty/Mesen selection. */
+    static int fcMode(boolean netplay,boolean jni,String variant,int oldMode) {
+        return !netplay?oldMode:jni?4:variant.isEmpty()?3:5;
     }
     public static String buttonState(int mode, int selected, int mask, boolean editable, String unavailable) {
         if (!supported(mask, mode)) return unavailable;

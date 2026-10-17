@@ -89,6 +89,21 @@ class PlayerSaveCatalogKeyTest {
                 "|minecraft:overworld|1,2,3|UNKNOWN", "|invalid dimension|1,2,3|LOCKSTEP")) reject(PLAYER + suffix);
     }
 
+    @Test void knownNetplayDomainsRetainThreeSlotGrammarAndRejectPrefixSpoofing() {
+        for(String prefix:cn.piq.fcarcade.netplay.FcNetplaySaves.allPrefixes()){
+            for(int slot=1;slot<=PlayerSaveSlots.SLOT_COUNT;slot++){
+                String player=PlayerSaveSlots.key(OWNER,slot);
+                assertEquals(player,PlayerSaveCatalogKey.normalize(prefix+player));
+                for(String nested:cn.piq.fcarcade.netplay.FcNetplaySaves.allPrefixes())reject(prefix+nested+player);
+                reject(prefix+"extra|"+player);
+            }
+            reject(prefix+PLAYER+"|global-slot|4");reject(prefix+PLAYER+"|global-slot|01");
+            reject(prefix+"cartridge|"+OWNER);
+        }
+        reject("core|nes-netplay-unknown-v1|"+PlayerSaveSlots.key(OWNER,1));
+        assertEquals(3,PlayerSaveSlots.SLOT_COUNT);
+    }
+
     @Test void actualSaveStoreCatalogIncludesAllFifteenModeCoreNamespacesWithoutRewritingFiles() {
         ArcadeSaveStore store = new ArcadeSaveStore(directory);
         String rom = "a".repeat(64), player = PlayerSaveSlots.key(OWNER, 1);

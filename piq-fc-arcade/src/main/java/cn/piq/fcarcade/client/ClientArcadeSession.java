@@ -200,7 +200,7 @@ final class ClientArcadeSession {
             if(netplayState!=null){
                 if(netplay==null){if(simulationEnabled&&System.nanoTime()>=nextSyncRequestNanos)startWorker(false);return;}
                 if(netplay.error()!=null){FcArcadeMod.LOGGER.error("[PIQ Netplay] {}\n{}",netplay.error(),netplay.diagnostic());throw new IllegalStateException(netplay.error());}
-                if(!workerReady&&netplay.ready()){workerReady=true;audioPlayer=new NesAudioPlayer();overlay(Component.literal("Netplay 实验 · 存档归属按开机选择；状态见运行环境"));}
+                if(!workerReady&&netplay.ready()){workerReady=true;audioPlayer=new NesAudioPlayer();overlay(Component.literal(cn.piq.fcarcade.netplay.FcNetplayBackend.label(netplayState.jniTrial(),netplayState.launch())+" · 存档归属按开机选择；状态见运行环境"));}
                 if(minecraft.isPaused())releaseControls();else updateControls();
                 if(computeHost&&workerReady&&!homeReadySent&&connected()){FcNetwork.homeReady(sessionId,epoch);homeReadySent=true;}
                 float gain=minecraft.isPaused()||audioMuted?0:audioVolume();
@@ -299,7 +299,7 @@ final class ClientArcadeSession {
                 ?NetworkDiagnosticsView.Mode.LOCAL_INPUT:NetworkDiagnosticsView.Mode.LEGACY_RELAY;
         var actualRole=keyboardPresent()?NetworkDiagnosticsView.Role.CONTROLLING:hasController()?NetworkDiagnosticsView.Role.SEATED
                 :computeHost?NetworkDiagnosticsView.Role.COMPUTING:NetworkDiagnosticsView.Role.WATCHING;
-        String machine=netplayState!=null?"FC Netplay 实验":homeRuntime?"FC / 小霸王":"FC 街机";
+        String machine=netplayState!=null?"FC · "+cn.piq.fcarcade.netplay.FcNetplayBackend.label(netplayState.jniTrial(),netplayState.launch()):homeRuntime?"FC / 小霸王":"FC 街机";
         return new NetworkDiagnosticsView.Device(machine+" @ "+arcadePos.toShortString(),actualMode,actualRole,
                 minecraft.player.distanceToSqr(arcadePos.getCenter()));
     }

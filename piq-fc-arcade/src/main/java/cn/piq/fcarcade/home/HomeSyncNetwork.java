@@ -31,7 +31,7 @@ public final class HomeSyncNetwork {
     }
     static void send(ServerPlayer player,Setting setting) { PacketDistributor.sendToPlayer(player,setting); }
     @SubscribeEvent public static void register(RegisterPayloadHandlersEvent event) {
-        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"home-sync-6")
+        cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"home-sync-7")
                 .playToServer(Request.TYPE,Request.CODEC,(packet,context) -> {
                     Connection source = context.connection();var entity = context.player();
                     context.enqueueWork(() -> {
@@ -47,6 +47,7 @@ public final class HomeSyncNetwork {
                 });
     }
     private static ResourceLocation id(String name) { return ResourceLocation.fromNamespaceAndPath("piq_fc_arcade","home_sync_"+name); }
+    private static int legacyMask(int mask){if((mask&~31)!=0)throw new IllegalArgumentException("Legacy home setting mask");return mask;}
     public record Request(UUID token,int revision,int mode,int occupancy,int approval,int secondPort) implements CustomPacketPayload {
         public Request(UUID token,int revision,int mode,int occupancy,int approval){this(token,revision,mode,occupancy,approval,-1);}
         public Request { Objects.requireNonNull(token);if (!DeviceDebugPolicy.validRequest(revision,mode,occupancy,approval,secondPort)) throw new IllegalArgumentException("Home settings request"); }
@@ -59,7 +60,15 @@ public final class HomeSyncNetwork {
     public record Setting(UUID token,int revision,ResourceLocation dimension,BlockPos console,UUID hardware,String system,
                           int mode,int supported,boolean editable,String reason,boolean open,
                           boolean occupancy,boolean approval,boolean occupancySupported,boolean debugTool,
-                          java.util.List<String> modeReasons,boolean secondPortAllowed,boolean secondPortSupported) implements CustomPacketPayload {
+                          java.util.List<String> modeReasons,boolean secondPortAllowed,boolean secondPortSupported,String netplayPadVariant) implements CustomPacketPayload {
+        /** Preserve the existing addon constructor; an old mask never opts into the FC-only sixth mode. */
+        public Setting(UUID token,int revision,ResourceLocation dimension,BlockPos console,UUID hardware,String system,
+                       int mode,int supported,boolean editable,String reason,boolean open,
+                       boolean occupancy,boolean approval,boolean occupancySupported,boolean debugTool,
+                       java.util.List<String> modeReasons,boolean secondPortAllowed,boolean secondPortSupported) {
+            this(token,revision,dimension,console,hardware,system,mode,legacyMask(supported),editable,reason,open,occupancy,approval,occupancySupported,debugTool,
+                    modeReasons,secondPortAllowed,secondPortSupported,"");
+        }
         public Setting(UUID token,int revision,ResourceLocation dimension,BlockPos console,UUID hardware,String system,
                        int mode,int supported,boolean editable,String reason,boolean open,
                        boolean occupancy,boolean approval,boolean occupancySupported,boolean debugTool,java.util.List<String> modeReasons) {
@@ -73,9 +82,11 @@ public final class HomeSyncNetwork {
         }
         public Setting {
             Objects.requireNonNull(token);Objects.requireNonNull(dimension);console = Objects.requireNonNull(console).immutable();Objects.requireNonNull(hardware);
-            if (revision < 0 || mode < 0 || mode > 4 || (supported & ~31) != 0 || system == null || system.length() > 128 || reason == null || reason.length() > 256) throw new IllegalArgumentException("Home setting");
+            if (revision < 0 || mode < 0 || mode > 5 || (supported & ~63) != 0 || system == null || system.length() > 128 || reason == null || reason.length() > 256
+                    ||netplayPadVariant==null||netplayPadVariant.length()>128) throw new IllegalArgumentException("Home setting");
             modeReasons=java.util.List.copyOf(Objects.requireNonNull(modeReasons));
-            if(modeReasons.size()!=5||modeReasons.stream().anyMatch(s->s.length()>256))throw new IllegalArgumentException("Home mode reasons");
+            if(modeReasons.size()==5){var expanded=new java.util.ArrayList<>(modeReasons);expanded.add("此机型未声明 FC 官方双手柄路线。");modeReasons=java.util.List.copyOf(expanded);}
+            if(modeReasons.size()!=6||modeReasons.stream().anyMatch(s->s.length()>256))throw new IllegalArgumentException("Home mode reasons");
         }
         public static final Type<Setting> TYPE = new Type<>(id("setting"));
         public static final StreamCodec<RegistryFriendlyByteBuf,Setting> CODEC = StreamCodec.of((b,p) -> {
@@ -84,8 +95,9 @@ public final class HomeSyncNetwork {
             b.writeBoolean(p.occupancy);b.writeBoolean(p.approval);b.writeBoolean(p.occupancySupported);b.writeBoolean(p.debugTool);
             for(String reason:p.modeReasons)b.writeUtf(reason,256);
             b.writeBoolean(p.secondPortAllowed);b.writeBoolean(p.secondPortSupported);
+            b.writeUtf(p.netplayPadVariant,128);
         },b -> new Setting(b.readUUID(),b.readVarInt(),b.readResourceLocation(),b.readBlockPos(),b.readUUID(),b.readUtf(128),b.readVarInt(),b.readVarInt(),b.readBoolean(),b.readUtf(256),b.readBoolean(),b.readBoolean(),b.readBoolean(),b.readBoolean(),b.readBoolean(),
-                java.util.List.of(b.readUtf(256),b.readUtf(256),b.readUtf(256),b.readUtf(256),b.readUtf(256)),b.readBoolean(),b.readBoolean()));
+                java.util.List.of(b.readUtf(256),b.readUtf(256),b.readUtf(256),b.readUtf(256),b.readUtf(256),b.readUtf(256)),b.readBoolean(),b.readBoolean(),b.readUtf(128)));
         @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 }

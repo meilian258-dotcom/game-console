@@ -9,7 +9,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -33,11 +32,18 @@ public final class ModCreativeTabs {
 
     private static void displayItems(CreativeModeTab.ItemDisplayParameters parameters,
                                      CreativeModeTab.Output output) {
-        for (String path : CreativeTabCatalog.itemPaths(ModList.get().isLoaded("waterframes"))) {
+        for (String path : CreativeTabCatalog.itemPaths(false)) {
             var id = ResourceLocation.fromNamespaceAndPath(FcArcadeMod.MOD_ID, path);
             output.accept(BuiltInRegistries.ITEM.getOptional(id)
                     .orElseThrow(() -> new IllegalStateException("Unregistered FC creative item: " + id)));
         }
         FurnitureRegistry.addCreativeItems(output);
+        if (ModList.get().isLoaded("waterframes")) {
+            for (String path : CreativeTabCatalog.waterFramesItemPaths()) {
+                var id = ResourceLocation.fromNamespaceAndPath(FcArcadeMod.MOD_ID, path);
+                output.accept(BuiltInRegistries.ITEM.getOptional(id)
+                        .orElseThrow(() -> new IllegalStateException("Unregistered FC creative item: " + id)));
+            }
+        }
     }
 }

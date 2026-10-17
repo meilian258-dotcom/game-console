@@ -4,7 +4,7 @@ package cn.piq.mdhome;
 
 import cn.piq.fcarcade.home.*;
 import cn.piq.fcarcade.home.content.*;
-import cn.piq.fcarcade.registry.ModCreativeTabs;
+import cn.piq.fcarcade.registry.CreativeTabGroups;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
@@ -62,7 +62,11 @@ public final class MdMod {
             public void onInteract(net.minecraft.server.level.ServerPlayer p,net.minecraft.world.InteractionHand h,HomeSystems.Connection c,net.minecraft.world.phys.BlockHitResult hit){((MdConsole)c.console()).interact(p,h);}
             public void onRemoved(net.minecraft.server.level.ServerLevel l,ExternalHomeConsoleBlockEntity c){((MdConsole)c).powerOff();((MdConsole)c).clearLoan();}
         });
-        bus.addListener((BuildCreativeModeTabContentsEvent e)->{if(e.getTabKey().equals(ModCreativeTabs.FC.getKey())){e.accept(CONSOLE_ITEM);e.accept(CARTRIDGE);}});
+        bus.addListener(MdMod::creativeContents);
+    }
+    private static void creativeContents(BuildCreativeModeTabContentsEvent event){
+        CreativeTabGroups.insert(event, CreativeTabGroups.Group.CONSOLES, CONSOLE_ITEM.get());
+        CreativeTabGroups.insert(event, CreativeTabGroups.Group.MEDIA, CARTRIDGE.get());
     }
     static void hint(net.minecraft.server.level.ServerPlayer p){p.displayClientMessage(net.minecraft.network.chat.Component.literal("MD2：卡带右键老式电脑写游戏 → 视频线连接电视 → 插卡 → 打开电视和主机电源 → 选择进度与人数 → 点击对应手柄取用。默认公开 JNI 串流；旁观自动接入。"),false);}
 }

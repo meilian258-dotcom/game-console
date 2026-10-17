@@ -66,8 +66,8 @@ public final class NetplayNetwork {
     }
     private static ResourceLocation id(String path){return ResourceLocation.fromNamespaceAndPath("piq_fc_arcade","netplay_"+path);}
     @SubscribeEvent public static void register(RegisterPayloadHandlersEvent event){
-        var registrar=event.registrar("netplay-5");
-        var measured=cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"netplay-5");
+        var registrar=event.registrar("netplay-6");
+        var measured=cn.piq.fcarcade.network.TrafficPayloadRegistrar.create(event,"netplay-6");
         measured.playToClient(State.TYPE,State.CODEC,(packet,ctx)->{Connection source=ctx.connection();ctx.enqueueWork(()->{var current=sink;if(source.isConnected()&&current!=null)current.state(source,packet);});});
         measured.playToClient(GunFrame.TYPE,GunFrame.CODEC,(packet,ctx)->{Connection source=ctx.connection();ctx.enqueueWork(()->{var current=sink;if(source.isConnected()&&current!=null)current.gun(source,packet);});});
         registrar.executesOn(HandlerThread.NETWORK).playBidirectional(Data.TYPE,Data.CODEC,(packet,ctx)->{
@@ -81,11 +81,21 @@ public final class NetplayNetwork {
             }else{var process=CLIENTS.get(new Key(source,packet.chunk.session()));if(process!=null)process.receive(packet.chunk,packet.port);else{var current=sink;if(current!=null)current.data(source,packet);}}
         });
     }
-    public record State(ArcadeSessionPayload session,UUID ticket,boolean player,boolean jniTrial) implements CustomPacketPayload {
+    public record State(ArcadeSessionPayload session,UUID ticket,boolean player,boolean jniTrial,NetplayLaunchSpec launch) implements CustomPacketPayload {
         public State(ArcadeSessionPayload session,UUID ticket,boolean player){this(session,ticket,player,false);}
-        public State {Objects.requireNonNull(session);Objects.requireNonNull(ticket);if(!session.active()||!session.homeRuntime()||session.playerMedia()||session.variant().isZapper()&&player&&!session.computeHost())throw new IllegalArgumentException("Netplay session");}
+        /** Java source compatibility only; the network always transmits an explicit frozen contract. */
+        public State(ArcadeSessionPayload session,UUID ticket,boolean player,boolean jniTrial){this(session,ticket,player,jniTrial,FcNetplayBackend.launch(session.variant().isZapper(),jniTrial));}
+        public State {Objects.requireNonNull(session);Objects.requireNonNull(ticket);Objects.requireNonNull(launch);if(!session.active()||!session.homeRuntime()||session.playerMedia()||session.variant().isZapper()&&player&&!session.computeHost())throw new IllegalArgumentException("Netplay session");}
+        public void verifyContinuation(State previous){
+            FcNetplayBackend.verify(session.variant().isZapper(),jniTrial,launch);
+            if(previous!=null&&(!previous.launch.equals(launch)||previous.jniTrial!=jniTrial
+                    ||previous.session.sessionId()!=session.sessionId()||previous.session.epoch()!=session.epoch()
+                    ||previous.session.variant()!=session.variant()||!previous.session.romSha256().equals(session.romSha256())
+                    ||!previous.session.blockPos().equals(session.blockPos())||previous.session.computeHost()!=session.computeHost()))
+                throw new IllegalArgumentException("本局后端或内容身份发生变化，已拒绝更新；请正常关机后重开，不会自动切换后端");
+        }
         public static final Type<State> TYPE=new Type<>(id("state"));
-        public static final StreamCodec<RegistryFriendlyByteBuf,State> CODEC=StreamCodec.of((b,p)->{ArcadeSessionPayload.STREAM_CODEC.encode(b,p.session);b.writeUUID(p.ticket);b.writeBoolean(p.player);b.writeBoolean(p.jniTrial);},b->new State(ArcadeSessionPayload.STREAM_CODEC.decode(b),b.readUUID(),b.readBoolean(),b.readBoolean()));
+        public static final StreamCodec<RegistryFriendlyByteBuf,State> CODEC=StreamCodec.of((b,p)->{ArcadeSessionPayload.STREAM_CODEC.encode(b,p.session);b.writeUUID(p.ticket);b.writeBoolean(p.player);b.writeBoolean(p.jniTrial);NetplayLaunchCodec.CODEC.encode(b,p.launch);},b->new State(ArcadeSessionPayload.STREAM_CODEC.decode(b),b.readUUID(),b.readBoolean(),b.readBoolean(),NetplayLaunchCodec.CODEC.decode(b)));
         @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
     }
     /** Clientbound only: session/epoch/ticket bound, never accepted as a player request. */

@@ -1,7 +1,19 @@
 {
   "schemaVersion": 1,
-  "scope": "FC76.25 external binary build inputs only; no ROM or user data; not an open-source distribution license grant",
+  "scope": "FC76.58 external binary build inputs; historical inputs retained plus explicit official RetroArch pad core; no ROM or user data; not a distribution license grant",
   "inputs": {
+    "fceumm-retroarch-pad": {
+      "filename": "fceumm_libretro.dll",
+      "bytes": 4162048,
+      "sha256": "a04f7fa28bdd46f602bb62750ab9b5e360d8e8d8ece97de8ad3ef1b669257ffd",
+      "legacyPath": "piq-fc-arcade/native/fc-retroarch/windows-x64/fceumm_libretro.dll",
+      "purpose": "Unmodified official Libretro Windows x64 FCEUmm (SVN) ac0d00a, fetched 2026-10-17; explicit new pad route only; old Mesen/JNI inputs unchanged",
+      "sourceCommit": "ac0d00a7fc01166f84c7bac01d1084ebfd2b865e",
+      "sourceUrl": "https://codeload.github.com/libretro/libretro-fceumm/zip/ac0d00a7fc01166f84c7bac01d1084ebfd2b865e",
+      "sourceSha256": "62ee00f82a0d94c9d36a3dc0d07e5dff24a395df66060d37cc6d443a29620efe",
+      "binaryUrl": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/fceumm_libretro.dll.zip",
+      "binaryArchiveSha256": "224d180b58061b55c5b778e11800d989821c9aeb22d0c32dae946cc7ef5b4398"
+    },
     "jna-5-14-0": {
       "filename": "jna-5.14.0.jar",
       "bytes": 1878533,

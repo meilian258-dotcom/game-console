@@ -64,7 +64,7 @@ class DeviceDebugServerSourceTest {
     }
     @Test void packetsCarryExplicitDebugAndRevisionWhileLegacyMenuRemainsNonempty()throws Exception{
         String home=source("home/HomeSyncNetwork"),menu=source("cabinet/CabinetNetwork"),sync=source("cabinet/CabinetSyncNetwork");
-        assertTrue(home.contains("TrafficPayloadRegistrar.create(event,\"home-sync-6\")"));assertTrue(home.contains("b.writeVarInt(p.revision)"));
+        assertTrue(home.contains("TrafficPayloadRegistrar.create(event,\"home-sync-7\")"));assertTrue(home.contains("b.writeVarInt(p.revision)"));
         assertTrue(home.contains("DeviceDebugPolicy.validRequest(revision,mode,occupancy,approval,secondPort)"));
         assertTrue(menu.contains("TrafficPayloadRegistrar.create(event,\"cabinet-4\")"));assertTrue(menu.contains("entries.isEmpty()"));
         assertTrue(menu.contains("this(target,token,entries,selected,false)"));assertTrue(menu.contains("b.writeBoolean(p.debugTool())"));

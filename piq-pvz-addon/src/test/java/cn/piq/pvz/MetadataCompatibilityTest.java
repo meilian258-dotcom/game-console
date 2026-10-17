@@ -21,9 +21,10 @@ class MetadataCompatibilityTest {
         }
     }
 
-    @Test void requiresSharedJniFc7622() throws Exception {
-        assertTrue(fcRange().containsVersion(new DefaultArtifactVersion("0.31.0-alpha.76.22")));
-        assertFalse(fcRange().containsVersion(new DefaultArtifactVersion("0.31.0-alpha.76.21")));
+    @Test void requiresMatchedCreativeGenerationFc7660() throws Exception {
+        assertTrue(fcRange().containsVersion(new DefaultArtifactVersion("0.31.0-alpha.76.60")));
+        assertFalse(fcRange().containsVersion(new DefaultArtifactVersion("0.31.0-alpha.76.59")));
+        assertFalse(fcRange().containsVersion(new DefaultArtifactVersion("0.31.0-alpha.76.22")));
         assertFalse(fcRange().containsVersion(new DefaultArtifactVersion("0.31.0-alpha.76")));
     }
 

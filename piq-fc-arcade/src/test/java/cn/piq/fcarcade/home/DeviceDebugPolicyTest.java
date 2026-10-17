@@ -20,13 +20,13 @@ class DeviceDebugPolicyTest {
     }
     @Test void refreshAndSingleFieldActionsAreValidButMixedWritesAreRejected() {
         assertTrue(DeviceDebugPolicy.validRequest(0,-1,-1,-1));
-        for(int mode=0;mode<=4;mode++)assertTrue(DeviceDebugPolicy.validRequest(8,mode,-1,-1));
+        for(int mode=0;mode<=5;mode++)assertTrue(DeviceDebugPolicy.validRequest(8,mode,-1,-1));
         for(int on=0;on<=1;on++){
             assertTrue(DeviceDebugPolicy.validRequest(8,-1,on,-1));
             assertTrue(DeviceDebugPolicy.validRequest(8,-1,-1,on));
         }
         assertFalse(DeviceDebugPolicy.validRequest(-1,-1,-1,-1));
-        assertFalse(DeviceDebugPolicy.validRequest(0,5,-1,-1));
+        assertFalse(DeviceDebugPolicy.validRequest(0,6,-1,-1));
         assertFalse(DeviceDebugPolicy.validRequest(0,-2,-1,-1));
         assertFalse(DeviceDebugPolicy.validRequest(0,-1,2,-1));
         assertFalse(DeviceDebugPolicy.validRequest(0,-1,-1,2));
@@ -47,6 +47,10 @@ class DeviceDebugPolicyTest {
         assertFalse(DeviceDebugPolicy.mayEdit(false,false,true,-1,-1,1,7));
     }
     @Test void editsRespectBusyCapabilitiesAndRealOccupancySupport() {
+        assertTrue(DeviceDebugPolicy.mayEdit(true,false,true,5,-1,-1,32));
+        assertFalse(DeviceDebugPolicy.mayEdit(true,false,true,5,-1,-1,31));
+        assertFalse(DeviceDebugPolicy.mayEdit(false,false,true,5,-1,-1,32));
+        assertFalse(DeviceDebugPolicy.mayEdit(true,true,true,5,-1,-1,32));
         assertTrue(DeviceDebugPolicy.mayEdit(true,false,true,4,-1,-1,31));
         assertFalse(DeviceDebugPolicy.mayEdit(false,false,true,4,-1,-1,31));
         assertFalse(DeviceDebugPolicy.mayEdit(true,true,true,4,-1,-1,31));

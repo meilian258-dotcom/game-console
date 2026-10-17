@@ -6,7 +6,7 @@ modId="piq_computer"
 version="${version}"
 displayName="方块电玩：可组装电脑"
 authors="meilian"
-description='''可组装电脑、同格键鼠与电视直接操作。PvZ12在Windows x64默认通用JNI，保留显式进程选择和独立存档；Flash0.1.3仍使用原运行器。实验性限速音画串流，附近旁观与单人键鼠交接。DOS未接入。'''
+description='''可组装电脑、同格键鼠与电视直接操作。配套PvZ在Windows x64默认通用JNI，保留显式进程选择和独立存档；Flash0.1.3仍使用原运行器。实验性限速音画串流，附近旁观与单人键鼠交接。DOS未接入。'''
 [[dependencies.piq_computer]]
 modId="neoforge"
 type="required"
@@ -22,7 +22,7 @@ side="BOTH"
 [[dependencies.piq_computer]]
 modId="piq_fc_arcade"
 type="required"
-versionRange="[0.31.0-alpha.76.26,0.31.0-alpha.77)"
+versionRange="[0.31.0-alpha.76.60,0.31.0-alpha.77)"
 ordering="AFTER"
 side="BOTH"
 [[mixins]]
@@ -31,6 +31,6 @@ config="piq_computer.mixins.json"
 [[dependencies.piq_computer]]
 modId="piq_pvz"
 type="optional"
-versionRange="[0.1.0-prototype.12,0.1.0-prototype.13)"
+versionRange="[0.1.0-prototype.12,0.1.0-prototype.14)"
 ordering="AFTER"
 side="BOTH"

@@ -38,7 +38,7 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
     private boolean pending,timedOut;
     private int waiting,age,cooldown,left,top,panelWidth;
     private HomeSyncSettingsLayout layout;
-    private static final String[] LABELS = { "玩家音画串流", "本地输入同步", "服务端托管音画", "RetroArch Netplay（实验）", "JNI Netplay（试验 / 本机确认）" };
+    private static final String[] LABELS = { "玩家音画串流", "本地输入同步", "服务端托管音画", "RetroArch Netplay（实验）", "JNI Netplay（试验 / 本机确认）", "官方 RetroArch 双手柄" };
     private HomeSyncSettingsScreen(HomeSyncNetwork.Setting value,Connection source) {
         super(Component.literal("设备设置 · "+value.system()));setting = value;connection = source;status = value.reason();
     }
@@ -63,32 +63,36 @@ public final class HomeSyncSettingsScreen extends cn.piq.fcarcade.client.ui.Devi
         layout=HomeSyncSettingsLayout.fit(width,height);panelWidth=layout.width();left=layout.left();top=layout.top();
         if(layout.compact()){addRenderableWidget(Button.builder(Component.literal("关闭"),b->onClose()).bounds(left,Math.max(35,height-32),panelWidth,20).build());return;}
         int row=0;
-        for(int mode=0;mode<5;mode++) {
+        boolean privateOnly=diagnosticsOnly();
+        boolean external=minecraft.level!=null&&minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity;
+        var visibleModes=HomeSyncMenuPolicy.visibleModes(setting.mode(),external,privateOnly,setting.supported());
+        for(int mode:visibleModes) {
             final int selected=mode;
-            boolean privateOnly=diagnosticsOnly();
-            boolean external=minecraft.level!=null&&minecraft.level.getBlockEntity(setting.console()) instanceof ExternalHomeConsoleBlockEntity;
-            if(!HomeSyncMenuPolicy.showMode(mode,external,privateOnly,setting.supported())&&setting.mode()!=mode)continue;
-            String label=(setting.mode()==mode&&!privateOnly?"✓ ":"")+LABELS[mode];
+            boolean chosen=setting.mode()==mode&&(mode!=5||cn.piq.fcarcade.netplay.FcNetplayBackend.OFFICIAL_PAD.equals(setting.netplayPadVariant()));
+            String backendLabel=mode==5?cn.piq.fcarcade.netplay.FcNetplayBackend.officialLabel()
+                    :!external&&(mode==3||mode==4)?cn.piq.fcarcade.netplay.FcNetplayBackend.label(mode==4)+"（试验）":LABELS[mode];
+            String label=(chosen&&!privateOnly?"✓ ":"")+backendLabel;
             if(privateOnly&&mode==4)label="私人单人 · 本机设置…";
             else if(privateOnly)label+="（尚未接入）";
             else if(mode==1)label+="（已退役）";
             else if((setting.supported()&(1<<mode))==0)label+="（不可用）";
-            else if(setting.mode()==mode)label+="（当前）";
+            else if(chosen)label+="（当前）";
+            else if(mode==5&&setting.mode()==5)label+="（重新选择）";
             var button=Button.builder(Component.literal(label),b->{
                 if(privateOnly&&selected==4){if(ready()&&current())openLocalSettings();}
                 else if(selected==4)JniNetplayConsent.confirm(this,()->{if(current()&&setting.mode()!=4)apply(4,-1,-1);});
                 else apply(selected,-1,-1);
             })
-                .bounds(left+10,top+HomeSyncSettingsLayout.MODE_ROW+row++*HomeSyncSettingsLayout.MODE_STEP,panelWidth-20,16).build();
+                .bounds(left+10,top+HomeSyncSettingsLayout.MODE_ROW+row++*HomeSyncSettingsLayout.modeStep(visibleModes.size()),panelWidth-20,HomeSyncSettingsLayout.modeHeight(visibleModes.size())).build();
             button.active=ready()&&(privateOnly&&mode==4||HomeSyncMenuPolicy.supported(setting.supported(),mode)
-                    &&(setting.editable()&&setting.mode()!=mode||mode==4&&setting.mode()==4&&!JniNetplayConsent.allowed()));
+                    &&(setting.editable()&&!chosen||mode==4&&chosen&&!JniNetplayConsent.allowed()));
             button.setTooltip(Tooltip.create(Component.literal(privateOnly
                 ?(mode==4?"打开已可用的本机控制、运行环境与运行器设置；不会开关机或切换公共模式。"
                         :"本附属尚未接入此公共运行方式；不是权限不足，也不能通过此按钮解锁。当前仅私人单人，附近玩家不能旁观。")
                 :(setting.supported()&(1<<mode))==0
                 ?setting.modeReasons().get(mode)
-                :(mode==0?"由开机玩家运行游戏，向其他玩家发送音画。":mode==1?"各客户端运行游戏，同步操作数据。":mode==2?"由服务器运行游戏，向玩家发送音画。":mode==4?"使用机型声明的 JNI 核心同步输入与状态，原生崩溃可影响整个 MC。参与和只读旁观跟随房间；保存按开局策略和核心身份隔离，不与 RetroArch 进度混接。":"RetroArch Netplay 同步操作与状态；Windows x64。按卡带策略保存，开机恢复；网络页可手动保存。")
-                    +"\n"+HomeSyncMenuPolicy.buttonState(mode,setting.mode(),setting.supported(),setting.editable(),setting.modeReasons().get(mode)))));
+                :(mode==0?"由开机玩家运行游戏，向其他玩家发送音画。":mode==1?"各客户端运行游戏，同步操作数据。":mode==2?"由服务器运行游戏，向玩家发送音画。":mode==4?"使用机型声明的 JNI 核心同步输入与状态，原生崩溃可影响整个 MC。参与和只读旁观跟随房间；保存按开局策略和核心身份隔离，不与 RetroArch 进度混接。":mode==5?"独立 RetroArch 进程使用固定官方核心；仅双手柄，不支持光枪。按卡带策略独立保存，不转换 JNI 或旧 RetroArch 进度；Windows x64。":"RetroArch Netplay 同步操作与状态；Windows x64。按卡带策略保存，开机恢复；网络页可手动保存。")
+                    +"\n"+HomeSyncMenuPolicy.buttonState(mode,chosen?mode:-1,setting.supported(),setting.editable(),setting.modeReasons().get(mode)))));
             addRenderableWidget(button);
         }
         int half=(panelWidth-26)/2,right=left+16+half;

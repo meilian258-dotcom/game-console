@@ -80,6 +80,7 @@ class StockInputTests(unittest.TestCase):
         output = self.root / 'prepared'
         with patch.object(inputs, 'require_published_jni_bundle'), \
                 patch.object(inputs, 'extract_bootstrap'), \
+                patch.object(inputs, 'fixed_fc_inputs', return_value={}), \
                 patch.dict(inputs.BOOTSTRAP, {}, clear=True), patch.dict(inputs.NIGHTLY, {}, clear=True), \
                 patch.object(inputs, 'fetch') as fetch:
             receipt = inputs.prepare(output, fbneo_stock_core=self.origins['core'],

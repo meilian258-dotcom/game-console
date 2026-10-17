@@ -8,6 +8,7 @@ public final class HomeSyncSaveHints {
     private HomeSyncSaveHints() {}
 
     public static String modeSaved(String system, int mode) {
+        if(fc(system)&&mode==5)return "FC 官方 RetroArch 双手柄路线已选择；下次开机生效，进度独立保存，不转换 JNI 或旧 RetroArch 存档；不支持光枪。";
         if(sfc(system)&&mode==4)return "SFC JNI Netplay 已选择；下次开机生效，个人／卡带存档身份不变，主持 P1、另一玩家 P2。";
         if(fc(system)&&mode==4)return "FC JNI Netplay 已选择；仅普通双手柄。Windows x64参与/旁观自动跟随；JNI独立档，旧档保留。";
         if(sfc(system)&&mode==3)return "Netplay 实验已启用；卡带工作台可选个人／卡带存档，主持 P1、另一玩家 P2。";
@@ -24,6 +25,7 @@ public final class HomeSyncSaveHints {
     }
 
     public static String footer(String system, int mode) {
+        if(fc(system)&&mode==5)return FOOTER+"官方 RetroArch：仅双手柄 · 独立进度 · Windows x64";
         if(sfc(system)&&mode==4)return FOOTER+"JNI Netplay：个人／卡带存档 · 2P按设备设置 · Windows x64";
         if(fc(system)&&mode==4)return FOOTER+"JNI：按个人/卡带归属另存 · 旁观自动跟随";
         if(sfc(system)&&mode==3)return FOOTER+"Netplay 实验：个人／卡带独立存档 · Windows x64";

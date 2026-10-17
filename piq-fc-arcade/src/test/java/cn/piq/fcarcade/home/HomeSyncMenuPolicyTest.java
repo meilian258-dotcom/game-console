@@ -47,8 +47,22 @@ class HomeSyncMenuPolicyTest {
         assertFalse(HomeSyncMenuPolicy.showMode(5,true,false,31));
     }
     @Test void masksNeverGrantInvalidModes(){
-        for(int mask=0;mask<32;mask++)for(int mode=-1;mode<=5;mode++)
-            assertEquals(mode>=0&&mode<5&&mode!=1&&(mask&(1<<mode))!=0,HomeSyncMenuPolicy.supported(mask,mode));
+        for(int mask=0;mask<64;mask++)for(int mode=-1;mode<=6;mode++)
+            assertEquals(mode>=0&&mode<6&&mode!=1&&(mask&(1<<mode))!=0,HomeSyncMenuPolicy.supported(mask,mode));
+    }
+    @Test void officialRouteIsOnlyVisibleForFcAndLegacyRowOnlyWhenSelected(){
+        assertEquals(java.util.List.of(0,2,3,4,5),HomeSyncMenuPolicy.visibleModes(4,false,false,61));
+        assertEquals(java.util.List.of(0,1,2,3,4,5),HomeSyncMenuPolicy.visibleModes(1,false,false,61));
+        assertEquals(java.util.List.of(0,2,3,4),HomeSyncMenuPolicy.visibleModes(4,true,false,63));
+        assertFalse(HomeSyncMenuPolicy.showMode(5,true,true,63));
+        assertEquals(0,HomeSyncMenuPolicy.externalModes(63,7,true,true)&32);
+    }
+    @Test void oldFcModesKeepTheirMeaningAndUnknownVariantNeverBecomesOldMesen(){
+        assertEquals(0,HomeSyncMenuPolicy.fcMode(false,false,"",0));
+        assertEquals(3,HomeSyncMenuPolicy.fcMode(true,false,"",1));
+        assertEquals(4,HomeSyncMenuPolicy.fcMode(true,true,"",1));
+        assertEquals(5,HomeSyncMenuPolicy.fcMode(true,false,"fceumm-v1",1));
+        assertEquals(5,HomeSyncMenuPolicy.fcMode(true,false,"unknown-future-core",1));
     }
     @Test void externalJniRequiresExplicitDeclarationAndServerPolicy(){
         for(int declared=0;declared<64;declared++)for(boolean local:new boolean[]{false,true})for(boolean jni:new boolean[]{false,true}){

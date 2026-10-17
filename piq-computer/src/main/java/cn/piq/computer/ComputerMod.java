@@ -3,7 +3,7 @@ package cn.piq.computer;
 import cn.piq.computer.net.ComputerNetwork;
 import cn.piq.computer.world.ComputerEntity;
 import cn.piq.fcarcade.home.*;
-import cn.piq.fcarcade.registry.ModCreativeTabs;
+import cn.piq.fcarcade.registry.CreativeTabGroups;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -21,5 +21,14 @@ public final class ComputerMod {
         });
         bus.addListener(ComputerMod::creative);
     }
-    private static void creative(BuildCreativeModeTabContentsEvent e){if(e.getTabKey().equals(ModCreativeTabs.FC.getKey()))ComputerRegistry.ITEMS.getEntries().stream().filter(i->!ComputerRegistry.legacyPeripheral(i.getId().getPath())).forEach(i->e.accept(i.get()));}
+    private static void creative(BuildCreativeModeTabContentsEvent event){
+        // Display order is explicit; registry iteration and persisted Assembly ordinals are independent.
+        CreativeTabGroups.insert(event, CreativeTabGroups.Group.COMPUTERS,
+                ComputerRegistry.BLACK.get(), ComputerRegistry.WHITE.get(),
+                ComputerRegistry.item(Assembly.Part.MOTHERBOARD), ComputerRegistry.item(Assembly.Part.CPU),
+                ComputerRegistry.item(Assembly.Part.COOLER), ComputerRegistry.item(Assembly.Part.RAM),
+                ComputerRegistry.item(Assembly.Part.GPU), ComputerRegistry.item(Assembly.Part.HDD),
+                ComputerRegistry.item(Assembly.Part.PSU),
+                ComputerRegistry.KIT_BLACK.get(), ComputerRegistry.KIT_WHITE.get(), ComputerRegistry.CONNECTOR.get());
+    }
 }
