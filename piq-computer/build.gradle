@@ -1,7 +1,7 @@
 plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
 apply from: '../source-control/neoforge-compat.gradle'
 group = 'cn.piq.computer'
-version = '0.1.0-prototype.13'
+version = '0.1.0-prototype.14'
 base { archivesName = 'game_console_computer' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 neoForge {
@@ -10,8 +10,8 @@ neoForge {
 }
 repositories { mavenCentral() }
 dependencies {
-    implementation files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.26.jar'))
-    compileOnly files(providers.gradleProperty('pvzJar').getOrElse('../piq-pvz-addon/build/libs/game_console_pvz-0.1.0-prototype.12.jar'))
+    implementation files(providers.gradleProperty('gameConsoleJar').getOrElse('../piq-fc-arcade/build/libs/piq_fc_arcade-0.31.0-alpha.76.60.jar'))
+    compileOnly files(providers.gradleProperty('pvzJar').getOrElse('../piq-pvz-addon/build/libs/game_console_pvz-0.1.0-prototype.13.jar'))
     testImplementation platform('org.junit:junit-bom:5.13.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

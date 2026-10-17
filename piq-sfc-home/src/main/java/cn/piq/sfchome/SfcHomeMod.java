@@ -5,7 +5,7 @@ import cn.piq.sfchome.net.SfcHomeNetwork;
 import cn.piq.sfchome.registry.SfcHomeRegistries;
 import cn.piq.sfchome.server.SfcHomeServer;
 import cn.piq.fcarcade.cabinet.CabinetBackends;
-import cn.piq.fcarcade.registry.ModCreativeTabs;
+import cn.piq.fcarcade.registry.CreativeTabGroups;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -30,9 +30,7 @@ public final class SfcHomeMod {
         bus.addListener(SfcHomeMod::creativeContents);
     }
     private static void creativeContents(BuildCreativeModeTabContentsEvent event){
-        if(event.getTabKey().equals(ModCreativeTabs.FC.getKey())){
-            event.accept(SfcHomeRegistries.CONSOLE_ITEM.get());
-            event.accept(SfcHomeRegistries.CARTRIDGE.get());
-        }
+        CreativeTabGroups.insert(event, CreativeTabGroups.Group.CONSOLES, SfcHomeRegistries.CONSOLE_ITEM.get());
+        CreativeTabGroups.insert(event, CreativeTabGroups.Group.MEDIA, SfcHomeRegistries.CARTRIDGE.get());
     }
 }

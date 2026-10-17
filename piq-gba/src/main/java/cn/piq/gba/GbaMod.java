@@ -2,7 +2,7 @@
 package cn.piq.gba;
 
 import cn.piq.fcarcade.cabinet.CabinetBackends;
-import cn.piq.fcarcade.registry.ModCreativeTabs;
+import cn.piq.fcarcade.registry.CreativeTabGroups;
 import cn.piq.gba.item.GbaHandheldItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.InteractionResult;
@@ -39,7 +39,8 @@ public final class GbaMod {
         NeoForge.EVENT_BUS.addListener(GbaMod::handheldSpecificEntityUse);
     }
     private static void creativeContents(BuildCreativeModeTabContentsEvent event){
-        if(event.getTabKey().equals(ModCreativeTabs.FC.getKey())){event.accept(HANDHELD.get());event.accept(CARTRIDGE.get());}
+        CreativeTabGroups.insert(event, CreativeTabGroups.Group.CONSOLES, HANDHELD.get());
+        CreativeTabGroups.insert(event, CreativeTabGroups.Group.MEDIA, CARTRIDGE.get());
     }
     private static void handheldBlockUse(PlayerInteractEvent.RightClickBlock event){
         // The handheld owns right click while held; do not also open a chest/cabinet,

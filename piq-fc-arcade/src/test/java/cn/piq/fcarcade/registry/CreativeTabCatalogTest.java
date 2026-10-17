@@ -7,9 +7,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CreativeTabCatalogTest {
     @Test void obsoleteFiveDisplaysAreHiddenButCurrentSingleAndDualCabinetsRemain() {
-        var expected = List.of("famicom_console", "retro_tv", "fc_cartridge", "av_cable",
-                "subor_console", "panel_tv_2", "panel_tv_3", "gray_crt_tv", "red_crt_tv", "dual_cabinet", "arcade_coin",
-                "fc_cartridge_board", "fc_cartridge_shell", "legacy_fc_arcade", "portrait_cabinet", "cartridge_computer", "tv_remote", "debug_screwdriver", "admin_terminal", "fc_zapper", "zapper_stand", "zapper_stand_cable");
+        var expected = List.of("famicom_console", "subor_console",
+                "legacy_fc_arcade", "portrait_cabinet", "dual_cabinet", "arcade_coin",
+                "retro_tv", "gray_crt_tv", "red_crt_tv", "panel_tv_2", "panel_tv_3",
+                "fc_cartridge", "fc_cartridge_board", "fc_cartridge_shell", "cartridge_computer",
+                "av_cable", "fc_zapper", "zapper_stand", "zapper_stand_cable",
+                "tv_remote", "debug_screwdriver", "admin_terminal");
         assertEquals(expected, CreativeTabCatalog.itemPaths(false));
         for (boolean installed : new boolean[]{false, true}) {
             var items = CreativeTabCatalog.itemPaths(installed);
@@ -30,9 +33,9 @@ class CreativeTabCatalogTest {
             }
         }
     }
-    @Test void homeKitIsAlwaysFirst() {
+    @Test void consolesPrecedeCabinetsAndDisplays() {
         for (boolean installed : new boolean[]{false, true}) {
-            assertEquals(List.of("famicom_console", "retro_tv", "fc_cartridge", "av_cable"),
+            assertEquals(List.of("famicom_console", "subor_console", "legacy_fc_arcade", "portrait_cabinet"),
                     CreativeTabCatalog.itemPaths(installed).subList(0, 4));
         }
     }
@@ -52,11 +55,11 @@ class CreativeTabCatalogTest {
                 "waterframes_tv_box_fc_arcade", "waterframes_panel_fc_arcade"), items.subList(base.size(), items.size()));
     }
 
-    @Test void suborAddsAnotherConsoleAfterTheOriginalHomeKitWithoutGivingFreeControllers() {
+    @Test void consolesStayTogetherWithoutGivingFreeControllers() {
         for (boolean installed : new boolean[]{false, true}) {
             var items = CreativeTabCatalog.itemPaths(installed);
-            assertEquals("subor_console", items.get(4));
-            assertEquals("panel_tv_2", items.get(5));
+            assertEquals("subor_console", items.get(1));
+            assertTrue(items.indexOf("panel_tv_2") < items.indexOf("fc_cartridge"));
             assertTrue(items.containsAll(List.of("fc_cartridge_board", "fc_cartridge_shell", "gray_crt_tv")));
             assertFalse(items.contains("fc_controller"));
             assertEquals(1, items.stream().filter("famicom_console"::equals).count());

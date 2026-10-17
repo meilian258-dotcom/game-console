@@ -7,7 +7,7 @@ import cn.piq.fcarcade.registry.ModBlocks;
 import cn.piq.fcarcade.registry.ModBlockEntities;
 import cn.piq.fcarcade.registry.ModItems;
 import cn.piq.fcarcade.registry.ModCreativeTabs;
-import cn.piq.fcarcade.registry.CreativeHardwareOrder;
+import cn.piq.fcarcade.registry.RetiredCreativeEntries;
 import cn.piq.fcarcade.server.ServerArcadeSessions;
 import cn.piq.fcarcade.server.ServerSkinService;
 import net.neoforged.bus.api.IEventBus;
@@ -40,7 +40,7 @@ public final class FcArcadeMod {
         modBus.addListener(cn.piq.fcarcade.cabinet.CabinetNetwork::register);
         modBus.addListener(cn.piq.fcarcade.cabinet.CabinetGameNetwork::register);
         modBus.addListener(this::addCreativeTabItems);
-        modBus.addListener(EventPriority.LOWEST, CreativeHardwareOrder::onBuildContents);
+        modBus.addListener(EventPriority.LOWEST, RetiredCreativeEntries::onBuildContents);
         ServerArcadeSessions.register();
         cn.piq.fcarcade.cabinet.ServerCabinets.register();
         cn.piq.fcarcade.cabinet.CabinetSharedGameService.register();
