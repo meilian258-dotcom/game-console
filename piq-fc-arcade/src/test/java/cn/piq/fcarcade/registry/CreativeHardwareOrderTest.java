@@ -25,11 +25,4 @@ class CreativeHardwareOrderTest {
         var items=List.of("piq_fc_arcade:furniture/oak_bench","piq_fc_arcade:furniture/oak_stool","piq_fc_arcade:furniture/birch_bench","piq_fc_arcade:furniture/birch_stool");
         assertEquals(List.of(items.get(0),items.get(2),items.get(1),items.get(3)),CreativeHardwareOrder.sorted(items,s->s));
     }
-    @Test void onlyOurTabUsesFinalTailHookAndNoVanillaTabPositionOverride()throws Exception{
-        var root=java.nio.file.Path.of("src/main/java/cn/piq/fcarcade");
-        var mix=java.nio.file.Files.readString(root.resolve("mixin/CreativeHardwareOrderMixin.java"));
-        var tab=java.nio.file.Files.readString(root.resolve("registry/ModCreativeTabs.java"));
-        assertTrue(mix.contains("@At(\"TAIL\")"));assertTrue(mix.contains("equals(\"piq_fc_arcade:fc\")"));
-        assertTrue(mix.contains("createTypeAndComponentsSet()"));assertFalse(tab.contains("withTabsBefore("));
-    }
 }

@@ -3,8 +3,12 @@
 package cn.piq.fcarcade.registry;
 
 import java.util.*;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
-/** Shared catalog ordering, applied after ALL addon callbacks. Unknown entries remain stable at the end. */
+/** Shared catalog ordering after ordinary addon callbacks. Unknown entries retain their relative order. */
 public final class CreativeHardwareOrder {
     private CreativeHardwareOrder(){}
     private static final List<String> ORDER=List.of(
@@ -26,5 +30,22 @@ public final class CreativeHardwareOrder {
     }
     public static <T> List<T> sorted(Collection<T> entries,java.util.function.Function<T,String> id){
         return entries.stream().filter(e->!hidden(id.apply(e))).sorted(Comparator.comparingInt(e->rank(id.apply(e)))).toList();
+    }
+
+    /** Registered at LOWEST: FML dispatches each priority across all mod buses before the next priority. */
+    public static void onBuildContents(BuildCreativeModeTabContentsEvent event) {
+        if (!event.getTabKey().equals(ModCreativeTabs.FC.getKey())) return;
+        // The public views are read-only. Snapshot before using the event's supported mutation API.
+        // Process each visibility independently so parent-only/search-only entries stay that way.
+        reorder(event, event.getParentEntries(), CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
+        reorder(event, event.getSearchEntries(), CreativeModeTab.TabVisibility.SEARCH_TAB_ONLY);
+    }
+
+    private static void reorder(BuildCreativeModeTabContentsEvent event, Collection<ItemStack> entries,
+                                CreativeModeTab.TabVisibility visibility) {
+        var original = List.copyOf(entries);
+        var ordered = sorted(original, stack -> BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
+        for (var stack : original) event.remove(stack, visibility);
+        for (var stack : ordered) event.accept(stack, visibility);
     }
 }
